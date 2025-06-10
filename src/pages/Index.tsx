@@ -37,6 +37,7 @@ const Index = () => {
             description="15 transactions"
             trend={{ value: 12.5, isPositive: true }}
             gradient="from-green-400/20 to-green-600/10"
+            iconColor="from-green-400 to-green-600"
           />
           
           <DashboardCard
@@ -46,6 +47,7 @@ const Index = () => {
             description="23 categories"
             trend={{ value: 8.2, isPositive: true }}
             gradient="from-blue-400/20 to-blue-600/10"
+            iconColor="from-blue-400 to-blue-600"
           />
           
           <DashboardCard
@@ -55,6 +57,7 @@ const Index = () => {
             description="28 new this month"
             trend={{ value: 15.3, isPositive: true }}
             gradient="from-purple-400/20 to-purple-600/10"
+            iconColor="from-purple-400 to-purple-600"
           />
           
           <DashboardCard
@@ -64,6 +67,7 @@ const Index = () => {
             description="Current month"
             trend={{ value: 22.8, isPositive: true }}
             gradient="from-orange-400/20 to-orange-600/10"
+            iconColor="from-orange-400 to-orange-600"
           />
         </div>
 
@@ -85,6 +89,7 @@ const Index = () => {
                 icon={Boxes}
                 description="Items to reorder"
                 gradient="from-red-400/20 to-red-600/10"
+                iconColor="from-red-400 to-red-600"
                 className="p-4"
               />
               
@@ -94,6 +99,7 @@ const Index = () => {
                 icon={TrendingUp}
                 description="vs last month"
                 gradient="from-teal-400/20 to-teal-600/10"
+                iconColor="from-teal-400 to-teal-600"
                 className="p-4"
               />
             </div>

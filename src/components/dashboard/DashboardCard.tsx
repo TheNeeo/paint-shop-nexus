@@ -14,6 +14,7 @@ interface DashboardCardProps {
   };
   className?: string;
   gradient?: string;
+  iconColor?: string;
 }
 
 export function DashboardCard({
@@ -23,7 +24,8 @@ export function DashboardCard({
   description,
   trend,
   className,
-  gradient = "from-primary/10 to-primary/5"
+  gradient = "from-primary/10 to-primary/5",
+  iconColor = "from-blue-400 to-blue-600"
 }: DashboardCardProps) {
   return (
     <div className={cn(
@@ -35,16 +37,30 @@ export function DashboardCard({
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <div className="p-2 rounded-lg bg-primary/20 text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-300">
-              <Icon className="h-6 w-6" />
+            {/* 3D Colorful Icon */}
+            <div className="relative">
+              <div className={cn(
+                "p-3 rounded-xl bg-gradient-to-br shadow-lg transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-3",
+                iconColor
+              )}>
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent"></div>
+                <Icon className="h-7 w-7 text-white relative z-10 drop-shadow-sm" />
+              </div>
+              {/* 3D Shadow Effect */}
+              <div className={cn(
+                "absolute top-1 left-1 w-full h-full rounded-xl opacity-40 -z-10",
+                iconColor.replace('to-', 'to-transparent from-')
+              )}></div>
             </div>
             <h3 className="font-semibold text-foreground/80">{title}</h3>
           </div>
           
           {trend && (
             <div className={cn(
-              "px-2 py-1 rounded-full text-xs font-medium",
-              trend.isPositive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+              "px-3 py-1 rounded-full text-xs font-medium shadow-sm",
+              trend.isPositive 
+                ? "bg-gradient-to-r from-green-100 to-green-50 text-green-700 border border-green-200" 
+                : "bg-gradient-to-r from-red-100 to-red-50 text-red-700 border border-red-200"
             )}>
               {trend.isPositive ? "+" : ""}{trend.value}%
             </div>
