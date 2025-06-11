@@ -60,10 +60,10 @@ const menuData: MenuItem[] = [
     icon: <Package className="w-4 h-4" />,
     children: [
       {
-        id: "product-management",
-        title: "Product Management",
+        id: "product-activity",
+        title: "Product Activity",
         icon: <Package className="w-4 h-4" />,
-        path: "/product/management",
+        path: "/product/activity",
       },
       {
         id: "add-product",
@@ -141,10 +141,10 @@ const menuData: MenuItem[] = [
     icon: <Boxes className="w-4 h-4" />,
     children: [
       {
-        id: "inventory-management",
-        title: "Inventory Management",
+        id: "inventory-activity",
+        title: "Inventory Activity",
         icon: <Archive className="w-4 h-4" />,
-        path: "/inventory/management",
+        path: "/inventory/activity",
       },
       {
         id: "update-stock",
@@ -367,12 +367,14 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
   const handleToggle = (id: string) => {
-    const newExpanded = new Set(expandedItems);
-    if (newExpanded.has(id)) {
-      newExpanded.delete(id);
-    } else {
+    const newExpanded = new Set<string>();
+    
+    // If the item is not currently expanded, expand only this item (accordion behavior)
+    if (!expandedItems.has(id)) {
       newExpanded.add(id);
     }
+    // If the item is currently expanded, close it (newExpanded remains empty)
+    
     setExpandedItems(newExpanded);
   };
 
