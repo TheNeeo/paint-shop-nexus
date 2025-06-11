@@ -9,6 +9,11 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
   const handleToggle = (id: string) => {
+    if (collapsed) {
+      // In collapsed mode, don't maintain expanded state
+      return;
+    }
+    
     const newExpanded = new Set<string>();
     
     // If the item is not currently expanded, expand only this item (accordion behavior)
@@ -52,7 +57,7 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
       </div>
 
       {/* Tree Menu */}
-      <div className="py-4 overflow-y-auto h-full scrollbar-thin scrollbar-thumb-primary">
+      <div className="py-4 overflow-y-auto h-full scrollbar-thin scrollbar-thumb-primary relative">
         {menuData.map((item) => (
           <TreeNode
             key={item.id}

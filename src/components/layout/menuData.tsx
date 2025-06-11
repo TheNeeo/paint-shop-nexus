@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   Home,
@@ -41,7 +40,7 @@ export const menuData: MenuItem[] = [
   },
   {
     id: "product",
-    title: "Product Activity",
+    title: "Product Management",
     icon: <Package className="w-4 h-4" />,
     children: [
       {
@@ -122,7 +121,7 @@ export const menuData: MenuItem[] = [
   },
   {
     id: "inventory",
-    title: "Inventory Activity",
+    title: "Inventory Management",
     icon: <Boxes className="w-4 h-4" />,
     children: [
       {

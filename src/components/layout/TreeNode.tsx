@@ -31,7 +31,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
           level === 0 ? "text-white font-medium" : "text-slate-300",
           level > 0 && "ml-4"
         )}
-        style={{ paddingLeft: `${level * 16 + 12}px` }}
+        style={{ paddingLeft: collapsed ? "12px" : `${level * 16 + 12}px` }}
         title={collapsed ? item.title : undefined}
       >
         <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -64,15 +64,20 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
         {collapsed && (
           <div className="absolute left-full ml-2 px-2 py-1 bg-slate-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 border border-slate-600">
             {item.title}
+            {hasChildren && (
+              <div className="text-xs text-slate-300 mt-1">
+                {item.children?.map(child => child.title).join(", ")}
+              </div>
+            )}
             <div className="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-full border-4 border-transparent border-r-slate-800"></div>
           </div>
         )}
       </div>
 
-      {/* Children */}
-      {!collapsed && hasChildren && (
+      {/* Children - Show even in collapsed state on hover/click */}
+      {hasChildren && (
         <AnimatePresence>
-          {isExpanded && (
+          {(isExpanded && !collapsed) && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
@@ -93,6 +98,26 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
             </motion.div>
           )}
         </AnimatePresence>
+      )}
+
+      {/* Special collapsed state sub-menu on hover */}
+      {collapsed && hasChildren && (
+        <div className="absolute left-full top-0 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none group-hover:pointer-events-auto z-50">
+          <div className="bg-slate-800 border border-slate-600 rounded-lg shadow-lg min-w-48 p-2">
+            <div className="text-cyan-400 font-medium text-sm mb-2 px-2">{item.title}</div>
+            {item.children?.map((child) => (
+              <div
+                key={child.id}
+                className="flex items-center gap-2 px-2 py-1.5 text-sm text-slate-200 hover:bg-slate-700 rounded cursor-pointer"
+              >
+                <div className="w-4 h-4 flex-shrink-0">
+                  {child.icon}
+                </div>
+                <span>{child.title}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );
