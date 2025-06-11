@@ -32,8 +32,15 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
           level > 0 && "ml-4"
         )}
         style={{ paddingLeft: `${level * 16 + 12}px` }}
+        title={collapsed ? item.title : undefined}
       >
         <div className="flex items-center gap-3 min-w-0 flex-1">
+          {/* Always show icons */}
+          <div className="w-4 h-4 flex-shrink-0">
+            {item.icon}
+          </div>
+          
+          {/* Show chevron for expandable items when not collapsed */}
           {hasChildren && !collapsed && (
             <motion.div
               animate={{ rotate: isExpanded ? 90 : 0 }}
@@ -44,18 +51,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
             </motion.div>
           )}
           
-          {(!hasChildren || collapsed) && (
-            <div className="w-4 h-4 flex-shrink-0">
-              {item.icon}
-            </div>
-          )}
-          
-          {hasChildren && !collapsed && (
-            <div className="w-4 h-4 flex-shrink-0">
-              {item.icon}
-            </div>
-          )}
-          
+          {/* Show title only when not collapsed */}
           {!collapsed && (
             <span className="truncate text-sm font-medium">{item.title}</span>
           )}
@@ -63,6 +59,14 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
         
         {/* Hover indicator */}
         <div className="absolute left-0 top-0 w-1 h-full bg-cyan-400 scale-y-0 group-hover:scale-y-100 transition-transform duration-200 origin-center rounded-r" />
+        
+        {/* Tooltip for collapsed state */}
+        {collapsed && (
+          <div className="absolute left-full ml-2 px-2 py-1 bg-slate-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 border border-slate-600">
+            {item.title}
+            <div className="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-full border-4 border-transparent border-r-slate-800"></div>
+          </div>
+        )}
       </div>
 
       {/* Children */}

@@ -21,7 +21,10 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
   };
 
   return (
-    <div className="h-full bg-gradient-to-b from-slate-800 via-slate-900 to-slate-800 border-r border-slate-700/50">
+    <div className={cn(
+      "h-full bg-gradient-to-b from-slate-800 via-slate-900 to-slate-800 border-r border-slate-700/50 transition-all duration-300",
+      collapsed ? "w-16" : "w-64"
+    )}>
       {/* Header */}
       <div className="p-4 border-b border-slate-700/50 bg-gradient-to-r from-slate-800 to-slate-700">
         <div className={cn("flex items-center", collapsed ? "justify-center" : "space-x-2")}>
