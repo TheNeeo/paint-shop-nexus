@@ -74,10 +74,10 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
         )}
       </div>
 
-      {/* Children - Show even in collapsed state on hover/click */}
+      {/* Children - Show in expanded mode always, and in collapsed mode when expanded */}
       {hasChildren && (
         <AnimatePresence>
-          {(isExpanded && !collapsed) && (
+          {(!collapsed && isExpanded) && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
@@ -100,9 +100,12 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
         </AnimatePresence>
       )}
 
-      {/* Special collapsed state sub-menu on hover */}
+      {/* Special collapsed state sub-menu on hover and click */}
       {collapsed && hasChildren && (
-        <div className="absolute left-full top-0 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none group-hover:pointer-events-auto z-50">
+        <div className={cn(
+          "absolute left-full top-0 ml-1 transition-opacity duration-200 z-50",
+          isExpanded ? "opacity-100 pointer-events-auto" : "opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto"
+        )}>
           <div className="bg-slate-800 border border-slate-600 rounded-lg shadow-lg min-w-48 p-2">
             <div className="text-cyan-400 font-medium text-sm mb-2 px-2">{item.title}</div>
             {item.children?.map((child) => (
