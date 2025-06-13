@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   Home,
@@ -35,13 +36,13 @@ export const menuData: MenuItem[] = [
   {
     id: "dashboard",
     title: "Dashboard",
-    icon: <Home className="w-4 h-4" />,
+    icon: <Home className="w-4 h-4 text-orange-400" />,
     path: "/",
   },
   {
     id: "product",
     title: "Product Management",
-    icon: <Package className="w-4 h-4" />,
+    icon: <Package className="w-4 h-4 text-green-400" />,
     children: [
       {
         id: "product-activity",
@@ -66,7 +67,7 @@ export const menuData: MenuItem[] = [
   {
     id: "sales",
     title: "Sales Management",
-    icon: <ShoppingCart className="w-4 h-4" />,
+    icon: <ShoppingCart className="w-4 h-4 text-red-400" />,
     children: [
       {
         id: "sales-activity",
@@ -91,7 +92,7 @@ export const menuData: MenuItem[] = [
   {
     id: "purchase",
     title: "Purchase Management",
-    icon: <ShoppingBag className="w-4 h-4" />,
+    icon: <ShoppingBag className="w-4 h-4 text-cyan-400" />,
     children: [
       {
         id: "purchase-activity",
@@ -122,7 +123,7 @@ export const menuData: MenuItem[] = [
   {
     id: "inventory",
     title: "Inventory Management",
-    icon: <Boxes className="w-4 h-4" />,
+    icon: <Boxes className="w-4 h-4 text-blue-400" />,
     children: [
       {
         id: "inventory-activity",
@@ -147,7 +148,7 @@ export const menuData: MenuItem[] = [
   {
     id: "customer",
     title: "Customer Management",
-    icon: <Users className="w-4 h-4" />,
+    icon: <Users className="w-4 h-4 text-yellow-400" />,
     children: [
       {
         id: "customer-info",
@@ -172,7 +173,7 @@ export const menuData: MenuItem[] = [
   {
     id: "reports",
     title: "Reports & Analytics",
-    icon: <BarChart2 className="w-4 h-4" />,
+    icon: <BarChart2 className="w-4 h-4 text-purple-400" />,
     children: [
       {
         id: "sales-report",
@@ -203,7 +204,7 @@ export const menuData: MenuItem[] = [
   {
     id: "expenses",
     title: "Expense Management",
-    icon: <DollarSign className="w-4 h-4" />,
+    icon: <DollarSign className="w-4 h-4 text-emerald-400" />,
     children: [
       {
         id: "expense-activity",
@@ -228,7 +229,7 @@ export const menuData: MenuItem[] = [
   {
     id: "settings",
     title: "Settings",
-    icon: <Settings className="w-4 h-4" />,
+    icon: <Settings className="w-4 h-4 text-gray-400" />,
     children: [
       {
         id: "app-settings",
