@@ -206,111 +206,115 @@ export default function ProductManagement() {
 
   return (
     <TooltipProvider>
-      <div className="p-6 space-y-6 bg-gradient-to-br from-gray-50 via-white to-gray-50 min-h-screen">
-        {/* Header */}
-        <div className="flex justify-between items-start">
-          <div className="space-y-3">
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <Home className="h-4 w-4" />
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Product Management</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-            <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-                <Package className="h-8 w-8 text-blue-600" />
-                Product Management
-              </h1>
-              <Badge className="bg-blue-100 text-blue-800">
-                {filteredProducts.length} products
-              </Badge>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+        <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+            <div className="space-y-3">
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <Home className="h-4 w-4" />
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Product Management</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2">
+                  <Package className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
+                  Product Management
+                </h1>
+                <Badge className="bg-blue-100 text-blue-800 w-fit">
+                  {filteredProducts.length} products
+                </Badge>
+              </div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+              
+              <Dialog open={isAddProductOpen} onOpenChange={setIsAddProductOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg w-full sm:w-auto">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add New Product
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Zap className="h-5 w-5 text-green-600" />
+                      Add New Product
+                    </DialogTitle>
+                  </DialogHeader>
+                  <ProductForm onClose={() => setIsAddProductOpen(false)} />
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
-          
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm">
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </Button>
-            
-            <Dialog open={isAddProductOpen} onOpenChange={setIsAddProductOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add New Product
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <Zap className="h-5 w-5 text-green-600" />
-                    Add New Product
-                  </DialogTitle>
-                </DialogHeader>
-                <ProductForm onClose={() => setIsAddProductOpen(false)} />
-              </DialogContent>
-            </Dialog>
+
+          {/* Stats */}
+          <ProductStats
+            totalProducts={products.length}
+            totalValue={stats.totalValue}
+            lowStockCount={stats.lowStockCount}
+            featuredCount={stats.featuredCount}
+          />
+
+          {/* Filters */}
+          <ProductFilters
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            categoryFilter={categoryFilter}
+            setCategoryFilter={setCategoryFilter}
+            stockFilter={stockFilter}
+            setStockFilter={setStockFilter}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            showFeaturedOnly={showFeaturedOnly}
+            setShowFeaturedOnly={setShowFeaturedOnly}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+            categories={categories}
+            stockStatuses={stockStatuses}
+            sortOptions={sortOptions}
+          />
+
+          {/* Bulk Actions */}
+          <BulkActions
+            selectedCount={selectedProducts.size}
+            onBulkAction={handleBulkAction}
+          />
+
+          {/* Product Table */}
+          <div className="overflow-hidden">
+            <ProductTable
+              products={filteredProducts}
+              expandedRows={expandedRows}
+              selectedProducts={selectedProducts}
+              onToggleRowExpansion={toggleRowExpansion}
+              onToggleProductSelection={toggleProductSelection}
+              onSelectAllProducts={selectAllProducts}
+              onSetSelectedProduct={setSelectedProduct}
+              selectedProduct={selectedProduct}
+              getCategoryColor={getCategoryColor}
+              getStockStatus={getStockStatus}
+            />
           </div>
+
+          {/* Footer */}
+          <ProductFooter
+            totalProducts={products.length}
+            totalValue={stats.totalValue}
+            lowStockCount={stats.lowStockCount}
+          />
         </div>
-
-        {/* Stats */}
-        <ProductStats
-          totalProducts={products.length}
-          totalValue={stats.totalValue}
-          lowStockCount={stats.lowStockCount}
-          featuredCount={stats.featuredCount}
-        />
-
-        {/* Filters */}
-        <ProductFilters
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          categoryFilter={categoryFilter}
-          setCategoryFilter={setCategoryFilter}
-          stockFilter={stockFilter}
-          setStockFilter={setStockFilter}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          showFeaturedOnly={showFeaturedOnly}
-          setShowFeaturedOnly={setShowFeaturedOnly}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-          categories={categories}
-          stockStatuses={stockStatuses}
-          sortOptions={sortOptions}
-        />
-
-        {/* Bulk Actions */}
-        <BulkActions
-          selectedCount={selectedProducts.size}
-          onBulkAction={handleBulkAction}
-        />
-
-        {/* Product Table */}
-        <ProductTable
-          products={filteredProducts}
-          expandedRows={expandedRows}
-          selectedProducts={selectedProducts}
-          onToggleRowExpansion={toggleRowExpansion}
-          onToggleProductSelection={toggleProductSelection}
-          onSelectAllProducts={selectAllProducts}
-          onSetSelectedProduct={setSelectedProduct}
-          selectedProduct={selectedProduct}
-          getCategoryColor={getCategoryColor}
-          getStockStatus={getStockStatus}
-        />
-
-        {/* Footer */}
-        <ProductFooter
-          totalProducts={products.length}
-          totalValue={stats.totalValue}
-          lowStockCount={stats.lowStockCount}
-        />
       </div>
     </TooltipProvider>
   );
