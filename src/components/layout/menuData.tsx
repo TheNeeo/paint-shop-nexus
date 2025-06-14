@@ -44,12 +44,6 @@ export const menuData: MenuItem[] = [
     icon: <Package className="w-4 h-4 text-green-400" />,
     children: [
       {
-        id: "product-activity",
-        title: "Product Activity",
-        icon: <Package className="w-4 h-4 text-green-500" />,
-        path: "/product-activity",
-      },
-      {
         id: "add-product",
         title: "Add New Product",
         icon: <Plus className="w-4 h-4 text-emerald-400" />,
