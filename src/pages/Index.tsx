@@ -1,145 +1,133 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
-import { Package, ShoppingCart, Users, TrendingUp, DollarSign, AlertTriangle, Eye } from "lucide-react";
+import AppLayout from "@/components/layout/AppLayout";
+import { DashboardCard } from "@/components/dashboard/DashboardCard";
+import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { PaintChart } from "@/components/dashboard/PaintChart";
-import { RecentActivity } from "@/components/dashboard/RecentActivity";
-import { DashboardCard } from "@/components/dashboard/DashboardCard";
+import { 
+  ShoppingCart, 
+  Package, 
+  Users, 
+  DollarSign, 
+  TrendingUp, 
+  Boxes 
+} from "lucide-react";
 
-export default function Index() {
-  const navigate = useNavigate();
-
+const Index = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100/50 to-slate-200/30 p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <AppLayout>
+      <div className="space-y-6">
         {/* Header */}
-        <div className="text-center">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent mb-4">
-            NEO COLOR FACTORY Dashboard
+        <div className="flex flex-col space-y-2">
+          <h1 className="text-3xl font-bold text-foreground">
+            Welcome to <span className="text-primary">NEO COLOR FACTORY</span>
           </h1>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Comprehensive paint business management system
+          <p className="text-muted-foreground">
+            Your complete paint shop management dashboard
           </p>
+        </div>
+
+        {/* Dashboard Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <DashboardCard
+            title="Today's Sales"
+            value="₹45,280"
+            icon={ShoppingCart}
+            description="15 transactions"
+            trend={{ value: 12.5, isPositive: true }}
+            gradient="from-green-400/20 to-green-600/10"
+            iconColor="from-green-400 to-green-600"
+          />
+          
+          <DashboardCard
+            title="Total Products"
+            value="1,247"
+            icon={Package}
+            description="23 categories"
+            trend={{ value: 8.2, isPositive: true }}
+            gradient="from-blue-400/20 to-blue-600/10"
+            iconColor="from-blue-400 to-blue-600"
+          />
+          
+          <DashboardCard
+            title="Active Customers"
+            value="342"
+            icon={Users}
+            description="28 new this month"
+            trend={{ value: 15.3, isPositive: true }}
+            gradient="from-purple-400/20 to-purple-600/10"
+            iconColor="from-purple-400 to-purple-600"
+          />
+          
+          <DashboardCard
+            title="Monthly Revenue"
+            value="₹8,45,690"
+            icon={DollarSign}
+            description="Current month"
+            trend={{ value: 22.8, isPositive: true }}
+            gradient="from-orange-400/20 to-orange-600/10"
+            iconColor="from-orange-400 to-orange-600"
+          />
         </div>
 
         {/* Quick Actions */}
         <QuickActions />
 
-        {/* Dashboard Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <DashboardCard
-            title="Total Products"
-            value="150+"
-            icon={Package}
-            description="Active paint products"
-            trend={{ value: 12, isPositive: true }}
-            iconColor="from-blue-400 to-blue-600"
-          />
-          <DashboardCard
-            title="Inventory Value"
-            value="₹12,450"
-            icon={DollarSign}
-            description="Total stock value"
-            trend={{ value: 8, isPositive: true }}
-            iconColor="from-green-400 to-green-600"
-          />
-          <DashboardCard
-            title="Low Stock Items"
-            value="25"
-            icon={AlertTriangle}
-            description="Items need restocking"
-            trend={{ value: -5, isPositive: false }}
-            iconColor="from-orange-400 to-orange-600"
-          />
-          <DashboardCard
-            title="Categories"
-            value="8"
-            icon={Eye}
-            description="Product categories"
-            iconColor="from-purple-400 to-purple-600"
-          />
-        </div>
-
         {/* Charts and Activity */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <PaintChart />
-          <RecentActivity />
+          
+          <div className="space-y-6">
+            <RecentActivity />
+            
+            {/* Additional Stats */}
+            <div className="grid grid-cols-2 gap-4">
+              <DashboardCard
+                title="Low Stock"
+                value="12"
+                icon={Boxes}
+                description="Items to reorder"
+                gradient="from-red-400/20 to-red-600/10"
+                iconColor="from-red-400 to-red-600"
+                className="p-4"
+              />
+              
+              <DashboardCard
+                title="Growth"
+                value="+18%"
+                icon={TrendingUp}
+                description="vs last month"
+                gradient="from-teal-400/20 to-teal-600/10"
+                iconColor="from-teal-400 to-teal-600"
+                className="p-4"
+              />
+            </div>
+          </div>
         </div>
 
-        {/* Navigation Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer hover:-translate-y-1" onClick={() => navigate('/product/activity')}>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Package className="h-6 w-6 text-blue-600" />
-                Product Management
-              </CardTitle>
-              <CardDescription>
-                Manage your paint products, variants, and inventory
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700">
-                Go to Products
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer opacity-50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ShoppingCart className="h-6 w-6 text-green-600" />
-                Sales Management
-              </CardTitle>
-              <CardDescription>
-                Track sales, orders, and customer transactions
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full" disabled>
-                Coming Soon
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer opacity-50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-6 w-6 text-purple-600" />
-                Customer Management
-              </CardTitle>
-              <CardDescription>
-                Manage customer information and relationships
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full" disabled>
-                Coming Soon
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer opacity-50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-6 w-6 text-red-600" />
-                Analytics
-              </CardTitle>
-              <CardDescription>
-                View reports and business insights
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full" disabled>
-                Coming Soon
-              </Button>
-            </CardContent>
-          </Card>
+        {/* Footer Info */}
+        <div className="paint-card text-center py-8">
+          <div className="space-y-2">
+            <h3 className="text-xl font-bold">
+              <span className="text-slate-600">NEO</span>{" "}
+              <span className="font-bold">
+                <span className="text-red-500">C</span>
+                <span className="text-orange-500">O</span>
+                <span className="text-green-500">L</span>
+                <span className="text-blue-500">O</span>
+                <span className="text-purple-500">R</span>
+              </span>{" "}
+              <span className="text-slate-600">FACTORY</span>
+            </h3>
+            <p className="text-muted-foreground">
+              Premium quality paints for all your painting needs
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    </AppLayout>
   );
-}
+};
+
+export default Index;
