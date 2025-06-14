@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,6 +43,7 @@ import {
   Home,
   SortAsc,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { ProductForm } from "@/components/product/ProductForm";
 import { ProductPreview } from "@/components/product/ProductPreview";
 
@@ -121,6 +121,7 @@ const getStockStatus = (quantity: number) => {
 };
 
 export default function ProductManagement() {
+  const navigate = useNavigate();
   const [products] = useState(mockProducts);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
@@ -180,7 +181,9 @@ export default function ProductManagement() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <Home className="h-4 w-4" />
+                <button onClick={() => navigate('/')} className="flex items-center hover:text-blue-600">
+                  <Home className="h-4 w-4" />
+                </button>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
