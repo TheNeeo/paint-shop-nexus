@@ -56,31 +56,31 @@ export function ProductFilters({
   sortOptions,
 }: ProductFiltersProps) {
   return (
-    <Card className="shadow-sm">
+    <Card className="shadow-sm border-slate-200 bg-white">
       <CardContent className="p-4">
         <div className="flex flex-wrap gap-4 items-center justify-between">
           <div className="flex flex-wrap gap-3 items-center flex-1">
             <div className="relative min-w-[300px] flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
               <Input
                 placeholder="Search products by name or code..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-white border-gray-200 focus:border-blue-500"
+                className="pl-10 bg-white border-slate-200 focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="border-gray-200 hover:bg-gray-50">
+                <Button variant="outline" className="border-slate-200 hover:bg-slate-50 text-slate-700">
                   <Filter className="h-4 w-4 mr-2" />
                   Category: {categoryFilter}
                   <ChevronDown className="h-4 w-4 ml-2" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-white">
+              <DropdownMenuContent className="bg-white border-slate-200">
                 {categories.map((category) => (
-                  <DropdownMenuItem key={category} onClick={() => setCategoryFilter(category)}>
+                  <DropdownMenuItem key={category} onClick={() => setCategoryFilter(category)} className="hover:bg-slate-50">
                     {category}
                   </DropdownMenuItem>
                 ))}
@@ -89,14 +89,14 @@ export function ProductFilters({
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="border-gray-200 hover:bg-gray-50">
+                <Button variant="outline" className="border-slate-200 hover:bg-slate-50 text-slate-700">
                   Stock: {stockFilter}
                   <ChevronDown className="h-4 w-4 ml-2" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-white">
+              <DropdownMenuContent className="bg-white border-slate-200">
                 {stockStatuses.map((status) => (
-                  <DropdownMenuItem key={status} onClick={() => setStockFilter(status)}>
+                  <DropdownMenuItem key={status} onClick={() => setStockFilter(status)} className="hover:bg-slate-50">
                     {status}
                   </DropdownMenuItem>
                 ))}
@@ -105,15 +105,15 @@ export function ProductFilters({
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="border-gray-200 hover:bg-gray-50">
+                <Button variant="outline" className="border-slate-200 hover:bg-slate-50 text-slate-700">
                   <SortAsc className="h-4 w-4 mr-2" />
                   Sort: {sortOptions.find(opt => opt.value === sortBy)?.label}
                   <ChevronDown className="h-4 w-4 ml-2" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-white">
+              <DropdownMenuContent className="bg-white border-slate-200">
                 {sortOptions.map((option) => (
-                  <DropdownMenuItem key={option.value} onClick={() => setSortBy(option.value)}>
+                  <DropdownMenuItem key={option.value} onClick={() => setSortBy(option.value)} className="hover:bg-slate-50">
                     {option.label}
                   </DropdownMenuItem>
                 ))}
@@ -130,14 +130,14 @@ export function ProductFilters({
               />
               <label
                 htmlFor="featured"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-1"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-1 text-slate-700"
               >
                 <Star className="h-4 w-4" />
                 Featured Only
               </label>
             </div>
             
-            <div className="flex border border-gray-200 rounded-md">
+            <div className="flex border border-slate-200 rounded-md">
               <Button
                 variant={viewMode === "table" ? "default" : "ghost"}
                 size="sm"

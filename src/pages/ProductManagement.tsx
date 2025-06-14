@@ -115,12 +115,12 @@ const getCategoryColor = (category: string) => {
     Canvas: "bg-green-100 text-green-800 border-green-200",
     Brushes: "bg-purple-100 text-purple-800 border-purple-200",
   };
-  return colors[category] || "bg-gray-100 text-gray-800 border-gray-200";
+  return colors[category] || "bg-slate-100 text-slate-800 border-slate-200";
 };
 
 const getStockStatus = (quantity: number) => {
   if (quantity === 0) return { status: "Out of Stock", color: "bg-red-100 text-red-800 border-red-200" };
-  if (quantity <= 10) return { status: "Low Stock", color: "bg-yellow-100 text-yellow-800 border-yellow-200" };
+  if (quantity <= 10) return { status: "Low Stock", color: "bg-orange-100 text-orange-800 border-orange-200" };
   return { status: "In Stock", color: "bg-green-100 text-green-800 border-green-200" };
 };
 
