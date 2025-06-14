@@ -1,27 +1,6 @@
-
 import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuCheckboxItem,
-} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -36,51 +15,20 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   Plus,
-  Search,
-  Filter,
-  ChevronDown,
-  ChevronRight,
-  Eye,
-  Edit,
-  Trash2,
-  Home,
-  SortAsc,
   Download,
-  Upload,
-  MoreHorizontal,
-  Copy,
-  Archive,
-  Star,
-  TrendingUp,
-  Package,
-  AlertTriangle,
-  CheckCircle,
-  Grid3X3,
-  List,
+  Home,
   Zap,
-  BarChart3,
+  Package,
 } from "lucide-react";
 import { ProductForm } from "@/components/product/ProductForm";
-import { ProductPreview } from "@/components/product/ProductPreview";
+import { ProductStats } from "@/components/product/ProductStats";
+import { ProductFilters } from "@/components/product/ProductFilters";
+import { ProductTable } from "@/components/product/ProductTable";
+import { BulkActions } from "@/components/product/BulkActions";
+import { ProductFooter } from "@/components/product/ProductFooter";
 
 // Enhanced mock data with more detailed information
 const mockProducts = [
@@ -254,13 +202,12 @@ export default function ProductManagement() {
 
   const handleBulkAction = (action: string) => {
     console.log(`Bulk action: ${action} on products:`, Array.from(selectedProducts));
-    // Implement bulk actions here
   };
 
   return (
     <TooltipProvider>
       <div className="p-6 space-y-6 bg-gradient-to-br from-gray-50 via-white to-gray-50 min-h-screen">
-        {/* Enhanced Header */}
+        {/* Header */}
         <div className="flex justify-between items-start">
           <div className="space-y-3">
             <Breadcrumb>
@@ -286,15 +233,10 @@ export default function ProductManagement() {
           </div>
           
           <div className="flex gap-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Download className="h-4 w-4 mr-2" />
-                  Export
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Export product data</TooltipContent>
-            </Tooltip>
+            <Button variant="outline" size="sm">
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
             
             <Dialog open={isAddProductOpen} onOpenChange={setIsAddProductOpen}>
               <DialogTrigger asChild>
@@ -316,454 +258,59 @@ export default function ProductManagement() {
           </div>
         </div>
 
-        {/* Enhanced Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-blue-600">Total Products</p>
-                  <p className="text-2xl font-bold text-blue-900">{products.length}</p>
-                </div>
-                <Package className="h-8 w-8 text-blue-600" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-green-600">Total Value</p>
-                  <p className="text-2xl font-bold text-green-900">${stats.totalValue.toFixed(2)}</p>
-                </div>
-                <TrendingUp className="h-8 w-8 text-green-600" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-yellow-600">Low Stock</p>
-                  <p className="text-2xl font-bold text-yellow-900">{stats.lowStockCount}</p>
-                </div>
-                <AlertTriangle className="h-8 w-8 text-yellow-600" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-purple-600">Featured</p>
-                  <p className="text-2xl font-bold text-purple-900">{stats.featuredCount}</p>
-                </div>
-                <Star className="h-8 w-8 text-purple-600" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Stats */}
+        <ProductStats
+          totalProducts={products.length}
+          totalValue={stats.totalValue}
+          lowStockCount={stats.lowStockCount}
+          featuredCount={stats.featuredCount}
+        />
 
-        {/* Advanced Filter & Sort Controls */}
-        <Card className="shadow-sm">
-          <CardContent className="p-4">
-            <div className="flex flex-wrap gap-4 items-center justify-between">
-              <div className="flex flex-wrap gap-3 items-center flex-1">
-                <div className="relative min-w-[300px] flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                  <Input
-                    placeholder="Search products by name or code..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-white border-gray-200 focus:border-blue-500"
-                  />
-                </div>
-                
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="border-gray-200 hover:bg-gray-50">
-                      <Filter className="h-4 w-4 mr-2" />
-                      Category: {categoryFilter}
-                      <ChevronDown className="h-4 w-4 ml-2" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="bg-white">
-                    {categories.map((category) => (
-                      <DropdownMenuItem key={category} onClick={() => setCategoryFilter(category)}>
-                        {category}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+        {/* Filters */}
+        <ProductFilters
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          categoryFilter={categoryFilter}
+          setCategoryFilter={setCategoryFilter}
+          stockFilter={stockFilter}
+          setStockFilter={setStockFilter}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+          showFeaturedOnly={showFeaturedOnly}
+          setShowFeaturedOnly={setShowFeaturedOnly}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          categories={categories}
+          stockStatuses={stockStatuses}
+          sortOptions={sortOptions}
+        />
 
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="border-gray-200 hover:bg-gray-50">
-                      Stock: {stockFilter}
-                      <ChevronDown className="h-4 w-4 ml-2" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="bg-white">
-                    {stockStatuses.map((status) => (
-                      <DropdownMenuItem key={status} onClick={() => setStockFilter(status)}>
-                        {status}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+        {/* Bulk Actions */}
+        <BulkActions
+          selectedCount={selectedProducts.size}
+          onBulkAction={handleBulkAction}
+        />
 
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="border-gray-200 hover:bg-gray-50">
-                      <SortAsc className="h-4 w-4 mr-2" />
-                      Sort: {sortOptions.find(opt => opt.value === sortBy)?.label}
-                      <ChevronDown className="h-4 w-4 ml-2" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="bg-white">
-                    {sortOptions.map((option) => (
-                      <DropdownMenuItem key={option.value} onClick={() => setSortBy(option.value)}>
-                        {option.label}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+        {/* Product Table */}
+        <ProductTable
+          products={filteredProducts}
+          expandedRows={expandedRows}
+          selectedProducts={selectedProducts}
+          onToggleRowExpansion={toggleRowExpansion}
+          onToggleProductSelection={toggleProductSelection}
+          onSelectAllProducts={selectAllProducts}
+          onSetSelectedProduct={setSelectedProduct}
+          selectedProduct={selectedProduct}
+          getCategoryColor={getCategoryColor}
+          getStockStatus={getStockStatus}
+        />
 
-              <div className="flex gap-2 items-center">
-                <DropdownMenuCheckboxItem
-                  checked={showFeaturedOnly}
-                  onCheckedChange={setShowFeaturedOnly}
-                  className="flex items-center gap-2"
-                >
-                  <Star className="h-4 w-4" />
-                  Featured Only
-                </DropdownMenuCheckboxItem>
-                
-                <div className="flex border border-gray-200 rounded-md">
-                  <Button
-                    variant={viewMode === "table" ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setViewMode("table")}
-                    className="rounded-r-none"
-                  >
-                    <List className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant={viewMode === "grid" ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setViewMode("grid")}
-                    className="rounded-l-none"
-                  >
-                    <Grid3X3 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {/* Bulk Actions */}
-            {selectedProducts.size > 0 && (
-              <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-blue-900">
-                    {selectedProducts.size} product(s) selected
-                  </span>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => handleBulkAction("export")}>
-                      <Download className="h-4 w-4 mr-1" />
-                      Export
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleBulkAction("archive")}>
-                      <Archive className="h-4 w-4 mr-1" />
-                      Archive
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button size="sm" variant="destructive">
-                          <Trash2 className="h-4 w-4 mr-1" />
-                          Delete
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Selected Products</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete {selectedProducts.size} product(s)? This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleBulkAction("delete")}>
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Enhanced Product Table */}
-        <Card className="shadow-sm overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-gradient-to-r from-gray-50 to-gray-100">
-                <TableHead className="w-12">
-                  <Checkbox
-                    checked={selectedProducts.size === filteredProducts.length && filteredProducts.length > 0}
-                    onCheckedChange={selectAllProducts}
-                  />
-                </TableHead>
-                <TableHead className="w-12"></TableHead>
-                <TableHead className="w-16">Image</TableHead>
-                <TableHead>Product Details</TableHead>
-                <TableHead>Unit</TableHead>
-                <TableHead>Pricing</TableHead>
-                <TableHead>Stock</TableHead>
-                <TableHead>Performance</TableHead>
-                <TableHead className="w-32">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredProducts.map((product) => (
-                <React.Fragment key={product.id}>
-                  <TableRow className="hover:bg-gray-50/50 transition-colors group">
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedProducts.has(product.id)}
-                        onCheckedChange={() => toggleProductSelection(product.id)}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleRowExpansion(product.id)}
-                        className="opacity-60 group-hover:opacity-100 transition-opacity"
-                      >
-                        {expandedRows.has(product.id) ? (
-                          <ChevronDown className="h-4 w-4" />
-                        ) : (
-                          <ChevronRight className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </TableCell>
-                    <TableCell>
-                      <div className="relative">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-12 h-12 object-cover rounded-lg border border-gray-200 shadow-sm"
-                        />
-                        {product.featured && (
-                          <Star className="absolute -top-1 -right-1 h-4 w-4 text-yellow-500 fill-current" />
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="font-medium text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
-                             onClick={() => toggleRowExpansion(product.id)}>
-                          {product.name}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge className={`text-xs ${getCategoryColor(product.category)}`}>
-                            {product.category}
-                          </Badge>
-                          <span className="text-xs text-gray-500">#{product.baseCode}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`h-3 w-3 ${
-                                i < Math.floor(product.rating) 
-                                  ? "text-yellow-400 fill-current" 
-                                  : "text-gray-300"
-                              }`}
-                            />
-                          ))}
-                          <span className="text-xs text-gray-600 ml-1">{product.rating}</span>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm font-medium">{product.unit}</span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="font-medium text-lg">${product.unitPrice.toFixed(2)}</div>
-                        <div className="text-xs text-gray-500">
-                          Total: ${(product.unitPrice * product.stockQuantity).toFixed(2)}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{product.stockQuantity}</span>
-                          <Badge className={getStockStatus(product.stockQuantity).color}>
-                            {getStockStatus(product.stockQuantity).status}
-                          </Badge>
-                        </div>
-                        {product.stockQuantity <= 10 && product.stockQuantity > 0 && (
-                          <div className="text-xs text-amber-600 flex items-center gap-1">
-                            <AlertTriangle className="h-3 w-3" />
-                            Reorder soon
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1 text-sm">
-                          <BarChart3 className="h-3 w-3 text-green-600" />
-                          <span className="font-medium">{product.totalSales}</span>
-                          <span className="text-gray-500">sold</span>
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          Last: {new Date(product.lastSold).toLocaleDateString()}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-1">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  className="opacity-60 hover:opacity-100"
-                                  onClick={() => setSelectedProduct(product)}
-                                >
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className="max-w-3xl">
-                                <ProductPreview product={selectedProduct} />
-                              </DialogContent>
-                            </Dialog>
-                          </TooltipTrigger>
-                          <TooltipContent>View details</TooltipContent>
-                        </Tooltip>
-                        
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="ghost" size="sm" className="opacity-60 hover:opacity-100">
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Edit product</TooltipContent>
-                        </Tooltip>
-
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="opacity-60 hover:opacity-100">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent className="bg-white" align="end">
-                            <DropdownMenuItem>
-                              <Copy className="h-4 w-4 mr-2" />
-                              Duplicate
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Archive className="h-4 w-4 mr-2" />
-                              Archive
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-red-600">
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                  
-                  {/* Enhanced Variant Rows */}
-                  {expandedRows.has(product.id) && product.variants.map((variant, index) => (
-                    <TableRow key={variant.id} className="bg-gradient-to-r from-blue-50/30 to-blue-50/10 border-l-4 border-blue-200">
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell>
-                        <div className="w-8 h-8 bg-gray-100 rounded-md flex items-center justify-center">
-                          <span className="text-xs font-medium text-gray-600">{index + 1}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="pl-8">
-                        <div className="flex items-center gap-2">
-                          <ChevronRight className="h-3 w-3 text-blue-400" />
-                          <div className="space-y-1">
-                            <span className="text-sm font-medium text-gray-700">{variant.name}</span>
-                            <div className="text-xs text-gray-500">SKU: {variant.sku}</div>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm text-gray-600">-</span>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm font-medium">${variant.unitPrice.toFixed(2)}</span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm">{variant.stockQuantity}</span>
-                          <Badge className={`text-xs ${getStockStatus(variant.stockQuantity).color}`}>
-                            {getStockStatus(variant.stockQuantity).status}
-                          </Badge>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-xs text-gray-500">Variant data</span>
-                      </TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="sm" className="opacity-60 hover:opacity-100">
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </React.Fragment>
-              ))}
-            </TableBody>
-          </Table>
-        </Card>
-
-        {/* Enhanced Footer Summary */}
-        <Card className="bg-gradient-to-r from-gray-50 to-white border border-gray-200">
-          <CardContent className="p-4">
-            <div className="flex justify-between items-center text-sm">
-              <div className="flex gap-6">
-                <div className="flex items-center gap-2">
-                  <Package className="h-4 w-4 text-blue-600" />
-                  <span>Total Products: <strong className="text-blue-900">{products.length}</strong></span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-green-600" />
-                  <span>Total Stock Value: <strong className="text-green-900">${stats.totalValue.toFixed(2)}</strong></span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-yellow-600" />
-                  <span>Low Stock Items: <strong className="text-yellow-900">{stats.lowStockCount}</strong></span>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 text-gray-600">
-                <CheckCircle className="h-4 w-4" />
-                <span>Last updated: {new Date().toLocaleString()}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Footer */}
+        <ProductFooter
+          totalProducts={products.length}
+          totalValue={stats.totalValue}
+          lowStockCount={stats.lowStockCount}
+        />
       </div>
     </TooltipProvider>
   );
