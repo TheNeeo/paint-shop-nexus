@@ -42,6 +42,7 @@ import {
   Trash2,
   Home,
   SortAsc,
+  ArrowLeft,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ProductForm } from "@/components/product/ProductForm";
@@ -175,38 +176,59 @@ export default function ProductManagement() {
 
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
-      {/* Page Title & Breadcrumb */}
-      <div className="flex justify-between items-start">
-        <div>
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <button onClick={() => navigate('/')} className="flex items-center hover:text-blue-600">
-                  <Home className="h-4 w-4" />
-                </button>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Product Management</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-          <h1 className="text-3xl font-bold text-gray-900 mt-2">📦 Product Management</h1>
-        </div>
-        <Dialog open={isAddProductOpen} onOpenChange={setIsAddProductOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-green-600 hover:bg-green-700">
-              <Plus className="h-4 w-4 mr-2" />
-              Add New Product
+      {/* Enhanced Navigation Header */}
+      <div className="bg-white p-4 rounded-lg shadow-sm border">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => navigate('/')}
+              className="flex items-center gap-2 hover:bg-blue-50 border-blue-200"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Home
             </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Add New Product</DialogTitle>
-            </DialogHeader>
-            <ProductForm onClose={() => setIsAddProductOpen(false)} />
-          </DialogContent>
-        </Dialog>
+            <div className="h-6 w-px bg-gray-300"></div>
+            <Breadcrumb>
+              <BreadcrumbList className="text-sm">
+                <BreadcrumbItem>
+                  <button 
+                    onClick={() => navigate('/')} 
+                    className="flex items-center hover:text-blue-600 text-gray-600"
+                  >
+                    <Home className="h-4 w-4 mr-1" />
+                    Home
+                  </button>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="text-blue-600 font-medium">Product Management</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+          <Dialog open={isAddProductOpen} onOpenChange={setIsAddProductOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-green-600 hover:bg-green-700">
+                <Plus className="h-4 w-4 mr-2" />
+                Add New Product
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Add New Product</DialogTitle>
+              </DialogHeader>
+              <ProductForm onClose={() => setIsAddProductOpen(false)} />
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+
+      {/* Page Title */}
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900">📦 Product Management</h1>
+        <p className="text-gray-600 mt-1">Manage your paint products, inventory, and variants</p>
       </div>
 
       {/* Filter & Sort Controls */}
