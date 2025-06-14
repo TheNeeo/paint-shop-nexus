@@ -1,5 +1,3 @@
-
-
 import React from "react";
 import {
   Home,
@@ -49,7 +47,7 @@ export const menuData: MenuItem[] = [
         id: "product-activity",
         title: "Product Activity",
         icon: <Package className="w-4 h-4 text-green-500" />,
-        path: "/product/activity",
+        path: "/product-activity",
       },
       {
         id: "add-product",
@@ -247,4 +245,3 @@ export const menuData: MenuItem[] = [
     ],
   },
 ];
-

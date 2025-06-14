@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TreeNodeProps } from "./types";
+import { useNavigate } from "react-router-dom";
 
 export const TreeNode: React.FC<TreeNodeProps> = ({
   item,
@@ -12,13 +13,20 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
   onToggle,
   collapsed,
 }) => {
+  const navigate = useNavigate();
   const isExpanded = expandedItems.has(item.id);
   const hasChildren = item.children && item.children.length > 0;
 
   const handleClick = () => {
     if (hasChildren) {
       onToggle(item.id);
+    } else if (item.path) {
+      navigate(item.path);
     }
+  };
+
+  const handleChildClick = (path: string) => {
+    navigate(path);
   };
 
   return (
@@ -111,6 +119,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
             {item.children?.map((child) => (
               <div
                 key={child.id}
+                onClick={() => child.path && handleChildClick(child.path)}
                 className="flex items-center gap-2 px-2 py-1.5 text-sm text-slate-200 hover:bg-slate-700 rounded cursor-pointer"
               >
                 <div className="w-4 h-4 flex-shrink-0">
