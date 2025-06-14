@@ -8,8 +8,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Search,
   Filter,
@@ -122,14 +122,20 @@ export function ProductFilters({
           </div>
 
           <div className="flex gap-2 items-center">
-            <DropdownMenuCheckboxItem
-              checked={showFeaturedOnly}
-              onCheckedChange={setShowFeaturedOnly}
-              className="flex items-center gap-2"
-            >
-              <Star className="h-4 w-4" />
-              Featured Only
-            </DropdownMenuCheckboxItem>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="featured"
+                checked={showFeaturedOnly}
+                onCheckedChange={setShowFeaturedOnly}
+              />
+              <label
+                htmlFor="featured"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-1"
+              >
+                <Star className="h-4 w-4" />
+                Featured Only
+              </label>
+            </div>
             
             <div className="flex border border-gray-200 rounded-md">
               <Button
