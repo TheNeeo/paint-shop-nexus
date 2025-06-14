@@ -146,7 +146,7 @@ export default function ProductActivity() {
   };
 
   return (
-    <div className="p-6 space-y-6 bg-gradient-to-br from-gray-50 via-white to-gray-50 min-h-screen">
+    <div className="p-6 space-y-6 bg-white min-h-screen">
       {/* Header */}
       <div className="space-y-3">
         <Breadcrumb>
@@ -161,18 +161,18 @@ export default function ProductActivity() {
           </BreadcrumbList>
         </Breadcrumb>
         <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+          <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-2">
             <Activity className="h-8 w-8 text-green-600" />
             Product Activity
           </h1>
-          <Badge className="bg-green-100 text-green-800">
+          <Badge className="bg-green-100 text-green-800 border-green-200">
             {filteredActivities.length} activities
           </Badge>
         </div>
       </div>
 
       {/* Filters */}
-      <Card>
+      <Card className="bg-white border-slate-200">
         <CardContent className="p-4">
           <div className="flex flex-col md:flex-row gap-4 items-center">
             <div className="flex-1">
@@ -180,16 +180,16 @@ export default function ProductActivity() {
                 placeholder="Search activities..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full"
+                className="w-full bg-white border-slate-300"
               />
             </div>
             <div className="flex gap-2">
               <Select value={activityFilter} onValueChange={setActivityFilter}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-[180px] bg-white border-slate-300">
                   <Filter className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="Filter by type" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border-slate-200">
                   {activityTypes.map(type => (
                     <SelectItem key={type} value={type}>
                       {type === "All" ? "All Activities" : type.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())}
@@ -197,7 +197,7 @@ export default function ProductActivity() {
                   ))}
                 </SelectContent>
               </Select>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="bg-white border-slate-300 hover:bg-slate-50">
                 <Calendar className="h-4 w-4 mr-2" />
                 Date Range
               </Button>
@@ -207,29 +207,29 @@ export default function ProductActivity() {
       </Card>
 
       {/* Activity Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Card className="bg-white border-slate-200">
+        <CardHeader className="bg-slate-50 border-b border-slate-200">
+          <CardTitle className="flex items-center gap-2 text-slate-900">
             <Activity className="h-5 w-5" />
             Recent Activity
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Activity</TableHead>
-                <TableHead>Product</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Changes</TableHead>
-                <TableHead>User</TableHead>
-                <TableHead>Timestamp</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+              <TableRow className="bg-slate-50 border-b border-slate-200">
+                <TableHead className="text-slate-700 font-medium">Activity</TableHead>
+                <TableHead className="text-slate-700 font-medium">Product</TableHead>
+                <TableHead className="text-slate-700 font-medium">Description</TableHead>
+                <TableHead className="text-slate-700 font-medium">Changes</TableHead>
+                <TableHead className="text-slate-700 font-medium">User</TableHead>
+                <TableHead className="text-slate-700 font-medium">Timestamp</TableHead>
+                <TableHead className="text-right text-slate-700 font-medium">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredActivities.map((activity) => (
-                <TableRow key={activity.id}>
+                <TableRow key={activity.id} className="border-b border-slate-100 hover:bg-slate-50">
                   <TableCell>
                     <div className="flex items-center gap-2">
                       {getActivityIcon(activity.activityType)}
@@ -239,31 +239,31 @@ export default function ProductActivity() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="font-medium">{activity.productName}</div>
-                    <div className="text-sm text-muted-foreground">{activity.category}</div>
+                    <div className="font-medium text-slate-900">{activity.productName}</div>
+                    <div className="text-sm text-slate-600">{activity.category}</div>
                   </TableCell>
-                  <TableCell>{activity.description}</TableCell>
+                  <TableCell className="text-slate-700">{activity.description}</TableCell>
                   <TableCell>
                     <div className="text-sm">
                       {activity.oldValue !== activity.newValue && (
                         <span>
-                          <span className="text-red-600">{activity.oldValue}</span>
-                          {" → "}
-                          <span className="text-green-600">{activity.newValue}</span>
+                          <span className="text-red-600 font-medium">{activity.oldValue}</span>
+                          <span className="text-slate-500"> → </span>
+                          <span className="text-green-600 font-medium">{activity.newValue}</span>
                         </span>
                       )}
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="text-sm font-medium">{activity.user}</div>
+                    <div className="text-sm font-medium text-slate-900">{activity.user}</div>
                   </TableCell>
                   <TableCell>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-sm text-slate-600">
                       {formatTimestamp(activity.timestamp)}
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" className="hover:bg-slate-100">
                       <Eye className="h-4 w-4" />
                     </Button>
                   </TableCell>
@@ -276,11 +276,11 @@ export default function ProductActivity() {
 
       {/* Activity Summary */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="bg-white border-slate-200">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-blue-600">Stock Updates</p>
+                <p className="text-sm font-medium text-blue-700">Stock Updates</p>
                 <p className="text-2xl font-bold text-blue-900">
                   {activities.filter(a => a.activityType === "stock_update").length}
                 </p>
@@ -290,11 +290,11 @@ export default function ProductActivity() {
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-white border-slate-200">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-green-600">Price Changes</p>
+                <p className="text-sm font-medium text-green-700">Price Changes</p>
                 <p className="text-2xl font-bold text-green-900">
                   {activities.filter(a => a.activityType === "price_change").length}
                 </p>
@@ -304,11 +304,11 @@ export default function ProductActivity() {
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-white border-slate-200">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-red-600">Sales</p>
+                <p className="text-sm font-medium text-red-700">Sales</p>
                 <p className="text-2xl font-bold text-red-900">
                   {activities.filter(a => a.activityType === "sale").length}
                 </p>
@@ -318,11 +318,11 @@ export default function ProductActivity() {
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-white border-slate-200">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-purple-600">New Products</p>
+                <p className="text-sm font-medium text-purple-700">New Products</p>
                 <p className="text-2xl font-bold text-purple-900">
                   {activities.filter(a => a.activityType === "new_product").length}
                 </p>

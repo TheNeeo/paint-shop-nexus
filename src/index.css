@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,60 +6,60 @@
 
 @layer base {
   :root {
-    --background: 245 245 240;
-    --foreground: 30 41 59;
+    --background: 255 255 255;
+    --foreground: 15 23 42;
 
     --card: 255 255 255;
-    --card-foreground: 30 41 59;
+    --card-foreground: 15 23 42;
 
     --popover: 255 255 255;
-    --popover-foreground: 30 41 59;
+    --popover-foreground: 15 23 42;
 
-    --primary: 90 122 78;
+    --primary: 34 197 94;
     --primary-foreground: 255 255 255;
 
-    --secondary: 224 224 220;
-    --secondary-foreground: 30 41 59;
+    --secondary: 241 245 249;
+    --secondary-foreground: 15 23 42;
 
     --muted: 248 250 252;
-    --muted-foreground: 100 116 139;
+    --muted-foreground: 71 85 105;
 
     --accent: 241 245 249;
-    --accent-foreground: 30 41 59;
+    --accent-foreground: 15 23 42;
 
     --destructive: 239 68 68;
     --destructive-foreground: 255 255 255;
 
     --border: 226 232 240;
     --input: 226 232 240;
-    --ring: 90 122 78;
+    --ring: 34 197 94;
 
     --radius: 0.75rem;
 
     /* Paint shop custom colors */
-    --paint-red: 255 87 87;
-    --paint-orange: 255 189 89;
-    --paint-green: 126 217 87;
-    --paint-blue: 82 113 255;
-    --paint-purple: 168 92 255;
-    --paint-teal: 0 225 255;
-    --paint-cream: 224 220 197;
+    --paint-red: 239 68 68;
+    --paint-orange: 249 115 22;
+    --paint-green: 34 197 94;
+    --paint-blue: 59 130 246;
+    --paint-purple: 147 51 234;
+    --paint-teal: 20 184 166;
+    --paint-cream: 254 249 195;
     
     /* Gradient variables */
     --shimmer: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%);
     --paint-gradient: linear-gradient(135deg, 
-      rgba(255,87,87,0.1) 0%, 
-      rgba(255,189,89,0.1) 20%, 
-      rgba(126,217,87,0.1) 40%, 
-      rgba(82,113,255,0.1) 60%, 
-      rgba(168,92,255,0.1) 80%, 
-      rgba(0,225,255,0.1) 100%);
+      rgba(239,68,68,0.1) 0%, 
+      rgba(249,115,22,0.1) 20%, 
+      rgba(34,197,94,0.1) 40%, 
+      rgba(59,130,246,0.1) 60%, 
+      rgba(147,51,234,0.1) 80%, 
+      rgba(20,184,166,0.1) 100%);
   }
 
   .dark {
-    --background: 30 41 59;
+    --background: 15 23 42;
     --foreground: 248 250 252;
-    --card: 51 65 85;
+    --card: 30 41 59;
     --card-foreground: 248 250 252;
   }
 }
@@ -73,9 +72,9 @@
   body {
     @apply bg-background text-foreground;
     background: linear-gradient(135deg, 
-      hsl(var(--background)) 0%, 
-      rgba(245,245,240,0.8) 50%, 
-      hsl(var(--background)) 100%);
+      rgb(255, 255, 255) 0%, 
+      rgb(248, 250, 252) 50%, 
+      rgb(255, 255, 255) 100%);
     min-height: 100vh;
   }
 }
@@ -94,9 +93,9 @@
     width: 200%;
     height: 200%;
     background: 
-      radial-gradient(circle at 20% 80%, rgba(255,87,87,0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(126,217,87,0.1) 0%, transparent 50%),
-      radial-gradient(circle at 40% 40%, rgba(82,113,255,0.1) 0%, transparent 50%);
+      radial-gradient(circle at 20% 80%, rgba(34,197,94,0.05) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(59,130,246,0.05) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(147,51,234,0.05) 0%, transparent 50%);
     animation: sparkle 8s ease-in-out infinite;
     pointer-events: none;
   }
@@ -120,22 +119,20 @@
   
   .gradient-border {
     background: linear-gradient(135deg, 
-      rgba(255,87,87,0.2) 0%, 
-      rgba(255,189,89,0.2) 25%, 
-      rgba(126,217,87,0.2) 50%, 
-      rgba(82,113,255,0.2) 75%, 
-      rgba(168,92,255,0.2) 100%);
+      rgba(34,197,94,0.2) 0%, 
+      rgba(59,130,246,0.2) 25%, 
+      rgba(147,51,234,0.2) 50%, 
+      rgba(20,184,166,0.2) 75%, 
+      rgba(249,115,22,0.2) 100%);
     padding: 2px;
     border-radius: calc(var(--radius) + 2px);
   }
   
   .paint-card {
     @apply bg-card border border-border rounded-lg p-6 shadow-lg;
-    background: linear-gradient(135deg, 
-      rgba(255,255,255,0.9) 0%, 
-      rgba(255,255,255,0.95) 100%);
+    background: rgba(255,255,255,0.95);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.2);
+    border: 1px solid rgba(226,232,240,0.5);
   }
 }
 
