@@ -39,7 +39,7 @@ export default function SalesManagement() {
         {/* Header Area */}
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Sales Management</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Sales Activity</h1>
             <Breadcrumb className="mt-2">
               <BreadcrumbList>
                 <BreadcrumbItem>
@@ -47,7 +47,11 @@ export default function SalesManagement() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Sales</BreadcrumbPage>
+                  <BreadcrumbLink href="/sales">Sales Management</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Sales Activity</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
