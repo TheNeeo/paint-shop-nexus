@@ -134,27 +134,27 @@ export function SalesTable({ filters, onViewInvoice }: SalesTableProps) {
   return (
     <div className="bg-white rounded-lg border shadow-sm">
       <div className="p-4 border-b">
-        <h2 className="text-lg font-semibold">Sales Records</h2>
+        <h2 className="text-lg font-semibold text-black">Sales Records</h2>
       </div>
       
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-12">
+            <TableHead className="w-12 text-black font-semibold">
               <Checkbox />
             </TableHead>
-            <TableHead className="w-8"></TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Invoice #</TableHead>
-            <TableHead>Customer</TableHead>
-            <TableHead>Product</TableHead>
-            <TableHead>Unit Price</TableHead>
-            <TableHead>Qty</TableHead>
-            <TableHead>Total Amount</TableHead>
-            <TableHead>Paid Amount</TableHead>
-            <TableHead>Payment Mode</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead className="w-8 text-black font-semibold"></TableHead>
+            <TableHead className="text-black font-semibold">Date</TableHead>
+            <TableHead className="text-black font-semibold">Invoice #</TableHead>
+            <TableHead className="text-black font-semibold">Customer</TableHead>
+            <TableHead className="text-black font-semibold">Product</TableHead>
+            <TableHead className="text-black font-semibold">Unit Price</TableHead>
+            <TableHead className="text-black font-semibold">Qty</TableHead>
+            <TableHead className="text-black font-semibold">Total Amount</TableHead>
+            <TableHead className="text-black font-semibold">Paid Amount</TableHead>
+            <TableHead className="text-black font-semibold">Payment Mode</TableHead>
+            <TableHead className="text-black font-semibold">Status</TableHead>
+            <TableHead className="text-black font-semibold">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
