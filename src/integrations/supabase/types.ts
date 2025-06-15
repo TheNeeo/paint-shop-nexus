@@ -9,6 +9,115 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      purchase_items: {
+        Row: {
+          created_at: string
+          discount_rate: number | null
+          id: string
+          product_name: string
+          purchase_id: string
+          quantity: number
+          tax_rate: number | null
+          total_amount: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          discount_rate?: number | null
+          id?: string
+          product_name: string
+          purchase_id: string
+          quantity: number
+          tax_rate?: number | null
+          total_amount: number
+          unit_price: number
+        }
+        Update: {
+          created_at?: string
+          discount_rate?: number | null
+          id?: string
+          product_name?: string
+          purchase_id?: string
+          quantity?: number
+          tax_rate?: number | null
+          total_amount?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_items_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "purchases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchases: {
+        Row: {
+          balance_amount: number
+          created_at: string
+          discount_amount: number
+          id: string
+          invoice_file_url: string | null
+          invoice_number: string
+          notes: string | null
+          paid_amount: number
+          payment_method: string | null
+          purchase_date: string
+          status: string
+          subtotal: number
+          tax_amount: number
+          total_amount: number
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          balance_amount?: number
+          created_at?: string
+          discount_amount?: number
+          id?: string
+          invoice_file_url?: string | null
+          invoice_number: string
+          notes?: string | null
+          paid_amount?: number
+          payment_method?: string | null
+          purchase_date?: string
+          status?: string
+          subtotal?: number
+          tax_amount?: number
+          total_amount?: number
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          balance_amount?: number
+          created_at?: string
+          discount_amount?: number
+          id?: string
+          invoice_file_url?: string | null
+          invoice_number?: string
+          notes?: string | null
+          paid_amount?: number
+          payment_method?: string | null
+          purchase_date?: string
+          status?: string
+          subtotal?: number
+          tax_amount?: number
+          total_amount?: number
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchases_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       table_name: {
         Row: {
           data: Json | null
@@ -29,6 +138,42 @@ export type Database = {
           id?: number
           inserted_at?: string
           name?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      vendors: {
+        Row: {
+          address: string | null
+          contact_person: string | null
+          created_at: string
+          email: string | null
+          gst_number: string | null
+          id: string
+          name: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          contact_person?: string | null
+          created_at?: string
+          email?: string | null
+          gst_number?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          contact_person?: string | null
+          created_at?: string
+          email?: string | null
+          gst_number?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
           updated_at?: string
         }
         Relationships: []
