@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   Dialog,
@@ -7,7 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Download, Print } from "lucide-react";
+import { Download, Printer } from "lucide-react";
 
 interface InvoiceViewerProps {
   isOpen: boolean;
@@ -35,7 +34,7 @@ export function InvoiceViewer({ isOpen, onClose, invoice }: InvoiceViewerProps) 
             <DialogTitle>Invoice Preview - {invoice.invoiceNumber}</DialogTitle>
             <div className="flex gap-2">
               <Button onClick={handlePrint} size="sm">
-                <Print className="h-4 w-4 mr-2" />
+                <Printer className="h-4 w-4 mr-2" />
                 Print
               </Button>
               <Button onClick={handleDownload} size="sm">
