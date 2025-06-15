@@ -1,4 +1,5 @@
 
+
 import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -209,7 +210,7 @@ export default function ProductManagement() {
   return (
     <AppLayout>
       <TooltipProvider>
-        <div className="w-full bg-gradient-to-br from-green-50 via-green-25 to-green-50 min-h-screen">
+        <div className="w-full bg-gradient-to-br from-green-100 via-green-50 to-green-100 min-h-screen">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
             <div className="space-y-3">
@@ -327,3 +328,4 @@ export default function ProductManagement() {
     </AppLayout>
   );
 }
+
