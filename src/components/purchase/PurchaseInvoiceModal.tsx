@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -7,9 +6,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Download, Print } from 'lucide-react';
+import { Download, Printer } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { Purchase, PurchaseItem, Vendor } from '../PurchaseManagement';
+import { Purchase, PurchaseItem, Vendor } from '@/types/purchase';
 import { format } from 'date-fns';
 
 interface PurchaseInvoiceModalProps {
@@ -217,7 +216,7 @@ export const PurchaseInvoiceModal: React.FC<PurchaseInvoiceModalProps> = ({
                 Download PDF
               </Button>
               <Button variant="outline" onClick={handlePrint}>
-                <Print className="w-4 h-4 mr-2" />
+                <Printer className="w-4 h-4 mr-2" />
                 Print
               </Button>
               <Button onClick={onClose}>Close</Button>

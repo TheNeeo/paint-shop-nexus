@@ -11,9 +11,9 @@ export const PurchaseSummary = () => {
     totalPurchases: 0,
     totalAmount: 0,
     totalVendors: 0,
-    topVendors: [],
-    purchaseTrend: [],
-    recentPurchases: []
+    topVendors: [] as Array<{ name: string; amount: number }>,
+    purchaseTrend: [] as Array<{ date: string; amount: number; label: string }>,
+    recentPurchases: [] as Array<any>
   });
   const [loading, setLoading] = useState(true);
 
@@ -37,7 +37,7 @@ export const PurchaseSummary = () => {
       if (monthlyError) throw monthlyError;
 
       const totalPurchases = monthlyPurchases?.length || 0;
-      const totalAmount = monthlyPurchases?.reduce((sum, p) => sum + p.total_amount, 0) || 0;
+      const totalAmount = monthlyPurchases?.reduce((sum, p) => sum + Number(p.total_amount), 0) || 0;
 
       // Fetch vendor count
       const { data: vendors, error: vendorError } = await supabase
@@ -59,17 +59,17 @@ export const PurchaseSummary = () => {
       if (topVendorError) throw topVendorError;
 
       // Group by vendor and calculate totals
-      const vendorTotals = topVendorData?.reduce((acc, purchase) => {
+      const vendorTotals = topVendorData?.reduce((acc: Record<string, number>, purchase) => {
         const vendorName = purchase.vendors?.name || 'Unknown';
         if (!acc[vendorName]) {
           acc[vendorName] = 0;
         }
-        acc[vendorName] += purchase.total_amount;
+        acc[vendorName] += Number(purchase.total_amount);
         return acc;
       }, {}) || {};
 
       const topVendors = Object.entries(vendorTotals)
-        .map(([name, amount]) => ({ name, amount }))
+        .map(([name, amount]) => ({ name, amount: Number(amount) }))
         .sort((a, b) => b.amount - a.amount)
         .slice(0, 5);
 
@@ -101,7 +101,7 @@ export const PurchaseSummary = () => {
 
           if (error) throw error;
 
-          const dayTotal = data?.reduce((sum, p) => sum + p.total_amount, 0) || 0;
+          const dayTotal = data?.reduce((sum, p) => sum + Number(p.total_amount), 0) || 0;
           return {
             date,
             amount: dayTotal,
@@ -206,7 +206,7 @@ export const PurchaseSummary = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="label" />
                 <YAxis />
-                <Tooltip formatter={(value) => [`₹${value.toLocaleString()}`, 'Amount']} />
+                <Tooltip formatter={(value) => [`₹${Number(value).toLocaleString()}`, 'Amount']} />
                 <Line type="monotone" dataKey="amount" stroke="#3b82f6" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
@@ -224,7 +224,7 @@ export const PurchaseSummary = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip formatter={(value) => [`₹${value.toLocaleString()}`, 'Amount']} />
+                <Tooltip formatter={(value) => [`₹${Number(value).toLocaleString()}`, 'Amount']} />
                 <Bar dataKey="amount" fill="#10b981" />
               </BarChart>
             </ResponsiveContainer>
@@ -246,7 +246,7 @@ export const PurchaseSummary = () => {
                   <p className="text-sm text-gray-600">{purchase.vendor_name}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium">₹{purchase.total_amount.toLocaleString()}</p>
+                  <p className="font-medium">₹{Number(purchase.total_amount).toLocaleString()}</p>
                   <Badge variant={
                     purchase.status === 'received' ? 'default' :
                     purchase.status === 'pending' ? 'secondary' : 'destructive'

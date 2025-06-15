@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -19,7 +18,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Eye, Edit, Trash2, RotateCcw, MoreHorizontal } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { Purchase } from '../PurchaseManagement';
+import { Purchase } from '@/types/purchase';
 import { format } from 'date-fns';
 
 interface PurchaseTableProps {
