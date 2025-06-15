@@ -96,9 +96,9 @@ export function NewSaleModal({ isOpen, onClose }: NewSaleModalProps) {
         <div className="space-y-6">
           {/* Customer Selection */}
           <div className="space-y-2">
-            <Label className="text-black">Customer</Label>
+            <Label className="text-black font-semibold">Customer</Label>
             <Select value={customer} onValueChange={setCustomer}>
-              <SelectTrigger>
+              <SelectTrigger className="bg-white border-gray-300">
                 <SelectValue placeholder="Select Customer" />
               </SelectTrigger>
               <SelectContent>
@@ -112,22 +112,22 @@ export function NewSaleModal({ isOpen, onClose }: NewSaleModalProps) {
           {/* Products Section */}
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <Label className="text-black">Products</Label>
-              <Button onClick={addProduct} size="sm">
+              <Label className="text-black font-semibold">Products</Label>
+              <Button onClick={addProduct} size="sm" className="bg-blue-600 hover:bg-blue-700">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Product
               </Button>
             </div>
 
             {products.map((product) => (
-              <div key={product.id} className="grid grid-cols-12 gap-4 items-end p-4 border rounded-lg bg-gray-50">
+              <div key={product.id} className="grid grid-cols-12 gap-4 items-end p-4 border rounded-lg bg-blue-50 border-blue-200">
                 <div className="col-span-4">
-                  <Label className="text-black">Product Name</Label>
+                  <Label className="text-black font-semibold">Product Name</Label>
                   <Select
                     value={product.name}
                     onValueChange={(value) => updateProduct(product.id, 'name', value)}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white border-gray-300">
                       <SelectValue placeholder="Select Product" />
                     </SelectTrigger>
                     <SelectContent>
@@ -138,31 +138,33 @@ export function NewSaleModal({ isOpen, onClose }: NewSaleModalProps) {
                   </Select>
                 </div>
                 <div className="col-span-2">
-                  <Label className="text-black">Quantity</Label>
+                  <Label className="text-black font-semibold">Quantity</Label>
                   <Input
                     type="number"
                     value={product.quantity}
                     onChange={(e) => updateProduct(product.id, 'quantity', Number(e.target.value))}
+                    className="bg-white border-gray-300"
                   />
                 </div>
                 <div className="col-span-2">
-                  <Label className="text-black">Unit Price</Label>
+                  <Label className="text-black font-semibold">Unit Price</Label>
                   <Input
                     type="number"
                     value={product.unitPrice}
                     onChange={(e) => updateProduct(product.id, 'unitPrice', Number(e.target.value))}
+                    className="bg-white border-gray-300"
                   />
                 </div>
                 <div className="col-span-3">
-                  <Label className="text-black">Total</Label>
-                  <Input value={`₹${product.total}`} disabled />
+                  <Label className="text-black font-semibold">Total</Label>
+                  <Input value={`₹${product.total}`} disabled className="bg-gray-100 border-gray-300" />
                 </div>
                 <div className="col-span-1">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => removeProduct(product.id)}
-                    className="text-red-600"
+                    className="text-red-600 border-red-300 hover:bg-red-50"
                   >
                     <Trash className="h-4 w-4" />
                   </Button>
@@ -176,38 +178,40 @@ export function NewSaleModal({ isOpen, onClose }: NewSaleModalProps) {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-black">Discount (%)</Label>
+                  <Label className="text-black font-semibold">Discount (%)</Label>
                   <Input
                     type="number"
                     value={discount}
                     onChange={(e) => setDiscount(Number(e.target.value))}
+                    className="bg-white border-gray-300"
                   />
                 </div>
                 <div>
-                  <Label className="text-black">Tax (%)</Label>
+                  <Label className="text-black font-semibold">Tax (%)</Label>
                   <Input
                     type="number"
                     value={tax}
                     onChange={(e) => setTax(Number(e.target.value))}
+                    className="bg-white border-gray-300"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="space-y-2 bg-slate-100 p-4 rounded-lg border">
-              <div className="flex justify-between text-black">
+            <div className="space-y-2 bg-green-50 p-4 rounded-lg border border-green-200">
+              <div className="flex justify-between text-black font-medium">
                 <span>Subtotal:</span>
                 <span>₹{subtotal.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-black">
+              <div className="flex justify-between text-black font-medium">
                 <span>Discount:</span>
                 <span>-₹{discountAmount.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-black">
+              <div className="flex justify-between text-black font-medium">
                 <span>Tax:</span>
                 <span>₹{taxAmount.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between font-bold text-lg text-black">
+              <div className="flex justify-between font-bold text-lg text-black border-t border-green-300 pt-2">
                 <span>Grand Total:</span>
                 <span>₹{grandTotal.toFixed(2)}</span>
               </div>
@@ -217,17 +221,18 @@ export function NewSaleModal({ isOpen, onClose }: NewSaleModalProps) {
           {/* Payment Information */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-black">Paid Amount</Label>
+              <Label className="text-black font-semibold">Paid Amount</Label>
               <Input
                 type="number"
                 value={paidAmount}
                 onChange={(e) => setPaidAmount(Number(e.target.value))}
+                className="bg-white border-gray-300"
               />
             </div>
             <div>
-              <Label className="text-black">Payment Mode</Label>
+              <Label className="text-black font-semibold">Payment Mode</Label>
               <Select value={paymentMode} onValueChange={setPaymentMode}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-white border-gray-300">
                   <SelectValue placeholder="Select Payment Mode" />
                 </SelectTrigger>
                 <SelectContent>
@@ -242,9 +247,9 @@ export function NewSaleModal({ isOpen, onClose }: NewSaleModalProps) {
           </div>
 
           {pendingAmount > 0 && (
-            <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="bg-orange-100 text-orange-800">
+                <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
                   Pending Amount: ₹{pendingAmount.toFixed(2)}
                 </Badge>
               </div>
@@ -253,20 +258,21 @@ export function NewSaleModal({ isOpen, onClose }: NewSaleModalProps) {
 
           {/* Notes */}
           <div>
-            <Label className="text-black">Notes (Optional)</Label>
+            <Label className="text-black font-semibold">Notes (Optional)</Label>
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Add any additional notes..."
+              className="bg-white border-gray-300"
             />
           </div>
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-4">
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" onClick={onClose} className="border-gray-300 hover:bg-gray-50">
               Cancel
             </Button>
-            <Button onClick={handleSave}>
+            <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
               Save Sale
             </Button>
             <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
