@@ -25,21 +25,33 @@ const colorOptions = [
   { value: "yellow", label: "Yellow", class: "bg-yellow-500" },
 ];
 
+interface CategoryFormData {
+  name: string;
+  description: string;
+  color: string;
+  isActive: boolean;
+}
+
+interface FormErrors {
+  name?: string;
+  description?: string;
+}
+
 interface CategoryFormProps {
   category?: any;
-  onSubmit: (data: any) => void;
+  onSubmit: (data: CategoryFormData) => void;
   onClose: () => void;
 }
 
 export function CategoryForm({ category, onSubmit, onClose }: CategoryFormProps) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CategoryFormData>({
     name: "",
     description: "",
     color: "blue",
     isActive: true,
   });
 
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<FormErrors>({});
 
   useEffect(() => {
     if (category) {
@@ -52,8 +64,8 @@ export function CategoryForm({ category, onSubmit, onClose }: CategoryFormProps)
     }
   }, [category]);
 
-  const validateForm = () => {
-    const newErrors = {};
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
     
     if (!formData.name.trim()) {
       newErrors.name = "Category name is required";
@@ -67,7 +79,7 @@ export function CategoryForm({ category, onSubmit, onClose }: CategoryFormProps)
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -87,14 +99,14 @@ export function CategoryForm({ category, onSubmit, onClose }: CategoryFormProps)
     }
   };
 
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: keyof CategoryFormData, value: string | boolean) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
     
     // Clear error when user starts typing
-    if (errors[field]) {
+    if (errors[field as keyof FormErrors]) {
       setErrors(prev => ({
         ...prev,
         [field]: undefined
