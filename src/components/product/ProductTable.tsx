@@ -1,4 +1,5 @@
 
+
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -74,20 +75,20 @@ export function ProductTable({
       <Table>
         <TableHeader>
           <TableRow className="bg-gradient-to-r from-gray-50 to-gray-100">
-            <TableHead className="w-12">
+            <TableHead className="w-12 text-black font-semibold">
               <Checkbox
                 checked={selectedProducts.size === products.length && products.length > 0}
                 onCheckedChange={onSelectAllProducts}
               />
             </TableHead>
-            <TableHead className="w-12"></TableHead>
-            <TableHead className="w-16">Image</TableHead>
-            <TableHead>Product Details</TableHead>
-            <TableHead>Unit</TableHead>
-            <TableHead>Pricing</TableHead>
-            <TableHead>Stock</TableHead>
-            <TableHead>Performance</TableHead>
-            <TableHead className="w-32">Actions</TableHead>
+            <TableHead className="w-12 text-black font-semibold"></TableHead>
+            <TableHead className="w-16 text-black font-semibold">Image</TableHead>
+            <TableHead className="text-black font-semibold">Product Details</TableHead>
+            <TableHead className="text-black font-semibold">Unit</TableHead>
+            <TableHead className="text-black font-semibold">Pricing</TableHead>
+            <TableHead className="text-black font-semibold">Stock</TableHead>
+            <TableHead className="text-black font-semibold">Performance</TableHead>
+            <TableHead className="w-32 text-black font-semibold">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -300,3 +301,4 @@ export function ProductTable({
     </Card>
   );
 }
+
