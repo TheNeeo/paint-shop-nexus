@@ -29,6 +29,7 @@ import { ProductFilters } from "@/components/product/ProductFilters";
 import { ProductTable } from "@/components/product/ProductTable";
 import { BulkActions } from "@/components/product/BulkActions";
 import { ProductFooter } from "@/components/product/ProductFooter";
+import AppLayout from "@/components/layout/AppLayout";
 
 // Enhanced mock data with more detailed information
 const mockProducts = [
@@ -205,11 +206,11 @@ export default function ProductManagement() {
   };
 
   return (
-    <TooltipProvider>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-        <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
+    <AppLayout>
+      <TooltipProvider>
+        <div className="w-full">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
             <div className="space-y-3">
               <Breadcrumb>
                 <BreadcrumbList>
@@ -260,40 +261,46 @@ export default function ProductManagement() {
           </div>
 
           {/* Stats */}
-          <ProductStats
-            totalProducts={products.length}
-            totalValue={stats.totalValue}
-            lowStockCount={stats.lowStockCount}
-            featuredCount={stats.featuredCount}
-          />
+          <div className="mb-6">
+            <ProductStats
+              totalProducts={products.length}
+              totalValue={stats.totalValue}
+              lowStockCount={stats.lowStockCount}
+              featuredCount={stats.featuredCount}
+            />
+          </div>
 
           {/* Filters */}
-          <ProductFilters
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            categoryFilter={categoryFilter}
-            setCategoryFilter={setCategoryFilter}
-            stockFilter={stockFilter}
-            setStockFilter={setStockFilter}
-            sortBy={sortBy}
-            setSortBy={setSortBy}
-            showFeaturedOnly={showFeaturedOnly}
-            setShowFeaturedOnly={setShowFeaturedOnly}
-            viewMode={viewMode}
-            setViewMode={setViewMode}
-            categories={categories}
-            stockStatuses={stockStatuses}
-            sortOptions={sortOptions}
-          />
+          <div className="mb-6">
+            <ProductFilters
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              categoryFilter={categoryFilter}
+              setCategoryFilter={setCategoryFilter}
+              stockFilter={stockFilter}
+              setStockFilter={setStockFilter}
+              sortBy={sortBy}
+              setSortBy={setSortBy}
+              showFeaturedOnly={showFeaturedOnly}
+              setShowFeaturedOnly={setShowFeaturedOnly}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+              categories={categories}
+              stockStatuses={stockStatuses}
+              sortOptions={sortOptions}
+            />
+          </div>
 
           {/* Bulk Actions */}
-          <BulkActions
-            selectedCount={selectedProducts.size}
-            onBulkAction={handleBulkAction}
-          />
+          <div className="mb-6">
+            <BulkActions
+              selectedCount={selectedProducts.size}
+              onBulkAction={handleBulkAction}
+            />
+          </div>
 
           {/* Product Table */}
-          <div className="overflow-hidden">
+          <div className="overflow-hidden mb-6">
             <ProductTable
               products={filteredProducts}
               expandedRows={expandedRows}
@@ -315,7 +322,7 @@ export default function ProductManagement() {
             lowStockCount={stats.lowStockCount}
           />
         </div>
-      </div>
-    </TooltipProvider>
+      </TooltipProvider>
+    </AppLayout>
   );
 }
