@@ -88,15 +88,15 @@ export function NewSaleModal({ isOpen, onClose }: NewSaleModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
         <DialogHeader>
-          <DialogTitle>New Sale</DialogTitle>
+          <DialogTitle className="text-black">New Sale</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
           {/* Customer Selection */}
           <div className="space-y-2">
-            <Label>Customer</Label>
+            <Label className="text-black">Customer</Label>
             <Select value={customer} onValueChange={setCustomer}>
               <SelectTrigger>
                 <SelectValue placeholder="Select Customer" />
@@ -112,7 +112,7 @@ export function NewSaleModal({ isOpen, onClose }: NewSaleModalProps) {
           {/* Products Section */}
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <Label>Products</Label>
+              <Label className="text-black">Products</Label>
               <Button onClick={addProduct} size="sm">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Product
@@ -120,9 +120,9 @@ export function NewSaleModal({ isOpen, onClose }: NewSaleModalProps) {
             </div>
 
             {products.map((product) => (
-              <div key={product.id} className="grid grid-cols-12 gap-4 items-end p-4 border rounded-lg">
+              <div key={product.id} className="grid grid-cols-12 gap-4 items-end p-4 border rounded-lg bg-gray-50">
                 <div className="col-span-4">
-                  <Label>Product Name</Label>
+                  <Label className="text-black">Product Name</Label>
                   <Select
                     value={product.name}
                     onValueChange={(value) => updateProduct(product.id, 'name', value)}
@@ -138,7 +138,7 @@ export function NewSaleModal({ isOpen, onClose }: NewSaleModalProps) {
                   </Select>
                 </div>
                 <div className="col-span-2">
-                  <Label>Quantity</Label>
+                  <Label className="text-black">Quantity</Label>
                   <Input
                     type="number"
                     value={product.quantity}
@@ -146,7 +146,7 @@ export function NewSaleModal({ isOpen, onClose }: NewSaleModalProps) {
                   />
                 </div>
                 <div className="col-span-2">
-                  <Label>Unit Price</Label>
+                  <Label className="text-black">Unit Price</Label>
                   <Input
                     type="number"
                     value={product.unitPrice}
@@ -154,7 +154,7 @@ export function NewSaleModal({ isOpen, onClose }: NewSaleModalProps) {
                   />
                 </div>
                 <div className="col-span-3">
-                  <Label>Total</Label>
+                  <Label className="text-black">Total</Label>
                   <Input value={`₹${product.total}`} disabled />
                 </div>
                 <div className="col-span-1">
@@ -176,7 +176,7 @@ export function NewSaleModal({ isOpen, onClose }: NewSaleModalProps) {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Discount (%)</Label>
+                  <Label className="text-black">Discount (%)</Label>
                   <Input
                     type="number"
                     value={discount}
@@ -184,7 +184,7 @@ export function NewSaleModal({ isOpen, onClose }: NewSaleModalProps) {
                   />
                 </div>
                 <div>
-                  <Label>Tax (%)</Label>
+                  <Label className="text-black">Tax (%)</Label>
                   <Input
                     type="number"
                     value={tax}
@@ -194,20 +194,20 @@ export function NewSaleModal({ isOpen, onClose }: NewSaleModalProps) {
               </div>
             </div>
 
-            <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
-              <div className="flex justify-between">
+            <div className="space-y-2 bg-slate-100 p-4 rounded-lg border">
+              <div className="flex justify-between text-black">
                 <span>Subtotal:</span>
                 <span>₹{subtotal.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between text-black">
                 <span>Discount:</span>
                 <span>-₹{discountAmount.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between text-black">
                 <span>Tax:</span>
                 <span>₹{taxAmount.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between font-bold text-lg">
+              <div className="flex justify-between font-bold text-lg text-black">
                 <span>Grand Total:</span>
                 <span>₹{grandTotal.toFixed(2)}</span>
               </div>
@@ -217,7 +217,7 @@ export function NewSaleModal({ isOpen, onClose }: NewSaleModalProps) {
           {/* Payment Information */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>Paid Amount</Label>
+              <Label className="text-black">Paid Amount</Label>
               <Input
                 type="number"
                 value={paidAmount}
@@ -225,7 +225,7 @@ export function NewSaleModal({ isOpen, onClose }: NewSaleModalProps) {
               />
             </div>
             <div>
-              <Label>Payment Mode</Label>
+              <Label className="text-black">Payment Mode</Label>
               <Select value={paymentMode} onValueChange={setPaymentMode}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select Payment Mode" />
@@ -242,9 +242,9 @@ export function NewSaleModal({ isOpen, onClose }: NewSaleModalProps) {
           </div>
 
           {pendingAmount > 0 && (
-            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="bg-yellow-100 text-yellow-800">
+                <Badge variant="outline" className="bg-orange-100 text-orange-800">
                   Pending Amount: ₹{pendingAmount.toFixed(2)}
                 </Badge>
               </div>
@@ -253,7 +253,7 @@ export function NewSaleModal({ isOpen, onClose }: NewSaleModalProps) {
 
           {/* Notes */}
           <div>
-            <Label>Notes (Optional)</Label>
+            <Label className="text-black">Notes (Optional)</Label>
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
