@@ -28,7 +28,7 @@ export function SalesFilters({ filters, onFiltersChange }: SalesFiltersProps) {
               <SelectValue placeholder="All Customers" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Customers</SelectItem>
+              <SelectItem value="all">All Customers</SelectItem>
               <SelectItem value="john-doe">John Doe</SelectItem>
               <SelectItem value="jane-smith">Jane Smith</SelectItem>
               <SelectItem value="bob-johnson">Bob Johnson</SelectItem>
@@ -47,7 +47,7 @@ export function SalesFilters({ filters, onFiltersChange }: SalesFiltersProps) {
               <SelectValue placeholder="All Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Status</SelectItem>
+              <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="paid">Paid</SelectItem>
               <SelectItem value="partial">Partial Paid</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>

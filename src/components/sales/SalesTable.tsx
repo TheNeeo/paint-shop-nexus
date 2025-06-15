@@ -121,8 +121,8 @@ export function SalesTable({ filters, onViewInvoice }: SalesTableProps) {
   };
 
   const filteredSales = mockSales.filter(sale => {
-    const matchesCustomer = !filters.customer || sale.customerName.toLowerCase().includes(filters.customer.toLowerCase());
-    const matchesStatus = !filters.status || sale.paymentStatus === filters.status;
+    const matchesCustomer = !filters.customer || filters.customer === 'all' || sale.customerName.toLowerCase().includes(filters.customer.toLowerCase());
+    const matchesStatus = !filters.status || filters.status === 'all' || sale.paymentStatus === filters.status;
     const matchesSearch = !filters.search || 
       sale.invoiceNumber.toLowerCase().includes(filters.search.toLowerCase()) ||
       sale.customerName.toLowerCase().includes(filters.search.toLowerCase()) ||

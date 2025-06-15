@@ -23,8 +23,8 @@ export default function SalesManagement() {
   const [isInvoiceViewerOpen, setIsInvoiceViewerOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [filters, setFilters] = useState({
-    customer: "",
-    status: "",
+    customer: "all",
+    status: "all",
     search: "",
   });
 
