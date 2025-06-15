@@ -1,5 +1,3 @@
-
-
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -74,21 +72,21 @@ export function ProductTable({
     <Card className="shadow-sm overflow-hidden">
       <Table>
         <TableHeader>
-          <TableRow className="bg-gradient-to-r from-gray-50 to-gray-100">
-            <TableHead className="w-12 text-black font-semibold">
+          <TableRow className="bg-gradient-to-r from-slate-100 to-slate-200 border-b-2 border-slate-300">
+            <TableHead className="w-12 text-black font-bold text-sm">
               <Checkbox
                 checked={selectedProducts.size === products.length && products.length > 0}
                 onCheckedChange={onSelectAllProducts}
               />
             </TableHead>
-            <TableHead className="w-12 text-black font-semibold"></TableHead>
-            <TableHead className="w-16 text-black font-semibold">Image</TableHead>
-            <TableHead className="text-black font-semibold">Product Details</TableHead>
-            <TableHead className="text-black font-semibold">Unit</TableHead>
-            <TableHead className="text-black font-semibold">Pricing</TableHead>
-            <TableHead className="text-black font-semibold">Stock</TableHead>
-            <TableHead className="text-black font-semibold">Performance</TableHead>
-            <TableHead className="w-32 text-black font-semibold">Actions</TableHead>
+            <TableHead className="w-12 text-black font-bold text-sm"></TableHead>
+            <TableHead className="w-16 text-black font-bold text-sm">Image</TableHead>
+            <TableHead className="text-black font-bold text-sm">Product Details</TableHead>
+            <TableHead className="text-black font-bold text-sm">Unit</TableHead>
+            <TableHead className="text-black font-bold text-sm">Pricing</TableHead>
+            <TableHead className="text-black font-bold text-sm">Stock</TableHead>
+            <TableHead className="text-black font-bold text-sm">Performance</TableHead>
+            <TableHead className="w-32 text-black font-bold text-sm">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -252,7 +250,7 @@ export function ProductTable({
               </TableRow>
               
               {/* Variant Rows */}
-              {expandedRows.has(product.id) && product.variants.map((variant, index) => (
+              {expandedRows.has(product.id) && product.variants?.map((variant, index) => (
                 <TableRow key={variant.id} className="bg-gradient-to-r from-blue-50/30 to-blue-50/10 border-l-4 border-blue-200">
                   <TableCell></TableCell>
                   <TableCell></TableCell>
@@ -301,4 +299,3 @@ export function ProductTable({
     </Card>
   );
 }
-
