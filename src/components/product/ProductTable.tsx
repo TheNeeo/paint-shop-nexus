@@ -93,7 +93,7 @@ export function ProductTable({
         <TableBody>
           {products.map((product) => (
             <React.Fragment key={product.id}>
-              <TableRow className="hover:bg-gray-50/50 transition-colors group">
+              <TableRow className="hover:bg-green-50/50 transition-colors group">
                 <TableCell>
                   <Checkbox
                     checked={selectedProducts.has(product.id)}

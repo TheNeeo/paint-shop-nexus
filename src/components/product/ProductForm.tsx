@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,7 +74,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-white">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* Basic Product Information */}
