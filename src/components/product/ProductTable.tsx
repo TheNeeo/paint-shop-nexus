@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -172,7 +173,7 @@ export function ProductTable({
                       </Badge>
                     </div>
                     {product.stockQuantity <= 10 && product.stockQuantity > 0 && (
-                      <div className="text-xs text-amber-600 flex items-center gap-1">
+                      <div className="text-xs text-green-600 flex items-center gap-1">
                         <AlertTriangle className="h-3 w-3" />
                         Reorder soon
                       </div>
@@ -251,7 +252,7 @@ export function ProductTable({
               
               {/* Variant Rows */}
               {expandedRows.has(product.id) && product.variants?.map((variant, index) => (
-                <TableRow key={variant.id} className="bg-gradient-to-r from-blue-50/30 to-blue-50/10 border-l-4 border-blue-200">
+                <TableRow key={variant.id} className="bg-gradient-to-r from-green-50/30 to-green-50/10 border-l-4 border-green-200">
                   <TableCell></TableCell>
                   <TableCell></TableCell>
                   <TableCell>
@@ -261,7 +262,7 @@ export function ProductTable({
                   </TableCell>
                   <TableCell className="pl-8">
                     <div className="flex items-center gap-2">
-                      <ChevronRight className="h-3 w-3 text-blue-400" />
+                      <ChevronRight className="h-3 w-3 text-green-400" />
                       <div className="space-y-1">
                         <span className="text-sm font-medium text-gray-700">{variant.name}</span>
                         <div className="text-xs text-gray-500">SKU: {variant.sku}</div>

@@ -55,7 +55,8 @@ export const PurchaseTable: React.FC<PurchaseTableProps> = ({
 
       const formattedPurchases = data.map(purchase => ({
         ...purchase,
-        vendor_name: purchase.vendors?.name || 'Unknown Vendor'
+        vendor_name: purchase.vendors?.name || 'Unknown Vendor',
+        status: purchase.status as 'pending' | 'received' | 'returned'
       }));
 
       setPurchases(formattedPurchases);
