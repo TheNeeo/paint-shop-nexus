@@ -1,11 +1,14 @@
 
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Package,
-  TrendingUp,
+  DollarSign,
   AlertTriangle,
   Star,
+  TrendingUp,
+  Boxes,
 } from "lucide-react";
 
 interface ProductStatsProps {
@@ -15,56 +18,75 @@ interface ProductStatsProps {
   featuredCount: number;
 }
 
-export function ProductStats({ totalProducts, totalValue, lowStockCount, featuredCount }: ProductStatsProps) {
+export function ProductStats({
+  totalProducts,
+  totalValue,
+  lowStockCount,
+  featuredCount,
+}: ProductStatsProps) {
+  const stats = [
+    {
+      title: "Total Products",
+      value: totalProducts,
+      icon: Package,
+      color: "text-green-600",
+      bgColor: "bg-green-100",
+      borderColor: "border-green-200",
+    },
+    {
+      title: "Total Inventory Value",
+      value: `$${totalValue.toFixed(2)}`,
+      icon: DollarSign,
+      color: "text-blue-600",
+      bgColor: "bg-blue-100",
+      borderColor: "border-blue-200",
+    },
+    {
+      title: "Low Stock Items",
+      value: lowStockCount,
+      icon: AlertTriangle,
+      color: "text-orange-600",
+      bgColor: "bg-orange-100",
+      borderColor: "border-orange-200",
+      badge: lowStockCount > 0 ? "Attention" : "Good",
+      badgeColor: lowStockCount > 0 ? "bg-orange-100 text-orange-800" : "bg-green-100 text-green-800",
+    },
+    {
+      title: "Featured Products",
+      value: featuredCount,
+      icon: Star,
+      color: "text-green-600",
+      bgColor: "bg-green-100",
+      borderColor: "border-green-200",
+    },
+  ];
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-blue-600">Total Products</p>
-              <p className="text-2xl font-bold text-blue-900">{totalProducts}</p>
+      {stats.map((stat, index) => (
+        <Card key={index} className={`shadow-sm border ${stat.borderColor} hover:shadow-md transition-shadow`}>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              {stat.title}
+            </CardTitle>
+            <div className={`h-8 w-8 rounded-lg ${stat.bgColor} flex items-center justify-center`}>
+              <stat.icon className={`h-4 w-4 ${stat.color}`} />
             </div>
-            <Package className="h-8 w-8 text-blue-600" />
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-green-600">Total Value</p>
-              <p className="text-2xl font-bold text-green-900">${totalValue.toFixed(2)}</p>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className={`text-2xl font-bold ${stat.color}`}>
+                {stat.value}
+              </div>
+              {stat.badge && (
+                <Badge className={`text-xs ${stat.badgeColor}`}>
+                  {stat.badge}
+                </Badge>
+              )}
             </div>
-            <TrendingUp className="h-8 w-8 text-green-600" />
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-yellow-600">Low Stock</p>
-              <p className="text-2xl font-bold text-yellow-900">{lowStockCount}</p>
-            </div>
-            <AlertTriangle className="h-8 w-8 text-yellow-600" />
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-purple-600">Featured</p>
-              <p className="text-2xl font-bold text-purple-900">{featuredCount}</p>
-            </div>
-            <Star className="h-8 w-8 text-purple-600" />
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }
