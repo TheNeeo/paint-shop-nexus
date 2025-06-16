@@ -122,7 +122,7 @@ export function ProductTable({
                       className="w-12 h-12 object-cover rounded-lg border border-gray-200 shadow-sm"
                     />
                     {product.featured && (
-                      <Star className="absolute -top-1 -right-1 h-4 w-4 text-yellow-500 fill-current" />
+                      <Star className="absolute -top-1 -right-1 h-4 w-4 text-green-500 fill-current" />
                     )}
                   </div>
                 </TableCell>
@@ -144,7 +144,7 @@ export function ProductTable({
                           key={i}
                           className={`h-3 w-3 ${
                             i < Math.floor(product.rating) 
-                              ? "text-yellow-400 fill-current" 
+                              ? "text-green-400 fill-current" 
                               : "text-gray-300"
                           }`}
                         />

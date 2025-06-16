@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -221,12 +222,16 @@ export default function ProductManagement() {
                   <BreadcrumbItem>
                     <BreadcrumbPage>Product Management</BreadcrumbPage>
                   </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Product Activity</BreadcrumbPage>
+                  </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2">
                   <Package className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
-                  Product Management
+                  Product Activity
                 </h1>
                 <Badge className="bg-blue-100 text-blue-800 w-fit">
                   {filteredProducts.length} products
