@@ -1,4 +1,5 @@
 
+
 import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -240,7 +241,7 @@ export default function ProductManagement() {
             </div>
             
             <div className="flex flex-col sm:flex-row gap-2">
-              <Button variant="outline" size="sm" className="w-full sm:w-auto">
+              <Button variant="outline" size="sm" className="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700">
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
@@ -331,3 +332,4 @@ export default function ProductManagement() {
     </AppLayout>
   );
 }
+

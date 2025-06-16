@@ -74,7 +74,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
   };
 
   return (
-    <div className="space-y-6 bg-white">
+    <div className="space-y-6 bg-white p-6 rounded-lg">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* Basic Product Information */}
@@ -86,7 +86,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                 <FormItem>
                   <FormLabel>Product Name *</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter product name" {...field} />
+                    <Input placeholder="Enter product name" {...field} className="bg-white border-gray-300" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -100,7 +100,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                 <FormItem>
                   <FormLabel>Base Code</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., PB001" {...field} />
+                    <Input placeholder="e.g., PB001" {...field} className="bg-white border-gray-300" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -115,11 +115,11 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                   <FormLabel>Category *</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="bg-white border-gray-300">
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent className="bg-white">
                       <SelectItem value="Tools">Tools</SelectItem>
                       <SelectItem value="Paint">Paint</SelectItem>
                       <SelectItem value="Canvas">Canvas</SelectItem>
@@ -139,11 +139,11 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                   <FormLabel>Unit of Measure *</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="bg-white border-gray-300">
                         <SelectValue placeholder="Select unit" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent className="bg-white">
                       <SelectItem value="Piece">Piece</SelectItem>
                       <SelectItem value="Set">Set</SelectItem>
                       <SelectItem value="Pack">Pack</SelectItem>
@@ -163,7 +163,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                 <FormItem>
                   <FormLabel>Unit Price *</FormLabel>
                   <FormControl>
-                    <Input type="number" step="0.01" placeholder="0.00" {...field} />
+                    <Input type="number" step="0.01" placeholder="0.00" {...field} className="bg-white border-gray-300" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -177,7 +177,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                 <FormItem>
                   <FormLabel>Stock Quantity *</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="0" {...field} />
+                    <Input type="number" placeholder="0" {...field} className="bg-white border-gray-300" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -192,7 +192,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Enter product description" rows={3} {...field} />
+                  <Textarea placeholder="Enter product description" rows={3} {...field} className="bg-white border-gray-300" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -213,7 +213,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                 />
                 <Label
                   htmlFor="image-upload"
-                  className="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-gray-400"
+                  className="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-gray-400 bg-white"
                 >
                   {imagePreview ? (
                     <img
@@ -243,13 +243,14 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
             </div>
 
             {variants.map((variant, index) => (
-              <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border rounded-lg bg-green-50">
+              <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border rounded-lg bg-blue-50 border-blue-200">
                 <div>
                   <Label>Variant Name</Label>
                   <Input
                     placeholder="e.g., Small Size"
                     value={variant.name}
                     onChange={(e) => updateVariant(index, "name", e.target.value)}
+                    className="bg-white border-gray-300"
                   />
                 </div>
                 <div>
@@ -260,6 +261,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                     placeholder="0.00"
                     value={variant.unitPrice}
                     onChange={(e) => updateVariant(index, "unitPrice", e.target.value)}
+                    className="bg-white border-gray-300"
                   />
                 </div>
                 <div>
@@ -269,6 +271,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                     placeholder="0"
                     value={variant.stockQuantity}
                     onChange={(e) => updateVariant(index, "stockQuantity", e.target.value)}
+                    className="bg-white border-gray-300"
                   />
                 </div>
                 <div className="flex items-end">
@@ -300,3 +303,4 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
     </div>
   );
 }
+
