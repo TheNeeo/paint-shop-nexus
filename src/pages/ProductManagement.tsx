@@ -1,5 +1,3 @@
-
-
 import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -210,38 +208,38 @@ export default function ProductManagement() {
   return (
     <AppLayout>
       <TooltipProvider>
-        <div className="w-full bg-gradient-to-br from-green-200 via-green-100 to-green-200 min-h-screen p-6">
+        <div className="w-full bg-gradient-to-br from-green-50 via-white to-blue-50 min-h-screen p-6">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-8">
             <div className="space-y-3">
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem>
-                    <Home className="h-4 w-4" />
+                    <Home className="h-4 w-4 text-green-600" />
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
-                    <BreadcrumbPage>Product Management</BreadcrumbPage>
+                    <BreadcrumbPage className="text-green-700">Product Management</BreadcrumbPage>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
-                    <BreadcrumbPage>Product Activity</BreadcrumbPage>
+                    <BreadcrumbPage className="text-green-700">Product Activity</BreadcrumbPage>
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2">
-                  <Package className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
+                <h1 className="text-2xl sm:text-3xl font-bold text-green-800 flex items-center gap-2">
+                  <Package className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
                   Product Activity
                 </h1>
-                <Badge className="bg-blue-100 text-blue-800 w-fit">
+                <Badge className="bg-green-100 text-green-800 border-green-200 w-fit">
                   {filteredProducts.length} products
                 </Badge>
               </div>
             </div>
             
             <div className="flex flex-col sm:flex-row gap-2">
-              <Button variant="outline" size="sm" className="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700">
+              <Button variant="outline" size="sm" className="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700 border-blue-600">
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
@@ -253,9 +251,9 @@ export default function ProductManagement() {
                     Add New Product
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white border-2 border-green-200">
                   <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
+                    <DialogTitle className="flex items-center gap-2 text-green-800">
                       <Zap className="h-5 w-5 text-green-600" />
                       Add New Product
                     </DialogTitle>
@@ -267,7 +265,7 @@ export default function ProductManagement() {
           </div>
 
           {/* Stats */}
-          <div className="mb-6">
+          <div className="mb-8">
             <ProductStats
               totalProducts={products.length}
               totalValue={stats.totalValue}
@@ -332,4 +330,3 @@ export default function ProductManagement() {
     </AppLayout>
   );
 }
-
