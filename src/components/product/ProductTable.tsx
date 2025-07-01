@@ -73,28 +73,28 @@ export function ProductTable({
     <Card className="shadow-lg overflow-hidden border-green-200 bg-white">
       <Table>
         <TableHeader>
-          <TableRow className="bg-gradient-to-r from-green-100 via-green-200 to-blue-100 border-b-2 border-green-300 hover:bg-gradient-to-r hover:from-green-200 hover:to-blue-200">
-            <TableHead className="w-12 text-green-800 font-bold text-sm">
+          <TableRow className="bg-gradient-to-r from-slate-100 to-slate-200 border-b-2 border-slate-300">
+            <TableHead className="w-12 text-black font-bold text-sm">
               <Checkbox
                 checked={selectedProducts.size === products.length && products.length > 0}
                 onCheckedChange={onSelectAllProducts}
                 className="border-green-500 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
               />
             </TableHead>
-            <TableHead className="w-12 text-green-800 font-bold text-sm"></TableHead>
-            <TableHead className="w-16 text-green-800 font-bold text-sm">Image</TableHead>
-            <TableHead className="text-green-800 font-bold text-sm">Product Details</TableHead>
-            <TableHead className="text-green-800 font-bold text-sm">Unit</TableHead>
-            <TableHead className="text-green-800 font-bold text-sm">Pricing</TableHead>
-            <TableHead className="text-green-800 font-bold text-sm">Stock</TableHead>
-            <TableHead className="text-green-800 font-bold text-sm">Performance</TableHead>
-            <TableHead className="w-32 text-green-800 font-bold text-sm">Actions</TableHead>
+            <TableHead className="w-12 text-black font-bold text-sm"></TableHead>
+            <TableHead className="w-16 text-black font-bold text-sm">Image</TableHead>
+            <TableHead className="text-black font-bold text-sm">Product Details</TableHead>
+            <TableHead className="text-black font-bold text-sm">Unit</TableHead>
+            <TableHead className="text-black font-bold text-sm">Pricing</TableHead>
+            <TableHead className="text-black font-bold text-sm">Stock</TableHead>
+            <TableHead className="text-black font-bold text-sm">Performance</TableHead>
+            <TableHead className="w-32 text-black font-bold text-sm">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className="bg-white">
           {products.map((product) => (
             <React.Fragment key={product.id}>
-              <TableRow className="hover:bg-green-50/50 transition-colors group border-b border-green-100">
+              <TableRow className="hover:bg-green-50/50 transition-colors group border-b border-gray-100">
                 <TableCell className="bg-white">
                   <Checkbox
                     checked={selectedProducts.has(product.id)}
@@ -219,8 +219,12 @@ export function ProductTable({
                     
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button variant="ghost" size="sm" className="opacity-60 hover:opacity-100 hover:bg-green-100">
-                          <Edit className="h-4 w-4 text-blue-600" />
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="opacity-60 hover:opacity-100 hover:bg-green-100"
+                        >
+                          <Edit className="h-4 w-4 text-green-600" />
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>Edit product</TooltipContent>
@@ -228,7 +232,11 @@ export function ProductTable({
 
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="opacity-60 hover:opacity-100 hover:bg-green-100">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="opacity-60 hover:opacity-100 hover:bg-green-100"
+                        >
                           <MoreHorizontal className="h-4 w-4 text-gray-600" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -254,7 +262,7 @@ export function ProductTable({
               
               {/* Variant Rows */}
               {expandedRows.has(product.id) && product.variants?.map((variant, index) => (
-                <TableRow key={variant.id} className="bg-gradient-to-r from-green-50/30 to-blue-50/10 border-l-4 border-green-300">
+                <TableRow key={variant.id} className="bg-gradient-to-r from-green-50/30 to-green-50/10 border-l-4 border-green-300 hover:from-green-50/50 hover:to-green-50/20">
                   <TableCell></TableCell>
                   <TableCell></TableCell>
                   <TableCell>
@@ -289,8 +297,12 @@ export function ProductTable({
                     <span className="text-xs text-gray-500">Variant data</span>
                   </TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="sm" className="opacity-60 hover:opacity-100 hover:bg-green-100">
-                      <Edit className="h-3 w-3 text-blue-600" />
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="opacity-60 hover:opacity-100 hover:bg-green-100"
+                    >
+                      <Edit className="h-3 w-3 text-green-600" />
                     </Button>
                   </TableCell>
                 </TableRow>

@@ -199,29 +199,29 @@ export function CategoryTable({ categories, onEdit, onDelete }: CategoryTablePro
               {expandedCategories.has(category.id) && (
                 <>
                   {/* Products Header */}
-                  <TableRow className="bg-gradient-to-r from-blue-50 to-blue-100 border-l-4 border-blue-400">
+                  <TableRow className="bg-gradient-to-r from-green-50 to-green-100 border-l-4 border-green-400">
                     <TableCell></TableCell>
-                    <TableCell className="font-semibold text-blue-900">Product Name</TableCell>
-                    <TableCell className="font-semibold text-blue-900">SKU</TableCell>
-                    <TableCell className="font-semibold text-blue-900">Price</TableCell>
-                    <TableCell className="font-semibold text-blue-900">Stock</TableCell>
-                    <TableCell className="font-semibold text-blue-900">Status</TableCell>
+                    <TableCell className="font-semibold text-green-900">Product Name</TableCell>
+                    <TableCell className="font-semibold text-green-900">SKU</TableCell>
+                    <TableCell className="font-semibold text-green-900">Price</TableCell>
+                    <TableCell className="font-semibold text-green-900">Stock</TableCell>
+                    <TableCell className="font-semibold text-green-900">Status</TableCell>
                     <TableCell></TableCell>
-                    <TableCell className="font-semibold text-blue-900">Actions</TableCell>
+                    <TableCell className="font-semibold text-green-900">Actions</TableCell>
                   </TableRow>
                   
                   {/* Product Rows */}
                   {getMockProducts(category.name).map((product, index) => (
                     <TableRow 
                       key={product.id} 
-                      className="bg-gradient-to-r from-blue-50/30 to-blue-50/10 border-l-4 border-blue-200 hover:from-green-50/50 hover:to-green-50/20"
+                      className="bg-gradient-to-r from-green-50/30 to-green-50/10 border-l-4 border-green-200 hover:from-green-50/50 hover:to-green-50/20"
                     >
                       <TableCell className="pl-8">
-                        <ChevronRight className="h-3 w-3 text-blue-400" />
+                        <ChevronRight className="h-3 w-3 text-green-400" />
                       </TableCell>
                       <TableCell className="pl-4">
                         <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                           <span className="text-sm font-medium text-gray-800">{product.name}</span>
                         </div>
                       </TableCell>
@@ -258,14 +258,14 @@ export function CategoryTable({ categories, onEdit, onDelete }: CategoryTablePro
                             size="sm"
                             className="h-6 w-6 p-0 opacity-60 hover:opacity-100 hover:bg-green-100"
                           >
-                            <Eye className="h-3 w-3 text-blue-600" />
+                            <Eye className="h-3 w-3 text-green-600" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
                             className="h-6 w-6 p-0 opacity-60 hover:opacity-100 hover:bg-green-100"
                           >
-                            <Edit className="h-3 w-3 text-blue-600" />
+                            <Edit className="h-3 w-3 text-green-600" />
                           </Button>
                         </div>
                       </TableCell>
