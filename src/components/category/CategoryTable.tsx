@@ -33,18 +33,18 @@ export function CategoryTable({ categories, onEdit, onDelete }: CategoryTablePro
   };
 
   return (
-    <div className="overflow-x-auto">
+    <div className="bg-white rounded-2xl shadow-xl border-2 border-green-200 overflow-hidden">
       <Table>
         <TableHeader>
-          <TableRow className="bg-gradient-to-r from-slate-100 to-slate-200 border-b-2 border-slate-300">
-            <TableHead className="text-black font-bold text-sm w-12"></TableHead>
-            <TableHead className="text-black font-bold text-sm">Category</TableHead>
-            <TableHead className="text-black font-bold text-sm">Description</TableHead>
-            <TableHead className="text-black font-bold text-sm">Color</TableHead>
-            <TableHead className="text-black font-bold text-sm">Products</TableHead>
-            <TableHead className="text-black font-bold text-sm">Status</TableHead>
-            <TableHead className="text-black font-bold text-sm">Created</TableHead>
-            <TableHead className="text-black font-bold text-sm w-32">Actions</TableHead>
+          <TableRow className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 border-b-2 border-green-800">
+            <TableHead className="text-white font-bold text-sm w-12"></TableHead>
+            <TableHead className="text-white font-bold text-sm">Category</TableHead>
+            <TableHead className="text-white font-bold text-sm">Description</TableHead>
+            <TableHead className="text-white font-bold text-sm">Color</TableHead>
+            <TableHead className="text-white font-bold text-sm">Products</TableHead>
+            <TableHead className="text-white font-bold text-sm">Status</TableHead>
+            <TableHead className="text-white font-bold text-sm">Created</TableHead>
+            <TableHead className="text-white font-bold text-sm w-32">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
