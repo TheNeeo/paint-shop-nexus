@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -112,7 +111,7 @@ export function CategoryTable({ categories, onEdit, onDelete }: CategoryTablePro
             <React.Fragment key={category.id}>
               {/* Category Row */}
               <TableRow 
-                className="hover:bg-gray-50/50 transition-colors border-b border-gray-100 cursor-pointer"
+                className="hover:bg-green-50/50 transition-colors border-b border-gray-100 cursor-pointer"
                 onClick={() => toggleCategoryExpansion(category.id)}
               >
                 <TableCell>
@@ -180,15 +179,15 @@ export function CategoryTable({ categories, onEdit, onDelete }: CategoryTablePro
                       variant="outline"
                       size="sm"
                       onClick={() => onEdit(category)}
-                      className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200"
+                      className="h-8 w-8 p-0 hover:bg-green-100 hover:border-green-300 bg-green-50 border-green-200"
                     >
-                      <Edit className="h-4 w-4 text-blue-600" />
+                      <Edit className="h-4 w-4 text-green-600" />
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => onDelete(category.id)}
-                      className="h-8 w-8 p-0 hover:bg-red-50 hover:border-red-200"
+                      className="h-8 w-8 p-0 hover:bg-green-100 hover:border-green-300 bg-green-50 border-green-200"
                     >
                       <Trash2 className="h-4 w-4 text-red-600" />
                     </Button>
@@ -215,7 +214,7 @@ export function CategoryTable({ categories, onEdit, onDelete }: CategoryTablePro
                   {getMockProducts(category.name).map((product, index) => (
                     <TableRow 
                       key={product.id} 
-                      className="bg-gradient-to-r from-blue-50/30 to-blue-50/10 border-l-4 border-blue-200 hover:from-blue-50/50 hover:to-blue-50/20"
+                      className="bg-gradient-to-r from-blue-50/30 to-blue-50/10 border-l-4 border-blue-200 hover:from-green-50/50 hover:to-green-50/20"
                     >
                       <TableCell className="pl-8">
                         <ChevronRight className="h-3 w-3 text-blue-400" />
@@ -257,14 +256,14 @@ export function CategoryTable({ categories, onEdit, onDelete }: CategoryTablePro
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-6 w-6 p-0 opacity-60 hover:opacity-100"
+                            className="h-6 w-6 p-0 opacity-60 hover:opacity-100 hover:bg-green-100"
                           >
                             <Eye className="h-3 w-3 text-blue-600" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-6 w-6 p-0 opacity-60 hover:opacity-100"
+                            className="h-6 w-6 p-0 opacity-60 hover:opacity-100 hover:bg-green-100"
                           >
                             <Edit className="h-3 w-3 text-blue-600" />
                           </Button>

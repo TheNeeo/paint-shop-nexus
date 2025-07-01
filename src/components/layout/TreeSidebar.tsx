@@ -4,26 +4,11 @@ import { cn } from "@/lib/utils";
 import { TreeNode } from "./TreeNode";
 import { menuData } from "./menuData";
 import { TreeSidebarProps } from "./types";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { ProductForm } from "@/components/product/ProductForm";
 import { useLocation } from "react-router-dom";
 
 export function TreeSidebar({ collapsed }: TreeSidebarProps) {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
-  const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const location = useLocation();
-  
-  // Show the Add Product button only when on product-related pages
-  const showAddProductButton = location.pathname.includes('/product') || 
-                               location.pathname === '/product-management';
 
   const handleToggle = (id: string) => {
     const newExpanded = new Set<string>();
@@ -67,41 +52,6 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
           )}
         </div>
       </div>
-
-      {/* Add Product Button - Show only on product pages */}
-      {showAddProductButton && (
-        <div className={cn("p-3 border-b border-slate-700/50", collapsed && "px-2")}>
-          <Dialog open={isAddProductOpen} onOpenChange={setIsAddProductOpen}>
-            <DialogTrigger asChild>
-              {!collapsed ? (
-                <Button 
-                  className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg text-white"
-                  size="sm"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add New Product
-                </Button>
-              ) : (
-                <Button 
-                  className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg text-white p-2"
-                  size="sm"
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              )}
-            </DialogTrigger>
-            <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-white border-2 border-green-200">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2 text-green-800">
-                  <Plus className="h-5 w-5 text-green-600" />
-                  Add New Product
-                </DialogTitle>
-              </DialogHeader>
-              <ProductForm onClose={() => setIsAddProductOpen(false)} />
-            </DialogContent>
-          </Dialog>
-        </div>
-      )}
 
       {/* Tree Menu */}
       <div className="py-4 overflow-y-auto h-full scrollbar-thin scrollbar-thumb-primary relative">
