@@ -18,7 +18,7 @@ export function TreeNode({ item, level, expandedItems, onToggle, onAction, colla
   const isExpanded = expandedItems.has(item.id);
   const hasChildren = item.children && item.children.length > 0;
   const isActive = location.pathname === item.path;
-  const paddingLeft = collapsed ? "pl-4" : `pl-${4 + level * 4}`;
+  const paddingLeft = collapsed ? "pl-3" : `pl-${3 + level * 3}`;
 
   const handleClick = () => {
     if (item.action && onAction) {
@@ -31,7 +31,7 @@ export function TreeNode({ item, level, expandedItems, onToggle, onAction, colla
   const NodeContent = () => (
     <div
       className={cn(
-        "flex items-center gap-3 py-3 px-4 rounded-lg transition-all duration-200 cursor-pointer group",
+        "flex items-center gap-3 py-2.5 px-3 rounded-lg transition-all duration-200 cursor-pointer group",
         paddingLeft,
         isActive
           ? "bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg"
@@ -49,14 +49,14 @@ export function TreeNode({ item, level, expandedItems, onToggle, onAction, colla
         )} 
       />
       
-      {/* Title - Always show unless collapsed and at root level */}
+      {/* Title - Show for root level even when collapsed, always show for children */}
       {(!collapsed || level > 0) && (
-        <>
+        <div className="flex items-center justify-between w-full min-w-0">
           <span className="font-medium text-sm truncate flex-1">{item.title}</span>
           
           {/* Chevron for expandable items */}
           {hasChildren && (
-            <div className="ml-auto flex-shrink-0">
+            <div className="flex-shrink-0 ml-2">
               {isExpanded ? (
                 <ChevronDown className="h-4 w-4 text-slate-400" />
               ) : (
@@ -64,13 +64,13 @@ export function TreeNode({ item, level, expandedItems, onToggle, onAction, colla
               )}
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );
 
   return (
-    <div className="px-2">
+    <div className="px-1">
       {/* Main Node */}
       {item.path && !item.action ? (
         <Link to={item.path}>
@@ -80,9 +80,9 @@ export function TreeNode({ item, level, expandedItems, onToggle, onAction, colla
         <NodeContent />
       )}
       
-      {/* Children - Show when expanded and not collapsed */}
-      {hasChildren && isExpanded && !collapsed && (
-        <div className="ml-4 mt-1 space-y-1">
+      {/* Children - Show when expanded */}
+      {hasChildren && isExpanded && (
+        <div className="ml-2 mt-1 space-y-1">
           {item.children.map((child: any) => (
             <TreeNode
               key={child.id}
@@ -91,7 +91,7 @@ export function TreeNode({ item, level, expandedItems, onToggle, onAction, colla
               expandedItems={expandedItems}
               onToggle={onToggle}
               onAction={onAction}
-              collapsed={collapsed}
+              collapsed={false}
             />
           ))}
         </div>
