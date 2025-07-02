@@ -39,13 +39,13 @@ export function TreeNode({ item, level, expandedItems, onToggle, onAction, colla
       )}
       onClick={handleClick}
     >
-      {/* Icon */}
+      {/* Icon with color */}
       <item.icon 
         className={cn(
           "h-5 w-5 transition-colors duration-200",
           isActive 
             ? "text-white" 
-            : "text-slate-400 group-hover:text-green-400"
+            : item.iconColor || "text-slate-400"
         )} 
       />
       
