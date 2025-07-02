@@ -10,22 +10,24 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Download, Filter } from "lucide-react";
 import { SalesFilters } from "@/components/sales/SalesFilters";
 import { SalesTable } from "@/components/sales/SalesTable";
-import { NewSaleModal } from "@/components/sales/NewSaleModal";
+import { NewInvoiceModal } from "@/components/sales/NewInvoiceModal";
 import { InvoiceViewer } from "@/components/sales/InvoiceViewer";
 import { SalesSummary } from "@/components/sales/SalesSummary";
 import { SalesChart } from "@/components/sales/SalesChart";
 
 export default function SalesManagement() {
-  const [isNewSaleModalOpen, setIsNewSaleModalOpen] = useState(false);
+  const [isNewInvoiceModalOpen, setIsNewInvoiceModalOpen] = useState(false);
   const [isInvoiceViewerOpen, setIsInvoiceViewerOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [filters, setFilters] = useState({
     customer: "all",
     status: "all",
+    paymentMode: "all",
     search: "",
+    dateRange: null,
   });
 
   const handleViewInvoice = (invoice: any) => {
@@ -33,13 +35,18 @@ export default function SalesManagement() {
     setIsInvoiceViewerOpen(true);
   };
 
+  const handleExportCSV = () => {
+    // Export functionality
+    console.log("Exporting CSV...");
+  };
+
   return (
     <AppLayout>
       <div className="space-y-6">
-        {/* Header Area */}
+        {/* Top Page Header */}
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Sales Activity</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Sales Management</h1>
             <Breadcrumb className="mt-2">
               <BreadcrumbList>
                 <BreadcrumbItem>
@@ -56,28 +63,38 @@ export default function SalesManagement() {
               </BreadcrumbList>
             </Breadcrumb>
           </div>
-          <Button onClick={() => setIsNewSaleModalOpen(true)} className="bg-green-600 hover:bg-green-700">
-            <Plus className="h-4 w-4 mr-2" />
-            New Sale
-          </Button>
+          <div className="flex gap-3">
+            <Button 
+              variant="outline" 
+              onClick={handleExportCSV}
+              className="border-green-300 text-green-700 hover:bg-green-50"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
+            </Button>
+            <Button onClick={() => setIsNewInvoiceModalOpen(true)} className="bg-green-600 hover:bg-green-700">
+              <Plus className="h-4 w-4 mr-2" />
+              New Invoice
+            </Button>
+          </div>
         </div>
 
-        {/* Filters */}
+        {/* Sales Summary Cards */}
+        <SalesSummary />
+
+        {/* Search & Filter Bar */}
         <SalesFilters filters={filters} onFiltersChange={setFilters} />
 
         {/* Sales Chart */}
         <SalesChart />
 
-        {/* Sales Table */}
+        {/* Sales Invoice Table */}
         <SalesTable filters={filters} onViewInvoice={handleViewInvoice} />
 
-        {/* Sales Summary */}
-        <SalesSummary />
-
         {/* Modals */}
-        <NewSaleModal
-          isOpen={isNewSaleModalOpen}
-          onClose={() => setIsNewSaleModalOpen(false)}
+        <NewInvoiceModal
+          isOpen={isNewInvoiceModalOpen}
+          onClose={() => setIsNewInvoiceModalOpen(false)}
         />
 
         <InvoiceViewer
