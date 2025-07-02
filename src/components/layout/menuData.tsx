@@ -9,7 +9,6 @@ import {
   BarChart3,
   Tags,
   Plus,
-  List,
   Activity,
   FileText,
   RefreshCw,
@@ -20,6 +19,8 @@ import {
   Calendar,
   Monitor,
   User,
+  Cube,
+  Clock,
 } from "lucide-react";
 
 export const menuData = [
@@ -127,7 +128,7 @@ export const menuData = [
   {
     id: "inventory-management",
     title: "Inventory Management",
-    icon: Package,
+    icon: Cube,
     iconColor: "text-teal-400",
     children: [
       {
@@ -147,7 +148,7 @@ export const menuData = [
       {
         id: "inventory-movement-history",
         title: "Inventory Movement History",
-        icon: History,
+        icon: Clock,
         path: "/inventory/history",
         iconColor: "text-slate-400",
       },

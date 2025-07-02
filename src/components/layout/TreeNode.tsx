@@ -39,24 +39,24 @@ export function TreeNode({ item, level, expandedItems, onToggle, onAction, colla
       )}
       onClick={handleClick}
     >
-      {/* Icon with color */}
+      {/* Icon with proper colors */}
       <item.icon 
         className={cn(
-          "h-5 w-5 transition-colors duration-200",
+          "h-5 w-5 transition-colors duration-200 flex-shrink-0",
           isActive 
             ? "text-white" 
             : item.iconColor || "text-slate-400"
         )} 
       />
       
-      {/* Title */}
-      {!collapsed && (
+      {/* Title - Always show unless collapsed and at root level */}
+      {(!collapsed || level > 0) && (
         <>
           <span className="font-medium text-sm truncate flex-1">{item.title}</span>
           
           {/* Chevron for expandable items */}
           {hasChildren && (
-            <div className="ml-auto">
+            <div className="ml-auto flex-shrink-0">
               {isExpanded ? (
                 <ChevronDown className="h-4 w-4 text-slate-400" />
               ) : (
@@ -80,7 +80,7 @@ export function TreeNode({ item, level, expandedItems, onToggle, onAction, colla
         <NodeContent />
       )}
       
-      {/* Children */}
+      {/* Children - Show when expanded and not collapsed */}
       {hasChildren && isExpanded && !collapsed && (
         <div className="ml-4 mt-1 space-y-1">
           {item.children.map((child: any) => (
