@@ -1,4 +1,3 @@
-
 import {
   LayoutDashboard,
   Package,
@@ -19,7 +18,7 @@ import {
   Calendar,
   Monitor,
   User,
-  Cube,
+  Box,
   Clock,
 } from "lucide-react";
 
@@ -128,7 +127,7 @@ export const menuData = [
   {
     id: "inventory-management",
     title: "Inventory Management",
-    icon: Cube,
+    icon: Box,
     iconColor: "text-teal-400",
     children: [
       {
