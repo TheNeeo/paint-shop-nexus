@@ -40,7 +40,7 @@ export const PurchaseFilters = () => {
     <div className="bg-gradient-to-r from-pink-50 to-purple-50 p-4 rounded-lg shadow-sm border border-pink-200 space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-pink-800">Filters & Search</h3>
-        <Button onClick={handleExportCSV} variant="outline" size="sm" className="border-pink-300 text-pink-700 hover:bg-pink-100">
+        <Button onClick={handleExportCSV} variant="outline" size="sm" className="bg-pink-600 hover:bg-pink-700 text-white border-pink-600">
           <Download className="w-4 h-4 mr-2" />
           Export CSV
         </Button>
@@ -64,7 +64,7 @@ export const PurchaseFilters = () => {
         <div className="flex items-center gap-2">
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-[140px] justify-start text-left font-normal border-pink-300 text-pink-700 hover:bg-pink-100">
+              <Button variant="outline" className="w-[140px] justify-start text-left font-normal bg-pink-600 hover:bg-pink-700 text-white border-pink-600">
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {dateFrom ? format(dateFrom, "MMM dd") : "From Date"}
               </Button>
@@ -81,7 +81,7 @@ export const PurchaseFilters = () => {
 
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-[140px] justify-start text-left font-normal border-pink-300 text-pink-700 hover:bg-pink-100">
+              <Button variant="outline" className="w-[140px] justify-start text-left font-normal bg-pink-600 hover:bg-pink-700 text-white border-pink-600">
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {dateTo ? format(dateTo, "MMM dd") : "To Date"}
               </Button>
@@ -101,7 +101,7 @@ export const PurchaseFilters = () => {
       <div className="flex items-center gap-4 flex-wrap">
         {/* Vendor Filter */}
         <Select value={vendorFilter} onValueChange={setVendorFilter}>
-          <SelectTrigger className="w-[180px] border-pink-300 focus:border-pink-500 focus:ring-pink-500">
+          <SelectTrigger className="w-[180px] bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500">
             <SelectValue placeholder="Select Vendor" />
           </SelectTrigger>
           <SelectContent>
@@ -115,7 +115,7 @@ export const PurchaseFilters = () => {
 
         {/* Payment Mode Filter */}
         <Select value={paymentModeFilter} onValueChange={setPaymentModeFilter}>
-          <SelectTrigger className="w-[150px] border-pink-300 focus:border-pink-500 focus:ring-pink-500">
+          <SelectTrigger className="w-[150px] bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500">
             <SelectValue placeholder="Payment Mode" />
           </SelectTrigger>
           <SelectContent>
@@ -130,7 +130,7 @@ export const PurchaseFilters = () => {
 
         {/* Status Filter */}
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[150px] border-pink-300 focus:border-pink-500 focus:ring-pink-500">
+          <SelectTrigger className="w-[150px] bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
@@ -143,7 +143,7 @@ export const PurchaseFilters = () => {
           </SelectContent>
         </Select>
 
-        <Button variant="outline" size="sm" onClick={handleClearFilters} className="border-pink-300 text-pink-700 hover:bg-pink-100">
+        <Button variant="outline" size="sm" onClick={handleClearFilters} className="bg-pink-600 hover:bg-pink-700 text-white border-pink-600">
           <Filter className="w-4 h-4 mr-2" />
           Clear Filters
         </Button>

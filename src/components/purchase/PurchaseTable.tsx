@@ -153,10 +153,10 @@ export const PurchaseTable: React.FC<PurchaseTableProps> = ({
           <h2 className="text-lg font-semibold text-pink-800">Purchase Records</h2>
           {selectedPurchases.length > 0 && (
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="border-pink-300 text-pink-700 hover:bg-pink-100">
+              <Button variant="outline" size="sm" className="bg-pink-600 hover:bg-pink-700 text-white border-pink-600">
                 Bulk Delete ({selectedPurchases.length})
               </Button>
-              <Button variant="outline" size="sm" className="border-pink-300 text-pink-700 hover:bg-pink-100">
+              <Button variant="outline" size="sm" className="bg-pink-600 hover:bg-pink-700 text-white border-pink-600">
                 Export Selected
               </Button>
             </div>
@@ -242,20 +242,20 @@ export const PurchaseTable: React.FC<PurchaseTableProps> = ({
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => onViewInvoice(purchase)}>
+                    <DropdownMenuContent align="end" className="bg-white">
+                      <DropdownMenuItem onClick={() => onViewInvoice(purchase)} className="bg-pink-600 hover:bg-pink-700 text-white">
                         <Eye className="mr-2 h-4 w-4" />
                         View Invoice
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem className="bg-pink-600 hover:bg-pink-700 text-white">
                         <Edit className="mr-2 h-4 w-4" />
                         Edit
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem className="bg-pink-600 hover:bg-pink-700 text-white">
                         <RotateCcw className="mr-2 h-4 w-4" />
                         Return
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600">
+                      <DropdownMenuItem className="bg-red-600 hover:bg-red-700 text-white">
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete
                       </DropdownMenuItem>
