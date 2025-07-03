@@ -14,6 +14,7 @@ export interface Purchase {
   status: 'pending' | 'received' | 'returned';
   payment_method?: string;
   notes?: string;
+  invoice_file_url?: string;
   created_at: string;
 }
 
