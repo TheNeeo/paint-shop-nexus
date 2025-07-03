@@ -250,7 +250,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
             <div>
               <Label htmlFor="vendor" className="text-pink-700">Vendor *</Label>
               <Select value={selectedVendor} onValueChange={setSelectedVendor}>
-                <SelectTrigger className="border-pink-300 focus:border-pink-500 focus:ring-pink-500">
+                <SelectTrigger className="bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500">
                   <SelectValue placeholder="Select Vendor" />
                 </SelectTrigger>
                 <SelectContent>
@@ -268,7 +268,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                 id="billNumber"
                 value={billNumber}
                 onChange={(e) => setBillNumber(e.target.value)}
-                className="border-pink-300 focus:border-pink-500 focus:ring-pink-500"
+                className="bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500 placeholder:text-pink-200"
               />
             </div>
             <div>
@@ -284,7 +284,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
             <div>
               <Label htmlFor="method" className="text-pink-700">Payment Mode</Label>
               <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                <SelectTrigger className="border-pink-300 focus:border-pink-500 focus:ring-pink-500">
+                <SelectTrigger className="bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500">
                   <SelectValue placeholder="Select payment method" />
                 </SelectTrigger>
                 <SelectContent>
@@ -329,7 +329,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                         value={item.product_name}
                         onChange={(e) => updateItem(index, 'product_name', e.target.value)}
                         placeholder="Product name"
-                        className="border-pink-300 focus:border-pink-500 focus:ring-pink-500"
+                        className="bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500 placeholder:text-pink-200"
                       />
                     </TableCell>
                     <TableCell>
@@ -337,7 +337,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                         value={item.unit} 
                         onValueChange={(value) => updateItem(index, 'unit', value)}
                       >
-                        <SelectTrigger className="w-20 border-pink-300 focus:border-pink-500 focus:ring-pink-500">
+                        <SelectTrigger className="w-20 bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -354,7 +354,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                         type="number"
                         value={item.quantity}
                         onChange={(e) => updateItem(index, 'quantity', parseInt(e.target.value) || 0)}
-                        className="w-20 border-pink-300 focus:border-pink-500 focus:ring-pink-500"
+                        className="w-20 bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500"
                       />
                     </TableCell>
                     <TableCell>
@@ -362,7 +362,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                         type="number"
                         value={item.unit_price}
                         onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
-                        className="w-24 border-pink-300 focus:border-pink-500 focus:ring-pink-500"
+                        className="w-24 bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500"
                       />
                     </TableCell>
                     <TableCell>
@@ -370,7 +370,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                         type="number"
                         value={item.tax_rate}
                         onChange={(e) => updateItem(index, 'tax_rate', parseFloat(e.target.value) || 0)}
-                        className="w-20 border-pink-300 focus:border-pink-500 focus:ring-pink-500"
+                        className="w-20 bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500"
                       />
                     </TableCell>
                     <TableCell>
@@ -378,7 +378,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                         type="number"
                         value={item.discount_rate}
                         onChange={(e) => updateItem(index, 'discount_rate', parseFloat(e.target.value) || 0)}
-                        className="w-20 border-pink-300 focus:border-pink-500 focus:ring-pink-500"
+                        className="w-20 bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500"
                       />
                     </TableCell>
                     <TableCell className="text-pink-700 font-medium">₹{item.total_amount.toFixed(2)}</TableCell>
@@ -451,7 +451,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Additional notes..."
-                  className="border-pink-300 focus:border-pink-500 focus:ring-pink-500"
+                  className="bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500 placeholder:text-pink-200"
                 />
               </div>
             </div>
@@ -475,7 +475,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                     type="number"
                     value={discountAmount}
                     onChange={(e) => setDiscountAmount(parseFloat(e.target.value) || 0)}
-                    className="w-24 text-right border-pink-300 focus:border-pink-500 focus:ring-pink-500"
+                    className="w-24 text-right bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500"
                   />
                 </div>
                 <div className="flex justify-between font-semibold text-lg border-t pt-2 text-pink-800">
@@ -489,7 +489,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                     type="number"
                     value={paidAmount}
                     onChange={(e) => setPaidAmount(parseFloat(e.target.value) || 0)}
-                    className="w-24 text-right border-pink-300 focus:border-pink-500 focus:ring-pink-500"
+                    className="w-24 text-right bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500"
                   />
                 </div>
                 <div className="flex justify-between text-red-600">
@@ -502,7 +502,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-4 pt-4 border-t border-pink-300">
-            <Button variant="outline" onClick={onClose} className="border-pink-300 text-pink-700 hover:bg-pink-100">
+            <Button variant="outline" onClick={onClose} className="bg-pink-600 hover:bg-pink-700 text-white border-pink-600">
               Cancel
             </Button>
             <Button onClick={handleSubmit} disabled={loading} className="bg-pink-600 hover:bg-pink-700 text-white">
