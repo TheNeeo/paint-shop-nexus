@@ -127,7 +127,7 @@ export const PurchaseTable: React.FC<PurchaseTableProps> = ({
       cash: 'bg-green-100 text-green-800',
       upi: 'bg-blue-100 text-blue-800',
       bank_transfer: 'bg-purple-100 text-purple-800',
-      cheque: 'bg-yellow-100 text-yellow-800',
+      cheque: 'bg-green-100 text-green-800',
       credit_card: 'bg-indigo-100 text-indigo-800'
     };
 
