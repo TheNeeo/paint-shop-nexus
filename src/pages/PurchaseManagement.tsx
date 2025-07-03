@@ -33,12 +33,12 @@ const PurchaseManagement = () => {
     <AppLayout>
       <div className="p-6 space-y-6">
         <PurchaseHeader onNewPurchase={handleNewPurchase} />
+        <PurchaseSummary />
         <PurchaseFilters />
         <PurchaseTable 
           onViewInvoice={handleViewInvoice}
           refreshTrigger={refreshTrigger}
         />
-        <PurchaseSummary />
         
         <NewPurchaseModal
           isOpen={isNewPurchaseModalOpen}

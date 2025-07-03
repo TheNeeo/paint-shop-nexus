@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, Search, Filter } from 'lucide-react';
+import { CalendarIcon, Search, Filter, Download } from 'lucide-react';
 import { format } from 'date-fns';
 
 export const PurchaseFilters = () => {
@@ -20,17 +20,39 @@ export const PurchaseFilters = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [vendorFilter, setVendorFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [sortBy, setSortBy] = useState('');
+  const [paymentModeFilter, setPaymentModeFilter] = useState('');
+
+  const handleClearFilters = () => {
+    setDateFrom(undefined);
+    setDateTo(undefined);
+    setSearchTerm('');
+    setVendorFilter('');
+    setStatusFilter('');
+    setPaymentModeFilter('');
+  };
+
+  const handleExportCSV = () => {
+    // Export functionality would be implemented here
+    console.log('Exporting CSV...');
+  };
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm border space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Filters & Search</h3>
+        <Button onClick={handleExportCSV} variant="outline" size="sm">
+          <Download className="w-4 h-4 mr-2" />
+          Export CSV
+        </Button>
+      </div>
+
       <div className="flex items-center gap-4 flex-wrap">
         {/* Search Bar */}
         <div className="flex-1 min-w-[300px]">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
-              placeholder="Search by Invoice No., Vendor, Product..."
+              placeholder="Search by Bill No., Vendor, Product, HSN..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -87,6 +109,22 @@ export const PurchaseFilters = () => {
             <SelectItem value="abc-suppliers">ABC Suppliers</SelectItem>
             <SelectItem value="xyz-distributors">XYZ Distributors</SelectItem>
             <SelectItem value="premium-paints">Premium Paints Co.</SelectItem>
+            <SelectItem value="color-world">Color World Ltd.</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* Payment Mode Filter */}
+        <Select value={paymentModeFilter} onValueChange={setPaymentModeFilter}>
+          <SelectTrigger className="w-[150px]">
+            <SelectValue placeholder="Payment Mode" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Modes</SelectItem>
+            <SelectItem value="cash">Cash</SelectItem>
+            <SelectItem value="upi">UPI</SelectItem>
+            <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+            <SelectItem value="cheque">Cheque</SelectItem>
+            <SelectItem value="credit_card">Credit Card</SelectItem>
           </SelectContent>
         </Select>
 
@@ -97,27 +135,15 @@ export const PurchaseFilters = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="paid">Paid</SelectItem>
+            <SelectItem value="partial">Partial</SelectItem>
+            <SelectItem value="due">Due</SelectItem>
             <SelectItem value="received">Received</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="returned">Returned</SelectItem>
           </SelectContent>
         </Select>
 
-        {/* Sort Options */}
-        <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Sort By" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="date-desc">Latest First</SelectItem>
-            <SelectItem value="date-asc">Oldest First</SelectItem>
-            <SelectItem value="amount-desc">Highest Amount</SelectItem>
-            <SelectItem value="amount-asc">Lowest Amount</SelectItem>
-            <SelectItem value="vendor">Vendor Name</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" onClick={handleClearFilters}>
           <Filter className="w-4 h-4 mr-2" />
           Clear Filters
         </Button>

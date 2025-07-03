@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,13 +25,14 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Plus, Trash2, Upload } from 'lucide-react';
+import { Plus, Trash2, Upload, X, FileImage } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Vendor } from '@/types/purchase';
 
 interface PurchaseItem {
   product_name: string;
   quantity: number;
+  unit: string;
   unit_price: number;
   tax_rate: number;
   discount_rate: number;
@@ -50,20 +52,23 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
 }) => {
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [selectedVendor, setSelectedVendor] = useState('');
-  const [invoiceNumber, setInvoiceNumber] = useState('');
+  const [billNumber, setBillNumber] = useState('');
   const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().split('T')[0]);
   const [items, setItems] = useState<PurchaseItem[]>([
-    { product_name: '', quantity: 1, unit_price: 0, tax_rate: 18, discount_rate: 0, total_amount: 0 }
+    { product_name: '', quantity: 1, unit: 'PCS', unit_price: 0, tax_rate: 18, discount_rate: 0, total_amount: 0 }
   ]);
+  const [discountAmount, setDiscountAmount] = useState(0);
   const [paidAmount, setPaidAmount] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState('');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
+  const [billImage, setBillImage] = useState<File | null>(null);
+  const [billImagePreview, setBillImagePreview] = useState<string>('');
 
   useEffect(() => {
     if (isOpen) {
       fetchVendors();
-      generateInvoiceNumber();
+      generateBillNumber();
     }
   }, [isOpen]);
 
@@ -81,18 +86,19 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
     }
   };
 
-  const generateInvoiceNumber = () => {
+  const generateBillNumber = () => {
     const date = new Date();
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const random = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
-    setInvoiceNumber(`PUR-${year}${month}-${random}`);
+    setBillNumber(`BILL-${year}${month}-${random}`);
   };
 
   const addItem = () => {
     setItems([...items, { 
       product_name: '', 
       quantity: 1, 
+      unit: 'PCS',
       unit_price: 0, 
       tax_rate: 18, 
       discount_rate: 0, 
@@ -119,6 +125,23 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
     setItems(updatedItems);
   };
 
+  const handleBillImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setBillImage(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setBillImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeBillImage = () => {
+    setBillImage(null);
+    setBillImagePreview('');
+  };
+
   const calculateTotals = () => {
     const subtotal = items.reduce((sum, item) => {
       const itemSubtotal = item.quantity * item.unit_price;
@@ -133,14 +156,15 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
       return sum + ((afterDiscount * item.tax_rate) / 100);
     }, 0);
 
-    const total = subtotal + taxAmount;
+    const totalBeforeDiscount = subtotal + taxAmount;
+    const total = totalBeforeDiscount - discountAmount;
     const balance = total - paidAmount;
 
     return { subtotal, taxAmount, total, balance };
   };
 
   const handleSubmit = async () => {
-    if (!selectedVendor || !invoiceNumber || items.length === 0) {
+    if (!selectedVendor || !billNumber || items.length === 0) {
       alert('Please fill in all required fields');
       return;
     }
@@ -153,11 +177,12 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
       const { data: purchase, error: purchaseError } = await supabase
         .from('purchases')
         .insert({
-          invoice_number: invoiceNumber,
+          invoice_number: billNumber,
           vendor_id: selectedVendor,
           purchase_date: purchaseDate,
           subtotal: totals.subtotal,
           tax_amount: totals.taxAmount,
+          discount_amount: discountAmount,
           total_amount: totals.total,
           paid_amount: paidAmount,
           balance_amount: totals.balance,
@@ -199,26 +224,29 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
 
   const resetForm = () => {
     setSelectedVendor('');
-    setInvoiceNumber('');
+    setBillNumber('');
     setPurchaseDate(new Date().toISOString().split('T')[0]);
-    setItems([{ product_name: '', quantity: 1, unit_price: 0, tax_rate: 18, discount_rate: 0, total_amount: 0 }]);
+    setItems([{ product_name: '', quantity: 1, unit: 'PCS', unit_price: 0, tax_rate: 18, discount_rate: 0, total_amount: 0 }]);
+    setDiscountAmount(0);
     setPaidAmount(0);
     setPaymentMethod('');
     setNotes('');
+    setBillImage(null);
+    setBillImagePreview('');
   };
 
   const totals = calculateTotals();
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>New Purchase Entry</DialogTitle>
+          <DialogTitle>Add Purchase Entry</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
           {/* Basic Information */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <Label htmlFor="vendor">Vendor *</Label>
               <Select value={selectedVendor} onValueChange={setSelectedVendor}>
@@ -235,11 +263,11 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
               </Select>
             </div>
             <div>
-              <Label htmlFor="invoice">Invoice Number *</Label>
+              <Label htmlFor="billNumber">Bill Number *</Label>
               <Input
-                id="invoice"
-                value={invoiceNumber}
-                onChange={(e) => setInvoiceNumber(e.target.value)}
+                id="billNumber"
+                value={billNumber}
+                onChange={(e) => setBillNumber(e.target.value)}
               />
             </div>
             <div>
@@ -250,6 +278,21 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                 value={purchaseDate}
                 onChange={(e) => setPurchaseDate(e.target.value)}
               />
+            </div>
+            <div>
+              <Label htmlFor="method">Payment Mode</Label>
+              <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select payment method" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cash">Cash</SelectItem>
+                  <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                  <SelectItem value="cheque">Cheque</SelectItem>
+                  <SelectItem value="upi">UPI</SelectItem>
+                  <SelectItem value="credit_card">Credit Card</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -267,10 +310,11 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
               <TableHeader>
                 <TableRow>
                   <TableHead>Product Name</TableHead>
+                  <TableHead>Unit</TableHead>
                   <TableHead>Qty</TableHead>
-                  <TableHead>Unit Price</TableHead>
-                  <TableHead>Tax %</TableHead>
-                  <TableHead>Discount %</TableHead>
+                  <TableHead>Rate</TableHead>
+                  <TableHead>GST %</TableHead>
+                  <TableHead>Disc %</TableHead>
                   <TableHead>Total</TableHead>
                   <TableHead></TableHead>
                 </TableRow>
@@ -284,6 +328,23 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                         onChange={(e) => updateItem(index, 'product_name', e.target.value)}
                         placeholder="Product name"
                       />
+                    </TableCell>
+                    <TableCell>
+                      <Select 
+                        value={item.unit} 
+                        onValueChange={(value) => updateItem(index, 'unit', value)}
+                      >
+                        <SelectTrigger className="w-20">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="PCS">PCS</SelectItem>
+                          <SelectItem value="KG">KG</SelectItem>
+                          <SelectItem value="LTR">LTR</SelectItem>
+                          <SelectItem value="MTR">MTR</SelectItem>
+                          <SelectItem value="BOX">BOX</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </TableCell>
                     <TableCell>
                       <Input
@@ -335,50 +396,65 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
             </Table>
           </div>
 
-          {/* Totals and Payment */}
+          {/* Bottom Section with Bill Upload and Totals */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Bill Upload */}
             <div>
-              <h3 className="text-lg font-semibold mb-4">Payment Details</h3>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="paid">Amount Paid</Label>
-                  <Input
-                    id="paid"
-                    type="number"
-                    value={paidAmount}
-                    onChange={(e) => setPaidAmount(parseFloat(e.target.value) || 0)}
+              <h3 className="text-lg font-semibold mb-4">Attach Bill Image (Optional)</h3>
+              {!billImagePreview ? (
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                  <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                  <p className="mt-2 text-sm text-gray-600">
+                    Drag and drop your bill image here, or click to browse
+                  </p>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleBillImageUpload}
+                    className="hidden"
+                    id="bill-upload"
                   />
+                  <Button variant="outline" className="mt-2" onClick={() => document.getElementById('bill-upload')?.click()}>
+                    Choose File
+                  </Button>
                 </div>
-                <div>
-                  <Label htmlFor="method">Payment Method</Label>
-                  <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select payment method" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="cash">Cash</SelectItem>
-                      <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                      <SelectItem value="cheque">Cheque</SelectItem>
-                      <SelectItem value="upi">UPI</SelectItem>
-                      <SelectItem value="credit_card">Credit Card</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="notes">Notes</Label>
-                  <Textarea
-                    id="notes"
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Additional notes..."
+              ) : (
+                <div className="relative">
+                  <img 
+                    src={billImagePreview} 
+                    alt="Bill preview" 
+                    className="w-full h-48 object-cover rounded-lg border"
                   />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute top-2 right-2"
+                    onClick={removeBillImage}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                  <div className="mt-2 flex items-center gap-2">
+                    <FileImage className="h-4 w-4" />
+                    <span className="text-sm text-gray-600">{billImage?.name}</span>
+                  </div>
                 </div>
+              )}
+
+              <div className="mt-4">
+                <Label htmlFor="notes">Notes</Label>
+                <Textarea
+                  id="notes"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Additional notes..."
+                />
               </div>
             </div>
 
+            {/* Purchase Summary */}
             <div>
               <h3 className="text-lg font-semibold mb-4">Purchase Summary</h3>
-              <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+              <div className="bg-gray-50 p-4 rounded-lg space-y-3">
                 <div className="flex justify-between">
                   <span>Subtotal:</span>
                   <span>₹{totals.subtotal.toFixed(2)}</span>
@@ -387,13 +463,29 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                   <span>Tax Amount:</span>
                   <span>₹{totals.taxAmount.toFixed(2)}</span>
                 </div>
+                <div className="flex justify-between items-center">
+                  <Label htmlFor="discount">Discount Amount:</Label>
+                  <Input
+                    id="discount"
+                    type="number"
+                    value={discountAmount}
+                    onChange={(e) => setDiscountAmount(parseFloat(e.target.value) || 0)}
+                    className="w-24 text-right"
+                  />
+                </div>
                 <div className="flex justify-between font-semibold text-lg border-t pt-2">
                   <span>Total Amount:</span>
                   <span>₹{totals.total.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-green-600">
-                  <span>Paid Amount:</span>
-                  <span>₹{paidAmount.toFixed(2)}</span>
+                <div className="flex justify-between items-center text-green-600">
+                  <Label htmlFor="paid">Paid Amount:</Label>
+                  <Input
+                    id="paid"
+                    type="number"
+                    value={paidAmount}
+                    onChange={(e) => setPaidAmount(parseFloat(e.target.value) || 0)}
+                    className="w-24 text-right"
+                  />
                 </div>
                 <div className="flex justify-between text-red-600">
                   <span>Balance Due:</span>
@@ -403,22 +495,8 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
             </div>
           </div>
 
-          {/* Invoice Upload */}
-          <div>
-            <Label>Upload Purchase Invoice (Optional)</Label>
-            <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-              <Upload className="mx-auto h-12 w-12 text-gray-400" />
-              <p className="mt-2 text-sm text-gray-600">
-                Drag and drop your invoice file here, or click to browse
-              </p>
-              <Button variant="outline" className="mt-2">
-                Choose File
-              </Button>
-            </div>
-          </div>
-
           {/* Action Buttons */}
-          <div className="flex justify-end gap-4">
+          <div className="flex justify-end gap-4 pt-4 border-t">
             <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
