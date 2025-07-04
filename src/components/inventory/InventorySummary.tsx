@@ -37,40 +37,52 @@ export function InventorySummary() {
       title: "Total Products",
       value: summary?.totalProducts || 0,
       icon: Package,
-      color: "cyan"
+      color: "cyan",
+      bgColor: "bg-cyan-100",
+      textColor: "text-cyan-800",
+      iconColor: "text-cyan-600"
     },
     {
       title: "Low Stock Count",
       value: summary?.lowStockCount || 0,
       icon: AlertTriangle,
-      color: "red"
+      color: "red",
+      bgColor: "bg-red-100",
+      textColor: "text-red-800",
+      iconColor: "text-red-600"
     },
     {
       title: "Total Stock Value",
       value: `₹${(summary?.totalValue || 0).toLocaleString()}`,
       icon: DollarSign,
-      color: "green"
+      color: "green",
+      bgColor: "bg-green-100",
+      textColor: "text-green-800",
+      iconColor: "text-green-600"
     },
     {
       title: "Categories",
       value: summary?.uniqueCategories || 0,
       icon: Tags,
-      color: "purple"
+      color: "purple",
+      bgColor: "bg-purple-100",
+      textColor: "text-purple-800",
+      iconColor: "text-purple-600"
     }
   ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {cards.map((card) => (
-        <Card key={card.title} className="border-cyan-200 hover:shadow-lg transition-shadow">
+        <Card key={card.title} className={`${card.bgColor} border-${card.color}-200 hover:shadow-lg transition-shadow`}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className={`text-sm font-medium ${card.textColor}`}>
               {card.title}
             </CardTitle>
-            <card.icon className={`h-4 w-4 text-${card.color}-600`} />
+            <card.icon className={`h-4 w-4 ${card.iconColor}`} />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-900">{card.value}</div>
+            <div className={`text-2xl font-bold ${card.textColor}`}>{card.value}</div>
           </CardContent>
         </Card>
       ))}

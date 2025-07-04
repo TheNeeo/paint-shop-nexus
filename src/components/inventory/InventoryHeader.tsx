@@ -24,7 +24,7 @@ export function InventoryHeader({ onAddProduct }: InventoryHeaderProps) {
         <Button
           onClick={handleExportCSV}
           variant="outline"
-          className="border-cyan-200 text-cyan-700 hover:bg-cyan-50 hover:border-cyan-300"
+          className="border-cyan-200 text-cyan-700 hover:bg-cyan-50 hover:border-cyan-300 bg-cyan-100"
         >
           <FileDown className="h-4 w-4 mr-2" />
           Export CSV
