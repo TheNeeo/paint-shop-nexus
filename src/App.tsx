@@ -10,6 +10,7 @@ import ProductManagement from "./pages/ProductManagement";
 import CategoryManagement from "./pages/CategoryManagement";
 import SalesManagement from "./pages/SalesManagement";
 import PurchaseManagement from "./pages/PurchaseManagement";
+import InventoryManagement from "./pages/InventoryManagement";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,9 @@ const App = () => (
           <Route path="/sales/activity" element={<SalesManagement />} />
           <Route path="/purchase" element={<PurchaseManagement />} />
           <Route path="/purchase/activity" element={<PurchaseManagement />} />
+          <Route path="/inventory" element={<InventoryManagement />} />
+          <Route path="/inventory/update" element={<InventoryManagement />} />
+          <Route path="/inventory/history" element={<InventoryManagement />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
