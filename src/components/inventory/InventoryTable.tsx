@@ -121,7 +121,7 @@ export function InventoryTable({
       case "out-of-stock":
         return <Badge variant="destructive">Out of Stock</Badge>;
       case "low-stock":
-        return <Badge variant="secondary" className="bg-orange-100 text-orange-800">Low Stock</Badge>;
+        return <Badge variant="secondary" className="bg-red-100 text-red-800">Low Stock</Badge>;
       default:
         return <Badge variant="default" className="bg-green-100 text-green-800">In Stock</Badge>;
     }
@@ -170,8 +170,8 @@ export function InventoryTable({
                 <TableRow 
                   className={cn(
                     "hover:bg-cyan-50 transition-colors",
-                    stockStatus === "low-stock" && "bg-orange-50",
-                    stockStatus === "out-of-stock" && "bg-red-50"
+                    stockStatus === "low-stock" && "bg-red-50",
+                    stockStatus === "out-of-stock" && "bg-red-100"
                   )}
                 >
                   <TableCell className="font-medium">{index + 1}</TableCell>
@@ -250,8 +250,8 @@ export function InventoryTable({
                       key={variant.id} 
                       className={cn(
                         "bg-gray-50 hover:bg-cyan-25 transition-colors",
-                        variantStockStatus === "low-stock" && "bg-orange-25",
-                        variantStockStatus === "out-of-stock" && "bg-red-25"
+                        variantStockStatus === "low-stock" && "bg-red-25",
+                        variantStockStatus === "out-of-stock" && "bg-red-50"
                       )}
                     >
                       <TableCell className="text-sm text-gray-500 pl-8">

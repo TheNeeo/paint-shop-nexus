@@ -186,7 +186,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
                 required
-                className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200"
+                placeholder="Enter product name"
+                className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
               />
             </div>
 
@@ -196,10 +197,10 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                 value={formData.category_id} 
                 onValueChange={(value) => setFormData({...formData, category_id: value})}
               >
-                <SelectTrigger className="border-cyan-200 focus:border-cyan-500">
+                <SelectTrigger className="border-cyan-200 focus:border-cyan-500 bg-white">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white">
                   {categories?.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       {category.name}
@@ -215,7 +216,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                 id="hsn_code"
                 value={formData.hsn_code}
                 onChange={(e) => setFormData({...formData, hsn_code: e.target.value})}
-                className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200"
+                placeholder="Enter HSN code"
+                className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
               />
             </div>
 
@@ -225,10 +227,10 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                 value={formData.unit} 
                 onValueChange={(value) => setFormData({...formData, unit: value})}
               >
-                <SelectTrigger className="border-cyan-200 focus:border-cyan-500">
+                <SelectTrigger className="border-cyan-200 focus:border-cyan-500 bg-white">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white">
                   {UNITS.map((unit) => (
                     <SelectItem key={unit} value={unit}>
                       {unit}
@@ -245,7 +247,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                 type="number"
                 value={formData.purchase_qty}
                 onChange={(e) => setFormData({...formData, purchase_qty: parseInt(e.target.value) || 0})}
-                className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200"
+                placeholder="Enter purchase quantity"
+                className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
               />
             </div>
 
@@ -256,7 +259,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                 type="number"
                 value={formData.current_stock}
                 onChange={(e) => setFormData({...formData, current_stock: parseInt(e.target.value) || 0})}
-                className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200"
+                placeholder="Enter current stock"
+                className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
               />
             </div>
 
@@ -267,7 +271,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                 type="number"
                 value={formData.threshold_qty}
                 onChange={(e) => setFormData({...formData, threshold_qty: parseInt(e.target.value) || 0})}
-                className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200"
+                placeholder="Enter threshold quantity"
+                className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
               />
             </div>
 
@@ -279,7 +284,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                 step="0.01"
                 value={formData.unit_price}
                 onChange={(e) => setFormData({...formData, unit_price: parseFloat(e.target.value) || 0})}
-                className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200"
+                placeholder="Enter unit price"
+                className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
               />
             </div>
           </div>
@@ -291,8 +297,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                 id="image_url"
                 value={formData.image_url}
                 onChange={(e) => setFormData({...formData, image_url: e.target.value})}
-                placeholder="Enter image URL or upload"
-                className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200"
+                placeholder="Enter image URL"
+                className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
               />
               <Button type="button" variant="outline" className="border-cyan-200 text-cyan-700 hover:bg-cyan-50">
                 <Upload className="h-4 w-4" />
@@ -338,8 +344,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                       <Input
                         value={variant.name}
                         onChange={(e) => updateVariant(index, "name", e.target.value)}
-                        placeholder="e.g., BW1 - Brilliant White"
-                        className="border-cyan-300 focus:border-cyan-500"
+                        placeholder="Enter variant name"
+                        className="border-cyan-300 focus:border-cyan-500 bg-white"
                       />
                     </div>
                     
@@ -348,8 +354,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                       <Input
                         value={variant.image_url}
                         onChange={(e) => updateVariant(index, "image_url", e.target.value)}
-                        placeholder="Variant image URL"
-                        className="border-cyan-300 focus:border-cyan-500"
+                        placeholder="Enter variant image URL"
+                        className="border-cyan-300 focus:border-cyan-500 bg-white"
                       />
                     </div>
                     
@@ -359,7 +365,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                         type="number"
                         value={variant.current_stock}
                         onChange={(e) => updateVariant(index, "current_stock", parseInt(e.target.value) || 0)}
-                        className="border-cyan-300 focus:border-cyan-500"
+                        placeholder="Enter current stock"
+                        className="border-cyan-300 focus:border-cyan-500 bg-white"
                       />
                     </div>
                     
@@ -369,7 +376,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                         type="number"
                         value={variant.threshold_qty}
                         onChange={(e) => updateVariant(index, "threshold_qty", parseInt(e.target.value) || 0)}
-                        className="border-cyan-300 focus:border-cyan-500"
+                        placeholder="Enter threshold quantity"
+                        className="border-cyan-300 focus:border-cyan-500 bg-white"
                       />
                     </div>
                   </div>
