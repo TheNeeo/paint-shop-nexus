@@ -54,12 +54,12 @@ export function InventoryFilters({
       </div>
       
       <div className="flex gap-2">
-        <Select value={categoryFilter} onValueChange={onCategoryChange}>
+        <Select value={categoryFilter || "all"} onValueChange={(value) => onCategoryChange(value === "all" ? "" : value)}>
           <SelectTrigger className="w-48 border-cyan-200 focus:border-cyan-500">
             <SelectValue placeholder="All Categories" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Categories</SelectItem>
+            <SelectItem value="all">All Categories</SelectItem>
             {categories?.map((category) => (
               <SelectItem key={category.id} value={category.id}>
                 {category.name}
@@ -68,12 +68,12 @@ export function InventoryFilters({
           </SelectContent>
         </Select>
         
-        <Select value={stockStatusFilter} onValueChange={onStockStatusChange}>
+        <Select value={stockStatusFilter || "all"} onValueChange={(value) => onStockStatusChange(value === "all" ? "" : value)}>
           <SelectTrigger className="w-48 border-cyan-200 focus:border-cyan-500">
             <SelectValue placeholder="Stock Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Stock</SelectItem>
+            <SelectItem value="all">All Stock</SelectItem>
             <SelectItem value="in-stock">In Stock</SelectItem>
             <SelectItem value="low-stock">Low Stock</SelectItem>
             <SelectItem value="out-of-stock">Out of Stock</SelectItem>
