@@ -29,6 +29,26 @@ interface InventoryTableProps {
   onEditProduct: (product: any) => void;
 }
 
+interface Product {
+  id: string;
+  name: string;
+  category_id: string;
+  hsn_code: string;
+  unit: string;
+  image_url: string;
+  purchase_qty: number;
+  sale_qty: number;
+  current_stock: number;
+  threshold_qty: number;
+  unit_price: number;
+  parent_product_id: string | null;
+  is_variant: boolean;
+  created_at: string;
+  updated_at: string;
+  categories?: { name: string };
+  variants?: Product[];
+}
+
 export function InventoryTable({
   searchTerm,
   categoryFilter,
@@ -44,8 +64,7 @@ export function InventoryTable({
         .from("products")
         .select(`
           *,
-          categories (name),
-          variants:products!parent_product_id (*)
+          categories (name)
         `)
         .is("parent_product_id", null);
 
@@ -57,8 +76,27 @@ export function InventoryTable({
         query = query.eq("category_id", categoryFilter);
       }
 
-      const { data } = await query.order("created_at", { ascending: false });
-      return data || [];
+      const { data: mainProducts } = await query.order("created_at", { ascending: false });
+      
+      if (!mainProducts) return [];
+
+      // Fetch variants for each main product
+      const productsWithVariants = await Promise.all(
+        mainProducts.map(async (product) => {
+          const { data: variants } = await supabase
+            .from("products")
+            .select("*")
+            .eq("parent_product_id", product.id)
+            .order("created_at", { ascending: false });
+          
+          return {
+            ...product,
+            variants: variants || []
+          };
+        })
+      );
+
+      return productsWithVariants;
     }
   });
 
@@ -203,7 +241,7 @@ export function InventoryTable({
                 </TableRow>
                 
                 {/* Variants/Sub-products */}
-                {isExpanded && hasVariants && product.variants.map((variant: any, vIndex: number) => {
+                {isExpanded && hasVariants && product.variants.map((variant: Product, vIndex: number) => {
                   const variantStockStatus = getStockStatus(variant.current_stock, variant.threshold_qty);
                   const variantTotalValue = variant.current_stock * variant.unit_price;
                   
