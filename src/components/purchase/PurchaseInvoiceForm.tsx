@@ -358,9 +358,9 @@ export const PurchaseInvoiceForm = () => {
                 <span>Balance Due:</span>
                 <span>₹{grandTotal.toFixed(2)}</span>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Action Buttons */}
