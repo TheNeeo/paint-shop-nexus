@@ -75,49 +75,84 @@
     min-height: 100vh;
   }
 
-  /* Override any yellow/amber default styles */
+  /* Override any yellow/amber default styles with pink/green equivalents */
   .bg-yellow-50, .bg-amber-50 {
-    @apply bg-green-50;
+    @apply bg-pink-50 !important;
   }
   
   .bg-yellow-100, .bg-amber-100 {
-    @apply bg-green-100;
+    @apply bg-pink-100 !important;
   }
   
   .bg-yellow-200, .bg-amber-200 {
-    @apply bg-green-200;
+    @apply bg-pink-200 !important;
+  }
+  
+  .bg-yellow-300, .bg-amber-300 {
+    @apply bg-pink-300 !important;
+  }
+  
+  .bg-yellow-400, .bg-amber-400 {
+    @apply bg-pink-400 !important;
+  }
+  
+  .bg-yellow-500, .bg-amber-500 {
+    @apply bg-pink-500 !important;
   }
   
   .text-yellow-600, .text-amber-600 {
-    @apply text-green-600;
+    @apply text-pink-600 !important;
   }
   
   .text-yellow-700, .text-amber-700 {
-    @apply text-green-700;
+    @apply text-pink-700 !important;
   }
   
   .text-yellow-800, .text-amber-800 {
-    @apply text-green-800;
+    @apply text-pink-800 !important;
+  }
+  
+  .text-yellow-900, .text-amber-900 {
+    @apply text-pink-900 !important;
   }
   
   .border-yellow-200, .border-amber-200 {
-    @apply border-green-200;
+    @apply border-pink-200 !important;
   }
   
   .border-yellow-300, .border-amber-300 {
-    @apply border-green-300;
+    @apply border-pink-300 !important;
+  }
+  
+  .border-yellow-400, .border-amber-400 {
+    @apply border-pink-400 !important;
   }
   
   .ring-yellow-500, .ring-amber-500 {
-    @apply ring-green-500;
+    @apply ring-pink-500 !important;
   }
   
   .focus:ring-yellow-500, .focus:ring-amber-500 {
-    @apply focus:ring-green-500;
+    @apply focus:ring-pink-500 !important;
   }
   
   .focus:border-yellow-500, .focus:border-amber-500 {
-    @apply focus:border-green-500;
+    @apply focus:border-pink-500 !important;
+  }
+
+  /* Override hover states */
+  .hover:bg-yellow-50:hover, .hover:bg-amber-50:hover {
+    @apply hover:bg-pink-50 !important;
+  }
+  
+  .hover:bg-yellow-100:hover, .hover:bg-amber-100:hover {
+    @apply hover:bg-pink-100 !important;
+  }
+
+  /* Force any yellow backgrounds to pink */
+  [class*="yellow"], [class*="amber"] {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(251 207 232 / var(--tw-bg-opacity)) !important;
   }
 }
 
@@ -177,35 +212,48 @@
     border: 1px solid rgba(226,232,240,0.5);
   }
 
-  /* Form styling - green theme */
+  /* Form styling - pink theme */
   .form-input {
-    @apply bg-white border-green-300 focus:border-green-500 focus:ring-green-500;
+    @apply bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500;
   }
   
   .form-select {
-    @apply bg-white border-green-300 focus:border-green-500 focus:ring-green-500;
+    @apply bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500;
   }
   
   .form-textarea {
-    @apply bg-white border-green-300 focus:border-green-500 focus:ring-green-500;
+    @apply bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500;
   }
   
-  /* Table styling - green theme */
+  /* Table styling - pink theme */
   .table-header {
-    @apply bg-gradient-to-r from-green-100 to-blue-100 border-green-200;
+    @apply bg-gradient-to-r from-pink-100 to-rose-100 border-pink-200;
   }
   
   .table-row-hover {
-    @apply hover:bg-green-50/50;
+    @apply hover:bg-pink-50/50;
   }
   
-  /* Card styling - green theme */
+  /* Card styling - pink theme */
   .card-border {
-    @apply border-green-200;
+    @apply border-pink-200;
   }
   
   .card-shadow {
     @apply shadow-sm hover:shadow-md;
+  }
+
+  /* Purchase specific overrides */
+  .purchase-card {
+    @apply bg-pink-50 border-pink-200;
+  }
+  
+  .purchase-header {
+    @apply bg-pink-100 text-pink-800;
+  }
+  
+  .purchase-button {
+    @apply bg-pink-600 hover:bg-pink-700 text-white;
   }
 }
 
