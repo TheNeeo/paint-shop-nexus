@@ -10,6 +10,7 @@ import ProductManagement from "./pages/ProductManagement";
 import CategoryManagement from "./pages/CategoryManagement";
 import SalesManagement from "./pages/SalesManagement";
 import PurchaseManagement from "./pages/PurchaseManagement";
+import NewPurchaseEntry from "./pages/NewPurchaseEntry";
 import InventoryManagement from "./pages/InventoryManagement";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/sales/activity" element={<SalesManagement />} />
           <Route path="/purchase" element={<PurchaseManagement />} />
           <Route path="/purchase/activity" element={<PurchaseManagement />} />
+          <Route path="/purchase/new" element={<NewPurchaseEntry />} />
           <Route path="/inventory" element={<InventoryManagement />} />
           <Route path="/inventory/update" element={<InventoryManagement />} />
           <Route path="/inventory/history" element={<InventoryManagement />} />
