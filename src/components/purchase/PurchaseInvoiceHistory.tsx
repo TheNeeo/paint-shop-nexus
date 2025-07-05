@@ -52,11 +52,11 @@ export const PurchaseInvoiceHistory = () => {
 
   const getStatusBadge = (status: string) => {
     const colors = {
-      'Paid': 'bg-green-100 text-green-800',
-      'Partial': 'bg-yellow-100 text-yellow-800',
-      'Pending': 'bg-red-100 text-red-800'
+      'Paid': 'bg-green-100 text-green-800 border-green-200',
+      'Partial': 'bg-pink-100 text-pink-800 border-pink-200',
+      'Pending': 'bg-red-100 text-red-800 border-red-200'
     };
-    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800 border-gray-200';
   };
 
   const handleView = (invoice: InvoiceHistory) => {
@@ -91,23 +91,23 @@ export const PurchaseInvoiceHistory = () => {
   return (
     <div className="space-y-6">
       {/* Search and Filters */}
-      <Card>
-        <CardHeader>
+      <Card className="bg-pink-50 border-pink-200">
+        <CardHeader className="bg-pink-100 border-b border-pink-200">
           <CardTitle className="text-pink-800">Search & Filters</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-3 h-4 w-4 text-pink-400" />
               <Input
                 placeholder="Search invoices..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 border-pink-300 focus:border-pink-500 focus:ring-pink-500"
               />
             </div>
             <Select value={dateRange} onValueChange={setDateRange}>
-              <SelectTrigger>
+              <SelectTrigger className="border-pink-300 focus:border-pink-500 focus:ring-pink-500">
                 <SelectValue placeholder="Date Range" />
               </SelectTrigger>
               <SelectContent>
@@ -119,7 +119,7 @@ export const PurchaseInvoiceHistory = () => {
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger>
+              <SelectTrigger className="border-pink-300 focus:border-pink-500 focus:ring-pink-500">
                 <SelectValue placeholder="Payment Status" />
               </SelectTrigger>
               <SelectContent>
@@ -129,7 +129,7 @@ export const PurchaseInvoiceHistory = () => {
                 <SelectItem value="pending">Pending</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline" className="border-pink-200 text-pink-700 hover:bg-pink-50">
+            <Button variant="outline" className="border-pink-300 text-pink-700 hover:bg-pink-100">
               <Filter className="w-4 h-4 mr-2" />
               Apply Filters
             </Button>
@@ -138,19 +138,19 @@ export const PurchaseInvoiceHistory = () => {
       </Card>
 
       {/* Invoice History Table */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+      <Card className="bg-pink-50 border-pink-200">
+        <CardHeader className="flex flex-row items-center justify-between bg-pink-100 border-b border-pink-200">
           <CardTitle className="text-pink-800">Purchase Invoice History</CardTitle>
-          <Button variant="outline" className="border-pink-200 text-pink-700 hover:bg-pink-50">
+          <Button variant="outline" className="border-pink-300 text-pink-700 hover:bg-pink-100">
             <FileDown className="w-4 h-4 mr-2" />
             Export All
           </Button>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full bg-white rounded-lg">
               <thead>
-                <tr className="border-b border-pink-200">
+                <tr className="border-b border-pink-200 bg-pink-100">
                   <th className="text-left p-4 font-medium text-pink-800">Invoice No.</th>
                   <th className="text-left p-4 font-medium text-pink-800">Supplier Name</th>
                   <th className="text-left p-4 font-medium text-pink-800">Date</th>
@@ -161,11 +161,11 @@ export const PurchaseInvoiceHistory = () => {
               </thead>
               <tbody>
                 {mockInvoices.map((invoice) => (
-                  <tr key={invoice.id} className="border-b hover:bg-pink-50/50">
+                  <tr key={invoice.id} className="border-b border-pink-100 hover:bg-pink-50">
                     <td className="p-4 font-medium text-pink-700">{invoice.invoiceNo}</td>
-                    <td className="p-4">{invoice.supplierName}</td>
-                    <td className="p-4">{new Date(invoice.date).toLocaleDateString()}</td>
-                    <td className="p-4 font-medium">₹{invoice.totalAmount.toLocaleString()}</td>
+                    <td className="p-4 text-pink-600">{invoice.supplierName}</td>
+                    <td className="p-4 text-pink-600">{new Date(invoice.date).toLocaleDateString()}</td>
+                    <td className="p-4 font-medium text-pink-700">₹{invoice.totalAmount.toLocaleString()}</td>
                     <td className="p-4">
                       <Badge className={getStatusBadge(invoice.paymentStatus)}>
                         {invoice.paymentStatus}
@@ -215,17 +215,17 @@ export const PurchaseInvoiceHistory = () => {
           
           {/* Pagination */}
           <div className="flex items-center justify-between mt-6">
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-pink-600">
               Showing 1 to 3 of 3 results
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" disabled>
+              <Button variant="outline" size="sm" disabled className="border-pink-300 text-pink-400">
                 Previous
               </Button>
-              <Button variant="outline" size="sm" className="bg-pink-100 text-pink-700">
+              <Button variant="outline" size="sm" className="bg-pink-100 text-pink-700 border-pink-300">
                 1
               </Button>
-              <Button variant="outline" size="sm" disabled>
+              <Button variant="outline" size="sm" disabled className="border-pink-300 text-pink-400">
                 Next
               </Button>
             </div>
@@ -235,35 +235,35 @@ export const PurchaseInvoiceHistory = () => {
 
       {/* Summary Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="bg-pink-50 border-pink-200">
           <CardContent className="p-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-pink-600">3</div>
-              <div className="text-sm text-gray-600">Total Invoices</div>
+              <div className="text-sm text-pink-500">Total Invoices</div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-pink-50 border-pink-200">
           <CardContent className="p-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">₹55,500</div>
-              <div className="text-sm text-gray-600">Total Amount</div>
+              <div className="text-sm text-pink-500">Total Amount</div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-pink-50 border-pink-200">
           <CardContent className="p-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-600">₹30,500</div>
-              <div className="text-sm text-gray-600">Paid Amount</div>
+              <div className="text-2xl font-bold text-pink-600">₹30,500</div>
+              <div className="text-sm text-pink-500">Paid Amount</div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-pink-50 border-pink-200">
           <CardContent className="p-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-red-600">₹25,000</div>
-              <div className="text-sm text-gray-600">Balance Due</div>
+              <div className="text-sm text-pink-500">Balance Due</div>
             </div>
           </CardContent>
         </Card>
