@@ -33,7 +33,7 @@ export function ReorderFilters({
   setStockStatusFilter,
 }: ReorderFiltersProps) {
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm border border-pink-200">
+    <div className="bg-pink-50 rounded-lg p-6 shadow-sm border border-pink-200">
       <div className="flex flex-col lg:flex-row gap-4">
         {/* Search Bar */}
         <div className="flex-1 relative">
@@ -42,17 +42,17 @@ export function ReorderFilters({
             placeholder="Search by Product Name, HSN, Category..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 border-pink-300 focus:border-pink-500 focus:ring-pink-500"
+            className="pl-10 border-pink-300 focus:border-pink-500 focus:ring-pink-500 bg-white"
           />
         </div>
 
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-4">
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-40 border-pink-300 focus:border-pink-500 focus:ring-pink-500">
+            <SelectTrigger className="w-40 border-pink-300 focus:border-pink-500 focus:ring-pink-500 bg-white">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white">
               <SelectItem value="all">All Categories</SelectItem>
               <SelectItem value="paint">Paint</SelectItem>
               <SelectItem value="tools">Tools</SelectItem>
@@ -61,10 +61,10 @@ export function ReorderFilters({
           </Select>
 
           <Select value={supplierFilter} onValueChange={setSupplierFilter}>
-            <SelectTrigger className="w-40 border-pink-300 focus:border-pink-500 focus:ring-pink-500">
+            <SelectTrigger className="w-40 border-pink-300 focus:border-pink-500 focus:ring-pink-500 bg-white">
               <SelectValue placeholder="Supplier" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white">
               <SelectItem value="all">All Suppliers</SelectItem>
               <SelectItem value="asian-paints">Asian Paints Ltd</SelectItem>
               <SelectItem value="tools-india">Tools India</SelectItem>
@@ -72,10 +72,10 @@ export function ReorderFilters({
           </Select>
 
           <Select value={stockStatusFilter} onValueChange={setStockStatusFilter}>
-            <SelectTrigger className="w-40 border-pink-300 focus:border-pink-500 focus:ring-pink-500">
+            <SelectTrigger className="w-40 border-pink-300 focus:border-pink-500 focus:ring-pink-500 bg-white">
               <SelectValue placeholder="Stock Status" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white">
               <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="critical">Critical</SelectItem>
               <SelectItem value="low">Low Stock</SelectItem>
@@ -84,7 +84,7 @@ export function ReorderFilters({
 
           <Button 
             variant="outline" 
-            className="border-pink-300 text-pink-700 hover:bg-pink-100"
+            className="border-pink-300 text-pink-700 hover:bg-pink-100 bg-white"
             onClick={() => {
               setSearchTerm('');
               setCategoryFilter('all');

@@ -21,7 +21,8 @@ export function ReorderSummaryCards({ products }: ReorderSummaryCardsProps) {
       icon: Package,
       description: 'Items below threshold',
       color: 'text-pink-600',
-      bgColor: 'bg-pink-100'
+      bgColor: 'bg-pink-100',
+      cardBg: 'bg-pink-50'
     },
     {
       title: 'Critical Stock Alerts',
@@ -29,7 +30,8 @@ export function ReorderSummaryCards({ products }: ReorderSummaryCardsProps) {
       icon: AlertTriangle,
       description: 'Urgent reorder required',
       color: 'text-rose-600',
-      bgColor: 'bg-rose-100'
+      bgColor: 'bg-rose-100',
+      cardBg: 'bg-rose-50'
     },
     {
       title: 'Total Estimated Cost',
@@ -37,7 +39,8 @@ export function ReorderSummaryCards({ products }: ReorderSummaryCardsProps) {
       icon: DollarSign,
       description: 'For suggested quantities',
       color: 'text-pink-600',
-      bgColor: 'bg-pink-100'
+      bgColor: 'bg-pink-100',
+      cardBg: 'bg-pink-50'
     },
     {
       title: 'Average Lead Time',
@@ -45,14 +48,15 @@ export function ReorderSummaryCards({ products }: ReorderSummaryCardsProps) {
       icon: Clock,
       description: 'Expected delivery time',
       color: 'text-pink-600',
-      bgColor: 'bg-pink-100'
+      bgColor: 'bg-pink-100',
+      cardBg: 'bg-pink-50'
     }
   ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {cards.map((card, index) => (
-        <Card key={index} className="border-pink-200 hover:shadow-md transition-shadow">
+        <Card key={index} className={`border-pink-200 hover:shadow-md transition-shadow ${card.cardBg}`}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-pink-700">
               {card.title}
