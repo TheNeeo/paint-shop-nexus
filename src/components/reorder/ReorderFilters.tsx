@@ -53,7 +53,7 @@ export function ReorderFilters({
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
+              <SelectItem value="all">All Categories</SelectItem>
               <SelectItem value="paint">Paint</SelectItem>
               <SelectItem value="tools">Tools</SelectItem>
               <SelectItem value="accessories">Accessories</SelectItem>
@@ -65,7 +65,7 @@ export function ReorderFilters({
               <SelectValue placeholder="Supplier" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Suppliers</SelectItem>
+              <SelectItem value="all">All Suppliers</SelectItem>
               <SelectItem value="asian-paints">Asian Paints Ltd</SelectItem>
               <SelectItem value="tools-india">Tools India</SelectItem>
             </SelectContent>
@@ -85,6 +85,12 @@ export function ReorderFilters({
           <Button 
             variant="outline" 
             className="border-pink-300 text-pink-700 hover:bg-pink-100"
+            onClick={() => {
+              setSearchTerm('');
+              setCategoryFilter('all');
+              setSupplierFilter('all');
+              setStockStatusFilter('all');
+            }}
           >
             <Filter className="h-4 w-4 mr-2" />
             Clear Filters

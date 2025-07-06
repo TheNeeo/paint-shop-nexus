@@ -28,8 +28,8 @@ const ReorderProductList = () => {
   const navigate = useNavigate();
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
-  const [supplierFilter, setSupplierFilter] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [supplierFilter, setSupplierFilter] = useState('all');
   const [stockStatusFilter, setStockStatusFilter] = useState('all');
 
   // Mock data for demonstration
@@ -57,6 +57,19 @@ const ReorderProductList = () => {
       minThreshold: 25,
       suggestedQty: 40,
       purchaseRate: 150,
+      supplierName: 'Tools India',
+      status: 'low'
+    },
+    {
+      id: '3',
+      name: 'Roller Kit Standard',
+      category: 'Tools',
+      hsnCode: '96034020',
+      unit: 'Set',
+      currentStock: 8,
+      minThreshold: 15,
+      suggestedQty: 30,
+      purchaseRate: 180,
       supplierName: 'Tools India',
       status: 'low'
     }
