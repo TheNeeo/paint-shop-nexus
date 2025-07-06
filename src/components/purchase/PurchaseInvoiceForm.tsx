@@ -85,7 +85,7 @@ export const PurchaseInvoiceForm = () => {
   return (
     <div className="space-y-6">
       {/* Supplier Information */}
-      <Card className="bg-pink-50 border-pink-200">
+      <Card className="bg-pink-50 border border-pink-200">
         <CardHeader className="bg-pink-100 border-b border-pink-200">
           <CardTitle className="text-pink-800">Supplier Information</CardTitle>
         </CardHeader>
@@ -95,10 +95,10 @@ export const PurchaseInvoiceForm = () => {
               <Label className="text-pink-700">Supplier</Label>
               <div className="flex gap-2">
                 <Select>
-                  <SelectTrigger className="flex-1 border-pink-300 focus:border-pink-500 focus:ring-pink-500">
+                  <SelectTrigger className="flex-1 bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500">
                     <SelectValue placeholder="Select Existing Supplier" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white border border-pink-200">
                     <SelectItem value="supplier1">ABC Suppliers</SelectItem>
                     <SelectItem value="supplier2">XYZ Industries</SelectItem>
                   </SelectContent>
@@ -111,24 +111,24 @@ export const PurchaseInvoiceForm = () => {
             </div>
             <div className="space-y-2">
               <Label className="text-pink-700">GSTIN</Label>
-              <Input placeholder="Enter GSTIN" className="border-pink-300 focus:border-pink-500 focus:ring-pink-500" />
+              <Input placeholder="Enter GSTIN" className="bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500" />
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="text-pink-700">Mobile / Email</Label>
-              <Input placeholder="Contact information" className="border-pink-300 focus:border-pink-500 focus:ring-pink-500" />
+              <Input placeholder="Contact information" className="bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500" />
             </div>
             <div className="space-y-2">
               <Label className="text-pink-700">Billing Address</Label>
-              <Textarea placeholder="Enter billing address" className="h-20 border-pink-300 focus:border-pink-500 focus:ring-pink-500" />
+              <Textarea placeholder="Enter billing address" className="h-20 bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500" />
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Invoice Details */}
-      <Card className="bg-pink-50 border-pink-200">
+      <Card className="bg-pink-50 border border-pink-200">
         <CardHeader className="bg-pink-100 border-b border-pink-200">
           <CardTitle className="text-pink-800">Purchase Invoice Details</CardTitle>
         </CardHeader>
@@ -136,25 +136,25 @@ export const PurchaseInvoiceForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label className="text-pink-700">Invoice No.</Label>
-              <Input placeholder="Auto-generated" className="border-pink-300 focus:border-pink-500 focus:ring-pink-500" />
+              <Input placeholder="Auto-generated" className="bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500" />
             </div>
             <div className="space-y-2">
               <Label className="text-pink-700">Purchase Date</Label>
-              <Input type="date" className="border-pink-300 focus:border-pink-500 focus:ring-pink-500" />
+              <Input type="date" className="bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500" />
             </div>
             <div className="space-y-2">
               <Label className="text-pink-700">Due Date</Label>
-              <Input type="date" className="border-pink-300 focus:border-pink-500 focus:ring-pink-500" />
+              <Input type="date" className="bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500" />
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="text-pink-700">Payment Terms</Label>
               <Select>
-                <SelectTrigger className="border-pink-300 focus:border-pink-500 focus:ring-pink-500">
+                <SelectTrigger className="bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500">
                   <SelectValue placeholder="Select payment terms" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border border-pink-200">
                   <SelectItem value="immediate">Immediate</SelectItem>
                   <SelectItem value="net30">Net 30</SelectItem>
                   <SelectItem value="net60">Net 60</SelectItem>
@@ -164,10 +164,10 @@ export const PurchaseInvoiceForm = () => {
             <div className="space-y-2">
               <Label className="text-pink-700">Purchase Type</Label>
               <Select>
-                <SelectTrigger className="border-pink-300 focus:border-pink-500 focus:ring-pink-500">
+                <SelectTrigger className="bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500">
                   <SelectValue placeholder="Select purchase type" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border border-pink-200">
                   <SelectItem value="local">Local</SelectItem>
                   <SelectItem value="interstate">Interstate</SelectItem>
                 </SelectContent>
@@ -178,7 +178,7 @@ export const PurchaseInvoiceForm = () => {
       </Card>
 
       {/* Product/Item Table */}
-      <Card className="bg-pink-50 border-pink-200">
+      <Card className="bg-pink-50 border border-pink-200">
         <CardHeader className="flex flex-row items-center justify-between bg-pink-100 border-b border-pink-200">
           <CardTitle className="text-pink-800">Products/Items</CardTitle>
           <Button onClick={addNewItem} size="sm" className="bg-pink-600 hover:bg-pink-700 text-white">
@@ -210,7 +210,7 @@ export const PurchaseInvoiceForm = () => {
                         placeholder="Product name"
                         value={item.productName}
                         onChange={(e) => updateItem(item.id, 'productName', e.target.value)}
-                        className="border-pink-300 focus:border-pink-500 focus:ring-pink-500"
+                        className="bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500"
                       />
                     </td>
                     <td className="p-2">
@@ -218,15 +218,15 @@ export const PurchaseInvoiceForm = () => {
                         placeholder="HSN"
                         value={item.hsnCode}
                         onChange={(e) => updateItem(item.id, 'hsnCode', e.target.value)}
-                        className="border-pink-300 focus:border-pink-500 focus:ring-pink-500"
+                        className="bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500"
                       />
                     </td>
                     <td className="p-2">
                       <Select value={item.unit} onValueChange={(value) => updateItem(item.id, 'unit', value)}>
-                        <SelectTrigger className="border-pink-300 focus:border-pink-500 focus:ring-pink-500">
+                        <SelectTrigger className="bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-white border border-pink-200">
                           <SelectItem value="PC">PC</SelectItem>
                           <SelectItem value="KG">KG</SelectItem>
                           <SelectItem value="LTR">LTR</SelectItem>
@@ -239,7 +239,7 @@ export const PurchaseInvoiceForm = () => {
                         type="number"
                         value={item.quantity}
                         onChange={(e) => updateItem(item.id, 'quantity', Number(e.target.value))}
-                        className="border-pink-300 focus:border-pink-500 focus:ring-pink-500"
+                        className="bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500"
                       />
                     </td>
                     <td className="p-2">
@@ -247,7 +247,7 @@ export const PurchaseInvoiceForm = () => {
                         type="number"
                         value={item.rate}
                         onChange={(e) => updateItem(item.id, 'rate', Number(e.target.value))}
-                        className="border-pink-300 focus:border-pink-500 focus:ring-pink-500"
+                        className="bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500"
                       />
                     </td>
                     <td className="p-2">
@@ -275,18 +275,18 @@ export const PurchaseInvoiceForm = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Additional Details */}
         <div className="lg:col-span-2 space-y-6">
-          <Card className="bg-pink-50 border-pink-200">
+          <Card className="bg-pink-50 border border-pink-200">
             <CardHeader className="bg-pink-100 border-b border-pink-200">
               <CardTitle className="text-pink-800">Additional Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 pt-6">
               <div className="space-y-2">
                 <Label className="text-pink-700">Notes</Label>
-                <Textarea placeholder="Add any notes..." className="h-20 border-pink-300 focus:border-pink-500 focus:ring-pink-500" />
+                <Textarea placeholder="Add any notes..." className="h-20 bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500" />
               </div>
               <div className="space-y-2">
                 <Label className="text-pink-700">Terms & Conditions</Label>
-                <Textarea placeholder="Enter terms and conditions..." className="h-20 border-pink-300 focus:border-pink-500 focus:ring-pink-500" />
+                <Textarea placeholder="Enter terms and conditions..." className="h-20 bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500" />
               </div>
               <div className="space-y-2">
                 <Label className="text-pink-700">Upload Invoice Copy</Label>
@@ -300,7 +300,7 @@ export const PurchaseInvoiceForm = () => {
         </div>
 
         {/* Financial Summary */}
-        <Card className="lg:sticky lg:top-6 bg-pink-50 border-pink-200">
+        <Card className="lg:sticky lg:top-6 bg-pink-50 border border-pink-200">
           <CardHeader className="bg-pink-100 border-b border-pink-200">
             <CardTitle className="text-pink-800">Financial Summary</CardTitle>
           </CardHeader>
@@ -314,10 +314,10 @@ export const PurchaseInvoiceForm = () => {
               <div className="space-y-2">
                 <div className="flex gap-2">
                   <Select value={discountType} onValueChange={(value: 'percentage' | 'flat') => setDiscountType(value)}>
-                    <SelectTrigger className="w-20 border-pink-300 focus:border-pink-500 focus:ring-pink-500">
+                    <SelectTrigger className="w-20 bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white border border-pink-200">
                       <SelectItem value="percentage">%</SelectItem>
                       <SelectItem value="flat">₹</SelectItem>
                     </SelectContent>
@@ -327,7 +327,7 @@ export const PurchaseInvoiceForm = () => {
                     placeholder="Discount"
                     value={discount}
                     onChange={(e) => setDiscount(Number(e.target.value))}
-                    className="border-pink-300 focus:border-pink-500 focus:ring-pink-500"
+                    className="bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500"
                   />
                 </div>
                 <div className="flex justify-between text-sm text-pink-600">
@@ -357,7 +357,7 @@ export const PurchaseInvoiceForm = () => {
               
               <div className="space-y-2">
                 <Label className="text-pink-700">Paid Amount</Label>
-                <Input type="number" placeholder="0.00" className="border-pink-300 focus:border-pink-500 focus:ring-pink-500" />
+                <Input type="number" placeholder="0.00" className="bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500" />
               </div>
               
               <div className="flex justify-between text-red-600 font-medium">
@@ -370,7 +370,7 @@ export const PurchaseInvoiceForm = () => {
       </div>
 
       {/* Action Buttons */}
-      <Card className="bg-pink-50 border-pink-200">
+      <Card className="bg-pink-50 border border-pink-200">
         <CardContent className="pt-6">
           <div className="flex flex-wrap gap-3 justify-center">
             <Button variant="outline" onClick={handleSaveDraft} className="border-pink-300 text-pink-700 hover:bg-pink-100">

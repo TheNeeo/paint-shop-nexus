@@ -63,7 +63,7 @@ export const menuData = [
     id: "sales-management",
     title: "Sales Management",
     icon: ShoppingCart,
-    iconColor: "text-yellow-400",
+    iconColor: "text-pink-400",
     children: [
       {
         id: "sales-activity",
@@ -120,7 +120,7 @@ export const menuData = [
         title: "Reorder Product List",
         icon: RefreshCw,
         path: "/purchase/reorder",
-        iconColor: "text-amber-400",
+        iconColor: "text-pink-400",
       },
     ],
   },
