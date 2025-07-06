@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +12,7 @@ import PurchaseManagement from "./pages/PurchaseManagement";
 import NewPurchaseEntry from "./pages/NewPurchaseEntry";
 import PurchaseInvoice from "./pages/PurchaseInvoice";
 import ReorderProductList from "./pages/ReorderProductList";
+import GeneratePurchaseOrder from "./pages/GeneratePurchaseOrder";
 import InventoryManagement from "./pages/InventoryManagement";
 
 const queryClient = new QueryClient();
@@ -35,6 +35,7 @@ const App = () => (
           <Route path="/purchase/new" element={<NewPurchaseEntry />} />
           <Route path="/purchase/invoice" element={<PurchaseInvoice />} />
           <Route path="/purchase/reorder" element={<ReorderProductList />} />
+          <Route path="/purchase/generate-order" element={<GeneratePurchaseOrder />} />
           <Route path="/inventory" element={<InventoryManagement />} />
           <Route path="/inventory/update" element={<InventoryManagement />} />
           <Route path="/inventory/history" element={<InventoryManagement />} />
