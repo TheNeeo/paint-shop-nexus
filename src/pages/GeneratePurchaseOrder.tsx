@@ -111,12 +111,12 @@ const GeneratePurchaseOrder = () => {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-white p-6">
+      <div className="min-h-screen bg-gray-50 p-6">
         <PurchaseOrderHeader />
         
         {/* Main Form Container */}
         <div className="max-w-7xl mx-auto mt-6">
-          <div className="bg-white border border-pink-200 rounded-lg shadow-sm">
+          <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
             {/* Form Header */}
             <div className="bg-gradient-to-r from-pink-50 to-rose-50 px-6 py-4 border-b border-pink-200">
               <h2 className="text-xl font-semibold text-pink-800">Purchase Order Form</h2>
@@ -124,9 +124,9 @@ const GeneratePurchaseOrder = () => {
             </div>
             
             {/* Form Content */}
-            <div className="p-6 space-y-8">
+            <div className="p-6">
               {/* Supplier and Order Info Row */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                 <SupplierSelection 
                   selectedSupplier={selectedSupplier}
                   setSelectedSupplier={setSelectedSupplier}
@@ -135,7 +135,7 @@ const GeneratePurchaseOrder = () => {
               </div>
               
               {/* Product Selection */}
-              <div className="border-t border-pink-200 pt-6">
+              <div className="mb-8">
                 <ProductSelection 
                   products={products}
                   updateProduct={updateProduct}
@@ -144,9 +144,12 @@ const GeneratePurchaseOrder = () => {
                 />
               </div>
               
-              {/* Order Summary */}
-              <div className="border-t border-pink-200 pt-6">
-                <div className="max-w-md ml-auto">
+              {/* Bottom Section: Order Summary and Terms */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div>
+                  <TermsConditions />
+                </div>
+                <div>
                   <OrderSummary 
                     orderSummary={orderSummary}
                     setOrderSummary={setOrderSummary}
@@ -154,15 +157,12 @@ const GeneratePurchaseOrder = () => {
                 </div>
               </div>
               
-              {/* Terms & Conditions */}
-              <div className="border-t border-pink-200 pt-6">
-                <TermsConditions />
-              </div>
-              
               {/* Action Buttons */}
-              <div className="border-t border-pink-200 pt-6">
-                <div className="max-w-md ml-auto">
-                  <ActionButtons />
+              <div className="border-t border-gray-200 pt-6">
+                <div className="flex justify-center">
+                  <div className="w-full max-w-md">
+                    <ActionButtons />
+                  </div>
                 </div>
               </div>
             </div>
