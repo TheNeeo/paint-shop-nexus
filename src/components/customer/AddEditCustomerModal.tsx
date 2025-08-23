@@ -124,7 +124,7 @@ export const AddEditCustomerModal: React.FC<AddEditCustomerModalProps> = ({
                 id="name"
                 value={formData.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
-                className={`mt-1 border-blue-200 focus:border-blue-400 focus:ring-blue-400 ${
+                className={`mt-1 border-blue-200 focus:border-blue-400 focus:ring-blue-400 bg-white ${
                   errors.name ? 'border-red-400' : ''
                 }`}
                 placeholder="Enter customer name"
@@ -139,7 +139,7 @@ export const AddEditCustomerModal: React.FC<AddEditCustomerModalProps> = ({
                 id="mobile"
                 value={formData.mobile}
                 onChange={(e) => handleInputChange('mobile', e.target.value)}
-                className={`mt-1 border-blue-200 focus:border-blue-400 focus:ring-blue-400 ${
+                className={`mt-1 border-blue-200 focus:border-blue-400 focus:ring-blue-400 bg-white ${
                   errors.mobile ? 'border-red-400' : ''
                 }`}
                 placeholder="+91 98765 43210"
@@ -157,7 +157,7 @@ export const AddEditCustomerModal: React.FC<AddEditCustomerModalProps> = ({
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                className={`mt-1 border-blue-200 focus:border-blue-400 focus:ring-blue-400 ${
+                className={`mt-1 border-blue-200 focus:border-blue-400 focus:ring-blue-400 bg-white ${
                   errors.email ? 'border-red-400' : ''
                 }`}
                 placeholder="customer@example.com"
@@ -171,7 +171,7 @@ export const AddEditCustomerModal: React.FC<AddEditCustomerModalProps> = ({
                 id="gstNo"
                 value={formData.gstNo}
                 onChange={(e) => handleInputChange('gstNo', e.target.value)}
-                className="mt-1 border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                className="mt-1 border-blue-200 focus:border-blue-400 focus:ring-blue-400 bg-white"
                 placeholder="07AABCU9603R1ZX"
               />
             </div>
@@ -184,7 +184,7 @@ export const AddEditCustomerModal: React.FC<AddEditCustomerModalProps> = ({
               id="address"
               value={formData.address}
               onChange={(e) => handleInputChange('address', e.target.value)}
-              className={`mt-1 border-blue-200 focus:border-blue-400 focus:ring-blue-400 ${
+              className={`mt-1 border-blue-200 focus:border-blue-400 focus:ring-blue-400 bg-white ${
                 errors.address ? 'border-red-400' : ''
               }`}
               placeholder="Enter complete address"
@@ -201,7 +201,7 @@ export const AddEditCustomerModal: React.FC<AddEditCustomerModalProps> = ({
                 value={formData.customerType} 
                 onValueChange={(value: 'retail' | 'wholesale') => handleInputChange('customerType', value)}
               >
-                <SelectTrigger className="mt-1 border-blue-200 focus:border-blue-400 focus:ring-blue-400">
+                <SelectTrigger className="mt-1 border-blue-200 focus:border-blue-400 focus:ring-blue-400 bg-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -218,7 +218,7 @@ export const AddEditCustomerModal: React.FC<AddEditCustomerModalProps> = ({
                 type="number"
                 value={formData.outstandingBalance}
                 onChange={(e) => handleInputChange('outstandingBalance', Number(e.target.value))}
-                className="mt-1 border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                className="mt-1 border-blue-200 focus:border-blue-400 focus:ring-blue-400 bg-white"
                 placeholder="0"
                 min="0"
                 step="0.01"

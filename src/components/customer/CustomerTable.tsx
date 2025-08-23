@@ -50,7 +50,7 @@ export const CustomerTable: React.FC<CustomerTableProps> = ({
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="bg-gradient-to-r from-blue-100 to-sky-100">
+              <TableRow className="bg-gradient-to-r from-blue-100 to-sky-100 hover:bg-gradient-to-r hover:from-blue-100 hover:to-sky-100">
                 <TableHead className="text-blue-900 font-semibold">S.No</TableHead>
                 <TableHead className="text-blue-900 font-semibold">Name</TableHead>
                 <TableHead className="text-blue-900 font-semibold">Mobile No</TableHead>
@@ -75,7 +75,7 @@ export const CustomerTable: React.FC<CustomerTableProps> = ({
                   <TableRow 
                     key={customer.id}
                     className={`hover:bg-blue-50/50 transition-colors ${
-                      customer.outstandingBalance > 10000 ? 'bg-blue-100/40' : 'bg-blue-50/20'
+                      customer.outstandingBalance > 10000 ? 'bg-blue-100/40' : 'bg-white'
                     }`}
                   >
                     <TableCell className="font-medium text-blue-800">

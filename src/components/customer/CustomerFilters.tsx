@@ -27,7 +27,7 @@ export const CustomerFilters: React.FC<CustomerFiltersProps> = ({ filters, setFi
               placeholder="Search by Name / Mobile / GST No"
               value={filters.searchTerm}
               onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
-              className="pl-10 border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+              className="pl-10 border-blue-200 focus:border-blue-400 focus:ring-blue-400 bg-white"
             />
           </div>
 
@@ -38,7 +38,7 @@ export const CustomerFilters: React.FC<CustomerFiltersProps> = ({ filters, setFi
               setFilters(prev => ({ ...prev, customerType: value }))
             }
           >
-            <SelectTrigger className="border-blue-200 focus:border-blue-400 focus:ring-blue-400">
+            <SelectTrigger className="border-blue-200 focus:border-blue-400 focus:ring-blue-400 bg-white">
               <SelectValue placeholder="Customer Type" />
             </SelectTrigger>
             <SelectContent>
@@ -55,7 +55,7 @@ export const CustomerFilters: React.FC<CustomerFiltersProps> = ({ filters, setFi
               setFilters(prev => ({ ...prev, balanceStatus: value }))
             }
           >
-            <SelectTrigger className="border-blue-200 focus:border-blue-400 focus:ring-blue-400">
+            <SelectTrigger className="border-blue-200 focus:border-blue-400 focus:ring-blue-400 bg-white">
               <SelectValue placeholder="Balance Status" />
             </SelectTrigger>
             <SelectContent>
