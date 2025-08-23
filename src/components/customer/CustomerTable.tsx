@@ -74,8 +74,8 @@ export const CustomerTable: React.FC<CustomerTableProps> = ({
                 customers.map((customer, index) => (
                   <TableRow 
                     key={customer.id}
-                    className={`hover:bg-blue-50/30 transition-colors ${
-                      customer.outstandingBalance > 10000 ? 'bg-red-50/30' : ''
+                    className={`hover:bg-blue-50/50 transition-colors ${
+                      customer.outstandingBalance > 10000 ? 'bg-blue-100/40' : 'bg-blue-50/20'
                     }`}
                   >
                     <TableCell className="font-medium text-blue-800">
@@ -165,7 +165,7 @@ export const CustomerTable: React.FC<CustomerTableProps> = ({
         </div>
         
         {/* Pagination Footer */}
-        <div className="flex items-center justify-between p-4 border-t border-blue-200 bg-blue-50/30">
+        <div className="flex items-center justify-between p-4 border-t border-blue-200 bg-gradient-to-r from-blue-50 to-sky-50">
           <div className="text-sm text-blue-700">
             Total Outstanding: <span className="font-semibold text-red-600">
               {formatCurrency(customers.reduce((sum, c) => sum + c.outstandingBalance, 0))}

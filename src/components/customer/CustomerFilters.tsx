@@ -12,7 +12,7 @@ interface CustomerFiltersProps {
 
 export const CustomerFilters: React.FC<CustomerFiltersProps> = ({ filters, setFilters }) => {
   return (
-    <Card className="border-blue-200 shadow-sm mb-6">
+    <Card className="border-blue-200 shadow-sm mb-6 bg-gradient-to-r from-blue-50 to-sky-50">
       <CardContent className="p-6">
         <div className="flex items-center gap-2 mb-4">
           <Filter className="h-5 w-5 text-blue-600" />
