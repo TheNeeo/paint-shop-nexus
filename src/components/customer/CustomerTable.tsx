@@ -50,7 +50,7 @@ export const CustomerTable: React.FC<CustomerTableProps> = ({
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="bg-blue-50/50">
+              <TableRow className="bg-gradient-to-r from-blue-100 to-sky-100">
                 <TableHead className="text-blue-900 font-semibold">S.No</TableHead>
                 <TableHead className="text-blue-900 font-semibold">Name</TableHead>
                 <TableHead className="text-blue-900 font-semibold">Mobile No</TableHead>
