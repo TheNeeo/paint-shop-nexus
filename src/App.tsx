@@ -14,6 +14,7 @@ import PurchaseInvoice from "./pages/PurchaseInvoice";
 import ReorderProductList from "./pages/ReorderProductList";
 import GeneratePurchaseOrder from "./pages/GeneratePurchaseOrder";
 import InventoryManagement from "./pages/InventoryManagement";
+import CustomerInformation from "./pages/CustomerInformation";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
           <Route path="/inventory" element={<InventoryManagement />} />
           <Route path="/inventory/update" element={<InventoryManagement />} />
           <Route path="/inventory/history" element={<InventoryManagement />} />
+          <Route path="/customers" element={<CustomerInformation />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
