@@ -15,6 +15,7 @@ import ReorderProductList from "./pages/ReorderProductList";
 import GeneratePurchaseOrder from "./pages/GeneratePurchaseOrder";
 import InventoryManagement from "./pages/InventoryManagement";
 import CustomerInformation from "./pages/CustomerInformation";
+import CustomerHistory from "./pages/CustomerHistory";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
           <Route path="/inventory/update" element={<InventoryManagement />} />
           <Route path="/inventory/history" element={<InventoryManagement />} />
           <Route path="/customers" element={<CustomerInformation />} />
+          <Route path="/customers/history" element={<CustomerHistory />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
