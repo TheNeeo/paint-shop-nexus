@@ -27,7 +27,7 @@ export const CustomerHistoryHeader: React.FC = () => {
           <Button
             variant="outline"
             onClick={handleExportPDF}
-            className="border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
+            className="border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
           >
             <FileText className="h-4 w-4 mr-2" />
             Export PDF
@@ -36,7 +36,7 @@ export const CustomerHistoryHeader: React.FC = () => {
           <Button
             variant="outline"
             onClick={handleExportExcel}
-            className="border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
+            className="border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
           >
             <Download className="h-4 w-4 mr-2" />
             Export Excel
@@ -45,7 +45,7 @@ export const CustomerHistoryHeader: React.FC = () => {
           <Button
             variant="outline"
             onClick={handleThemeToggle}
-            className="border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
+            className="border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
           >
             <Palette className="h-4 w-4 mr-2" />
             Theme

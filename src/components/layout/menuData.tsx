@@ -20,6 +20,9 @@ import {
   User,
   Box,
   Clock,
+  Truck,
+  UserPlus,
+  Archive,
 } from "lucide-react";
 
 export const menuData = [
@@ -179,6 +182,27 @@ export const menuData = [
         icon: History,
         path: "/customers/history",
         iconColor: "text-slate-400",
+      },
+      {
+        id: "vendor-information",
+        title: "Vendor Information",
+        icon: Truck,
+        path: "/vendors",
+        iconColor: "text-orange-400",
+      },
+      {
+        id: "add-new-vendor",
+        title: "Add New Vendor",
+        icon: UserPlus,
+        path: "/vendors/new",
+        iconColor: "text-emerald-400",
+      },
+      {
+        id: "vendor-history",
+        title: "Vendor History",
+        icon: Archive,
+        path: "/vendors/history",
+        iconColor: "text-indigo-400",
       },
     ],
   },

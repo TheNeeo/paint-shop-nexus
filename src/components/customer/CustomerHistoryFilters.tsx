@@ -99,7 +99,7 @@ export const CustomerHistoryFilters: React.FC<CustomerHistoryFiltersProps> = ({ 
           <Button
             variant="outline"
             onClick={clearFilters}
-            className="border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
+            className="border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
           >
             <X className="h-4 w-4 mr-2" />
             Clear Filters
