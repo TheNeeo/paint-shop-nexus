@@ -101,7 +101,7 @@ export function AddEditVendorModal({
                 value={formData.name}
                 onChange={(e) => handleInputChange("name", e.target.value)}
                 placeholder="Enter vendor name"
-                className="border-gray-300 focus:border-orange-500 focus:ring-orange-200"
+                className="border-gray-300 focus:border-orange-500 focus:ring-orange-100"
                 required
               />
             </div>
@@ -116,7 +116,7 @@ export function AddEditVendorModal({
                 value={formData.mobile}
                 onChange={(e) => handleInputChange("mobile", e.target.value)}
                 placeholder="Enter mobile number"
-                className="border-gray-300 focus:border-orange-500 focus:ring-orange-200"
+                className="border-gray-300 focus:border-orange-500 focus:ring-orange-100"
                 required
               />
             </div>
@@ -132,7 +132,7 @@ export function AddEditVendorModal({
                 value={formData.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 placeholder="Enter email address"
-                className="border-gray-300 focus:border-orange-500 focus:ring-orange-200"
+                className="border-gray-300 focus:border-orange-500 focus:ring-orange-100"
               />
             </div>
 
@@ -146,7 +146,7 @@ export function AddEditVendorModal({
                 value={formData.gstNo}
                 onChange={(e) => handleInputChange("gstNo", e.target.value)}
                 placeholder="Enter GST number"
-                className="border-gray-300 focus:border-orange-500 focus:ring-orange-200"
+                className="border-gray-300 focus:border-orange-500 focus:ring-orange-100"
               />
             </div>
 
@@ -161,7 +161,7 @@ export function AddEditVendorModal({
                 value={formData.openingBalance}
                 onChange={(e) => handleInputChange("openingBalance", e.target.value)}
                 placeholder="Enter opening balance"
-                className="border-gray-300 focus:border-orange-500 focus:ring-orange-200"
+                className="border-gray-300 focus:border-orange-500 focus:ring-orange-100"
               />
             </div>
 
@@ -195,7 +195,7 @@ export function AddEditVendorModal({
               value={formData.address}
               onChange={(e) => handleInputChange("address", e.target.value)}
               placeholder="Enter complete address"
-              className="border-gray-300 focus:border-orange-500 focus:ring-orange-200 min-h-[100px]"
+              className="border-gray-300 focus:border-orange-500 focus:ring-orange-100 min-h-[100px]"
             />
           </div>
 

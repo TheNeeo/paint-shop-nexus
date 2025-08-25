@@ -149,10 +149,30 @@
     @apply hover:bg-pink-100 !important;
   }
 
-  /* Force any yellow backgrounds to pink */
+  /* Force any yellow backgrounds to pink, but preserve orange */
   [class*="yellow"], [class*="amber"] {
     --tw-bg-opacity: 1 !important;
     background-color: rgb(251 207 232 / var(--tw-bg-opacity)) !important;
+  }
+  
+  /* Preserve orange colors - override the yellow/amber rules for orange */
+  [class*="orange"] {
+    --tw-bg-opacity: 1 !important;
+    background-color: inherit !important;
+  }
+  
+  /* Specific orange focus ring preservation */
+  .focus\:ring-orange-100:focus {
+    --tw-ring-color: rgb(254 215 170) !important;
+  }
+  
+  .focus\:ring-orange-200:focus {
+    --tw-ring-color: rgb(254 215 170) !important;
+  }
+  
+  .focus\:border-orange-500:focus {
+    --tw-border-opacity: 1 !important;
+    border-color: rgb(249 115 22 / var(--tw-border-opacity)) !important;
   }
 }
 

@@ -39,7 +39,7 @@ export function VendorFilters({
             placeholder="Search by Name, Mobile, GST No..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 border-gray-300 focus:border-orange-500 focus:ring-orange-200"
+            className="pl-10 border-gray-300 focus:border-orange-500 focus:ring-orange-100"
           />
         </div>
 
