@@ -246,6 +246,76 @@
     --tw-bg-opacity: 1 !important;
     background-color: rgb(239 246 255 / var(--tw-bg-opacity)) !important;
   }
+
+  /* Preserve light green colors for expense activity theme - Mindaro #BAEA66 */
+  .bg-green-50 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(244 252 242 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .bg-green-100 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(220 252 231 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .bg-green-200 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(186 234 102 / var(--tw-bg-opacity)) !important; /* Mindaro color */
+  }
+  
+  .bg-green-25 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(248 252 248 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .text-green-600 {
+    --tw-text-opacity: 1 !important;
+    color: rgb(22 163 74 / var(--tw-text-opacity)) !important;
+  }
+  
+  .text-green-700 {
+    --tw-text-opacity: 1 !important;
+    color: rgb(21 128 61 / var(--tw-text-opacity)) !important;
+  }
+  
+  .text-green-800 {
+    --tw-text-opacity: 1 !important;
+    color: rgb(22 101 52 / var(--tw-text-opacity)) !important;
+  }
+  
+  .text-green-900 {
+    --tw-text-opacity: 1 !important;
+    color: rgb(20 83 45 / var(--tw-text-opacity)) !important;
+  }
+  
+  .border-green-200 {
+    --tw-border-opacity: 1 !important;
+    border-color: rgb(186 234 102 / var(--tw-border-opacity)) !important;
+  }
+  
+  .border-green-300 {
+    --tw-border-opacity: 1 !important;
+    border-color: rgb(134 239 172 / var(--tw-border-opacity)) !important;
+  }
+  
+  .hover\:bg-green-100:hover {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(220 252 231 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .hover\:bg-green-50:hover {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(244 252 242 / var(--tw-bg-opacity)) !important;
+  }
+
+  .focus\:ring-green-500:focus {
+    --tw-ring-color: rgb(34 197 94) !important;
+  }
+  
+  .focus\:border-green-500:focus {
+    --tw-border-opacity: 1 !important;
+    border-color: rgb(34 197 94 / var(--tw-border-opacity)) !important;
+  }
 }
 
 @layer components {
