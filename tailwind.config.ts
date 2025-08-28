@@ -73,6 +73,18 @@ export default {
 					700: "rgb(15 118 110)",
 					800: "rgb(17 94 89)",
 					900: "rgb(19 78 74)",
+				},
+				"ruby-blue": {
+					50: "hsl(var(--ruby-blue-50))",
+					100: "hsl(var(--ruby-blue-100))",
+					200: "hsl(var(--ruby-blue-200))",
+					300: "hsl(var(--ruby-blue-300))",
+					400: "hsl(var(--ruby-blue-400))",
+					500: "hsl(var(--ruby-blue-500))",
+					600: "hsl(var(--ruby-blue-600))",
+					700: "hsl(var(--ruby-blue-700))",
+					800: "hsl(var(--ruby-blue-800))",
+					900: "hsl(var(--ruby-blue-900))",
 				}
 			},
 			borderRadius: {

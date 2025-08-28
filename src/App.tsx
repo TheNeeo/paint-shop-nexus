@@ -21,6 +21,7 @@ import VendorHistory from "./pages/VendorHistory";
 import ExpenseActivity from "./pages/ExpenseActivity";
 import ExpenseReport from "./pages/ExpenseReport";
 import ApplicationSettings from "./pages/ApplicationSettings";
+import UserInterfaceSettings from "./pages/UserInterfaceSettings";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,7 @@ const App = () => (
           <Route path="/expenses" element={<ExpenseActivity />} />
           <Route path="/expenses/report" element={<ExpenseReport />} />
           <Route path="/settings" element={<ApplicationSettings />} />
+          <Route path="/settings/user-interface" element={<UserInterfaceSettings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
