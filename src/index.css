@@ -46,13 +46,13 @@
     --paint-teal: 20 184 166;
     --paint-cream: 243 244 246;
     
-    /* Ruby blue theme colors */
-    --ruby-blue-50: 239 245 252;
+    /* Ruby blue theme colors - Updated to proper Ruby Blue #83B2E2 */
+    --ruby-blue-50: 239 246 255;
     --ruby-blue-100: 219 234 254;
     --ruby-blue-200: 191 219 254;
-    --ruby-blue-300: 147 197 253;
+    --ruby-blue-300: 131 178 226; /* #83B2E2 main color */
     --ruby-blue-400: 96 165 250;
-    --ruby-blue-500: 59 130 246;
+    --ruby-blue-500: 131 178 226;
     --ruby-blue-600: 37 99 235;
     --ruby-blue-700: 29 78 216;
     --ruby-blue-800: 30 64 175;

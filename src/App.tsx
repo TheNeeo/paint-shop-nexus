@@ -53,8 +53,8 @@ const App = () => (
           <Route path="/vendors/history" element={<VendorHistory />} />
           <Route path="/expenses" element={<ExpenseActivity />} />
           <Route path="/expenses/report" element={<ExpenseReport />} />
-          <Route path="/settings" element={<ApplicationSettings />} />
-          <Route path="/settings/user-interface" element={<UserInterfaceSettings />} />
+          <Route path="/settings/app" element={<ApplicationSettings />} />
+          <Route path="/settings/ui" element={<UserInterfaceSettings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -55,7 +55,7 @@ export default function UserInterfaceSettings() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-ruby-blue-50">
+      <div className="min-h-screen bg-background">
         <UserInterfaceHeader />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -80,21 +80,20 @@ export default function UserInterfaceSettings() {
           </div>
 
           {/* Footer Actions */}
-          <div className="mt-12 flex flex-col sm:flex-row justify-between items-center gap-4 p-6 bg-white rounded-lg border border-ruby-blue-200 shadow-sm">
-            <p className="text-sm text-ruby-blue-600">
+          <div className="mt-12 flex flex-col sm:flex-row justify-between items-center gap-4 p-6 bg-card rounded-lg border border-border shadow-sm">
+            <p className="text-sm text-muted-foreground">
               Changes will apply on next page load
             </p>
             <div className="flex space-x-3">
               <Button 
                 variant="outline" 
                 onClick={handleResetSettings}
-                className="border-ruby-blue-300 text-ruby-blue-700 hover:bg-ruby-blue-50"
               >
                 Reset to Default
               </Button>
               <Button 
                 onClick={handleSaveSettings}
-                className="bg-ruby-blue-600 hover:bg-ruby-blue-700 text-white"
+                variant="default"
               >
                 Save & Apply Changes
               </Button>
