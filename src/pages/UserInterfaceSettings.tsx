@@ -55,7 +55,7 @@ export default function UserInterfaceSettings() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen" style={{ backgroundColor: 'rgb(239, 246, 255)' }}>
         <UserInterfaceHeader />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -80,20 +80,32 @@ export default function UserInterfaceSettings() {
           </div>
 
           {/* Footer Actions */}
-          <div className="mt-12 flex flex-col sm:flex-row justify-between items-center gap-4 p-6 bg-card rounded-lg border border-border shadow-sm">
-            <p className="text-sm text-muted-foreground">
+          <div className="mt-12 flex flex-col sm:flex-row justify-between items-center gap-4 p-6 rounded-lg border shadow-sm" style={{
+            backgroundColor: 'white',
+            borderColor: 'rgb(191, 219, 254)'
+          }}>
+            <p className="text-sm" style={{ color: 'rgb(37, 99, 235)' }}>
               Changes will apply on next page load
             </p>
             <div className="flex space-x-3">
               <Button 
                 variant="outline" 
                 onClick={handleResetSettings}
+                style={{
+                  borderColor: 'rgb(147, 197, 253)',
+                  color: 'rgb(29, 78, 216)'
+                }}
+                className="hover:bg-blue-50"
               >
                 Reset to Default
               </Button>
               <Button 
                 onClick={handleSaveSettings}
-                variant="default"
+                style={{
+                  backgroundColor: 'rgb(37, 99, 235)',
+                  color: 'white'
+                }}
+                className="hover:bg-blue-700"
               >
                 Save & Apply Changes
               </Button>

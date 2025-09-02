@@ -46,17 +46,17 @@
     --paint-teal: 20 184 166;
     --paint-cream: 243 244 246;
     
-    /* Ruby blue theme colors - Updated to proper Ruby Blue #83B2E2 */
-    --ruby-blue-50: 239 246 255;
-    --ruby-blue-100: 219 234 254;
-    --ruby-blue-200: 191 219 254;
-    --ruby-blue-300: 131 178 226; /* #83B2E2 main color */
-    --ruby-blue-400: 96 165 250;
-    --ruby-blue-500: 131 178 226;
-    --ruby-blue-600: 37 99 235;
-    --ruby-blue-700: 29 78 216;
-    --ruby-blue-800: 30 64 175;
-    --ruby-blue-900: 30 58 138;
+    /* Cadet gray theme colors - Proper HSL values for Cadet Gray #9BA2A3 */
+    --cadet-gray-50: 248 249 250;  /* Very light gray */
+    --cadet-gray-100: 241 243 244; /* Light gray */
+    --cadet-gray-200: 229 231 235; /* Medium light gray */
+    --cadet-gray-300: 209 213 219; /* Medium gray */
+    --cadet-gray-400: 156 163 175; /* Base cadet gray */
+    --cadet-gray-500: 155 162 163; /* Main Cadet Gray #9BA2A3 */
+    --cadet-gray-600: 107 114 128; /* Darker gray */
+    --cadet-gray-700: 75 85 99;    /* Dark gray */
+    --cadet-gray-800: 55 65 81;    /* Very dark gray */
+    --cadet-gray-900: 31 41 55;    /* Almost black */
     
     /* Gradient variables - Updated to remove yellow */
     --shimmer: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%);
