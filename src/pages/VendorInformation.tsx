@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import AppLayout from "@/components/layout/AppLayout";
 import { VendorHeader } from "@/components/vendor/VendorHeader";
 import { VendorSummaryCards } from "@/components/vendor/VendorSummaryCards";
 import { VendorFilters } from "@/components/vendor/VendorFilters";
@@ -29,35 +30,37 @@ export default function VendorInformation() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="space-y-6">
-        <VendorHeader onAddVendor={handleAddVendor} />
-        
-        <VendorSummaryCards />
-        
-        <VendorFilters
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          statusFilter={statusFilter}
-          setStatusFilter={setStatusFilter}
-          locationFilter={locationFilter}
-          setLocationFilter={setLocationFilter}
-          clearFilters={clearFilters}
-        />
-        
-        <VendorTable
-          searchTerm={searchTerm}
-          statusFilter={statusFilter}
-          locationFilter={locationFilter}
-          onEditVendor={handleEditVendor}
+    <AppLayout>
+      <div className="min-h-screen bg-gray-50">
+        <div className="space-y-6">
+          <VendorHeader onAddVendor={handleAddVendor} />
+          
+          <VendorSummaryCards />
+          
+          <VendorFilters
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            locationFilter={locationFilter}
+            setLocationFilter={setLocationFilter}
+            clearFilters={clearFilters}
+          />
+          
+          <VendorTable
+            searchTerm={searchTerm}
+            statusFilter={statusFilter}
+            locationFilter={locationFilter}
+            onEditVendor={handleEditVendor}
+          />
+        </div>
+
+        <AddEditVendorModal
+          isOpen={isAddVendorOpen}
+          onClose={() => setIsAddVendorOpen(false)}
+          vendor={editingVendor}
         />
       </div>
-
-      <AddEditVendorModal
-        isOpen={isAddVendorOpen}
-        onClose={() => setIsAddVendorOpen(false)}
-        vendor={editingVendor}
-      />
-    </div>
+    </AppLayout>
   );
 }
