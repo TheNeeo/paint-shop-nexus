@@ -23,6 +23,7 @@ import {
   Truck,
   UserPlus,
   Archive,
+  Receipt,
 } from "lucide-react";
 
 export const menuData = [
@@ -88,6 +89,13 @@ export const menuData = [
         icon: FileText,
         path: "/sales/invoice",
         iconColor: "text-indigo-400",
+      },
+      {
+        id: "cash-receipt",
+        title: "Cash Receipt",
+        icon: Receipt,
+        path: "/sales/cash-receipt",
+        iconColor: "#7DBE3C",
       },
     ],
   },
