@@ -3,6 +3,10 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/hooks/useAuth";
+import ProtectedRoute from "@/components/layout/ProtectedRoute";
+import ErrorBoundary from "@/components/layout/ErrorBoundary";
+import Auth from "./pages/Auth";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ProductManagement from "./pages/ProductManagement";
@@ -27,42 +31,47 @@ import CashReceipt from "./pages/CashReceipt";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/products" element={<ProductManagement />} />
-          <Route path="/product/add" element={<ProductManagement />} />
-          <Route path="/product/category" element={<CategoryManagement />} />
-          <Route path="/sales" element={<SalesManagement />} />
-          <Route path="/sales/activity" element={<SalesManagement />} />
-          <Route path="/purchase" element={<PurchaseManagement />} />
-          <Route path="/purchase/activity" element={<PurchaseManagement />} />
-          <Route path="/purchase/new" element={<NewPurchaseEntry />} />
-          <Route path="/purchase/invoice" element={<PurchaseInvoice />} />
-          <Route path="/purchase/reorder" element={<ReorderProductList />} />
-          <Route path="/purchase/generate-order" element={<GeneratePurchaseOrder />} />
-          <Route path="/inventory" element={<InventoryManagement />} />
-          <Route path="/inventory/update" element={<InventoryManagement />} />
-          <Route path="/inventory/history" element={<InventoryManagement />} />
-          <Route path="/customers" element={<CustomerInformation />} />
-          <Route path="/customers/history" element={<CustomerHistory />} />
-          <Route path="/vendors" element={<VendorInformation />} />
-          <Route path="/vendors/history" element={<VendorHistory />} />
-          <Route path="/expenses" element={<ExpenseActivity />} />
-          <Route path="/expenses/report" element={<ExpenseReport />} />
-          <Route path="/settings/app" element={<ApplicationSettings />} />
-          <Route path="/settings/ui" element={<UserInterfaceSettings />} />
-          <Route path="/sales/cash-receipt" element={<CashReceipt />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+              <Route path="/products" element={<ProtectedRoute><ProductManagement /></ProtectedRoute>} />
+              <Route path="/product/add" element={<ProtectedRoute><ProductManagement /></ProtectedRoute>} />
+              <Route path="/product/category" element={<ProtectedRoute><CategoryManagement /></ProtectedRoute>} />
+              <Route path="/sales" element={<ProtectedRoute><SalesManagement /></ProtectedRoute>} />
+              <Route path="/sales/activity" element={<ProtectedRoute><SalesManagement /></ProtectedRoute>} />
+              <Route path="/purchase" element={<ProtectedRoute><PurchaseManagement /></ProtectedRoute>} />
+              <Route path="/purchase/activity" element={<ProtectedRoute><PurchaseManagement /></ProtectedRoute>} />
+              <Route path="/purchase/new" element={<ProtectedRoute><NewPurchaseEntry /></ProtectedRoute>} />
+              <Route path="/purchase/invoice" element={<ProtectedRoute><PurchaseInvoice /></ProtectedRoute>} />
+              <Route path="/purchase/reorder" element={<ProtectedRoute><ReorderProductList /></ProtectedRoute>} />
+              <Route path="/purchase/generate-order" element={<ProtectedRoute><GeneratePurchaseOrder /></ProtectedRoute>} />
+              <Route path="/inventory" element={<ProtectedRoute><InventoryManagement /></ProtectedRoute>} />
+              <Route path="/inventory/update" element={<ProtectedRoute><InventoryManagement /></ProtectedRoute>} />
+              <Route path="/inventory/history" element={<ProtectedRoute><InventoryManagement /></ProtectedRoute>} />
+              <Route path="/customers" element={<ProtectedRoute><CustomerInformation /></ProtectedRoute>} />
+              <Route path="/customers/history" element={<ProtectedRoute><CustomerHistory /></ProtectedRoute>} />
+              <Route path="/vendors" element={<ProtectedRoute><VendorInformation /></ProtectedRoute>} />
+              <Route path="/vendors/history" element={<ProtectedRoute><VendorHistory /></ProtectedRoute>} />
+              <Route path="/expenses" element={<ProtectedRoute><ExpenseActivity /></ProtectedRoute>} />
+              <Route path="/expenses/report" element={<ProtectedRoute><ExpenseReport /></ProtectedRoute>} />
+              <Route path="/settings/app" element={<ProtectedRoute><ApplicationSettings /></ProtectedRoute>} />
+              <Route path="/settings/ui" element={<ProtectedRoute><UserInterfaceSettings /></ProtectedRoute>} />
+              <Route path="/sales/cash-receipt" element={<ProtectedRoute><CashReceipt /></ProtectedRoute>} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;
