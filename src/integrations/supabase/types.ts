@@ -275,6 +275,7 @@ export type Database = {
           address: string | null
           contact_person: string | null
           created_at: string
+          created_by_user_id: string | null
           email: string | null
           gst_number: string | null
           id: string
@@ -286,6 +287,7 @@ export type Database = {
           address?: string | null
           contact_person?: string | null
           created_at?: string
+          created_by_user_id?: string | null
           email?: string | null
           gst_number?: string | null
           id?: string
@@ -297,6 +299,7 @@ export type Database = {
           address?: string | null
           contact_person?: string | null
           created_at?: string
+          created_by_user_id?: string | null
           email?: string | null
           gst_number?: string | null
           id?: string

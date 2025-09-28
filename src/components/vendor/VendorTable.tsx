@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Eye, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 interface VendorTableProps {
   searchTerm: string;
@@ -24,77 +27,88 @@ export function VendorTable({
   locationFilter,
   onEditVendor,
 }: VendorTableProps) {
+  const { user } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
+  const [vendors, setVendors] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const itemsPerPage = 10;
 
-  // Mock vendor data
-  const vendors = [
-    {
-      id: 1,
-      name: "ABC Suppliers",
-      mobile: "+91 98765 43210",
-      gstNo: "27AABCU9603R1ZX",
-      address: "Mumbai, Maharashtra",
-      totalPurchases: "₹1,25,000",
-      outstanding: "₹15,000",
-      status: "Active",
-      paymentStatus: "due",
-    },
-    {
-      id: 2,
-      name: "XYZ Trading Co.",
-      mobile: "+91 87654 32109",
-      gstNo: "09AABCU9603R1ZY",
-      address: "Delhi, NCR",
-      totalPurchases: "₹85,000",
-      outstanding: "₹0",
-      status: "Active",
-      paymentStatus: "cleared",
-    },
-    {
-      id: 3,
-      name: "PQR Industries",
-      mobile: "+91 76543 21098",
-      gstNo: "29AABCU9603R1ZZ",
-      address: "Bangalore, Karnataka",
-      totalPurchases: "₹2,50,000",
-      outstanding: "₹35,000",
-      status: "Inactive",
-      paymentStatus: "overdue",
-    },
-  ];
+  useEffect(() => {
+    if (user) {
+      fetchVendors();
+    }
+  }, [user]);
+
+  const fetchVendors = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("vendors")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setVendors(data || []);
+    } catch (error: any) {
+      toast.error("Failed to fetch vendors: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleView = (vendor: any) => {
     console.log("Viewing vendor:", vendor);
   };
 
-  const handleDelete = (vendor: any) => {
-    console.log("Deleting vendor:", vendor);
+  const handleDelete = async (vendor: any) => {
+    if (!confirm("Are you sure you want to delete this vendor?")) return;
+    
+    try {
+      const { error } = await supabase
+        .from("vendors")
+        .delete()
+        .eq("id", vendor.id);
+
+      if (error) throw error;
+      toast.success("Vendor deleted successfully");
+      fetchVendors(); // Refresh the list
+    } catch (error: any) {
+      toast.error("Failed to delete vendor: " + error.message);
+    }
   };
 
-  const getStatusBadge = (status: string) => {
-    return status === "Active" ? (
+  const getStatusBadge = (status: boolean) => {
+    return status ? (
       <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
-        {status}
+        Active
       </Badge>
     ) : (
       <Badge className="bg-red-100 text-red-800 hover:bg-red-100">
-        {status}
+        Inactive
       </Badge>
     );
   };
 
-  const getPaymentStatusColor = (paymentStatus: string, outstanding: string) => {
-    if (outstanding === "₹0" || paymentStatus === "cleared") {
-      return "hover:bg-green-50";
-    } else if (paymentStatus === "overdue") {
-      return "hover:bg-red-50";
-    } else {
-      return "hover:bg-orange-50";
-    }
-  };
+  // Filter vendors based on search and status
+  const filteredVendors = vendors.filter(vendor => {
+    const matchesSearch = vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         vendor.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         vendor.email?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = !statusFilter || 
+                         (statusFilter === "Active" && vendor.status) ||
+                         (statusFilter === "Inactive" && !vendor.status);
+    const matchesLocation = !locationFilter || 
+                           vendor.address?.toLowerCase().includes(locationFilter.toLowerCase());
+    
+    return matchesSearch && matchesStatus && matchesLocation;
+  });
 
-  const totalPages = Math.ceil(vendors.length / itemsPerPage);
+  const paginatedVendors = filteredVendors.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const totalPages = Math.ceil(filteredVendors.length / itemsPerPage);
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -104,48 +118,51 @@ export function VendorTable({
             <TableRow className="bg-gray-50">
               <TableHead className="text-gray-700 font-semibold">S.No</TableHead>
               <TableHead className="text-gray-700 font-semibold">Name</TableHead>
-              <TableHead className="text-gray-700 font-semibold">Mobile No</TableHead>
+              <TableHead className="text-gray-700 font-semibold">Phone No</TableHead>
               <TableHead className="text-gray-700 font-semibold">GST No</TableHead>
               <TableHead className="text-gray-700 font-semibold">Address</TableHead>
-              <TableHead className="text-gray-700 font-semibold">Total Purchases</TableHead>
-              <TableHead className="text-gray-700 font-semibold">Outstanding</TableHead>
+              <TableHead className="text-gray-700 font-semibold">Contact Person</TableHead>
+              <TableHead className="text-gray-700 font-semibold">Email</TableHead>
               <TableHead className="text-gray-700 font-semibold">Status</TableHead>
               <TableHead className="text-gray-700 font-semibold">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {vendors.map((vendor, index) => (
-              <TableRow
-                key={vendor.id}
-                className={`border-b border-gray-100 ${getPaymentStatusColor(
-                  vendor.paymentStatus,
-                  vendor.outstanding
-                )} transition-colors`}
-              >
-                <TableCell className="text-gray-900">{index + 1}</TableCell>
-                <TableCell className="font-medium text-gray-900">
-                  {vendor.name}
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-8">
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-600"></div>
+                    <span className="ml-2 text-gray-600">Loading vendors...</span>
+                  </div>
                 </TableCell>
-                <TableCell className="text-gray-700">{vendor.mobile}</TableCell>
-                <TableCell className="text-gray-700 font-mono text-sm">
-                  {vendor.gstNo}
+              </TableRow>
+            ) : paginatedVendors.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-8 text-gray-500">
+                  No vendors found
                 </TableCell>
-                <TableCell className="text-gray-700">{vendor.address}</TableCell>
-                <TableCell className="text-gray-900 font-semibold">
-                  {vendor.totalPurchases}
-                </TableCell>
-                <TableCell
-                  className={`font-semibold ${
-                    vendor.outstanding === "₹0"
-                      ? "text-green-600"
-                      : vendor.paymentStatus === "overdue"
-                      ? "text-red-600"
-                      : "text-orange-600"
-                  }`}
+              </TableRow>
+            ) : (
+              paginatedVendors.map((vendor, index) => (
+                <TableRow
+                  key={vendor.id}
+                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
                 >
-                  {vendor.outstanding}
-                </TableCell>
-                <TableCell>{getStatusBadge(vendor.status)}</TableCell>
+                  <TableCell className="text-gray-900">
+                    {(currentPage - 1) * itemsPerPage + index + 1}
+                  </TableCell>
+                  <TableCell className="font-medium text-gray-900">
+                    {vendor.name}
+                  </TableCell>
+                  <TableCell className="text-gray-700">{vendor.phone || 'N/A'}</TableCell>
+                  <TableCell className="text-gray-700 font-mono text-sm">
+                    {vendor.gst_number || 'N/A'}
+                  </TableCell>
+                  <TableCell className="text-gray-700">{vendor.address || 'N/A'}</TableCell>
+                  <TableCell className="text-gray-700">{vendor.contact_person || 'N/A'}</TableCell>
+                  <TableCell className="text-gray-700">{vendor.email || 'N/A'}</TableCell>
+                  <TableCell>{getStatusBadge(vendor.status)}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Button
@@ -175,7 +192,8 @@ export function VendorTable({
                   </div>
                 </TableCell>
               </TableRow>
-            ))}
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
@@ -183,8 +201,8 @@ export function VendorTable({
       {/* Pagination */}
       <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
         <div className="text-sm text-gray-600">
-          Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-          {Math.min(currentPage * itemsPerPage, vendors.length)} of {vendors.length} vendors
+          Showing {paginatedVendors.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} to{" "}
+          {Math.min(currentPage * itemsPerPage, filteredVendors.length)} of {filteredVendors.length} vendors
         </div>
         <div className="flex items-center gap-2">
           <Button

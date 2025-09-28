@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { VendorHeader } from "@/components/vendor/VendorHeader";
 import { VendorSummaryCards } from "@/components/vendor/VendorSummaryCards";
@@ -12,6 +12,7 @@ export default function VendorInformation() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
+  const vendorTableRef = useRef<{ fetchVendors: () => void }>(null);
 
   const handleAddVendor = () => {
     setEditingVendor(null);
@@ -21,6 +22,15 @@ export default function VendorInformation() {
   const handleEditVendor = (vendor: any) => {
     setEditingVendor(vendor);
     setIsAddVendorOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsAddVendorOpen(false);
+    setEditingVendor(null);
+    // Refresh the vendor table if there's a ref to it
+    if (vendorTableRef.current) {
+      vendorTableRef.current.fetchVendors();
+    }
   };
 
   const clearFilters = () => {
@@ -57,7 +67,7 @@ export default function VendorInformation() {
 
         <AddEditVendorModal
           isOpen={isAddVendorOpen}
-          onClose={() => setIsAddVendorOpen(false)}
+          onClose={handleModalClose}
           vendor={editingVendor}
         />
       </div>

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +17,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 interface AddEditVendorModalProps {
   isOpen: boolean;
@@ -30,14 +32,15 @@ export function AddEditVendorModal({
   onClose,
   vendor,
 }: AddEditVendorModalProps) {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
-    mobile: "",
+    phone: "",
     email: "",
-    gstNo: "",
+    gst_number: "",
     address: "",
-    openingBalance: "",
-    paymentTerms: "net30",
+    contact_person: "",
     status: true,
   });
 
@@ -45,32 +48,73 @@ export function AddEditVendorModal({
     if (vendor) {
       setFormData({
         name: vendor.name || "",
-        mobile: vendor.mobile || "",
+        phone: vendor.phone || "",
         email: vendor.email || "",
-        gstNo: vendor.gstNo || "",
+        gst_number: vendor.gst_number || "",
         address: vendor.address || "",
-        openingBalance: vendor.openingBalance || "",
-        paymentTerms: vendor.paymentTerms || "net30",
+        contact_person: vendor.contact_person || "",
         status: vendor.status === "Active",
       });
     } else {
       setFormData({
         name: "",
-        mobile: "",
+        phone: "",
         email: "",
-        gstNo: "",
+        gst_number: "",
         address: "",
-        openingBalance: "",
-        paymentTerms: "net30",
+        contact_person: "",
         status: true,
       });
     }
-  }, [vendor]);
+  }, [vendor, isOpen]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Saving vendor:", formData);
-    onClose();
+    if (!user) {
+      toast.error("You must be logged in to create vendors");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const vendorData = {
+        ...formData,
+        created_by_user_id: user.id,
+      };
+
+      if (vendor) {
+        const { error } = await supabase
+          .from("vendors")
+          .update(vendorData)
+          .eq("id", vendor.id);
+        
+        if (error) throw error;
+        toast.success("Vendor updated successfully");
+      } else {
+        const { error } = await supabase
+          .from("vendors")
+          .insert([vendorData]);
+        
+        if (error) throw error;
+        toast.success("Vendor created successfully");
+      }
+      
+      onClose();
+      // Reset form
+      setFormData({
+        name: "",
+        phone: "",
+        email: "",
+        gst_number: "",
+        address: "",
+        contact_person: "",
+        status: true,
+      });
+    } catch (error: any) {
+      toast.error(error.message || "Failed to save vendor");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleInputChange = (field: string, value: string | boolean) => {
@@ -106,16 +150,16 @@ export function AddEditVendorModal({
               />
             </div>
 
-            {/* Mobile Number */}
+            {/* Phone Number */}
             <div className="space-y-2">
-              <Label htmlFor="mobile" className="text-gray-700 font-medium">
-                Mobile Number *
+              <Label htmlFor="phone" className="text-gray-700 font-medium">
+                Phone Number *
               </Label>
               <Input
-                id="mobile"
-                value={formData.mobile}
-                onChange={(e) => handleInputChange("mobile", e.target.value)}
-                placeholder="Enter mobile number"
+                id="phone"
+                value={formData.phone}
+                onChange={(e) => handleInputChange("phone", e.target.value)}
+                placeholder="Enter phone number"
                 className="border-gray-300 focus:border-orange-500 focus:ring-orange-100"
                 required
               />
@@ -138,50 +182,30 @@ export function AddEditVendorModal({
 
             {/* GST Number */}
             <div className="space-y-2">
-              <Label htmlFor="gstNo" className="text-gray-700 font-medium">
+              <Label htmlFor="gst_number" className="text-gray-700 font-medium">
                 GST No (Optional)
               </Label>
               <Input
-                id="gstNo"
-                value={formData.gstNo}
-                onChange={(e) => handleInputChange("gstNo", e.target.value)}
+                id="gst_number"
+                value={formData.gst_number}
+                onChange={(e) => handleInputChange("gst_number", e.target.value)}
                 placeholder="Enter GST number"
                 className="border-gray-300 focus:border-orange-500 focus:ring-orange-100"
               />
             </div>
 
-            {/* Opening Balance */}
-            <div className="space-y-2">
-              <Label htmlFor="openingBalance" className="text-gray-700 font-medium">
-                Opening Balance
+            {/* Contact Person */}
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="contact_person" className="text-gray-700 font-medium">
+                Contact Person (Optional)
               </Label>
               <Input
-                id="openingBalance"
-                type="number"
-                value={formData.openingBalance}
-                onChange={(e) => handleInputChange("openingBalance", e.target.value)}
-                placeholder="Enter opening balance"
+                id="contact_person"
+                value={formData.contact_person}
+                onChange={(e) => handleInputChange("contact_person", e.target.value)}
+                placeholder="Enter contact person name"
                 className="border-gray-300 focus:border-orange-500 focus:ring-orange-100"
               />
-            </div>
-
-            {/* Payment Terms */}
-            <div className="space-y-2">
-              <Label className="text-gray-700 font-medium">Payment Terms</Label>
-              <Select
-                value={formData.paymentTerms}
-                onValueChange={(value) => handleInputChange("paymentTerms", value)}
-              >
-                <SelectTrigger className="border-gray-300 focus:border-orange-500">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-white border-gray-200">
-                  <SelectItem value="net7">Net 7 days</SelectItem>
-                  <SelectItem value="net15">Net 15 days</SelectItem>
-                  <SelectItem value="net30">Net 30 days</SelectItem>
-                  <SelectItem value="net45">Net 45 days</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </div>
 
@@ -226,9 +250,13 @@ export function AddEditVendorModal({
             </Button>
             <Button
               type="submit"
-              className="bg-orange-600 hover:bg-orange-700 text-white"
+              disabled={loading}
+              className="bg-orange-600 hover:bg-orange-700 text-white disabled:opacity-50"
             >
-              {vendor ? "Update Vendor" : "Save Vendor"}
+              {loading 
+                ? (vendor ? "Updating..." : "Saving...") 
+                : (vendor ? "Update Vendor" : "Save Vendor")
+              }
             </Button>
           </div>
         </form>
