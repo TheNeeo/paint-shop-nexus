@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Calendar, Download, Printer, BookOpen, TrendingUp, TrendingDown, DollarSign, Wallet } from "lucide-react";
+import { Calendar, Download, Printer, BookOpen, TrendingUp, TrendingDown, DollarSign, Wallet, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/collapsible";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import AppLayout from "@/components/layout/AppLayout";
+import AddNewTransactionModal from "@/components/daybook/AddNewTransactionModal";
 
 interface Transaction {
   id: string;
@@ -45,6 +46,7 @@ const DayBook = () => {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [dailyNotes, setDailyNotes] = useState("");
+  const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
 
   // Mock data
   const summaryData = {
@@ -195,6 +197,14 @@ const DayBook = () => {
                   />
                 </div>
                 <div className="flex gap-2">
+                  <Button 
+                    onClick={() => setIsAddTransactionOpen(true)}
+                    className="bg-coral-500 hover:bg-coral-600 text-white"
+                    size="sm"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Transaction
+                  </Button>
                   <Button variant="outline" size="sm" className="border-coral-200 text-coral-700 hover:bg-coral-50">
                     <Download className="h-4 w-4 mr-2" />
                     Export CSV
@@ -298,15 +308,15 @@ const DayBook = () => {
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-coral-50/50">
-                      <TableHead className="w-16"></TableHead>
-                      <TableHead className="font-semibold text-gray-700">Time</TableHead>
-                      <TableHead className="font-semibold text-gray-700">Type</TableHead>
-                      <TableHead className="font-semibold text-gray-700">Description</TableHead>
-                      <TableHead className="font-semibold text-gray-700 text-right">Debit</TableHead>
-                      <TableHead className="font-semibold text-gray-700 text-right">Credit</TableHead>
-                      <TableHead className="font-semibold text-gray-700">Payment Mode</TableHead>
-                      <TableHead className="font-semibold text-gray-700 text-right">Balance</TableHead>
+                    <TableRow className="bg-coral-50/50 border-b border-coral-200">
+                      <TableHead className="w-12 text-center"></TableHead>
+                      <TableHead className="font-semibold text-gray-700 w-20">Time</TableHead>
+                      <TableHead className="font-semibold text-gray-700 w-24">Type</TableHead>
+                      <TableHead className="font-semibold text-gray-700 min-w-[200px]">Description</TableHead>
+                      <TableHead className="font-semibold text-gray-700 text-right w-24">Debit</TableHead>
+                      <TableHead className="font-semibold text-gray-700 text-right w-24">Credit</TableHead>
+                      <TableHead className="font-semibold text-gray-700 w-32">Payment Mode</TableHead>
+                      <TableHead className="font-semibold text-gray-700 text-right w-24">Balance</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -314,36 +324,36 @@ const DayBook = () => {
                       <React.Fragment key={transaction.id}>
                         <Collapsible>
                           <CollapsibleTrigger asChild>
-                            <TableRow 
+                             <TableRow 
                               className="hover:bg-coral-50/30 cursor-pointer border-b border-coral-100"
                               onClick={() => setExpandedRow(expandedRow === transaction.id ? null : transaction.id)}
                             >
-                              <TableCell>
+                              <TableCell className="text-center w-12">
                                 {expandedRow === transaction.id ? (
-                                  <ChevronDown className="h-4 w-4 text-gray-500" />
+                                  <ChevronDown className="h-4 w-4 text-gray-500 mx-auto" />
                                 ) : (
-                                  <ChevronRight className="h-4 w-4 text-gray-500" />
+                                  <ChevronRight className="h-4 w-4 text-gray-500 mx-auto" />
                                 )}
                               </TableCell>
-                              <TableCell className="font-medium text-gray-700">{transaction.time}</TableCell>
-                              <TableCell>
+                              <TableCell className="font-medium text-gray-700 w-20">{transaction.time}</TableCell>
+                              <TableCell className="w-24">
                                 <Badge variant="outline" className={getTypeColor(transaction.type)}>
                                   {transaction.type}
                                 </Badge>
                               </TableCell>
-                              <TableCell className="text-gray-700">{transaction.description}</TableCell>
-                              <TableCell className="text-right text-red-600 font-medium">
+                              <TableCell className="text-gray-700 min-w-[200px]">{transaction.description}</TableCell>
+                              <TableCell className="text-right text-red-600 font-medium w-24">
                                 {transaction.debit > 0 ? formatCurrency(transaction.debit) : '-'}
                               </TableCell>
-                              <TableCell className="text-right text-green-600 font-medium">
+                              <TableCell className="text-right text-green-600 font-medium w-24">
                                 {transaction.credit > 0 ? formatCurrency(transaction.credit) : '-'}
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="w-32">
                                 <Badge variant="outline" className={getPaymentModeColor(transaction.paymentMode)}>
                                   {transaction.paymentMode}
                                 </Badge>
                               </TableCell>
-                              <TableCell className="text-right font-semibold text-gray-900">
+                              <TableCell className="text-right font-semibold text-gray-900 w-24">
                                 {formatCurrency(transaction.balance)}
                               </TableCell>
                             </TableRow>
@@ -468,6 +478,11 @@ const DayBook = () => {
             </CardContent>
           </Card>
         </div>
+        
+        <AddNewTransactionModal 
+          open={isAddTransactionOpen} 
+          onOpenChange={setIsAddTransactionOpen}
+        />
       </div>
     </AppLayout>
   );
