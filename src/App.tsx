@@ -27,6 +27,7 @@ import ExpenseReport from "./pages/ExpenseReport";
 import ApplicationSettings from "./pages/ApplicationSettings";
 import UserInterfaceSettings from "./pages/UserInterfaceSettings";
 import CashReceipt from "./pages/CashReceipt";
+import DayBook from "./pages/DayBook";
 
 const queryClient = new QueryClient();
 
@@ -64,6 +65,7 @@ const App = () => (
               <Route path="/settings/app" element={<ProtectedRoute><ApplicationSettings /></ProtectedRoute>} />
               <Route path="/settings/ui" element={<ProtectedRoute><UserInterfaceSettings /></ProtectedRoute>} />
               <Route path="/sales/cash-receipt" element={<ProtectedRoute><CashReceipt /></ProtectedRoute>} />
+              <Route path="/reports/day-book" element={<ProtectedRoute><DayBook /></ProtectedRoute>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -24,6 +24,7 @@ import {
   UserPlus,
   Archive,
   Receipt,
+  BookOpen,
 } from "lucide-react";
 
 export const menuData = [
@@ -247,6 +248,13 @@ export const menuData = [
         icon: Calendar,
         path: "/reports/periodic",
         iconColor: "text-purple-400",
+      },
+      {
+        id: "day-book",
+        title: "Day Book",
+        icon: BookOpen,
+        path: "/reports/day-book",
+        iconColor: "#F56E75",
       },
     ],
   },
