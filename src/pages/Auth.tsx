@@ -360,15 +360,16 @@ const Auth = () => {
           </Tabs>
         </Card>
 
-        <div className="text-center space-y-2">
-          <p className="text-sm text-slate-500 flex items-center justify-center space-x-1">
-            <Sparkles className="w-3 h-3" />
-            <span>Trusted by paint professionals worldwide</span>
-            <Sparkles className="w-3 h-3" />
-          </p>
-          <p className="text-xs text-slate-400">
-            By signing in, you agree to our terms of service and privacy policy
-          </p>
+          <div className="text-center space-y-2">
+            <p className="text-sm text-slate-500 flex items-center justify-center space-x-1">
+              <Sparkles className="w-3 h-3" />
+              <span>Trusted by paint professionals worldwide</span>
+              <Sparkles className="w-3 h-3" />
+            </p>
+            <p className="text-xs text-slate-400">
+              By signing in, you agree to our terms of service and privacy policy
+            </p>
+          </div>
         </div>
       </div>
     </div>
