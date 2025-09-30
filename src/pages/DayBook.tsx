@@ -137,7 +137,7 @@ const DayBook = () => {
       case "Purchase": return "bg-blue-100 text-blue-800 border-blue-200";
       case "Expense": return "bg-red-100 text-red-800 border-red-200";
       case "Receipt": return "bg-purple-100 text-purple-800 border-purple-200";
-      case "Adjustment": return "bg-orange-100 text-orange-800 border-orange-200";
+      case "Adjustment": return "bg-coral-100 text-coral-800 border-coral-200";
       default: return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
@@ -147,7 +147,7 @@ const DayBook = () => {
       case "Cash": return "bg-green-100 text-green-700 border-green-200";
       case "UPI": return "bg-blue-100 text-blue-700 border-blue-200";
       case "Account Transfer": return "bg-purple-100 text-purple-700 border-purple-200";
-      case "Cheque": return "bg-orange-100 text-orange-700 border-orange-200";
+      case "Cheque": return "bg-pink-100 text-pink-700 border-pink-200";
       default: return "bg-gray-100 text-gray-700 border-gray-200";
     }
   };
