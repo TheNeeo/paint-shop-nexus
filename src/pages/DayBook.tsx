@@ -321,8 +321,7 @@ const DayBook = () => {
                   </TableHeader>
                   <TableBody>
                     {transactions.map((transaction) => (
-                      <React.Fragment key={transaction.id}>
-                        <Collapsible>
+                        <Collapsible key={transaction.id}>
                           <CollapsibleTrigger asChild>
                              <TableRow 
                               className="hover:bg-coral-50/30 cursor-pointer border-b border-coral-100"
@@ -414,7 +413,6 @@ const DayBook = () => {
                             </CollapsibleContent>
                           )}
                         </Collapsible>
-                      </React.Fragment>
                     ))}
                   </TableBody>
                 </Table>
