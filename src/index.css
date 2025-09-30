@@ -63,18 +63,18 @@
     --cadet-gray-800: 55 65 81;    /* Very dark gray */
     --cadet-gray-900: 31 41 55;    /* Almost black */
     
-    /* Coral theme colors for Day Book - #F56E75 - HSL format */
-    --coral-25: 0 20% 99%;        /* Very light coral */
-    --coral-50: 0 60% 97%;        /* Light coral background */
-    --coral-100: 0 60% 94%;       /* Light coral */
-    --coral-200: 0 70% 82%;       /* Medium light coral */
-    --coral-300: 0 80% 71%;       /* Medium coral */
-    --coral-400: 357 85% 70%;     /* Base coral */
+    /* Coral theme colors for Day Book - #F56E75 - All HSL format with consistent hue */
+    --coral-25: 357 40% 98%;      /* Very light coral - almost white with coral tint */
+    --coral-50: 357 50% 96%;      /* Light coral background */
+    --coral-100: 357 60% 92%;     /* Light coral */
+    --coral-200: 357 70% 85%;     /* Medium light coral */
+    --coral-300: 357 80% 75%;     /* Medium coral */
+    --coral-400: 357 85% 72%;     /* Base coral */
     --coral-500: 357 87% 70%;     /* Main Coral #F56E75 */
-    --coral-600: 0 70% 50%;       /* Darker coral */
-    --coral-700: 0 70% 40%;       /* Dark coral */
-    --coral-800: 0 65% 35%;       /* Very dark coral */
-    --coral-900: 0 60% 30%;       /* Almost black coral */
+    --coral-600: 357 70% 55%;     /* Darker coral */
+    --coral-700: 357 65% 45%;     /* Dark coral */
+    --coral-800: 357 60% 35%;     /* Very dark coral */
+    --coral-900: 357 55% 25%;     /* Almost black coral */
     
     /* Gradient variables - Updated to remove yellow */
     --shimmer: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%);

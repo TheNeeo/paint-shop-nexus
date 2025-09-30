@@ -309,14 +309,16 @@ const DayBook = () => {
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-coral-50/50 border-b border-coral-200">
-                      <TableHead className="w-12 text-center"></TableHead>
+                      <TableHead className="text-center w-12">
+                        <div className="w-4"></div>
+                      </TableHead>
                       <TableHead className="font-semibold text-gray-700 w-20">Time</TableHead>
-                      <TableHead className="font-semibold text-gray-700 w-24">Type</TableHead>
+                      <TableHead className="font-semibold text-gray-700 w-32">Type</TableHead>
                       <TableHead className="font-semibold text-gray-700 min-w-[200px]">Description</TableHead>
-                      <TableHead className="font-semibold text-gray-700 text-right w-24">Debit</TableHead>
-                      <TableHead className="font-semibold text-gray-700 text-right w-24">Credit</TableHead>
-                      <TableHead className="font-semibold text-gray-700 w-32">Payment Mode</TableHead>
-                      <TableHead className="font-semibold text-gray-700 text-right w-24">Balance</TableHead>
+                      <TableHead className="font-semibold text-gray-700 text-right w-28">Debit</TableHead>
+                      <TableHead className="font-semibold text-gray-700 text-right w-28">Credit</TableHead>
+                      <TableHead className="font-semibold text-gray-700 w-40">Payment Mode</TableHead>
+                      <TableHead className="font-semibold text-gray-700 text-right w-28">Balance</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -335,24 +337,24 @@ const DayBook = () => {
                                 )}
                               </TableCell>
                               <TableCell className="font-medium text-gray-700 w-20">{transaction.time}</TableCell>
-                              <TableCell className="w-24">
+                              <TableCell className="w-32">
                                 <Badge variant="outline" className={getTypeColor(transaction.type)}>
                                   {transaction.type}
                                 </Badge>
                               </TableCell>
                               <TableCell className="text-gray-700 min-w-[200px]">{transaction.description}</TableCell>
-                              <TableCell className="text-right text-red-600 font-medium w-24">
+                              <TableCell className="text-right text-red-600 font-medium w-28">
                                 {transaction.debit > 0 ? formatCurrency(transaction.debit) : '-'}
                               </TableCell>
-                              <TableCell className="text-right text-green-600 font-medium w-24">
+                              <TableCell className="text-right text-green-600 font-medium w-28">
                                 {transaction.credit > 0 ? formatCurrency(transaction.credit) : '-'}
                               </TableCell>
-                              <TableCell className="w-32">
+                              <TableCell className="w-40">
                                 <Badge variant="outline" className={getPaymentModeColor(transaction.paymentMode)}>
                                   {transaction.paymentMode}
                                 </Badge>
                               </TableCell>
-                              <TableCell className="text-right font-semibold text-gray-900 w-24">
+                              <TableCell className="text-right font-semibold text-gray-900 w-28">
                                 {formatCurrency(transaction.balance)}
                               </TableCell>
                             </TableRow>
