@@ -7,61 +7,61 @@
 
 @layer base {
   :root {
-    --background: 255 255 255;
-    --foreground: 15 23 42;
+    --background: 0 0% 100%;
+    --foreground: 215 25% 11%;
 
-    --card: 255 255 255;
-    --card-foreground: 15 23 42;
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 11%;
 
-    --popover: 255 255 255;
-    --popover-foreground: 15 23 42;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 25% 11%;
 
-    --primary: 34 197 94;
-    --primary-foreground: 255 255 255;
+    --primary: 142 69% 45%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 241 245 249;
-    --secondary-foreground: 15 23 42;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 215 25% 11%;
 
-    --muted: 248 250 252;
-    --muted-foreground: 71 85 105;
+    --muted: 210 40% 98%;
+    --muted-foreground: 215 20% 35%;
 
-    --accent: 241 245 249;
-    --accent-foreground: 15 23 42;
+    --accent: 210 40% 96%;
+    --accent-foreground: 215 25% 11%;
 
-    --destructive: 239 68 68;
-    --destructive-foreground: 255 255 255;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 226 232 240;
-    --input: 226 232 240;
-    --ring: 34 197 94;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 142 69% 45%;
 
     --radius: 0.75rem;
 
     /* Paint shop custom colors - Updated to Kelly green theme */
-    --paint-red: 239 68 68;
-    --paint-orange: 249 115 22;
-    --paint-green: 125 190 60; /* Kelly green #7DBE3C */
-    --paint-blue: 59 130 246;
-    --paint-purple: 147 51 234;
-    --paint-teal: 20 184 166;
-    --paint-cream: 243 244 246;
+    --paint-red: 0 84% 60%;
+    --paint-orange: 25 95% 53%;
+    --paint-green: 88 52% 49%; /* Kelly green #7DBE3C */
+    --paint-blue: 217 91% 60%;
+    --paint-purple: 271 81% 56%;
+    --paint-teal: 173 80% 40%;
+    --paint-cream: 216 33% 97%;
     
     /* Kelly green theme colors */
-    --kelly-green-main: 125 190 60; /* #7DBE3C */
-    --kelly-green-dark: 22 88 63;   /* #16583f */
-    --kelly-green-light: 125 190 60; /* #7DBE3C with opacity */
+    --kelly-green-main: 88 52% 49%; /* #7DBE3C */
+    --kelly-green-dark: 160 60% 22%;   /* #16583f */
+    --kelly-green-light: 88 52% 69%; /* #7DBE3C lighter */
     
     /* Cadet gray theme colors - Proper HSL values for Cadet Gray #9BA2A3 */
-    --cadet-gray-50: 248 249 250;  /* Very light gray */
-    --cadet-gray-100: 241 243 244; /* Light gray */
-    --cadet-gray-200: 229 231 235; /* Medium light gray */
-    --cadet-gray-300: 209 213 219; /* Medium gray */
-    --cadet-gray-400: 156 163 175; /* Base cadet gray */
-    --cadet-gray-500: 155 162 163; /* Main Cadet Gray #9BA2A3 */
-    --cadet-gray-600: 107 114 128; /* Darker gray */
-    --cadet-gray-700: 75 85 99;    /* Dark gray */
-    --cadet-gray-800: 55 65 81;    /* Very dark gray */
-    --cadet-gray-900: 31 41 55;    /* Almost black */
+    --cadet-gray-50: 210 20% 98%;  /* Very light gray */
+    --cadet-gray-100: 210 17% 95%; /* Light gray */
+    --cadet-gray-200: 214 14% 91%; /* Medium light gray */
+    --cadet-gray-300: 214 12% 83%; /* Medium gray */
+    --cadet-gray-400: 215 14% 65%; /* Base cadet gray */
+    --cadet-gray-500: 184 4% 64%; /* Main Cadet Gray #9BA2A3 */
+    --cadet-gray-600: 215 17% 47%; /* Darker gray */
+    --cadet-gray-700: 215 20% 34%;    /* Dark gray */
+    --cadet-gray-800: 215 23% 27%;    /* Very dark gray */
+    --cadet-gray-900: 215 28% 17%;    /* Almost black */
     
     /* Coral theme colors for Day Book - HSL format with consistent hue 357 */
     --coral-25: 357 40% 98%;      /* Very light coral - almost white with coral tint */
@@ -88,10 +88,10 @@
   }
 
   .dark {
-    --background: 15 23 42;
-    --foreground: 248 250 252;
-    --card: 30 41 59;
-    --card-foreground: 248 250 252;
+    --background: 215 28% 11%;
+    --foreground: 210 40% 98%;
+    --card: 215 25% 18%;
+    --card-foreground: 210 40% 98%;
   }
 }
 
