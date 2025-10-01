@@ -84,7 +84,7 @@ export const ExpenseActivityTable = ({ onEditExpense }: ExpenseActivityTableProp
       "Office": "bg-purple-100 text-purple-700",
       "Rent": "bg-orange-100 text-orange-700",
       "Marketing": "bg-pink-100 text-pink-700",
-      "Maintenance": "bg-yellow-100 text-yellow-700"
+      "Maintenance": "bg-coral-100 text-coral-700"
     };
     return colors[type as keyof typeof colors] || "bg-gray-100 text-gray-700";
   };
@@ -93,7 +93,7 @@ export const ExpenseActivityTable = ({ onEditExpense }: ExpenseActivityTableProp
     const colors = {
       "UPI": "bg-green-100 text-green-700",
       "Bank": "bg-blue-100 text-blue-700",
-      "Cash": "bg-yellow-100 text-yellow-700",
+      "Cash": "bg-coral-100 text-coral-700",
       "Cheque": "bg-purple-100 text-purple-700",
       "Card": "bg-pink-100 text-pink-700"
     };

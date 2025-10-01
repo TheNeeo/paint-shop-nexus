@@ -87,7 +87,7 @@ export function SalesTable({ filters, onViewInvoice }: SalesTableProps) {
   const getPaymentStatusBadge = (status: string) => {
     const variants = {
       paid: "bg-green-100 text-green-800",
-      partial: "bg-yellow-100 text-yellow-800",
+      partial: "bg-coral-100 text-coral-800",
       pending: "bg-red-100 text-red-800",
     };
     return variants[status as keyof typeof variants] || variants.pending;

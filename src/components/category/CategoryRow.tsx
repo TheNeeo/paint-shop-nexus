@@ -22,7 +22,7 @@ const getCategoryColor = (color: string) => {
     orange: "bg-orange-100 text-orange-800 border-orange-200",
     pink: "bg-pink-100 text-pink-800 border-pink-200",
     indigo: "bg-indigo-100 text-indigo-800 border-indigo-200",
-    yellow: "bg-yellow-100 text-yellow-800 border-yellow-200",
+    coral: "bg-coral-100 text-coral-800 border-coral-200",
   };
   return colors[color] || "bg-slate-100 text-slate-800 border-slate-200";
 };
@@ -36,7 +36,7 @@ const getColorDot = (color: string) => {
     orange: "bg-orange-500",
     pink: "bg-pink-500",
     indigo: "bg-indigo-500",
-    yellow: "bg-yellow-500",
+    coral: "bg-coral-500",
   };
   return colors[color] || "bg-slate-500";
 };
