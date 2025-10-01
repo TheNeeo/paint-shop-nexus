@@ -22,7 +22,7 @@ const colorOptions = [
   { value: "orange", label: "Orange", class: "bg-orange-500" },
   { value: "pink", label: "Pink", class: "bg-pink-500" },
   { value: "indigo", label: "Indigo", class: "bg-indigo-500" },
-  { value: "yellow", label: "Yellow", class: "bg-yellow-500" },
+  { value: "coral", label: "Coral", class: "bg-coral-500" },
 ];
 
 interface CategoryFormData {

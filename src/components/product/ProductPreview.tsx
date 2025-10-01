@@ -28,7 +28,7 @@ export function ProductPreview({ product }: ProductPreviewProps) {
 
   const getStockStatus = (quantity: number) => {
     if (quantity === 0) return { status: "Out of Stock", color: "bg-red-100 text-red-800" };
-    if (quantity <= 10) return { status: "Low Stock", color: "bg-yellow-100 text-yellow-800" };
+    if (quantity <= 10) return { status: "Low Stock", color: "bg-coral-100 text-coral-800" };
     return { status: "In Stock", color: "bg-green-100 text-green-800" };
   };
 

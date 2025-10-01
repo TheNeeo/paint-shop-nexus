@@ -78,7 +78,7 @@ export const VendorHistoryTable: React.FC<VendorHistoryTableProps> = ({
   const getPaymentStatusBadge = (status: string) => {
     const statusColors = {
       "Paid": "bg-green-100 text-green-800",
-      "Pending": "bg-yellow-100 text-yellow-800",
+      "Pending": "bg-coral-100 text-coral-800",
       "Overdue": "bg-red-100 text-red-800",
     };
     

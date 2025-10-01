@@ -162,7 +162,7 @@ export function InvoiceViewer({ isOpen, onClose, invoice }: InvoiceViewerProps) 
               <p>Payment Mode: <span className="font-medium">{invoice.paymentMode}</span></p>
               <p>Payment Status: <span className={`font-medium ${
                 invoice.paymentStatus === 'paid' ? 'text-green-600' : 
-                invoice.paymentStatus === 'partial' ? 'text-yellow-600' : 'text-red-600'
+                invoice.paymentStatus === 'partial' ? 'text-coral-600' : 'text-red-600'
               }`}>
                 {invoice.paymentStatus === 'paid' ? 'Paid' : 
                  invoice.paymentStatus === 'partial' ? 'Partial Paid' : 'Pending'}

@@ -34,7 +34,7 @@ const getMockProducts = (categoryName: string) => {
 
 const getStockStatus = (stock: number) => {
   if (stock <= 10) return { status: "Low Stock", color: "bg-red-100 text-red-800 border-red-200" };
-  if (stock <= 30) return { status: "Medium", color: "bg-yellow-100 text-yellow-800 border-yellow-200" };
+  if (stock <= 30) return { status: "Medium", color: "bg-coral-100 text-coral-800 border-coral-200" };
   return { status: "In Stock", color: "bg-green-100 text-green-800 border-green-200" };
 };
 
@@ -93,7 +93,7 @@ export function ProductRows({ categoryName }: ProductRowsProps) {
               className={
                 product.status === "Active" 
                   ? "bg-green-100 text-green-800 border-green-200" 
-                  : "bg-yellow-100 text-yellow-800 border-yellow-200"
+                  : "bg-coral-100 text-coral-800 border-coral-200"
               }
             >
               {product.status}

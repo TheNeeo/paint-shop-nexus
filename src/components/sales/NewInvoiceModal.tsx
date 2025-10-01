@@ -223,7 +223,7 @@ export function NewInvoiceModal({ isOpen, onClose }: NewInvoiceModalProps) {
             {/* Tax Settings and Calculations */}
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-coral-50 border border-coral-200 rounded-lg">
                   <div>
                     <Label className="text-black font-semibold">Tax Inclusive/Exclusive</Label>
                     <p className="text-sm text-gray-600">

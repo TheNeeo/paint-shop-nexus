@@ -103,7 +103,7 @@ export function ProductTable({
                       <div className="flex items-center gap-2">
                         <span className="font-semibold text-gray-800">{product.name}</span>
                         {product.featured && (
-                          <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                          <Star className="h-4 w-4 text-coral-500 fill-current" />
                         )}
                       </div>
                       <div className="text-sm text-gray-500">Code: {product.baseCode}</div>

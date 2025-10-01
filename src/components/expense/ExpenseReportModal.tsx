@@ -18,7 +18,7 @@ export const ExpenseReportModal = ({ isOpen, onClose, expense }: ExpenseReportMo
     const colors: { [key: string]: string } = {
       "Rent": "bg-blue-100 text-blue-800",
       "Transport": "bg-green-100 text-green-800",
-      "Utilities": "bg-yellow-100 text-yellow-800",
+      "Utilities": "bg-coral-100 text-coral-800",
       "Marketing": "bg-purple-100 text-purple-800",
       "Office": "bg-gray-100 text-gray-800",
       "Food": "bg-orange-100 text-orange-800",
@@ -33,7 +33,7 @@ export const ExpenseReportModal = ({ isOpen, onClose, expense }: ExpenseReportMo
       "UPI": "bg-blue-100 text-blue-800",
       "Bank": "bg-purple-100 text-purple-800",
       "Card": "bg-pink-100 text-pink-800",
-      "Cheque": "bg-amber-100 text-amber-800"
+      "Cheque": "bg-coral-100 text-coral-800"
     };
     return colors[mode] || "bg-gray-100 text-gray-800";
   };
