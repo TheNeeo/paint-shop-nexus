@@ -30,6 +30,7 @@ import ApplicationSettings from "./pages/ApplicationSettings";
 import UserInterfaceSettings from "./pages/UserInterfaceSettings";
 import CashReceipt from "./pages/CashReceipt";
 import DayBook from "./pages/DayBook";
+import InvoiceGenerate from "./pages/InvoiceGenerate";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ const App = () => (
               <Route path="/product/category" element={<ProtectedRoute><CategoryManagement /></ProtectedRoute>} />
               <Route path="/sales" element={<ProtectedRoute><SalesManagement /></ProtectedRoute>} />
               <Route path="/sales/activity" element={<ProtectedRoute><SalesManagement /></ProtectedRoute>} />
+              <Route path="/sales/invoice-generate" element={<ProtectedRoute><InvoiceGenerate /></ProtectedRoute>} />
               <Route path="/purchase" element={<ProtectedRoute><PurchaseManagement /></ProtectedRoute>} />
               <Route path="/purchase/activity" element={<ProtectedRoute><PurchaseManagement /></ProtectedRoute>} />
               <Route path="/purchase/new" element={<ProtectedRoute><NewPurchaseEntry /></ProtectedRoute>} />
