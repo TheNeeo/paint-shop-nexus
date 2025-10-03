@@ -10,6 +10,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -30,7 +43,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Package, TrendingUp, DollarSign, Layers, AlertTriangle, Plus } from "lucide-react";
+import { Package, TrendingUp, DollarSign, Layers, AlertTriangle, Plus, Check, ChevronsUpDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -41,6 +54,7 @@ export default function UpdateStock() {
   const [adjustQuantity, setAdjustQuantity] = useState<number>(0);
   const [reason, setReason] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
+  const [open, setOpen] = useState(false);
 
   // Fetch products
   const { data: products = [] } = useQuery({
@@ -216,18 +230,48 @@ export default function UpdateStock() {
             <div className="flex items-end gap-4">
               <div className="flex-1">
                 <Label>Select Product</Label>
-                <Select value={selectedProductId} onValueChange={setSelectedProductId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Search and select a product..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {products.map((product) => (
-                      <SelectItem key={product.id} value={product.id}>
-                        {product.name} ({product.current_stock} {product.unit})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={open}
+                      className="w-full justify-between"
+                    >
+                      {selectedProductId
+                        ? products.find((product) => product.id === selectedProductId)?.name
+                        : "Search and select a product..."}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0" align="start">
+                    <Command>
+                      <CommandInput placeholder="Search product..." />
+                      <CommandList>
+                        <CommandEmpty>No product found.</CommandEmpty>
+                        <CommandGroup>
+                          {products.map((product) => (
+                            <CommandItem
+                              key={product.id}
+                              value={product.name}
+                              onSelect={() => {
+                                setSelectedProductId(product.id);
+                                setOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={`mr-2 h-4 w-4 ${
+                                  selectedProductId === product.id ? "opacity-100" : "opacity-0"
+                                }`}
+                              />
+                              {product.name} ({product.current_stock} {product.unit})
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
               <Button variant="outline" style={{ borderColor: "#96A3CC", color: "#96A3CC" }}>
                 <Plus className="h-4 w-4 mr-2" />
@@ -244,13 +288,13 @@ export default function UpdateStock() {
                 </div>
                 <div>
                   <Label className="text-xs text-muted-foreground">Category</Label>
-                  <p>
+                  <div>
                     {selectedProduct.category_id && (
                       <Badge className={getCategoryColor(selectedProduct.category_id)}>
                         {categories.find((c) => c.id === selectedProduct.category_id)?.name || "N/A"}
                       </Badge>
                     )}
-                  </p>
+                  </div>
                 </div>
                 <div>
                   <Label className="text-xs text-muted-foreground">HSN Code</Label>
