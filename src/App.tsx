@@ -18,6 +18,8 @@ import PurchaseInvoice from "./pages/PurchaseInvoice";
 import ReorderProductList from "./pages/ReorderProductList";
 import GeneratePurchaseOrder from "./pages/GeneratePurchaseOrder";
 import InventoryManagement from "./pages/InventoryManagement";
+import UpdateStock from "./pages/UpdateStock";
+import InventoryMovementHistory from "./pages/InventoryMovementHistory";
 import CustomerInformation from "./pages/CustomerInformation";
 import CustomerHistory from "./pages/CustomerHistory";
 import VendorInformation from "./pages/VendorInformation";
@@ -54,8 +56,8 @@ const App = () => (
               <Route path="/purchase/reorder" element={<ProtectedRoute><ReorderProductList /></ProtectedRoute>} />
               <Route path="/purchase/generate-order" element={<ProtectedRoute><GeneratePurchaseOrder /></ProtectedRoute>} />
               <Route path="/inventory" element={<ProtectedRoute><InventoryManagement /></ProtectedRoute>} />
-              <Route path="/inventory/update" element={<ProtectedRoute><InventoryManagement /></ProtectedRoute>} />
-              <Route path="/inventory/history" element={<ProtectedRoute><InventoryManagement /></ProtectedRoute>} />
+              <Route path="/inventory/update" element={<ProtectedRoute><UpdateStock /></ProtectedRoute>} />
+              <Route path="/inventory/history" element={<ProtectedRoute><InventoryMovementHistory /></ProtectedRoute>} />
               <Route path="/customers" element={<ProtectedRoute><CustomerInformation /></ProtectedRoute>} />
               <Route path="/customers/history" element={<ProtectedRoute><CustomerHistory /></ProtectedRoute>} />
               <Route path="/vendors" element={<ProtectedRoute><VendorInformation /></ProtectedRoute>} />
