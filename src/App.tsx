@@ -50,7 +50,7 @@ const App = () => (
               <Route path="/product/category" element={<ProtectedRoute><CategoryManagement /></ProtectedRoute>} />
               <Route path="/sales" element={<ProtectedRoute><SalesManagement /></ProtectedRoute>} />
               <Route path="/sales/activity" element={<ProtectedRoute><SalesManagement /></ProtectedRoute>} />
-              <Route path="/sales/invoice-generate" element={<ProtectedRoute><InvoiceGenerate /></ProtectedRoute>} />
+              <Route path="/sales/invoice" element={<ProtectedRoute><InvoiceGenerate /></ProtectedRoute>} />
               <Route path="/purchase" element={<ProtectedRoute><PurchaseManagement /></ProtectedRoute>} />
               <Route path="/purchase/activity" element={<ProtectedRoute><PurchaseManagement /></ProtectedRoute>} />
               <Route path="/purchase/new" element={<ProtectedRoute><NewPurchaseEntry /></ProtectedRoute>} />
