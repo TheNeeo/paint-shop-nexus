@@ -323,98 +323,94 @@ const DayBook = () => {
                   </TableHeader>
                   <TableBody>
                     {transactions.map((transaction) => (
-                        <Collapsible key={transaction.id}>
-                          <CollapsibleTrigger asChild>
-                             <TableRow 
-                              className="hover:bg-coral-50/30 cursor-pointer border-b border-coral-100"
-                              onClick={() => setExpandedRow(expandedRow === transaction.id ? null : transaction.id)}
-                            >
-                              <TableCell className="text-center w-12">
-                                {expandedRow === transaction.id ? (
-                                  <ChevronDown className="h-4 w-4 text-gray-500 mx-auto" />
-                                ) : (
-                                  <ChevronRight className="h-4 w-4 text-gray-500 mx-auto" />
-                                )}
-                              </TableCell>
-                              <TableCell className="font-medium text-gray-700 w-20">{transaction.time}</TableCell>
-                              <TableCell className="w-32">
-                                <Badge variant="outline" className={getTypeColor(transaction.type)}>
-                                  {transaction.type}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-gray-700 min-w-[200px]">{transaction.description}</TableCell>
-                              <TableCell className="text-right text-red-600 font-medium w-28">
-                                {transaction.debit > 0 ? formatCurrency(transaction.debit) : '-'}
-                              </TableCell>
-                              <TableCell className="text-right text-green-600 font-medium w-28">
-                                {transaction.credit > 0 ? formatCurrency(transaction.credit) : '-'}
-                              </TableCell>
-                              <TableCell className="w-40">
-                                <Badge variant="outline" className={getPaymentModeColor(transaction.paymentMode)}>
-                                  {transaction.paymentMode}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-right font-semibold text-gray-900 w-28">
-                                {formatCurrency(transaction.balance)}
-                              </TableCell>
-                            </TableRow>
-                          </CollapsibleTrigger>
-                          {expandedRow === transaction.id && transaction.details && (
-                            <CollapsibleContent asChild>
-                              <TableRow className="bg-coral-25 border-b border-coral-100">
-                                <TableCell colSpan={8}>
-                                  <div className="py-4 px-6 bg-coral-50/20 rounded-lg mx-4">
-                                    <h4 className="font-semibold text-gray-900 mb-3">Transaction Details</h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-                                      {transaction.details.invoiceNo && (
-                                        <div>
-                                          <span className="text-gray-600">Invoice No:</span>
-                                          <p className="font-medium text-gray-900">{transaction.details.invoiceNo}</p>
-                                        </div>
-                                      )}
-                                      {transaction.details.customerName && (
-                                        <div>
-                                          <span className="text-gray-600">Customer/Vendor:</span>
-                                          <p className="font-medium text-gray-900">{transaction.details.customerName}</p>
-                                        </div>
-                                      )}
-                                      {transaction.details.productName && (
-                                        <div>
-                                          <span className="text-gray-600">Product:</span>
-                                          <p className="font-medium text-gray-900">{transaction.details.productName}</p>
-                                        </div>
-                                      )}
-                                      {transaction.details.unit && (
-                                        <div>
-                                          <span className="text-gray-600">Unit:</span>
-                                          <p className="font-medium text-gray-900">{transaction.details.unit}</p>
-                                        </div>
-                                      )}
-                                      {transaction.details.amount && (
-                                        <div>
-                                          <span className="text-gray-600">Amount:</span>
-                                          <p className="font-medium text-gray-900">{formatCurrency(transaction.details.amount)}</p>
-                                        </div>
-                                      )}
-                                      {transaction.details.totalAmount && (
-                                        <div>
-                                          <span className="text-gray-600">Total Amount:</span>
-                                          <p className="font-medium text-gray-900">{formatCurrency(transaction.details.totalAmount)}</p>
-                                        </div>
-                                      )}
+                      <React.Fragment key={transaction.id}>
+                        <TableRow 
+                          className="hover:bg-coral-50/30 cursor-pointer border-b border-coral-100"
+                          onClick={() => setExpandedRow(expandedRow === transaction.id ? null : transaction.id)}
+                        >
+                          <TableCell className="text-center w-12">
+                            {expandedRow === transaction.id ? (
+                              <ChevronDown className="h-4 w-4 text-gray-500 mx-auto" />
+                            ) : (
+                              <ChevronRight className="h-4 w-4 text-gray-500 mx-auto" />
+                            )}
+                          </TableCell>
+                          <TableCell className="font-medium text-gray-700 w-20">{transaction.time}</TableCell>
+                          <TableCell className="w-32">
+                            <Badge variant="outline" className={getTypeColor(transaction.type)}>
+                              {transaction.type}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-gray-700 min-w-[200px]">{transaction.description}</TableCell>
+                          <TableCell className="text-right text-red-600 font-medium w-28">
+                            {transaction.debit > 0 ? formatCurrency(transaction.debit) : '-'}
+                          </TableCell>
+                          <TableCell className="text-right text-green-600 font-medium w-28">
+                            {transaction.credit > 0 ? formatCurrency(transaction.credit) : '-'}
+                          </TableCell>
+                          <TableCell className="w-40">
+                            <Badge variant="outline" className={getPaymentModeColor(transaction.paymentMode)}>
+                              {transaction.paymentMode}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right font-semibold text-gray-900 w-28">
+                            {formatCurrency(transaction.balance)}
+                          </TableCell>
+                        </TableRow>
+                        {expandedRow === transaction.id && transaction.details && (
+                          <TableRow className="bg-coral-25 border-b border-coral-100">
+                            <TableCell colSpan={8}>
+                              <div className="py-4 px-6 bg-coral-50/20 rounded-lg mx-4">
+                                <h4 className="font-semibold text-gray-900 mb-3">Transaction Details</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                                  {transaction.details.invoiceNo && (
+                                    <div>
+                                      <span className="text-gray-600">Invoice No:</span>
+                                      <p className="font-medium text-gray-900">{transaction.details.invoiceNo}</p>
                                     </div>
-                                    {transaction.details.notes && (
-                                      <div className="mt-3">
-                                        <span className="text-gray-600">Notes:</span>
-                                        <p className="font-medium text-gray-900 mt-1">{transaction.details.notes}</p>
-                                      </div>
-                                    )}
-                                  </div>
-                                </TableCell>
-                              </TableRow>
-                            </CollapsibleContent>
-                          )}
-                        </Collapsible>
+                                  )}
+                                  {transaction.details.customerName && (
+                                    <div>
+                                      <span className="text-gray-600">Customer/Vendor:</span>
+                                      <p className="font-medium text-gray-900">{transaction.details.customerName}</p>
+                                    </div>
+                                  )}
+                                  {transaction.details.productName && (
+                                    <div>
+                                      <span className="text-gray-600">Product:</span>
+                                      <p className="font-medium text-gray-900">{transaction.details.productName}</p>
+                                    </div>
+                                  )}
+                                  {transaction.details.unit && (
+                                    <div>
+                                      <span className="text-gray-600">Unit:</span>
+                                      <p className="font-medium text-gray-900">{transaction.details.unit}</p>
+                                    </div>
+                                  )}
+                                  {transaction.details.amount && (
+                                    <div>
+                                      <span className="text-gray-600">Amount:</span>
+                                      <p className="font-medium text-gray-900">{formatCurrency(transaction.details.amount)}</p>
+                                    </div>
+                                  )}
+                                  {transaction.details.totalAmount && (
+                                    <div>
+                                      <span className="text-gray-600">Total Amount:</span>
+                                      <p className="font-medium text-gray-900">{formatCurrency(transaction.details.totalAmount)}</p>
+                                    </div>
+                                  )}
+                                  {transaction.details.notes && (
+                                    <div className="md:col-span-2">
+                                      <span className="text-gray-600">Notes:</span>
+                                      <p className="font-medium text-gray-900">{transaction.details.notes}</p>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </React.Fragment>
                     ))}
                   </TableBody>
                 </Table>
