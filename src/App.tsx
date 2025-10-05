@@ -33,6 +33,7 @@ import DayBook from "./pages/DayBook";
 import InvoiceGenerate from "./pages/InvoiceGenerate";
 import SalesReport from "./pages/SalesReport";
 import InventoryReport from "./pages/InventoryReport";
+import ProfitLossReport from "./pages/ProfitLossReport";
 
 const queryClient = new QueryClient();
 
@@ -53,8 +54,9 @@ const App = () => (
               <Route path="/sales" element={<ProtectedRoute><SalesManagement /></ProtectedRoute>} />
               <Route path="/sales/activity" element={<ProtectedRoute><SalesManagement /></ProtectedRoute>} />
               <Route path="/sales/invoice" element={<ProtectedRoute><InvoiceGenerate /></ProtectedRoute>} />
-              <Route path="/reports/sales" element={<ProtectedRoute><SalesReport /></ProtectedRoute>} />
-              <Route path="/reports/inventory" element={<ProtectedRoute><InventoryReport /></ProtectedRoute>} />
+          <Route path="/reports/sales" element={<ProtectedRoute><SalesReport /></ProtectedRoute>} />
+          <Route path="/reports/inventory" element={<ProtectedRoute><InventoryReport /></ProtectedRoute>} />
+          <Route path="/reports/profit-loss" element={<ProtectedRoute><ProfitLossReport /></ProtectedRoute>} />
               <Route path="/purchase" element={<ProtectedRoute><PurchaseManagement /></ProtectedRoute>} />
               <Route path="/purchase/activity" element={<ProtectedRoute><PurchaseManagement /></ProtectedRoute>} />
               <Route path="/purchase/new" element={<ProtectedRoute><NewPurchaseEntry /></ProtectedRoute>} />
