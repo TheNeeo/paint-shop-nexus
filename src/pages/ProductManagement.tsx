@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -22,6 +23,8 @@ import {
   Home,
   Zap,
   Package,
+  RefreshCw,
+  Paintbrush,
 } from "lucide-react";
 import { ProductForm } from "@/components/product/ProductForm";
 import { ProductStats } from "@/components/product/ProductStats";
@@ -209,60 +212,120 @@ export default function ProductManagement() {
     <AppLayout>
       <TooltipProvider>
         <div className="w-full bg-gradient-to-br from-green-50 via-white to-blue-50 min-h-screen p-6">
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-8">
-            <div className="space-y-3">
-              <Breadcrumb>
-                <BreadcrumbList>
-                  <BreadcrumbItem>
-                    <Home className="h-4 w-4 text-green-600" />
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage className="text-green-700">Product Management</BreadcrumbPage>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage className="text-green-700">Product Activity</BreadcrumbPage>
-                  </BreadcrumbItem>
-                </BreadcrumbList>
-              </Breadcrumb>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <h1 className="text-2xl sm:text-3xl font-bold text-green-800 flex items-center gap-2">
-                  <Package className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
-                  Product Activity
-                </h1>
-                <Badge className="bg-green-100 text-green-800 border-green-200 w-fit">
-                  {filteredProducts.length} products
-                </Badge>
-              </div>
+          {/* Enhanced Animated Header */}
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-gradient-to-r from-green-100 via-emerald-50 to-teal-50 rounded-3xl p-6 mb-8 shadow-lg border-2 border-green-200 relative overflow-hidden"
+          >
+            {/* Animated background pattern */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 left-0 w-40 h-40 bg-green-400 rounded-full blur-3xl animate-pulse"></div>
+              <div className="absolute bottom-0 right-0 w-40 h-40 bg-teal-400 rounded-full blur-3xl animate-pulse delay-1000"></div>
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Button variant="outline" size="sm" className="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700 border-blue-600">
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
+            <div className="relative z-10 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+              <div className="space-y-3">
+                <Breadcrumb>
+                  <BreadcrumbList>
+                    <BreadcrumbItem>
+                      <Home className="h-4 w-4 text-green-600" />
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage className="text-green-700 font-medium">Product Management</BreadcrumbPage>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage className="text-green-800 font-semibold">Product Activity</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                  <motion.h1 
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2, duration: 0.5 }}
+                    className="text-2xl sm:text-4xl font-bold text-green-900 flex items-center gap-3"
+                  >
+                    <motion.div
+                      animate={{ rotate: [0, 10, -10, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                    >
+                      <Paintbrush className="h-8 w-8 sm:h-10 sm:w-10 text-green-600" />
+                    </motion.div>
+                    Product Activity
+                  </motion.h1>
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
+                  >
+                    <Badge className="bg-gradient-to-r from-green-600 to-teal-600 text-white border-none text-sm px-4 py-1 shadow-md">
+                      {filteredProducts.length} products
+                    </Badge>
+                  </motion.div>
+                </div>
+                <motion.p 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                  className="text-sm text-green-700 italic"
+                >
+                  Neo Color Factory ~ The Colors of Your Dreams 🎨
+                </motion.p>
+              </div>
               
-              <Dialog open={isAddProductOpen} onOpenChange={setIsAddProductOpen}>
-                <DialogTrigger asChild>
-                  <Button className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg w-full sm:w-auto">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add New Product
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white border-2 border-green-200">
-                  <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2 text-green-800">
-                      <Zap className="h-5 w-5 text-green-600" />
-                      Add New Product
-                    </DialogTitle>
-                  </DialogHeader>
-                  <ProductForm onClose={() => setIsAddProductOpen(false)} />
-                </DialogContent>
-              </Dialog>
+              <motion.div 
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+                className="flex flex-col sm:flex-row gap-2"
+              >
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full sm:w-auto bg-white hover:bg-green-50 border-2 border-green-300 text-green-700 hover:border-green-400 transition-all duration-300 shadow-sm hover:shadow-md group"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2 group-hover:rotate-180 transition-transform duration-500" />
+                  Refresh
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700 border-blue-600 transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+              
+                <Dialog open={isAddProductOpen} onOpenChange={setIsAddProductOpen}>
+                  <DialogTrigger asChild>
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl w-full sm:w-auto border-2 border-green-400 transition-all duration-300 relative overflow-hidden group">
+                        <span className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
+                        <Plus className="h-4 w-4 mr-2 relative z-10" />
+                        <span className="relative z-10">Add New Product</span>
+                      </Button>
+                    </motion.div>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white border-2 border-green-200">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2 text-green-800">
+                        <Zap className="h-5 w-5 text-green-600" />
+                        Add New Product
+                      </DialogTitle>
+                    </DialogHeader>
+                    <ProductForm onClose={() => setIsAddProductOpen(false)} />
+                  </DialogContent>
+                </Dialog>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Stats */}
           <div className="mb-8">

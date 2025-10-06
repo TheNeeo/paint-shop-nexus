@@ -1,5 +1,5 @@
-
 import React from "react";
+import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -41,7 +41,12 @@ export function ProductTable({
   getStockStatus,
 }: ProductTableProps) {
   return (
-    <div className="bg-white rounded-2xl shadow-xl border-2 border-green-200 overflow-hidden">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+      className="bg-white rounded-2xl shadow-xl border-2 border-green-200 overflow-hidden"
+    >
       <Table>
         <TableHeader>
           <TableRow className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 border-b-2 border-green-800">
@@ -65,7 +70,7 @@ export function ProductTable({
         <TableBody>
           {products.map((product, index) => (
             <React.Fragment key={product.id}>
-              <TableRow className="border-b border-green-100 hover:bg-gradient-to-r hover:from-green-50 hover:to-green-100 transition-all duration-200 group">
+              <TableRow className="border-b border-green-100 hover:bg-gradient-to-r hover:from-green-50 hover:to-green-100 transition-all duration-200 group hover:scale-[1.01] hover:shadow-md">
                 <TableCell>
                   <Checkbox
                     checked={selectedProducts.has(product.id)}
@@ -78,7 +83,7 @@ export function ProductTable({
                     variant="ghost"
                     size="sm"
                     onClick={() => onToggleRowExpansion(product.id)}
-                    className="p-1 hover:bg-green-100 transition-colors duration-200"
+                    className="p-1 hover:bg-green-100 transition-all duration-200 hover:scale-110"
                   >
                     {expandedRows.has(product.id) ? (
                       <ChevronDown className="h-4 w-4 text-green-600" />
@@ -88,7 +93,7 @@ export function ProductTable({
                   </Button>
                 </TableCell>
                 <TableCell>
-                  <div className="w-8 h-8 bg-green-100 rounded-md flex items-center justify-center border border-green-200">
+                  <div className="w-8 h-8 bg-green-100 rounded-md flex items-center justify-center border border-green-200 group-hover:bg-green-200 transition-colors duration-200">
                     <span className="text-xs font-medium text-green-700">{index + 1}</span>
                   </div>
                 </TableCell>
@@ -97,13 +102,13 @@ export function ProductTable({
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-10 h-10 rounded-lg border-2 border-green-200 object-cover"
+                      className="w-10 h-10 rounded-lg border-2 border-green-200 object-cover group-hover:scale-110 group-hover:border-green-400 transition-all duration-200"
                     />
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-gray-800">{product.name}</span>
+                        <span className="font-semibold text-gray-800 group-hover:text-green-700 transition-colors duration-200">{product.name}</span>
                         {product.featured && (
-                          <Star className="h-4 w-4 text-coral-500 fill-current" />
+                          <Star className="h-4 w-4 text-coral-500 fill-current animate-pulse" />
                         )}
                       </div>
                       <div className="text-sm text-gray-500">Code: {product.baseCode}</div>
@@ -111,19 +116,32 @@ export function ProductTable({
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge className={`${getCategoryColor(product.category)} text-xs font-medium`}>
+                  <Badge className={`${getCategoryColor(product.category)} text-xs font-medium group-hover:scale-110 transition-transform duration-200`}>
                     {product.category}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <span className="text-lg font-bold text-green-700">${product.unitPrice.toFixed(2)}</span>
+                  <span className="text-lg font-bold text-green-700 group-hover:text-green-800 transition-colors duration-200">${product.unitPrice.toFixed(2)}</span>
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">{product.stockQuantity}</span>
-                    <Badge className={`text-xs ${getStockStatus(product.stockQuantity).color}`}>
-                      {getStockStatus(product.stockQuantity).status}
-                    </Badge>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">{product.stockQuantity}</span>
+                      <Badge className={`text-xs ${getStockStatus(product.stockQuantity).color}`}>
+                        {getStockStatus(product.stockQuantity).status}
+                      </Badge>
+                    </div>
+                    {/* Stock Progress Bar */}
+                    <div className="w-full bg-gray-200 rounded-full h-1.5">
+                      <div 
+                        className={`h-1.5 rounded-full transition-all duration-500 ${
+                          product.stockQuantity === 0 ? 'bg-red-500' : 
+                          product.stockQuantity <= 10 ? 'bg-orange-500' : 
+                          'bg-green-500'
+                        }`}
+                        style={{ width: `${Math.min((product.stockQuantity / 150) * 100, 100)}%` }}
+                      />
+                    </div>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -163,6 +181,6 @@ export function ProductTable({
           )}
         </TableBody>
       </Table>
-    </div>
+    </motion.div>
   );
 }

@@ -1,5 +1,6 @@
 
 import React from "react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -37,63 +38,73 @@ interface ProductRowActionsProps {
 export function ProductRowActions({ product, selectedProduct, onSetSelectedProduct }: ProductRowActionsProps) {
   return (
     <div className="flex gap-1">
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Dialog>
+      <Dialog>
+        <Tooltip>
+          <TooltipTrigger asChild>
             <DialogTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="opacity-60 hover:opacity-100 hover:bg-green-100"
-                onClick={() => onSetSelectedProduct(product)}
-              >
-                <Eye className="h-4 w-4 text-green-600" />
-              </Button>
+              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="opacity-70 hover:opacity-100 hover:bg-green-100 transition-all duration-200 group"
+                  onClick={() => onSetSelectedProduct(product)}
+                >
+                  <Eye className="h-4 w-4 text-green-600 group-hover:scale-110 transition-transform duration-200" />
+                </Button>
+              </motion.div>
             </DialogTrigger>
-            <DialogContent className="max-w-3xl">
-              <ProductPreview product={selectedProduct} />
-            </DialogContent>
-          </Dialog>
-        </TooltipTrigger>
-        <TooltipContent>View details</TooltipContent>
-      </Tooltip>
+          </TooltipTrigger>
+          <TooltipContent>
+            <span className="text-xs font-medium">View details</span>
+          </TooltipContent>
+        </Tooltip>
+        <DialogContent className="max-w-3xl">
+          <ProductPreview product={selectedProduct} />
+        </DialogContent>
+      </Dialog>
       
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="opacity-60 hover:opacity-100 hover:bg-green-100"
-          >
-            <Edit className="h-4 w-4 text-green-600" />
-          </Button>
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="opacity-70 hover:opacity-100 hover:bg-blue-100 transition-all duration-200 group"
+            >
+              <Edit className="h-4 w-4 text-blue-600 group-hover:rotate-12 transition-transform duration-200" />
+            </Button>
+          </motion.div>
         </TooltipTrigger>
-        <TooltipContent>Edit product</TooltipContent>
+        <TooltipContent>
+          <span className="text-xs font-medium">Edit product</span>
+        </TooltipContent>
       </Tooltip>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="opacity-60 hover:opacity-100 hover:bg-green-100"
-          >
-            <MoreHorizontal className="h-4 w-4 text-gray-600" />
-          </Button>
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="opacity-70 hover:opacity-100 hover:bg-gray-100 transition-all duration-200"
+            >
+              <MoreHorizontal className="h-4 w-4 text-gray-600" />
+            </Button>
+          </motion.div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="bg-white" align="end">
-          <DropdownMenuItem>
-            <Copy className="h-4 w-4 mr-2" />
-            Duplicate
+        <DropdownMenuContent className="bg-white border-2 border-gray-200 shadow-xl" align="end">
+          <DropdownMenuItem className="hover:bg-blue-50 cursor-pointer transition-colors duration-150">
+            <Copy className="h-4 w-4 mr-2 text-blue-600" />
+            <span className="font-medium">Duplicate</span>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Archive className="h-4 w-4 mr-2" />
-            Archive
+          <DropdownMenuItem className="hover:bg-orange-50 cursor-pointer transition-colors duration-150">
+            <Archive className="h-4 w-4 mr-2 text-orange-600" />
+            <span className="font-medium">Archive</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="text-red-600">
+          <DropdownMenuItem className="text-red-600 hover:bg-red-50 cursor-pointer transition-colors duration-150">
             <Trash2 className="h-4 w-4 mr-2" />
-            Delete
+            <span className="font-medium">Delete</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
