@@ -313,12 +313,9 @@ export default function ProductManagement() {
                       </Button>
                     </motion.div>
                   </DialogTrigger>
-                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white border-2 border-green-200">
-                    <DialogHeader>
-                      <DialogTitle className="flex items-center gap-2 text-green-800">
-                        <Zap className="h-5 w-5 text-green-600" />
-                        Add New Product
-                      </DialogTitle>
+                  <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-background via-background to-muted/20 border-0 shadow-2xl rounded-2xl">
+                    <DialogHeader className="sr-only">
+                      <DialogTitle>Add New Product</DialogTitle>
                     </DialogHeader>
                     <ProductForm onClose={() => setIsAddProductOpen(false)} />
                   </DialogContent>

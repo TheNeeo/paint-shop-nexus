@@ -21,6 +21,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { Plus, Trash2, Upload, Package, DollarSign, AlertTriangle } from "lucide-react";
+import bucketIcon from "@/assets/bucket-icon.png";
 
 interface ProductFormProps {
   onClose: () => void;
@@ -78,25 +79,35 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
   };
 
   return (
-    <div className="space-y-6 bg-gradient-to-br from-green-50 via-white to-blue-50 p-8 rounded-2xl border-2 border-green-200 shadow-xl max-h-[85vh] overflow-y-auto">
-      <div className="border-b-2 border-green-100 pb-4">
-        <h2 className="text-2xl font-bold text-green-800 flex items-center gap-2">
-          <Package className="h-6 w-6 text-green-600" />
-          {product ? "Edit Product" : "Add New Product"}
-        </h2>
-        <p className="text-gray-600 mt-1">Fill in the details below to {product ? "update" : "create"} your product</p>
+    <div className="space-y-8 p-2">
+      <div className="border-b-2 border-border/50 pb-6 animate-fade-in">
+        <div className="flex items-center gap-4">
+          <img 
+            src={bucketIcon} 
+            alt="Add Product" 
+            className="w-14 h-14 animate-[bounce_2s_ease-in-out_infinite]"
+          />
+          <div>
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              {product ? "Edit Product" : "Add New Product"}
+            </h2>
+            <p className="text-muted-foreground mt-1 text-sm">Fill in the details below to {product ? "update" : "create"} your product</p>
+          </div>
+        </div>
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Column - Main Product Details */}
-            <div className="lg:col-span-2 space-y-6">
-              <div className="bg-white p-6 rounded-xl border-2 border-green-200 shadow-sm">
-                <h3 className="text-lg font-semibold text-green-800 mb-4 flex items-center gap-2">
-                  <Package className="h-5 w-5" />
-                  Main Product Details
-                </h3>
+            <div className="lg:col-span-2 space-y-8">
+              <div className="p-6 rounded-xl bg-gradient-to-br from-blue-50/50 to-cyan-50/30 dark:from-blue-950/20 dark:to-cyan-950/10 border border-blue-100/50 dark:border-blue-900/30 animate-fade-in">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 rounded-lg bg-blue-500/10">
+                    <Package className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground">Main Product Details</h3>
+                </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
@@ -111,7 +122,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                           <Input 
                             placeholder="Enter product name" 
                             {...field} 
-                            className="bg-white border-2 border-green-300 focus:border-green-500 focus:ring-green-500 rounded-lg transition-all duration-200" 
+                            className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary" 
                           />
                         </FormControl>
                         <FormMessage />
@@ -131,7 +142,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                           <Input 
                             placeholder="e.g., HSN12345" 
                             {...field} 
-                            className="bg-white border-2 border-green-300 focus:border-green-500 focus:ring-green-500 rounded-lg transition-all duration-200" 
+                            className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary" 
                           />
                         </FormControl>
                         <FormMessage />
@@ -149,7 +160,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                         </FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <SelectTrigger className="bg-white border-2 border-green-300 focus:border-green-500 focus:ring-green-500 rounded-lg transition-all duration-200">
+                            <SelectTrigger className="h-12 transition-all duration-200 hover:border-primary/50">
                               <SelectValue placeholder="Select category" />
                             </SelectTrigger>
                           </FormControl>
@@ -175,7 +186,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                         </FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <SelectTrigger className="bg-white border-2 border-green-300 focus:border-green-500 focus:ring-green-500 rounded-lg transition-all duration-200">
+                            <SelectTrigger className="h-12 transition-all duration-200 hover:border-primary/50">
                               <SelectValue placeholder="Select unit" />
                             </SelectTrigger>
                           </FormControl>
@@ -208,7 +219,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                             type="number" 
                             placeholder="Available quantity" 
                             {...field} 
-                            className="bg-white border-2 border-green-300 focus:border-green-500 focus:ring-green-500 rounded-lg transition-all duration-200" 
+                            className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary" 
                           />
                         </FormControl>
                         <FormMessage />
@@ -226,7 +237,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                         </FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <SelectTrigger className="bg-white border-2 border-green-300 focus:border-green-500 focus:ring-green-500 rounded-lg transition-all duration-200">
+                            <SelectTrigger className="h-12 transition-all duration-200 hover:border-primary/50">
                               <SelectValue placeholder="Select status" />
                             </SelectTrigger>
                           </FormControl>
@@ -243,11 +254,13 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
               </div>
 
               {/* Pricing Section */}
-              <div className="bg-gradient-to-r from-blue-50 to-green-50 p-6 rounded-xl border-2 border-blue-200 shadow-sm">
-                <h3 className="text-lg font-semibold text-blue-800 mb-4 flex items-center gap-2">
-                  <DollarSign className="h-5 w-5" />
-                  Pricing Details
-                </h3>
+              <div className="p-6 rounded-xl bg-gradient-to-br from-emerald-50/50 to-green-50/30 dark:from-emerald-950/20 dark:to-green-950/10 border border-emerald-100/50 dark:border-emerald-900/30 animate-fade-in" style={{animationDelay: '0.1s'}}>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 rounded-lg bg-emerald-500/10">
+                    <DollarSign className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground">Pricing Details</h3>
+                </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <FormField
@@ -264,7 +277,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                             step="0.01" 
                             placeholder="Buying price" 
                             {...field} 
-                            className="bg-white border-2 border-blue-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg transition-all duration-200" 
+                            className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary" 
                           />
                         </FormControl>
                         <FormMessage />
@@ -286,7 +299,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                             step="0.01" 
                             placeholder="Selling price" 
                             {...field} 
-                            className="bg-white border-2 border-blue-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg transition-all duration-200" 
+                            className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary" 
                           />
                         </FormControl>
                         <FormMessage />
@@ -308,7 +321,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                             step="0.01" 
                             placeholder="Maximum retail price" 
                             {...field} 
-                            className="bg-white border-2 border-blue-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg transition-all duration-200" 
+                            className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary" 
                           />
                         </FormControl>
                         <FormMessage />
@@ -319,11 +332,13 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
               </div>
 
               {/* Stock Management */}
-              <div className="bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-xl border-2 border-orange-200 shadow-sm">
-                <h3 className="text-lg font-semibold text-orange-800 mb-4 flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5" />
-                  Stock Management
-                </h3>
+              <div className="p-6 rounded-xl bg-gradient-to-br from-orange-50/50 to-amber-50/30 dark:from-orange-950/20 dark:to-amber-950/10 border border-orange-100/50 dark:border-orange-900/30 animate-fade-in" style={{animationDelay: '0.2s'}}>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 rounded-lg bg-orange-500/10">
+                    <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground">Stock Management</h3>
+                </div>
                 
                 <FormField
                   control={form.control}
@@ -338,7 +353,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                           type="number" 
                           placeholder="Low stock alert quantity" 
                           {...field} 
-                          className="bg-white border-2 border-orange-300 focus:border-orange-500 focus:ring-orange-500 rounded-lg transition-all duration-200" 
+                          className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary" 
                         />
                       </FormControl>
                       <FormMessage />
@@ -350,10 +365,13 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
 
             {/* Right Column - Product Image */}
             <div className="lg:col-span-1">
-              <div className="bg-white p-6 rounded-xl border-2 border-green-200 shadow-sm h-fit sticky top-4">
-                <h3 className="text-lg font-semibold text-green-800 mb-4 flex items-center gap-2">
-                  🖼️ Product Image
-                </h3>
+              <div className="p-6 rounded-xl bg-gradient-to-br from-purple-50/50 to-pink-50/30 dark:from-purple-950/20 dark:to-pink-950/10 border border-purple-100/50 dark:border-purple-900/30 h-fit sticky top-4 animate-fade-in" style={{animationDelay: '0.3s'}}>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 rounded-lg bg-purple-500/10">
+                    <Upload className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground">Product Image</h3>
+                </div>
                 
                 <div className="space-y-4">
                   <Input
@@ -365,7 +383,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                   />
                   <Label
                     htmlFor="image-upload"
-                    className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-green-300 rounded-xl cursor-pointer hover:border-green-400 bg-green-50/50 transition-all duration-200 hover:bg-green-100/50"
+                    className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary transition-all duration-300 bg-background/50 hover:bg-primary/5"
                   >
                     {imagePreview ? (
                       <img
@@ -375,41 +393,44 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                       />
                     ) : (
                       <div className="flex flex-col items-center space-y-3">
-                        <Upload className="h-12 w-12 text-green-400" />
+                        <Upload className="h-12 w-12 text-muted-foreground group-hover:scale-110 transition-transform" />
                         <div className="text-center">
-                          <span className="text-sm text-green-600 font-medium block">Drag Product Image Here or</span>
-                          <span className="text-sm text-blue-600 font-medium">Browse Image</span>
+                          <span className="text-sm text-foreground font-medium block">Drag Product Image Here or</span>
+                          <span className="text-sm text-primary font-medium">Browse Image</span>
                         </div>
                       </div>
                     )}
                   </Label>
-                  <p className="text-xs text-gray-500 text-center">Recommended: 400x400px, PNG/JPG format</p>
+                  <p className="text-xs text-muted-foreground text-center">Recommended: 400x400px, PNG/JPG format</p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Product Variants */}
-          <div className="bg-white p-6 rounded-xl border-2 border-purple-200 shadow-sm">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-purple-800 flex items-center gap-2">
-                🔄 Product Variants
-              </h3>
+          <div className="p-6 rounded-xl bg-gradient-to-br from-indigo-50/50 to-blue-50/30 dark:from-indigo-950/20 dark:to-blue-950/10 border border-indigo-100/50 dark:border-indigo-900/30 animate-fade-in" style={{animationDelay: '0.4s'}}>
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-indigo-500/10">
+                  <Package className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground">Product Variants</h3>
+              </div>
               <Button 
                 type="button" 
                 onClick={addVariant} 
                 variant="outline" 
                 size="sm"
-                className="border-purple-500 text-purple-600 hover:bg-purple-50"
+                className="border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300 group"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 mr-2 group-hover:rotate-90 transition-transform duration-300" />
                 Add New Variant
               </Button>
             </div>
 
             {variants.length > 0 && (
               <div className="space-y-4">
-                <div className="grid grid-cols-5 gap-4 p-4 bg-purple-50 rounded-lg font-semibold text-purple-800 text-sm">
+                <div className="grid grid-cols-5 gap-4 p-4 bg-primary/5 rounded-lg font-semibold text-foreground text-sm">
                   <div>Variant Name</div>
                   <div>Purchase Rate</div>
                   <div>Sale Rate</div>
@@ -418,12 +439,16 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                 </div>
                 
                 {variants.map((variant, index) => (
-                  <div key={index} className="grid grid-cols-5 gap-4 p-4 border-2 rounded-xl bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+                  <div 
+                    key={index} 
+                    className="grid grid-cols-5 gap-4 p-5 border-2 border-border/50 rounded-xl bg-background/50 backdrop-blur-sm hover:border-primary/30 transition-all duration-300 animate-fade-in"
+                    style={{animationDelay: `${0.5 + index * 0.1}s`}}
+                  >
                     <Input
                       placeholder="e.g., Small Size"
                       value={variant.name}
                       onChange={(e) => updateVariant(index, "name", e.target.value)}
-                      className="bg-white border-2 border-purple-300 focus:border-purple-500 focus:ring-purple-500 rounded-lg"
+                      className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
                     />
                     <Input
                       type="number"
@@ -431,7 +456,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                       placeholder="0.00"
                       value={variant.purchaseRate}
                       onChange={(e) => updateVariant(index, "purchaseRate", e.target.value)}
-                      className="bg-white border-2 border-purple-300 focus:border-purple-500 focus:ring-purple-500 rounded-lg"
+                      className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
                     />
                     <Input
                       type="number"
@@ -439,21 +464,21 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                       placeholder="0.00"
                       value={variant.saleRate}
                       onChange={(e) => updateVariant(index, "saleRate", e.target.value)}
-                      className="bg-white border-2 border-purple-300 focus:border-purple-500 focus:ring-purple-500 rounded-lg"
+                      className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
                     />
                     <Input
                       type="number"
                       placeholder="0"
                       value={variant.quantity}
                       onChange={(e) => updateVariant(index, "quantity", e.target.value)}
-                      className="bg-white border-2 border-purple-300 focus:border-purple-500 focus:ring-purple-500 rounded-lg"
+                      className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
                     />
                     <Button
                       type="button"
                       onClick={() => removeVariant(index)}
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
-                      className="text-red-600 hover:text-red-700 border-red-300 hover:bg-red-50"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10 transition-all duration-200"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -464,8 +489,8 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
           </div>
 
           {/* Description - At the bottom */}
-          <div className="bg-white p-6 rounded-xl border-2 border-green-200 shadow-sm">
-            <h3 className="text-lg font-semibold text-green-800 mb-4">📝 Description / Notes</h3>
+          <div className="p-6 rounded-xl bg-card border border-border animate-fade-in" style={{animationDelay: '0.5s'}}>
+            <h3 className="text-lg font-semibold text-foreground mb-4">📝 Description / Notes</h3>
             <FormField
               control={form.control}
               name="description"
@@ -477,7 +502,7 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
                       placeholder="Enter detailed product description, specifications, usage instructions, or any additional notes..." 
                       rows={4} 
                       {...field} 
-                      className="bg-white border-2 border-green-300 focus:border-green-500 focus:ring-green-500 rounded-lg transition-all duration-200" 
+                      className="transition-all duration-200 hover:border-primary/50 focus:border-primary" 
                     />
                   </FormControl>
                   <FormMessage />
@@ -487,19 +512,20 @@ export function ProductForm({ onClose, product }: ProductFormProps) {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end space-x-4 pt-6 border-t-2 border-green-100">
+          <div className="flex justify-end space-x-4 pt-8 border-t-2 border-border/50">
             <Button 
               type="button" 
               variant="outline" 
               onClick={onClose}
-              className="border-gray-300 text-gray-600 hover:bg-gray-50 px-8"
+              className="h-12 px-8 border-2 hover:bg-muted transition-all duration-300"
             >
               Cancel
             </Button>
             <Button 
               type="submit" 
-              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg px-8"
+              className="h-12 px-8 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 group"
             >
+              <Plus className="h-4 w-4 mr-2 group-hover:rotate-90 transition-transform duration-300" />
               {product ? "Update Product" : "Save Product"}
             </Button>
           </div>
