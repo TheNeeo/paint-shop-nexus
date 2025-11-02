@@ -76,19 +76,32 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
     setIsLoading(true);
 
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to add products",
+          variant: "destructive"
+        });
+        setIsLoading(false);
+        return;
+      }
+
       if (formData.is_variant && !formData.parent_product_id) {
         toast({
           title: "Error",
           description: "Please select a parent product for variant",
           variant: "destructive"
         });
+        setIsLoading(false);
         return;
       }
 
-      // Insert main product
+      // Insert main product with created_by_user_id
       const { data: product, error } = await supabase
         .from("products")
-        .insert([formData])
+        .insert([{ ...formData, created_by_user_id: user.id }])
         .select()
         .single();
 
@@ -104,7 +117,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
             category_id: formData.category_id,
             unit: formData.unit,
             unit_price: formData.unit_price,
-            is_variant: true
+            is_variant: true,
+            created_by_user_id: user.id
           }));
 
         if (variantData.length > 0) {

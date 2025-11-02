@@ -17,6 +17,7 @@ export type Database = {
       categories: {
         Row: {
           created_at: string
+          created_by_user_id: string | null
           description: string | null
           id: string
           name: string
@@ -24,6 +25,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          created_by_user_id?: string | null
           description?: string | null
           id?: string
           name: string
@@ -31,6 +33,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          created_by_user_id?: string | null
           description?: string | null
           id?: string
           name?: string
@@ -42,6 +45,7 @@ export type Database = {
         Row: {
           category_id: string | null
           created_at: string
+          created_by_user_id: string | null
           current_stock: number
           hsn_code: string | null
           id: string
@@ -59,6 +63,7 @@ export type Database = {
         Insert: {
           category_id?: string | null
           created_at?: string
+          created_by_user_id?: string | null
           current_stock?: number
           hsn_code?: string | null
           id?: string
@@ -76,6 +81,7 @@ export type Database = {
         Update: {
           category_id?: string | null
           created_at?: string
+          created_by_user_id?: string | null
           current_stock?: number
           hsn_code?: string | null
           id?: string
@@ -140,6 +146,7 @@ export type Database = {
       purchase_items: {
         Row: {
           created_at: string
+          created_by_user_id: string | null
           discount_rate: number | null
           id: string
           product_name: string
@@ -151,6 +158,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          created_by_user_id?: string | null
           discount_rate?: number | null
           id?: string
           product_name: string
@@ -162,6 +170,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          created_by_user_id?: string | null
           discount_rate?: number | null
           id?: string
           product_name?: string

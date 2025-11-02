@@ -195,7 +195,13 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
 
       if (purchaseError) throw purchaseError;
 
-      // Create purchase items
+      // Get current user for purchase items
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
+      // Create purchase items with created_by_user_id
       const purchaseItems = items.map(item => ({
         purchase_id: purchase.id,
         product_name: item.product_name,
@@ -203,7 +209,8 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
         unit_price: item.unit_price,
         tax_rate: item.tax_rate,
         discount_rate: item.discount_rate,
-        total_amount: item.total_amount
+        total_amount: item.total_amount,
+        created_by_user_id: user.id
       }));
 
       const { error: itemsError } = await supabase
