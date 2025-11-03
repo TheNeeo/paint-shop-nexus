@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -17,10 +17,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Upload, Plus, X, Package, DollarSign, TrendingUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { CategoryForm } from "@/components/category/CategoryForm";
 import bucketIcon from "@/assets/bucket-icon.png";
 
 interface AddProductModalProps {
@@ -48,8 +49,17 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
   
   const [variants, setVariants] = useState([{ name: "", image_url: "", current_stock: 0, threshold_qty: 0 }]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  // Auto-calculate main product stock from variants
+  useEffect(() => {
+    if (!formData.is_variant && variants.some(v => v.name.trim())) {
+      const totalStock = variants.reduce((sum, v) => sum + (v.current_stock || 0), 0);
+      setFormData(prev => ({ ...prev, current_stock: totalStock }));
+    }
+  }, [variants, formData.is_variant]);
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -71,8 +81,74 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
     }
   });
 
+  // Create category mutation
+  const createCategoryMutation = useMutation({
+    mutationFn: async (categoryData: any) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      const { data, error } = await supabase
+        .from("categories")
+        .insert([{ 
+          name: categoryData.name, 
+          description: categoryData.description,
+          created_by_user_id: user.id 
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      setFormData(prev => ({ ...prev, category_id: data.id }));
+      setIsCategoryModalOpen(false);
+      toast({
+        title: "Success",
+        description: "Category created successfully"
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to create category",
+        variant: "destructive"
+      });
+    }
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validation
+    if (!formData.name.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Product name is required",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!formData.category_id) {
+      toast({
+        title: "Validation Error",
+        description: "Please select a category",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (formData.unit_price < 0) {
+      toast({
+        title: "Validation Error",
+        description: "Unit price cannot be negative",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -228,12 +304,27 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                 <Label htmlFor="category" className="text-sm font-medium">Category *</Label>
                 <Select 
                   value={formData.category_id} 
-                  onValueChange={(value) => setFormData({...formData, category_id: value})}
+                  onValueChange={(value) => {
+                    if (value === "ADD_NEW") {
+                      setIsCategoryModalOpen(true);
+                    } else {
+                      setFormData({...formData, category_id: value});
+                    }
+                  }}
                 >
                   <SelectTrigger className="h-12 transition-all duration-200 hover:border-primary/50">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-background z-[100]">
+                    <SelectItem 
+                      value="ADD_NEW" 
+                      className="text-primary font-semibold border-b border-border mb-1"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Plus className="h-4 w-4" />
+                        + Add New Category
+                      </div>
+                    </SelectItem>
                     {categories?.map((category) => (
                       <SelectItem key={category.id} value={category.id}>
                         {category.name}
@@ -323,7 +414,9 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="current_stock" className="text-sm font-medium">Current Stock</Label>
+                <Label htmlFor="current_stock" className="text-sm font-medium">
+                  Current Stock {!formData.is_variant && variants.some(v => v.name.trim()) && "(Auto-calculated from variants)"}
+                </Label>
                 <Input
                   id="current_stock"
                   type="number"
@@ -331,7 +424,13 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                   onChange={(e) => setFormData({...formData, current_stock: parseInt(e.target.value) || 0})}
                   placeholder="Enter current stock"
                   className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                  disabled={!formData.is_variant && variants.some(v => v.name.trim())}
                 />
+                {!formData.is_variant && variants.some(v => v.name.trim()) && (
+                  <p className="text-xs text-muted-foreground">
+                    Stock is automatically calculated as sum of variant stocks
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -510,6 +609,19 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
           </div>
         </form>
       </DialogContent>
+
+      {/* Add New Category Modal */}
+      <Dialog open={isCategoryModalOpen} onOpenChange={setIsCategoryModalOpen}>
+        <DialogContent className="max-w-md bg-background">
+          <DialogHeader>
+            <DialogTitle>Add New Category</DialogTitle>
+          </DialogHeader>
+          <CategoryForm 
+            onSubmit={(data) => createCategoryMutation.mutate(data)}
+            onClose={() => setIsCategoryModalOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }
