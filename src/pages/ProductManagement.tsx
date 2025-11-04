@@ -2,6 +2,8 @@ import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
   DialogContent,
@@ -26,12 +28,12 @@ import {
   RefreshCw,
   Paintbrush,
 } from "lucide-react";
-import { ProductForm } from "@/components/product/ProductForm";
 import { ProductStats } from "@/components/product/ProductStats";
 import { ProductFilters } from "@/components/product/ProductFilters";
 import { ProductTable } from "@/components/product/ProductTable";
 import { BulkActions } from "@/components/product/BulkActions";
 import { ProductFooter } from "@/components/product/ProductFooter";
+import { AddProductModal } from "@/components/inventory/AddProductModal";
 import AppLayout from "@/components/layout/AppLayout";
 
 // Enhanced mock data with more detailed information
@@ -129,7 +131,46 @@ const getStockStatus = (quantity: number) => {
 };
 
 export default function ProductManagement() {
-  const [products] = useState(mockProducts);
+  // Fetch products from database
+  const { data: dbProducts = [], isLoading } = useQuery({
+    queryKey: ["products"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select(`
+          *,
+          categories (
+            name
+          )
+        `)
+        .is("parent_product_id", null)
+        .order("created_at", { ascending: false });
+      
+      if (error) throw error;
+      
+      // Transform database products to match the format expected by the UI
+      return (data || []).map((product, index) => ({
+        id: product.id,
+        name: product.name,
+        category: product.categories?.name || "Uncategorized",
+        unit: product.unit,
+        unitPrice: Number(product.unit_price) || 0,
+        stockQuantity: product.current_stock || 0,
+        image: product.image_url || "/placeholder.svg",
+        baseCode: product.hsn_code || `PRD${String(index + 1).padStart(3, '0')}`,
+        description: "",
+        dateAdded: new Date(product.created_at).toISOString().split('T')[0],
+        featured: false,
+        rating: 4.5,
+        totalSales: product.sale_qty || 0,
+        lastSold: "",
+        supplier: "",
+        variants: []
+      }));
+    },
+  });
+
+  const products = dbProducts;
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
   const [searchTerm, setSearchTerm] = useState("");
@@ -212,8 +253,17 @@ export default function ProductManagement() {
     <AppLayout>
       <TooltipProvider>
         <div className="w-full bg-gradient-to-br from-green-50 via-white to-blue-50 min-h-screen p-6">
+          {isLoading ? (
+            <div className="flex items-center justify-center min-h-[400px]">
+              <div className="text-center">
+                <RefreshCw className="h-12 w-12 animate-spin text-green-600 mx-auto mb-4" />
+                <p className="text-gray-600">Loading products...</p>
+              </div>
+            </div>
+          ) : (
+            <>
           {/* Enhanced Animated Header */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -313,13 +363,12 @@ export default function ProductManagement() {
                       </Button>
                     </motion.div>
                   </DialogTrigger>
-                  <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-background via-background to-muted/20 border-0 shadow-2xl rounded-2xl">
-                    <DialogHeader className="sr-only">
-                      <DialogTitle>Add New Product</DialogTitle>
-                    </DialogHeader>
-                    <ProductForm onClose={() => setIsAddProductOpen(false)} />
-                  </DialogContent>
                 </Dialog>
+                
+                <AddProductModal 
+                  isOpen={isAddProductOpen} 
+                  onClose={() => setIsAddProductOpen(false)} 
+                />
               </motion.div>
             </div>
           </motion.div>
@@ -385,6 +434,8 @@ export default function ProductManagement() {
             totalValue={stats.totalValue}
             lowStockCount={stats.lowStockCount}
           />
+            </>
+          )}
         </div>
       </TooltipProvider>
     </AppLayout>

@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -290,6 +291,9 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
               Add New Product
             </span>
           </DialogTitle>
+          <DialogDescription className="text-muted-foreground">
+            Fill in the product details below to add a new item to your inventory.
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-8 pt-2">
