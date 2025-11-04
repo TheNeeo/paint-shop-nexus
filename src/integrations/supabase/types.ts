@@ -53,6 +53,7 @@ export type Database = {
           is_variant: boolean
           name: string
           parent_product_id: string | null
+          preferred_vendor_id: string | null
           purchase_qty: number
           sale_qty: number
           threshold_qty: number
@@ -71,6 +72,7 @@ export type Database = {
           is_variant?: boolean
           name: string
           parent_product_id?: string | null
+          preferred_vendor_id?: string | null
           purchase_qty?: number
           sale_qty?: number
           threshold_qty?: number
@@ -89,6 +91,7 @@ export type Database = {
           is_variant?: boolean
           name?: string
           parent_product_id?: string | null
+          preferred_vendor_id?: string | null
           purchase_qty?: number
           sale_qty?: number
           threshold_qty?: number
@@ -109,6 +112,13 @@ export type Database = {
             columns: ["parent_product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_preferred_vendor_id_fkey"
+            columns: ["preferred_vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
             referencedColumns: ["id"]
           },
         ]

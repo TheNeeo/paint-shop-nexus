@@ -22,6 +22,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Upload, Plus, X, Package, DollarSign, TrendingUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CategoryForm } from "@/components/category/CategoryForm";
+import { AddEditVendorModal } from "@/components/vendor/AddEditVendorModal";
 import bucketIcon from "@/assets/bucket-icon.png";
 
 interface AddProductModalProps {
@@ -44,12 +45,14 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
     unit_price: 0,
     image_url: "",
     is_variant: false,
-    parent_product_id: ""
+    parent_product_id: "",
+    preferred_vendor_id: ""
   });
   
   const [variants, setVariants] = useState([{ name: "", image_url: "", current_stock: 0, threshold_qty: 0 }]);
   const [isLoading, setIsLoading] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -76,6 +79,17 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
         .from("products")
         .select("*")
         .is("parent_product_id", null)
+        .order("name");
+      return data || [];
+    }
+  });
+
+  const { data: vendors } = useQuery({
+    queryKey: ["vendors"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("vendors")
+        .select("*")
         .order("name");
       return data || [];
     }
@@ -240,7 +254,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
       unit_price: 0,
       image_url: "",
       is_variant: false,
-      parent_product_id: ""
+      parent_product_id: "",
+      preferred_vendor_id: ""
     });
     setVariants([{ name: "", image_url: "", current_stock: 0, threshold_qty: 0 }]);
   };
@@ -444,6 +459,40 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                   className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
                 />
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="preferred_vendor" className="text-sm font-medium">Preferred Vendor</Label>
+                <Select
+                  value={formData.preferred_vendor_id}
+                  onValueChange={(value) => {
+                    if (value === "ADD_NEW") {
+                      setIsVendorModalOpen(true);
+                    } else {
+                      setFormData({...formData, preferred_vendor_id: value});
+                    }
+                  }}
+                >
+                  <SelectTrigger className="h-12 transition-all duration-200 hover:border-primary/50">
+                    <SelectValue placeholder="Select vendor (optional)" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background z-[100]">
+                    {vendors?.map((vendor) => (
+                      <SelectItem key={vendor.id} value={vendor.id}>
+                        {vendor.name}
+                      </SelectItem>
+                    ))}
+                    <SelectItem 
+                      value="ADD_NEW" 
+                      className="text-primary font-semibold border-t border-border mt-1 pt-2"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Plus className="h-4 w-4" />
+                        + Add New Vendor
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 
@@ -622,6 +671,15 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
           />
         </DialogContent>
       </Dialog>
+
+      {/* Add New Vendor Modal */}
+      <AddEditVendorModal
+        isOpen={isVendorModalOpen}
+        onClose={() => {
+          setIsVendorModalOpen(false);
+          queryClient.invalidateQueries({ queryKey: ["vendors"] });
+        }}
+      />
     </Dialog>
   );
 }
