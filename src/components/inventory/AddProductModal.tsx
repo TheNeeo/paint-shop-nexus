@@ -56,6 +56,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [variantDragging, setVariantDragging] = useState<number | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -192,9 +194,17 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
       }
 
       // Insert main product with created_by_user_id
+      // Convert empty string UUIDs to null
+      const productData = {
+        ...formData,
+        parent_product_id: formData.parent_product_id || null,
+        preferred_vendor_id: formData.preferred_vendor_id || null,
+        created_by_user_id: user.id
+      };
+
       const { data: product, error } = await supabase
         .from("products")
-        .insert([{ ...formData, created_by_user_id: user.id }])
+        .insert([productData])
         .select()
         .single();
 
@@ -279,6 +289,46 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
     setVariants(updated);
   };
 
+  const handleMainImageDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({...formData, image_url: reader.result as string});
+      };
+      reader.readAsDataURL(file);
+    } else {
+      toast({
+        title: "Invalid File",
+        description: "Please drop an image file",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleVariantImageDrop = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    setVariantDragging(null);
+    
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        updateVariant(index, "image_url", reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      toast({
+        title: "Invalid File",
+        description: "Please drop an image file",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-background via-background to-muted/20 border-0 shadow-2xl rounded-2xl animate-fade-in">
@@ -301,90 +351,171 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-8 pt-2">
-          {/* Main Product Details Section */}
-          <div className="space-y-6 p-6 rounded-xl bg-gradient-to-br from-blue-50/50 to-cyan-50/30 dark:from-blue-950/20 dark:to-cyan-950/10 border border-blue-100/50 dark:border-blue-900/30 animate-fade-in">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <Package className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          {/* Main Product Details & Image Section - Side by Side */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Main Product Details - Takes 2 columns */}
+            <div className="lg:col-span-2 space-y-6 p-6 rounded-xl bg-gradient-to-br from-blue-50/50 to-cyan-50/30 dark:from-blue-950/20 dark:to-cyan-950/10 border border-blue-100/50 dark:border-blue-900/30 animate-fade-in">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 rounded-lg bg-blue-500/10">
+                  <Package className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground">Main Product Details</h3>
               </div>
-              <h3 className="text-lg font-semibold text-foreground">Main Product Details</h3>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm font-medium">Product Name *</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  required
-                  placeholder="Enter product name"
-                  className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
-                />
-              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-sm font-medium">Product Name *</Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    required
+                    placeholder="Enter product name"
+                    className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="category" className="text-sm font-medium">Category *</Label>
-                <Select 
-                  value={formData.category_id} 
-                  onValueChange={(value) => {
-                    if (value === "ADD_NEW") {
-                      setIsCategoryModalOpen(true);
-                    } else {
-                      setFormData({...formData, category_id: value});
+                <div className="space-y-2">
+                  <Label htmlFor="category" className="text-sm font-medium">Category *</Label>
+                  <Select 
+                    value={formData.category_id} 
+                    onValueChange={(value) => {
+                      if (value === "ADD_NEW") {
+                        setIsCategoryModalOpen(true);
+                      } else {
+                        setFormData({...formData, category_id: value});
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="h-12 transition-all duration-200 hover:border-primary/50">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background z-[100]">
+                      <SelectItem 
+                        value="ADD_NEW" 
+                        className="text-primary font-semibold border-b border-border mb-1"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Plus className="h-4 w-4" />
+                          + Add New Category
+                        </div>
+                      </SelectItem>
+                      {categories?.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="hsn_code" className="text-sm font-medium">HSN Code</Label>
+                  <Input
+                    id="hsn_code"
+                    value={formData.hsn_code}
+                    onChange={(e) => setFormData({...formData, hsn_code: e.target.value})}
+                    placeholder="Enter HSN code"
+                    className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="unit" className="text-sm font-medium">Unit *</Label>
+                  <Select 
+                    value={formData.unit} 
+                    onValueChange={(value) => setFormData({...formData, unit: value})}
+                  >
+                    <SelectTrigger className="h-12 transition-all duration-200 hover:border-primary/50">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {UNITS.map((unit) => (
+                        <SelectItem key={unit} value={unit}>
+                          {unit}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+
+            {/* Product Image - Takes 1 column */}
+            <div className="space-y-4 p-6 rounded-xl bg-gradient-to-br from-purple-50/50 to-pink-50/30 dark:from-purple-950/20 dark:to-pink-950/10 border border-purple-100/50 dark:border-purple-900/30 animate-fade-in">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 rounded-lg bg-purple-500/10">
+                  <Upload className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground">Product Image</h3>
+              </div>
+              
+              <div
+                className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
+                  isDragging 
+                    ? 'border-primary bg-primary/10' 
+                    : 'border-border hover:border-primary/50'
+                }`}
+                onDrop={handleMainImageDrop}
+                onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                onDragLeave={() => setIsDragging(false)}
+              >
+                <input
+                  type="file"
+                  id="main_image_upload"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        setFormData({...formData, image_url: reader.result as string});
+                      };
+                      reader.readAsDataURL(file);
                     }
                   }}
-                >
-                  <SelectTrigger className="h-12 transition-all duration-200 hover:border-primary/50">
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-background z-[100]">
-                    <SelectItem 
-                      value="ADD_NEW" 
-                      className="text-primary font-semibold border-b border-border mb-1"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Plus className="h-4 w-4" />
-                        + Add New Category
-                      </div>
-                    </SelectItem>
-                    {categories?.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="hsn_code" className="text-sm font-medium">HSN Code</Label>
-                <Input
-                  id="hsn_code"
-                  value={formData.hsn_code}
-                  onChange={(e) => setFormData({...formData, hsn_code: e.target.value})}
-                  placeholder="Enter HSN code"
-                  className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
                 />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="unit" className="text-sm font-medium">Unit *</Label>
-                <Select 
-                  value={formData.unit} 
-                  onValueChange={(value) => setFormData({...formData, unit: value})}
-                >
-                  <SelectTrigger className="h-12 transition-all duration-200 hover:border-primary/50">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {UNITS.map((unit) => (
-                      <SelectItem key={unit} value={unit}>
-                        {unit}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                
+                {formData.image_url ? (
+                  <div className="space-y-3">
+                    <img 
+                      src={formData.image_url} 
+                      alt="Preview" 
+                      className="w-full h-40 object-cover rounded-lg"
+                      onError={(e) => {
+                        e.currentTarget.src = 'https://via.placeholder.com/200?text=Invalid+Image';
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setFormData({...formData, image_url: ""})}
+                      className="w-full"
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      Remove Image
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <Upload className="h-12 w-12 mx-auto text-muted-foreground" />
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium">Drop image here</p>
+                      <p className="text-xs text-muted-foreground">or</p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => document.getElementById('main_image_upload')?.click()}
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Browse
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -530,62 +661,6 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
             </div>
           </div>
 
-          {/* Product Image Section */}
-          <div className="space-y-4 p-6 rounded-xl bg-gradient-to-br from-purple-50/50 to-pink-50/30 dark:from-purple-950/20 dark:to-pink-950/10 border border-purple-100/50 dark:border-purple-900/30 animate-fade-in" style={{animationDelay: '0.3s'}}>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-purple-500/10">
-                <Upload className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-              </div>
-              <h3 className="text-lg font-semibold text-foreground">Product Image</h3>
-            </div>
-            
-            <div className="flex gap-3">
-              <Input
-                id="image_url"
-                value={formData.image_url}
-                onChange={(e) => setFormData({...formData, image_url: e.target.value})}
-                placeholder="Enter image URL or upload"
-                className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
-              />
-              <input
-                type="file"
-                id="image_upload"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                      setFormData({...formData, image_url: reader.result as string});
-                    };
-                    reader.readAsDataURL(file);
-                  }
-                }}
-              />
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => document.getElementById('image_upload')?.click()}
-                className="h-12 px-6 border-2 border-dashed hover:border-primary hover:bg-primary/5 transition-all duration-300 group"
-              >
-                <Upload className="h-5 w-5 group-hover:scale-110 transition-transform" />
-              </Button>
-            </div>
-            
-            {formData.image_url && (
-              <div className="mt-4 p-2 border-2 border-dashed border-border rounded-lg">
-                <img 
-                  src={formData.image_url} 
-                  alt="Preview" 
-                  className="w-24 h-24 object-cover rounded-lg mx-auto"
-                  onError={(e) => {
-                    e.currentTarget.src = 'https://via.placeholder.com/96?text=Invalid+URL';
-                  }}
-                />
-              </div>
-            )}
-          </div>
 
           {/* Product Variants Section */}
           {!formData.is_variant && (
@@ -642,13 +717,64 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                       </div>
                       
                       <div className="space-y-2">
-                        <Label className="text-sm font-medium">Image URL</Label>
-                        <Input
-                          value={variant.image_url}
-                          onChange={(e) => updateVariant(index, "image_url", e.target.value)}
-                          placeholder="Enter variant image URL"
-                          className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
-                        />
+                        <Label className="text-sm font-medium">Variant Image</Label>
+                        <div
+                          className={`relative border-2 border-dashed rounded-lg p-4 text-center transition-all duration-300 ${
+                            variantDragging === index 
+                              ? 'border-primary bg-primary/10' 
+                              : 'border-border hover:border-primary/50'
+                          }`}
+                          onDrop={(e) => handleVariantImageDrop(e, index)}
+                          onDragOver={(e) => { e.preventDefault(); setVariantDragging(index); }}
+                          onDragLeave={() => setVariantDragging(null)}
+                        >
+                          <input
+                            type="file"
+                            id={`variant_image_${index}`}
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  updateVariant(index, "image_url", reader.result as string);
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                          />
+                          
+                          {variant.image_url ? (
+                            <div className="flex items-center justify-between gap-2">
+                              <img 
+                                src={variant.image_url} 
+                                alt="Variant" 
+                                className="w-16 h-16 object-cover rounded"
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => updateVariant(index, "image_url", "")}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-center gap-2">
+                              <Upload className="h-5 w-5 text-muted-foreground" />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => document.getElementById(`variant_image_${index}`)?.click()}
+                              >
+                                Drop or Browse
+                              </Button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                       
                       <div className="space-y-2">
