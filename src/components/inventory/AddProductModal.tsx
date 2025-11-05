@@ -44,6 +44,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
     current_stock: 0,
     threshold_qty: 0,
     unit_price: 0,
+    purchase_price: 0,
+    sale_price: 0,
     image_url: "",
     is_variant: false,
     parent_product_id: "",
@@ -253,6 +255,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
       current_stock: 0,
       threshold_qty: 0,
       unit_price: 0,
+      purchase_price: 0,
+      sale_price: 0,
       image_url: "",
       is_variant: false,
       parent_product_id: "",
@@ -396,6 +400,32 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
+                <Label htmlFor="purchase_price" className="text-sm font-medium">Purchase Price (INR)</Label>
+                <Input
+                  id="purchase_price"
+                  type="number"
+                  step="0.01"
+                  value={formData.purchase_price}
+                  onChange={(e) => setFormData({...formData, purchase_price: parseFloat(e.target.value) || 0})}
+                  placeholder="Enter purchase price"
+                  className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="sale_price" className="text-sm font-medium">Selling Price (INR)</Label>
+                <Input
+                  id="sale_price"
+                  type="number"
+                  step="0.01"
+                  value={formData.sale_price}
+                  onChange={(e) => setFormData({...formData, sale_price: parseFloat(e.target.value) || 0})}
+                  placeholder="Enter selling price"
+                  className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                />
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="purchase_qty" className="text-sm font-medium">Purchase Qty</Label>
                 <Input
                   id="purchase_qty"
@@ -517,9 +547,26 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                 placeholder="Enter image URL or upload"
                 className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
               />
+              <input
+                type="file"
+                id="image_upload"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      setFormData({...formData, image_url: reader.result as string});
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
+              />
               <Button 
                 type="button" 
                 variant="outline" 
+                onClick={() => document.getElementById('image_upload')?.click()}
                 className="h-12 px-6 border-2 border-dashed hover:border-primary hover:bg-primary/5 transition-all duration-300 group"
               >
                 <Upload className="h-5 w-5 group-hover:scale-110 transition-transform" />

@@ -54,7 +54,9 @@ export type Database = {
           name: string
           parent_product_id: string | null
           preferred_vendor_id: string | null
+          purchase_price: number | null
           purchase_qty: number
+          sale_price: number | null
           sale_qty: number
           threshold_qty: number
           unit: string
@@ -73,7 +75,9 @@ export type Database = {
           name: string
           parent_product_id?: string | null
           preferred_vendor_id?: string | null
+          purchase_price?: number | null
           purchase_qty?: number
+          sale_price?: number | null
           sale_qty?: number
           threshold_qty?: number
           unit?: string
@@ -92,7 +96,9 @@ export type Database = {
           name?: string
           parent_product_id?: string | null
           preferred_vendor_id?: string | null
+          purchase_price?: number | null
           purchase_qty?: number
+          sale_price?: number | null
           sale_qty?: number
           threshold_qty?: number
           unit?: string
