@@ -20,7 +20,8 @@ import {
 } from "@/components/ui/select";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, Plus, X, Package, DollarSign, TrendingUp } from "lucide-react";
+import { Upload, Plus, X, Package, DollarSign, TrendingUp, FileText, Hash, FolderTree, Box, Activity, IndianRupee, ShoppingCart, AlertTriangle, Building2, Package2 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { CategoryForm } from "@/components/category/CategoryForm";
 import { AddEditVendorModal } from "@/components/vendor/AddEditVendorModal";
@@ -46,13 +47,16 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
     unit_price: 0,
     purchase_price: 0,
     sale_price: 0,
+    mrp: 0,
     image_url: "",
     is_variant: false,
     parent_product_id: "",
-    preferred_vendor_id: ""
+    preferred_vendor_id: "",
+    status: "active",
+    description: ""
   });
   
-  const [variants, setVariants] = useState([{ name: "", image_url: "", current_stock: 0, threshold_qty: 0 }]);
+  const [variants, setVariants] = useState([{ name: "", image_url: "", current_stock: 0, threshold_qty: 0, purchase_price: 0, sale_price: 0, mrp: 0 }]);
   const [isLoading, setIsLoading] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
@@ -267,16 +271,19 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
       unit_price: 0,
       purchase_price: 0,
       sale_price: 0,
+      mrp: 0,
       image_url: "",
       is_variant: false,
       parent_product_id: "",
-      preferred_vendor_id: ""
+      preferred_vendor_id: "",
+      status: "active",
+      description: ""
     });
-    setVariants([{ name: "", image_url: "", current_stock: 0, threshold_qty: 0 }]);
+    setVariants([{ name: "", image_url: "", current_stock: 0, threshold_qty: 0, purchase_price: 0, sale_price: 0, mrp: 0 }]);
   };
 
   const addVariant = () => {
-    setVariants([...variants, { name: "", image_url: "", current_stock: 0, threshold_qty: 0 }]);
+    setVariants([...variants, { name: "", image_url: "", current_stock: 0, threshold_qty: 0, purchase_price: 0, sale_price: 0, mrp: 0 }]);
   };
 
   const removeVariant = (index: number) => {
@@ -353,101 +360,13 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
         <form onSubmit={handleSubmit} className="space-y-8 pt-2">
           {/* Main Product Details & Image Section - Side by Side */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Main Product Details - Takes 2 columns */}
-            <div className="lg:col-span-2 space-y-6 p-6 rounded-xl bg-gradient-to-br from-blue-50/50 to-cyan-50/30 dark:from-blue-950/20 dark:to-cyan-950/10 border border-blue-100/50 dark:border-blue-900/30 animate-fade-in">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-blue-500/10">
-                  <Package className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                </div>
-                <h3 className="text-lg font-semibold text-foreground">Main Product Details</h3>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="name" className="text-sm font-medium">Product Name *</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    required
-                    placeholder="Enter product name"
-                    className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="category" className="text-sm font-medium">Category *</Label>
-                  <Select 
-                    value={formData.category_id} 
-                    onValueChange={(value) => {
-                      if (value === "ADD_NEW") {
-                        setIsCategoryModalOpen(true);
-                      } else {
-                        setFormData({...formData, category_id: value});
-                      }
-                    }}
-                  >
-                    <SelectTrigger className="h-12 transition-all duration-200 hover:border-primary/50">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-background z-[100]">
-                      <SelectItem 
-                        value="ADD_NEW" 
-                        className="text-primary font-semibold border-b border-border mb-1"
-                      >
-                        <div className="flex items-center gap-2">
-                          <Plus className="h-4 w-4" />
-                          + Add New Category
-                        </div>
-                      </SelectItem>
-                      {categories?.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="hsn_code" className="text-sm font-medium">HSN Code</Label>
-                  <Input
-                    id="hsn_code"
-                    value={formData.hsn_code}
-                    onChange={(e) => setFormData({...formData, hsn_code: e.target.value})}
-                    placeholder="Enter HSN code"
-                    className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="unit" className="text-sm font-medium">Unit *</Label>
-                  <Select 
-                    value={formData.unit} 
-                    onValueChange={(value) => setFormData({...formData, unit: value})}
-                  >
-                    <SelectTrigger className="h-12 transition-all duration-200 hover:border-primary/50">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {UNITS.map((unit) => (
-                        <SelectItem key={unit} value={unit}>
-                          {unit}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-
             {/* Product Image - Takes 1 column */}
             <div className="space-y-4 p-6 rounded-xl bg-gradient-to-br from-purple-50/50 to-pink-50/30 dark:from-purple-950/20 dark:to-pink-950/10 border border-purple-100/50 dark:border-purple-900/30 animate-fade-in">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 rounded-lg bg-purple-500/10">
                   <Upload className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground">Product Image</h3>
+                <h3 className="text-lg font-semibold text-foreground">📸 Product Image</h3>
               </div>
               
               <div
@@ -518,65 +437,198 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                 )}
               </div>
             </div>
+
+            {/* Main Product Details - Takes 2 columns */}
+            <div className="lg:col-span-2 space-y-6 p-6 rounded-xl bg-gradient-to-br from-blue-50/50 to-cyan-50/30 dark:from-blue-950/20 dark:to-cyan-950/10 border border-blue-100/50 dark:border-blue-900/30 animate-fade-in">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 rounded-lg bg-blue-500/10">
+                  <Package className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground">Main Product Details</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-sm font-medium flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-primary" />
+                    Product / Item Name *
+                  </Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    required
+                    placeholder="Enter product name"
+                    className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="hsn_code" className="text-sm font-medium flex items-center gap-2">
+                    <Hash className="w-4 h-4 text-primary" />
+                    HSN / Product Code *
+                  </Label>
+                  <Input
+                    id="hsn_code"
+                    value={formData.hsn_code}
+                    onChange={(e) => setFormData({...formData, hsn_code: e.target.value})}
+                    required
+                    placeholder="Enter HSN code"
+                    className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="category" className="text-sm font-medium flex items-center gap-2">
+                    <FolderTree className="w-4 h-4 text-primary" />
+                    Category *
+                  </Label>
+                  <Select 
+                    value={formData.category_id} 
+                    onValueChange={(value) => {
+                      if (value === "ADD_NEW") {
+                        setIsCategoryModalOpen(true);
+                      } else {
+                        setFormData({...formData, category_id: value});
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="h-12 transition-all duration-200 hover:border-primary/50">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background z-[100]">
+                      <SelectItem 
+                        value="ADD_NEW" 
+                        className="text-primary font-semibold border-b border-border mb-1"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Plus className="h-4 w-4" />
+                          + Add New Category
+                        </div>
+                      </SelectItem>
+                      {categories?.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="unit" className="text-sm font-medium flex items-center gap-2">
+                    <Box className="w-4 h-4 text-primary" />
+                    Unit Of Measurement *
+                  </Label>
+                  <Select 
+                    value={formData.unit} 
+                    onValueChange={(value) => setFormData({...formData, unit: value})}
+                  >
+                    <SelectTrigger className="h-12 transition-all duration-200 hover:border-primary/50">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {UNITS.map((unit) => (
+                        <SelectItem key={unit} value={unit}>
+                          {unit}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="status" className="text-sm font-medium flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-primary" />
+                    Status
+                  </Label>
+                  <div className="flex items-center gap-3 h-12 px-4 rounded-lg border bg-background">
+                    <Switch
+                      id="status"
+                      checked={formData.status === "active"}
+                      onCheckedChange={(checked) => setFormData({...formData, status: checked ? "active" : "inactive"})}
+                    />
+                    <span className="text-sm font-medium">
+                      {formData.status === "active" ? "Active" : "Inactive"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Pricing Section */}
+          {/* Pricing & Quantity Section */}
           <div className="space-y-6 p-6 rounded-xl bg-gradient-to-br from-emerald-50/50 to-green-50/30 dark:from-emerald-950/20 dark:to-green-950/10 border border-emerald-100/50 dark:border-emerald-900/30 animate-fade-in" style={{animationDelay: '0.1s'}}>
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 rounded-lg bg-emerald-500/10">
                 <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
               </div>
-              <h3 className="text-lg font-semibold text-foreground">Pricing & Quantity</h3>
+              <h3 className="text-lg font-semibold text-foreground">Pricing & Quantity Details</h3>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="purchase_price" className="text-sm font-medium">Purchase Price (INR)</Label>
+                <Label htmlFor="purchase_price" className="text-sm font-medium flex items-center gap-2">
+                  <IndianRupee className="w-4 h-4 text-primary" />
+                  Purchase Rate (INR) *
+                </Label>
                 <Input
                   id="purchase_price"
                   type="number"
                   step="0.01"
                   value={formData.purchase_price}
                   onChange={(e) => setFormData({...formData, purchase_price: parseFloat(e.target.value) || 0})}
+                  required
                   placeholder="Enter purchase price"
                   className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="sale_price" className="text-sm font-medium">Selling Price (INR)</Label>
+                <Label htmlFor="sale_price" className="text-sm font-medium flex items-center gap-2">
+                  <IndianRupee className="w-4 h-4 text-primary" />
+                  Sales Rate (INR) *
+                </Label>
                 <Input
                   id="sale_price"
                   type="number"
                   step="0.01"
                   value={formData.sale_price}
                   onChange={(e) => setFormData({...formData, sale_price: parseFloat(e.target.value) || 0})}
+                  required
                   placeholder="Enter selling price"
                   className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="purchase_qty" className="text-sm font-medium">Purchase Qty</Label>
+                <Label htmlFor="mrp" className="text-sm font-medium flex items-center gap-2">
+                  <IndianRupee className="w-4 h-4 text-primary" />
+                  MRP (INR)
+                </Label>
                 <Input
-                  id="purchase_qty"
+                  id="mrp"
                   type="number"
-                  value={formData.purchase_qty}
-                  onChange={(e) => setFormData({...formData, purchase_qty: parseInt(e.target.value) || 0})}
-                  placeholder="Enter purchase quantity"
+                  step="0.01"
+                  value={formData.mrp}
+                  onChange={(e) => setFormData({...formData, mrp: parseFloat(e.target.value) || 0})}
+                  placeholder="Enter MRP"
                   className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="unit_price" className="text-sm font-medium">Unit Price</Label>
+                <Label htmlFor="purchase_qty" className="text-sm font-medium flex items-center gap-2">
+                  <ShoppingCart className="w-4 h-4 text-primary" />
+                  Purchase Quantity *
+                </Label>
                 <Input
-                  id="unit_price"
+                  id="purchase_qty"
                   type="number"
-                  step="0.01"
-                  value={formData.unit_price}
-                  onChange={(e) => setFormData({...formData, unit_price: parseFloat(e.target.value) || 0})}
-                  placeholder="Enter unit price"
+                  value={formData.purchase_qty}
+                  onChange={(e) => setFormData({...formData, purchase_qty: parseInt(e.target.value) || 0})}
+                  required
+                  placeholder="Enter purchase quantity"
                   className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
                 />
               </div>
@@ -594,14 +646,16 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="current_stock" className="text-sm font-medium">
-                  Current Stock {!formData.is_variant && variants.some(v => v.name.trim()) && "(Auto-calculated from variants)"}
+                <Label htmlFor="current_stock" className="text-sm font-medium flex items-center gap-2">
+                  <Package2 className="w-4 h-4 text-primary" />
+                  Current Stock * {!formData.is_variant && variants.some(v => v.name.trim()) && "(Auto-calculated)"}
                 </Label>
                 <Input
                   id="current_stock"
                   type="number"
                   value={formData.current_stock}
                   onChange={(e) => setFormData({...formData, current_stock: parseInt(e.target.value) || 0})}
+                  required
                   placeholder="Enter current stock"
                   className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
                   disabled={!formData.is_variant && variants.some(v => v.name.trim())}
@@ -614,19 +668,26 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="threshold_qty" className="text-sm font-medium">Threshold Qty</Label>
+                <Label htmlFor="threshold_qty" className="text-sm font-medium flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-primary" />
+                  Threshold Quantity *
+                </Label>
                 <Input
                   id="threshold_qty"
                   type="number"
                   value={formData.threshold_qty}
                   onChange={(e) => setFormData({...formData, threshold_qty: parseInt(e.target.value) || 0})}
+                  required
                   placeholder="Enter threshold quantity"
                   className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="preferred_vendor" className="text-sm font-medium">Preferred Vendor</Label>
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="preferred_vendor" className="text-sm font-medium flex items-center gap-2">
+                  <Building2 className="w-4 h-4 text-primary" />
+                  Preferred Vendor *
+                </Label>
                 <Select
                   value={formData.preferred_vendor_id}
                   onValueChange={(value) => {
@@ -638,7 +699,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                   }}
                 >
                   <SelectTrigger className="h-12 transition-all duration-200 hover:border-primary/50">
-                    <SelectValue placeholder="Select vendor (optional)" />
+                    <SelectValue placeholder="Select vendor" />
                   </SelectTrigger>
                   <SelectContent className="bg-background z-[100]">
                     {vendors?.map((vendor) => (
@@ -705,19 +766,13 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                       )}
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
+                      {/* Variant Image on left */}
                       <div className="space-y-2">
-                        <Label className="text-sm font-medium">Variant Name</Label>
-                        <Input
-                          value={variant.name}
-                          onChange={(e) => updateVariant(index, "name", e.target.value)}
-                          placeholder="e.g., Red, Large, 500ml"
-                          className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Variant Image</Label>
+                        <Label className="text-sm font-medium flex items-center gap-2">
+                          <Upload className="w-4 h-4 text-primary" />
+                          📸 Variant Image
+                        </Label>
                         <div
                           className={`relative border-2 border-dashed rounded-lg p-4 text-center transition-all duration-300 ${
                             variantDragging === index 
@@ -746,29 +801,31 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                           />
                           
                           {variant.image_url ? (
-                            <div className="flex items-center justify-between gap-2">
+                            <div className="space-y-2">
                               <img 
                                 src={variant.image_url} 
                                 alt="Variant" 
-                                className="w-16 h-16 object-cover rounded"
+                                className="w-full h-32 object-cover rounded"
                               />
                               <Button
                                 type="button"
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => updateVariant(index, "image_url", "")}
+                                className="w-full"
                               >
                                 <X className="h-4 w-4" />
                               </Button>
                             </div>
                           ) : (
-                            <div className="flex items-center justify-center gap-2">
-                              <Upload className="h-5 w-5 text-muted-foreground" />
+                            <div className="space-y-2">
+                              <Upload className="h-8 w-8 mx-auto text-muted-foreground" />
                               <Button
                                 type="button"
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => document.getElementById(`variant_image_${index}`)?.click()}
+                                className="text-xs"
                               >
                                 Drop or Browse
                               </Button>
@@ -776,27 +833,94 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                           )}
                         </div>
                       </div>
-                      
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Current Stock</Label>
-                        <Input
-                          type="number"
-                          value={variant.current_stock}
-                          onChange={(e) => updateVariant(index, "current_stock", parseInt(e.target.value) || 0)}
-                          placeholder="0"
-                          className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Threshold Qty</Label>
-                        <Input
-                          type="number"
-                          value={variant.threshold_qty}
-                          onChange={(e) => updateVariant(index, "threshold_qty", parseInt(e.target.value) || 0)}
-                          placeholder="0"
-                          className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
-                        />
+
+                      {/* Variant details on right - 3 columns */}
+                      <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium flex items-center gap-2">
+                            <FileText className="w-4 h-4 text-primary" />
+                            Variant Name
+                          </Label>
+                          <Input
+                            value={variant.name}
+                            onChange={(e) => updateVariant(index, "name", e.target.value)}
+                            placeholder="e.g., Red, Large, 500ml"
+                            className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium flex items-center gap-2">
+                            <IndianRupee className="w-4 h-4 text-primary" />
+                            Purchase Rate (INR)
+                          </Label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={variant.purchase_price}
+                            onChange={(e) => updateVariant(index, "purchase_price", parseFloat(e.target.value) || 0)}
+                            placeholder="0.00"
+                            className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium flex items-center gap-2">
+                            <IndianRupee className="w-4 h-4 text-primary" />
+                            Sales Rate (INR)
+                          </Label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={variant.sale_price}
+                            onChange={(e) => updateVariant(index, "sale_price", parseFloat(e.target.value) || 0)}
+                            placeholder="0.00"
+                            className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium flex items-center gap-2">
+                            <Package2 className="w-4 h-4 text-primary" />
+                            Current Stock
+                          </Label>
+                          <Input
+                            type="number"
+                            value={variant.current_stock}
+                            onChange={(e) => updateVariant(index, "current_stock", parseInt(e.target.value) || 0)}
+                            placeholder="0"
+                            className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium flex items-center gap-2">
+                            <IndianRupee className="w-4 h-4 text-primary" />
+                            MRP (INR)
+                          </Label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={variant.mrp}
+                            onChange={(e) => updateVariant(index, "mrp", parseFloat(e.target.value) || 0)}
+                            placeholder="0.00"
+                            className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium flex items-center gap-2">
+                            <AlertTriangle className="w-4 h-4 text-primary" />
+                            Threshold Quantity
+                          </Label>
+                          <Input
+                            type="number"
+                            value={variant.threshold_qty}
+                            onChange={(e) => updateVariant(index, "threshold_qty", parseInt(e.target.value) || 0)}
+                            placeholder="0"
+                            className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -804,6 +928,30 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
               </div>
             </div>
           )}
+
+          {/* Product Description & Notes Section */}
+          <div className="space-y-6 p-6 rounded-xl bg-gradient-to-br from-slate-50/50 to-gray-50/30 dark:from-slate-950/20 dark:to-gray-950/10 border border-slate-100/50 dark:border-slate-900/30 animate-fade-in" style={{animationDelay: '0.5s'}}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-lg bg-slate-500/10">
+                <FileText className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-foreground">Product Description & Notes</h3>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="description" className="text-sm font-medium flex items-center gap-2">
+                <FileText className="w-4 h-4 text-primary" />
+                Description
+              </Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                placeholder="Enter product description and notes..."
+                className="min-h-[120px] transition-all duration-200 hover:border-primary/50 focus:border-primary resize-none"
+              />
+            </div>
+          </div>
 
           {/* Action Buttons */}
           <div className="flex items-center justify-end gap-4 pt-6 border-t-2 border-border/50 mt-8">
