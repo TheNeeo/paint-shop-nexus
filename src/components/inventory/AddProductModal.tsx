@@ -360,84 +360,6 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
         <form onSubmit={handleSubmit} className="space-y-8 pt-2">
           {/* Main Product Details & Image Section - Side by Side */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Product Image - Takes 1 column */}
-            <div className="space-y-4 p-6 rounded-xl bg-gradient-to-br from-purple-50/50 to-pink-50/30 dark:from-purple-950/20 dark:to-pink-950/10 border border-purple-100/50 dark:border-purple-900/30 animate-fade-in">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-purple-500/10">
-                  <Upload className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                </div>
-                <h3 className="text-lg font-semibold text-foreground">📸 Product Image</h3>
-              </div>
-              
-              <div
-                className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
-                  isDragging 
-                    ? 'border-primary bg-primary/10' 
-                    : 'border-border hover:border-primary/50'
-                }`}
-                onDrop={handleMainImageDrop}
-                onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-                onDragLeave={() => setIsDragging(false)}
-              >
-                <input
-                  type="file"
-                  id="main_image_upload"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      const reader = new FileReader();
-                      reader.onloadend = () => {
-                        setFormData({...formData, image_url: reader.result as string});
-                      };
-                      reader.readAsDataURL(file);
-                    }
-                  }}
-                />
-                
-                {formData.image_url ? (
-                  <div className="space-y-3">
-                    <img 
-                      src={formData.image_url} 
-                      alt="Preview" 
-                      className="w-full h-40 object-cover rounded-lg"
-                      onError={(e) => {
-                        e.currentTarget.src = 'https://via.placeholder.com/200?text=Invalid+Image';
-                      }}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setFormData({...formData, image_url: ""})}
-                      className="w-full"
-                    >
-                      <X className="h-4 w-4 mr-2" />
-                      Remove Image
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <Upload className="h-12 w-12 mx-auto text-muted-foreground" />
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium">Drop image here</p>
-                      <p className="text-xs text-muted-foreground">or</p>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => document.getElementById('main_image_upload')?.click()}
-                      >
-                        <Upload className="h-4 w-4 mr-2" />
-                        Browse
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
             {/* Main Product Details - Takes 2 columns */}
             <div className="lg:col-span-2 space-y-6 p-6 rounded-xl bg-gradient-to-br from-blue-50/50 to-cyan-50/30 dark:from-blue-950/20 dark:to-cyan-950/10 border border-blue-100/50 dark:border-blue-900/30 animate-fade-in">
               <div className="flex items-center gap-3 mb-4">
@@ -538,21 +460,101 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                 </div>
 
                 <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="status" className="text-sm font-medium flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-primary" />
-                    Status
-                  </Label>
-                  <div className="flex items-center gap-3 h-12 px-4 rounded-lg border bg-background">
-                    <Switch
-                      id="status"
-                      checked={formData.status === "active"}
-                      onCheckedChange={(checked) => setFormData({...formData, status: checked ? "active" : "inactive"})}
-                    />
-                    <span className="text-sm font-medium">
-                      {formData.status === "active" ? "Active" : "Inactive"}
-                    </span>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="status" className="text-sm font-medium flex items-center gap-2">
+                      <Activity className="w-4 h-4 text-primary" />
+                      Status
+                    </Label>
+                    <div className="flex items-center gap-3">
+                      <Switch
+                        id="status"
+                        checked={formData.status === "active"}
+                        onCheckedChange={(checked) => setFormData({...formData, status: checked ? "active" : "inactive"})}
+                      />
+                      <span className="text-sm font-medium">
+                        {formData.status === "active" ? "Active" : "Inactive"}
+                      </span>
+                    </div>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Product Image - Takes 1 column */}
+            <div className="space-y-4 p-6 rounded-xl bg-gradient-to-br from-purple-50/50 to-pink-50/30 dark:from-purple-950/20 dark:to-pink-950/10 border border-purple-100/50 dark:border-purple-900/30 animate-fade-in">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 rounded-lg bg-purple-500/10">
+                  <Upload className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground">📸 Product Image</h3>
+              </div>
+              
+              <div
+                className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
+                  isDragging 
+                    ? 'border-primary bg-primary/10' 
+                    : 'border-border hover:border-primary/50'
+                }`}
+                onDrop={handleMainImageDrop}
+                onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                onDragLeave={() => setIsDragging(false)}
+              >
+                <input
+                  type="file"
+                  id="main_image_upload"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        setFormData({...formData, image_url: reader.result as string});
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+                
+                {formData.image_url ? (
+                  <div className="space-y-3">
+                    <img 
+                      src={formData.image_url} 
+                      alt="Preview" 
+                      className="w-full h-40 object-cover rounded-lg"
+                      onError={(e) => {
+                        e.currentTarget.src = 'https://via.placeholder.com/200?text=Invalid+Image';
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setFormData({...formData, image_url: ""})}
+                      className="w-full"
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      Remove Image
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <Upload className="h-12 w-12 mx-auto text-muted-foreground" />
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium">Drop image here</p>
+                      <p className="text-xs text-muted-foreground">or</p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => document.getElementById('main_image_upload')?.click()}
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Browse
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -576,8 +578,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                   id="purchase_price"
                   type="number"
                   step="0.01"
-                  value={formData.purchase_price}
-                  onChange={(e) => setFormData({...formData, purchase_price: parseFloat(e.target.value) || 0})}
+                  value={formData.purchase_price === 0 ? "" : formData.purchase_price}
+                  onChange={(e) => setFormData({...formData, purchase_price: e.target.value === "" ? 0 : parseFloat(e.target.value)})}
                   required
                   placeholder="Enter purchase price"
                   className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
@@ -593,8 +595,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                   id="sale_price"
                   type="number"
                   step="0.01"
-                  value={formData.sale_price}
-                  onChange={(e) => setFormData({...formData, sale_price: parseFloat(e.target.value) || 0})}
+                  value={formData.sale_price === 0 ? "" : formData.sale_price}
+                  onChange={(e) => setFormData({...formData, sale_price: e.target.value === "" ? 0 : parseFloat(e.target.value)})}
                   required
                   placeholder="Enter selling price"
                   className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
@@ -610,8 +612,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                   id="mrp"
                   type="number"
                   step="0.01"
-                  value={formData.mrp}
-                  onChange={(e) => setFormData({...formData, mrp: parseFloat(e.target.value) || 0})}
+                  value={formData.mrp === 0 ? "" : formData.mrp}
+                  onChange={(e) => setFormData({...formData, mrp: e.target.value === "" ? 0 : parseFloat(e.target.value)})}
                   placeholder="Enter MRP"
                   className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
                 />
@@ -625,8 +627,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                 <Input
                   id="purchase_qty"
                   type="number"
-                  value={formData.purchase_qty}
-                  onChange={(e) => setFormData({...formData, purchase_qty: parseInt(e.target.value) || 0})}
+                  value={formData.purchase_qty === 0 ? "" : formData.purchase_qty}
+                  onChange={(e) => setFormData({...formData, purchase_qty: e.target.value === "" ? 0 : parseInt(e.target.value)})}
                   required
                   placeholder="Enter purchase quantity"
                   className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
@@ -653,8 +655,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                 <Input
                   id="current_stock"
                   type="number"
-                  value={formData.current_stock}
-                  onChange={(e) => setFormData({...formData, current_stock: parseInt(e.target.value) || 0})}
+                  value={formData.current_stock === 0 ? "" : formData.current_stock}
+                  onChange={(e) => setFormData({...formData, current_stock: e.target.value === "" ? 0 : parseInt(e.target.value)})}
                   required
                   placeholder="Enter current stock"
                   className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
@@ -675,8 +677,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                 <Input
                   id="threshold_qty"
                   type="number"
-                  value={formData.threshold_qty}
-                  onChange={(e) => setFormData({...formData, threshold_qty: parseInt(e.target.value) || 0})}
+                  value={formData.threshold_qty === 0 ? "" : formData.threshold_qty}
+                  onChange={(e) => setFormData({...formData, threshold_qty: e.target.value === "" ? 0 : parseInt(e.target.value)})}
                   required
                   placeholder="Enter threshold quantity"
                   className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
@@ -767,7 +769,96 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                     </div>
                     
                     <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
-                      {/* Variant Image on left */}
+                      {/* Variant details on left - 3 columns */}
+                      <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium flex items-center gap-2">
+                            <FileText className="w-4 h-4 text-primary" />
+                            Variant Name
+                          </Label>
+                          <Input
+                            value={variant.name}
+                            onChange={(e) => updateVariant(index, "name", e.target.value)}
+                            placeholder="e.g., Red, Large, 500ml"
+                            className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium flex items-center gap-2">
+                            <IndianRupee className="w-4 h-4 text-primary" />
+                            Purchase Rate (INR)
+                          </Label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={variant.purchase_price === 0 ? "" : variant.purchase_price}
+                            onChange={(e) => updateVariant(index, "purchase_price", e.target.value === "" ? 0 : parseFloat(e.target.value))}
+                            placeholder="0.00"
+                            className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium flex items-center gap-2">
+                            <IndianRupee className="w-4 h-4 text-primary" />
+                            Sales Rate (INR)
+                          </Label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={variant.sale_price === 0 ? "" : variant.sale_price}
+                            onChange={(e) => updateVariant(index, "sale_price", e.target.value === "" ? 0 : parseFloat(e.target.value))}
+                            placeholder="0.00"
+                            className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium flex items-center gap-2">
+                            <Package2 className="w-4 h-4 text-primary" />
+                            Current Stock
+                          </Label>
+                          <Input
+                            type="number"
+                            value={variant.current_stock === 0 ? "" : variant.current_stock}
+                            onChange={(e) => updateVariant(index, "current_stock", e.target.value === "" ? 0 : parseInt(e.target.value))}
+                            placeholder="0"
+                            className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium flex items-center gap-2">
+                            <IndianRupee className="w-4 h-4 text-primary" />
+                            MRP (INR)
+                          </Label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={variant.mrp === 0 ? "" : variant.mrp}
+                            onChange={(e) => updateVariant(index, "mrp", e.target.value === "" ? 0 : parseFloat(e.target.value))}
+                            placeholder="0.00"
+                            className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium flex items-center gap-2">
+                            <AlertTriangle className="w-4 h-4 text-primary" />
+                            Threshold Quantity
+                          </Label>
+                          <Input
+                            type="number"
+                            value={variant.threshold_qty === 0 ? "" : variant.threshold_qty}
+                            onChange={(e) => updateVariant(index, "threshold_qty", e.target.value === "" ? 0 : parseInt(e.target.value))}
+                            placeholder="0"
+                            className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Variant Image on right */}
                       <div className="space-y-2">
                         <Label className="text-sm font-medium flex items-center gap-2">
                           <Upload className="w-4 h-4 text-primary" />
@@ -831,95 +922,6 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                               </Button>
                             </div>
                           )}
-                        </div>
-                      </div>
-
-                      {/* Variant details on right - 3 columns */}
-                      <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div className="space-y-2">
-                          <Label className="text-sm font-medium flex items-center gap-2">
-                            <FileText className="w-4 h-4 text-primary" />
-                            Variant Name
-                          </Label>
-                          <Input
-                            value={variant.name}
-                            onChange={(e) => updateVariant(index, "name", e.target.value)}
-                            placeholder="e.g., Red, Large, 500ml"
-                            className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label className="text-sm font-medium flex items-center gap-2">
-                            <IndianRupee className="w-4 h-4 text-primary" />
-                            Purchase Rate (INR)
-                          </Label>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            value={variant.purchase_price}
-                            onChange={(e) => updateVariant(index, "purchase_price", parseFloat(e.target.value) || 0)}
-                            placeholder="0.00"
-                            className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label className="text-sm font-medium flex items-center gap-2">
-                            <IndianRupee className="w-4 h-4 text-primary" />
-                            Sales Rate (INR)
-                          </Label>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            value={variant.sale_price}
-                            onChange={(e) => updateVariant(index, "sale_price", parseFloat(e.target.value) || 0)}
-                            placeholder="0.00"
-                            className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label className="text-sm font-medium flex items-center gap-2">
-                            <Package2 className="w-4 h-4 text-primary" />
-                            Current Stock
-                          </Label>
-                          <Input
-                            type="number"
-                            value={variant.current_stock}
-                            onChange={(e) => updateVariant(index, "current_stock", parseInt(e.target.value) || 0)}
-                            placeholder="0"
-                            className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label className="text-sm font-medium flex items-center gap-2">
-                            <IndianRupee className="w-4 h-4 text-primary" />
-                            MRP (INR)
-                          </Label>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            value={variant.mrp}
-                            onChange={(e) => updateVariant(index, "mrp", parseFloat(e.target.value) || 0)}
-                            placeholder="0.00"
-                            className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label className="text-sm font-medium flex items-center gap-2">
-                            <AlertTriangle className="w-4 h-4 text-primary" />
-                            Threshold Quantity
-                          </Label>
-                          <Input
-                            type="number"
-                            value={variant.threshold_qty}
-                            onChange={(e) => updateVariant(index, "threshold_qty", parseInt(e.target.value) || 0)}
-                            placeholder="0"
-                            className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
-                          />
                         </div>
                       </div>
                     </div>
