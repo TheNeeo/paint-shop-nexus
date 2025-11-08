@@ -62,16 +62,47 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
   const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [variantDragging, setVariantDragging] = useState<number | null>(null);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [showLowStockAlert, setShowLowStockAlert] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Auto-calculate main product stock from variants
+  // Auto-calculate main product stock from variants (Condition 3 & 4)
   useEffect(() => {
     if (!formData.is_variant && variants.some(v => v.name.trim())) {
       const totalStock = variants.reduce((sum, v) => sum + (v.current_stock || 0), 0);
-      setFormData(prev => ({ ...prev, current_stock: totalStock }));
+      const totalPurchaseQty = variants.reduce((sum, v) => sum + (v.current_stock || 0), 0);
+      setFormData(prev => ({ 
+        ...prev, 
+        current_stock: totalStock,
+        purchase_qty: totalPurchaseQty 
+      }));
     }
   }, [variants, formData.is_variant]);
+
+  // Threshold Alert Logic
+  useEffect(() => {
+    if (formData.current_stock > 0 && formData.threshold_qty > 0) {
+      setShowLowStockAlert(formData.current_stock <= formData.threshold_qty);
+    } else {
+      setShowLowStockAlert(false);
+    }
+  }, [formData.current_stock, formData.threshold_qty]);
+
+  // Check for existing products to determine if it's new or old (for stock logic)
+  const { data: existingProduct } = useQuery({
+    queryKey: ["existing-product", formData.hsn_code],
+    queryFn: async () => {
+      if (!formData.hsn_code) return null;
+      const { data } = await supabase
+        .from("products")
+        .select("*")
+        .eq("hsn_code", formData.hsn_code)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!formData.hsn_code
+  });
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -141,32 +172,103 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
     }
   });
 
+  // Create vendor mutation
+  const createVendorMutation = useMutation({
+    mutationFn: async (vendorData: any) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      const { data, error } = await supabase
+        .from("vendors")
+        .insert([{ 
+          ...vendorData,
+          created_by_user_id: user.id 
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["vendors"] });
+      setFormData(prev => ({ ...prev, preferred_vendor_id: data.id }));
+      setIsVendorModalOpen(false);
+      toast({
+        title: "Success",
+        description: "Vendor created successfully"
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to create vendor",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+    
+    if (!formData.name.trim()) {
+      errors.name = "Product name is required";
+    }
+    
+    if (!formData.hsn_code.trim()) {
+      errors.hsn_code = "HSN/Product code is required";
+    }
+    
+    if (!formData.category_id) {
+      errors.category_id = "Category is required";
+    }
+    
+    if (!formData.preferred_vendor_id) {
+      errors.preferred_vendor_id = "Preferred vendor is required";
+    }
+    
+    if (formData.purchase_price <= 0) {
+      errors.purchase_price = "Purchase rate must be greater than 0";
+    }
+    
+    if (formData.sale_price <= 0) {
+      errors.sale_price = "Sales rate must be greater than 0";
+    }
+    
+    if (formData.mrp <= 0) {
+      errors.mrp = "MRP must be greater than 0";
+    }
+    
+    if (formData.purchase_qty <= 0) {
+      errors.purchase_qty = "Purchase quantity must be greater than 0";
+    }
+    
+    if (formData.threshold_qty <= 0) {
+      errors.threshold_qty = "Threshold quantity must be greater than 0";
+    }
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validation
-    if (!formData.name.trim()) {
+    if (!validateForm()) {
       toast({
         title: "Validation Error",
-        description: "Product name is required",
+        description: "Please fill all required fields correctly",
         variant: "destructive"
       });
       return;
     }
 
-    if (!formData.category_id) {
+    // Check for duplicate HSN code
+    if (existingProduct) {
       toast({
         title: "Validation Error",
-        description: "Please select a category",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (formData.unit_price < 0) {
-      toast({
-        title: "Validation Error",
-        description: "Unit price cannot be negative",
+        description: "HSN code already exists. Please use a unique code.",
         variant: "destructive"
       });
       return;
@@ -197,10 +299,25 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
         return;
       }
 
+      // Smart Inventory Logic Implementation
+      // Condition 1 & 2: New or Old Main Product (No Variants)
+      // If no variants, current_stock = purchase_qty for new products
+      // For old products, it would be added in purchase entry, not here
+      
+      const hasVariants = variants.some(v => v.name.trim());
+      let calculatedStock = formData.purchase_qty;
+      
+      if (hasVariants) {
+        // Condition 3: New Main Product with Variants
+        // Total stock = sum of variant stocks
+        calculatedStock = variants.reduce((sum, v) => sum + (v.current_stock || 0), 0);
+      }
+
       // Insert main product with created_by_user_id
       // Convert empty string UUIDs to null
       const productData = {
         ...formData,
+        current_stock: calculatedStock,
         parent_product_id: formData.parent_product_id || null,
         preferred_vendor_id: formData.preferred_vendor_id || null,
         created_by_user_id: user.id
@@ -280,6 +397,23 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
       description: ""
     });
     setVariants([{ name: "", image_url: "", current_stock: 0, threshold_qty: 0, purchase_price: 0, sale_price: 0, mrp: 0 }]);
+    setValidationErrors({});
+    setShowLowStockAlert(false);
+  };
+
+  // Calculate profit margin
+  const calculateProfitMargin = () => {
+    if (formData.purchase_price > 0 && formData.sale_price > 0) {
+      return ((formData.sale_price - formData.purchase_price) / formData.purchase_price * 100).toFixed(2);
+    }
+    return "0.00";
+  };
+
+  // Get stock color indicator
+  const getStockColor = (currentStock: number, threshold: number) => {
+    if (currentStock === 0) return "text-red-500";
+    if (currentStock <= threshold) return "text-yellow-500";
+    return "text-green-500";
   };
 
   const addVariant = () => {
@@ -378,11 +512,22 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                   <Input
                     id="name"
                     value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    onChange={(e) => {
+                      setFormData({...formData, name: e.target.value});
+                      if (validationErrors.name) {
+                        setValidationErrors(prev => ({...prev, name: ""}));
+                      }
+                    }}
                     required
                     placeholder="Enter product name"
-                    className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                    className={`h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary ${validationErrors.name ? 'border-red-500' : ''}`}
                   />
+                  {validationErrors.name && (
+                    <p className="text-xs text-red-500 flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" />
+                      {validationErrors.name}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -393,11 +538,28 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                   <Input
                     id="hsn_code"
                     value={formData.hsn_code}
-                    onChange={(e) => setFormData({...formData, hsn_code: e.target.value})}
+                    onChange={(e) => {
+                      setFormData({...formData, hsn_code: e.target.value});
+                      if (validationErrors.hsn_code) {
+                        setValidationErrors(prev => ({...prev, hsn_code: ""}));
+                      }
+                    }}
                     required
                     placeholder="Enter HSN code"
-                    className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                    className={`h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary ${validationErrors.hsn_code ? 'border-red-500' : ''}`}
                   />
+                  {validationErrors.hsn_code && (
+                    <p className="text-xs text-red-500 flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" />
+                      {validationErrors.hsn_code}
+                    </p>
+                  )}
+                  {existingProduct && (
+                    <p className="text-xs text-red-500 flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" />
+                      HSN code already exists
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -412,10 +574,13 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                         setIsCategoryModalOpen(true);
                       } else {
                         setFormData({...formData, category_id: value});
+                        if (validationErrors.category_id) {
+                          setValidationErrors(prev => ({...prev, category_id: ""}));
+                        }
                       }
                     }}
                   >
-                    <SelectTrigger className="h-12 transition-all duration-200 hover:border-primary/50">
+                    <SelectTrigger className={`h-12 transition-all duration-200 hover:border-primary/50 ${validationErrors.category_id ? 'border-red-500' : ''}`}>
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent className="bg-background z-[100]">
@@ -435,6 +600,12 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                       ))}
                     </SelectContent>
                   </Select>
+                  {validationErrors.category_id && (
+                    <p className="text-xs text-red-500 flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" />
+                      {validationErrors.category_id}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -579,11 +750,22 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                   type="number"
                   step="0.01"
                   value={formData.purchase_price === 0 ? "" : formData.purchase_price}
-                  onChange={(e) => setFormData({...formData, purchase_price: e.target.value === "" ? 0 : parseFloat(e.target.value)})}
+                  onChange={(e) => {
+                    setFormData({...formData, purchase_price: e.target.value === "" ? 0 : parseFloat(e.target.value)});
+                    if (validationErrors.purchase_price) {
+                      setValidationErrors(prev => ({...prev, purchase_price: ""}));
+                    }
+                  }}
                   required
                   placeholder="Enter purchase price"
-                  className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                  className={`h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary ${validationErrors.purchase_price ? 'border-red-500' : ''}`}
                 />
+                {validationErrors.purchase_price && (
+                  <p className="text-xs text-red-500 flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3" />
+                    {validationErrors.purchase_price}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -596,27 +778,50 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                   type="number"
                   step="0.01"
                   value={formData.sale_price === 0 ? "" : formData.sale_price}
-                  onChange={(e) => setFormData({...formData, sale_price: e.target.value === "" ? 0 : parseFloat(e.target.value)})}
+                  onChange={(e) => {
+                    setFormData({...formData, sale_price: e.target.value === "" ? 0 : parseFloat(e.target.value)});
+                    if (validationErrors.sale_price) {
+                      setValidationErrors(prev => ({...prev, sale_price: ""}));
+                    }
+                  }}
                   required
                   placeholder="Enter selling price"
-                  className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                  className={`h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary ${validationErrors.sale_price ? 'border-red-500' : ''}`}
                 />
+                {validationErrors.sale_price && (
+                  <p className="text-xs text-red-500 flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3" />
+                    {validationErrors.sale_price}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="mrp" className="text-sm font-medium flex items-center gap-2">
                   <IndianRupee className="w-4 h-4 text-primary" />
-                  MRP (INR)
+                  MRP (INR) *
                 </Label>
                 <Input
                   id="mrp"
                   type="number"
                   step="0.01"
                   value={formData.mrp === 0 ? "" : formData.mrp}
-                  onChange={(e) => setFormData({...formData, mrp: e.target.value === "" ? 0 : parseFloat(e.target.value)})}
+                  onChange={(e) => {
+                    setFormData({...formData, mrp: e.target.value === "" ? 0 : parseFloat(e.target.value)});
+                    if (validationErrors.mrp) {
+                      setValidationErrors(prev => ({...prev, mrp: ""}));
+                    }
+                  }}
+                  required
                   placeholder="Enter MRP"
-                  className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                  className={`h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary ${validationErrors.mrp ? 'border-red-500' : ''}`}
                 />
+                {validationErrors.mrp && (
+                  <p className="text-xs text-red-500 flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3" />
+                    {validationErrors.mrp}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -628,12 +833,44 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                   id="purchase_qty"
                   type="number"
                   value={formData.purchase_qty === 0 ? "" : formData.purchase_qty}
-                  onChange={(e) => setFormData({...formData, purchase_qty: e.target.value === "" ? 0 : parseInt(e.target.value)})}
+                  onChange={(e) => {
+                    const newQty = e.target.value === "" ? 0 : parseInt(e.target.value);
+                    setFormData({...formData, purchase_qty: newQty, current_stock: newQty});
+                    if (validationErrors.purchase_qty) {
+                      setValidationErrors(prev => ({...prev, purchase_qty: ""}));
+                    }
+                  }}
                   required
                   placeholder="Enter purchase quantity"
-                  className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                  className={`h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary ${validationErrors.purchase_qty ? 'border-red-500' : ''}`}
                 />
+                {validationErrors.purchase_qty && (
+                  <p className="text-xs text-red-500 flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3" />
+                    {validationErrors.purchase_qty}
+                  </p>
+                )}
               </div>
+
+              {/* Profit Margin Display */}
+              {formData.purchase_price > 0 && formData.sale_price > 0 && (
+                <div className="md:col-span-2 p-4 rounded-lg bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-200 dark:border-emerald-800">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                      <span className="text-sm font-medium text-foreground">Profit Margin</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                        {calculateProfitMargin()}%
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        ₹{(formData.sale_price - formData.purchase_price).toFixed(2)} per unit
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -652,20 +889,32 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                   <Package2 className="w-4 h-4 text-primary" />
                   Current Stock * {!formData.is_variant && variants.some(v => v.name.trim()) && "(Auto-calculated)"}
                 </Label>
-                <Input
-                  id="current_stock"
-                  type="number"
-                  value={formData.current_stock === 0 ? "" : formData.current_stock}
-                  onChange={(e) => setFormData({...formData, current_stock: e.target.value === "" ? 0 : parseInt(e.target.value)})}
-                  required
-                  placeholder="Enter current stock"
-                  className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
-                  disabled={!formData.is_variant && variants.some(v => v.name.trim())}
-                />
+                <div className="relative">
+                  <Input
+                    id="current_stock"
+                    type="number"
+                    value={formData.current_stock === 0 ? "" : formData.current_stock}
+                    onChange={(e) => setFormData({...formData, current_stock: e.target.value === "" ? 0 : parseInt(e.target.value)})}
+                    required
+                    placeholder="Enter current stock"
+                    className={`h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary ${
+                      getStockColor(formData.current_stock, formData.threshold_qty)
+                    }`}
+                    disabled={!formData.is_variant && variants.some(v => v.name.trim())}
+                  />
+                </div>
                 {!formData.is_variant && variants.some(v => v.name.trim()) && (
                   <p className="text-xs text-muted-foreground">
                     Stock is automatically calculated as sum of variant stocks
                   </p>
+                )}
+                {showLowStockAlert && (
+                  <div className="flex items-center gap-2 p-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                    <AlertTriangle className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
+                    <p className="text-xs text-yellow-600 dark:text-yellow-400 font-medium">
+                      Low stock warning! Current stock is below threshold.
+                    </p>
+                  </div>
                 )}
               </div>
 
@@ -678,11 +927,22 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                   id="threshold_qty"
                   type="number"
                   value={formData.threshold_qty === 0 ? "" : formData.threshold_qty}
-                  onChange={(e) => setFormData({...formData, threshold_qty: e.target.value === "" ? 0 : parseInt(e.target.value)})}
+                  onChange={(e) => {
+                    setFormData({...formData, threshold_qty: e.target.value === "" ? 0 : parseInt(e.target.value)});
+                    if (validationErrors.threshold_qty) {
+                      setValidationErrors(prev => ({...prev, threshold_qty: ""}));
+                    }
+                  }}
                   required
                   placeholder="Enter threshold quantity"
-                  className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                  className={`h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary ${validationErrors.threshold_qty ? 'border-red-500' : ''}`}
                 />
+                {validationErrors.threshold_qty && (
+                  <p className="text-xs text-red-500 flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3" />
+                    {validationErrors.threshold_qty}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2 md:col-span-2">
@@ -697,10 +957,13 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                       setIsVendorModalOpen(true);
                     } else {
                       setFormData({...formData, preferred_vendor_id: value});
+                      if (validationErrors.preferred_vendor_id) {
+                        setValidationErrors(prev => ({...prev, preferred_vendor_id: ""}));
+                      }
                     }
                   }}
                 >
-                  <SelectTrigger className="h-12 transition-all duration-200 hover:border-primary/50">
+                  <SelectTrigger className={`h-12 transition-all duration-200 hover:border-primary/50 ${validationErrors.preferred_vendor_id ? 'border-red-500' : ''}`}>
                     <SelectValue placeholder="Select vendor" />
                   </SelectTrigger>
                   <SelectContent className="bg-background z-[100]">
@@ -720,6 +983,12 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                     </SelectItem>
                   </SelectContent>
                 </Select>
+                {validationErrors.preferred_vendor_id && (
+                  <p className="text-xs text-red-500 flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3" />
+                    {validationErrors.preferred_vendor_id}
+                  </p>
+                )}
               </div>
             </div>
           </div>
