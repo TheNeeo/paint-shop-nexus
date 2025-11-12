@@ -12,7 +12,12 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     mode === 'development' &&
-    componentTagger(),
+    componentTagger({
+      filterElements: (element) => {
+        // Skip React.Fragment and Fragment shorthand
+        return element.type !== 'Fragment' && element.type.name !== 'Fragment';
+      }
+    }),
   ].filter(Boolean),
   resolve: {
     alias: {
