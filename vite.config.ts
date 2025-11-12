@@ -11,11 +11,19 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
-    mode === 'development' &&
-    componentTagger({
-      // Skip React.Fragment as it doesn't accept data attributes
-      enabled: true,
-    }),
+    mode === 'development' && {
+      ...componentTagger(),
+      apply: 'serve',
+      enforce: 'post',
+      transform(code) {
+        // Skip transformation of React.Fragment elements
+        // This prevents adding data attributes to fragments
+        if (code.includes('React.Fragment') || code.includes('<>')) {
+          return null;
+        }
+        return undefined;
+      }
+    }
   ].filter(Boolean),
   resolve: {
     alias: {
