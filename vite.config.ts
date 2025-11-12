@@ -3,6 +3,24 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 
+// Custom wrapper for componentTagger to skip React.Fragment elements
+const createComponentTaggerPlugin = () => {
+  const tagger = componentTagger();
+
+  return {
+    ...tagger,
+    transform(code, id) {
+      // Don't tag files containing only Fragment definitions or critical Fragment usage
+      if (code.includes('React.Fragment') && !code.includes('TableRow')) {
+        return null;
+      }
+
+      // Call the original transform
+      return tagger.transform?.call(this, code, id);
+    }
+  };
+};
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
@@ -11,19 +29,8 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
-    mode === 'development' && {
-      ...componentTagger(),
-      apply: 'serve',
-      enforce: 'post',
-      transform(code) {
-        // Skip transformation of React.Fragment elements
-        // This prevents adding data attributes to fragments
-        if (code.includes('React.Fragment') || code.includes('<>')) {
-          return null;
-        }
-        return undefined;
-      }
-    }
+    mode === 'development' &&
+    createComponentTaggerPlugin(),
   ].filter(Boolean),
   resolve: {
     alias: {
