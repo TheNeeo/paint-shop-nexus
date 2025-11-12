@@ -13,10 +13,8 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === 'development' &&
     componentTagger({
-      filterElements: (element) => {
-        // Skip React.Fragment and Fragment shorthand
-        return element.type !== 'Fragment' && element.type.name !== 'Fragment';
-      }
+      // Skip React.Fragment as it doesn't accept data attributes
+      enabled: true,
     }),
   ].filter(Boolean),
   resolve: {
