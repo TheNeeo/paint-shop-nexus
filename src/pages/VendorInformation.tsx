@@ -58,6 +58,7 @@ export default function VendorInformation() {
           />
           
           <VendorTable
+            ref={vendorTableRef}
             searchTerm={searchTerm}
             statusFilter={statusFilter}
             locationFilter={locationFilter}
