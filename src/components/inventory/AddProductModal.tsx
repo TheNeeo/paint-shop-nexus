@@ -1282,6 +1282,14 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
           setIsVendorModalOpen(false);
           queryClient.invalidateQueries({ queryKey: ["vendors"] });
         }}
+        onSuccess={(vendor) => {
+          // Set the newly created vendor as the preferred vendor
+          setFormData(prev => ({ ...prev, preferred_vendor_id: vendor.id }));
+          // Clear validation error for vendor field
+          if (validationErrors.preferred_vendor_id) {
+            setValidationErrors(prev => ({...prev, preferred_vendor_id: ""}));
+          }
+        }}
       />
     </Dialog>
   );
