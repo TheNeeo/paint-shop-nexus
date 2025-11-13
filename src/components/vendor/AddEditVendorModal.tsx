@@ -25,6 +25,7 @@ interface AddEditVendorModalProps {
   isOpen: boolean;
   onClose: () => void;
   vendor?: any;
+  onSuccess?: (vendor: any) => void;
 }
 
 export function AddEditVendorModal({
