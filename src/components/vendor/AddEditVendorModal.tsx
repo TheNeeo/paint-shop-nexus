@@ -32,6 +32,7 @@ export function AddEditVendorModal({
   isOpen,
   onClose,
   vendor,
+  onSuccess,
 }: AddEditVendorModalProps) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
