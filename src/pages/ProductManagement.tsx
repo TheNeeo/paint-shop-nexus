@@ -266,6 +266,30 @@ export default function ProductManagement() {
             </div>
           ) : (
             <>
+          {/* Breadcrumb Navigation */}
+          <div className="mb-6">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink
+                    onClick={() => navigate("/")}
+                    className="cursor-pointer hover:text-green-700 transition-colors"
+                  >
+                    <Home className="h-4 w-4 text-green-600" />
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="text-green-700 font-medium">Product Management</BreadcrumbPage>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="text-green-800 font-semibold">Product Activity</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+
           {/* Enhanced Animated Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -278,24 +302,9 @@ export default function ProductManagement() {
               <div className="absolute top-0 left-0 w-40 h-40 bg-green-400 rounded-full blur-3xl animate-pulse"></div>
               <div className="absolute bottom-0 right-0 w-40 h-40 bg-teal-400 rounded-full blur-3xl animate-pulse delay-1000"></div>
             </div>
-            
+
             <div className="relative z-10 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
               <div className="space-y-3">
-                <Breadcrumb>
-                  <BreadcrumbList>
-                    <BreadcrumbItem>
-                      <Home className="h-4 w-4 text-green-600" />
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                      <BreadcrumbPage className="text-green-700 font-medium">Product Management</BreadcrumbPage>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                      <BreadcrumbPage className="text-green-800 font-semibold">Product Activity</BreadcrumbPage>
-                    </BreadcrumbItem>
-                  </BreadcrumbList>
-                </Breadcrumb>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                   <motion.h1 
                     initial={{ opacity: 0, x: -20 }}
