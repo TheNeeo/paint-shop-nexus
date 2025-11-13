@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -254,8 +253,12 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    console.log("Form submit - formData:", formData);
+    console.log("Vendor ID:", formData.preferred_vendor_id);
+
     // Validation
     if (!validateForm()) {
+      console.log("Validation failed");
       toast({
         title: "Validation Error",
         description: "Please fill all required fields correctly",
