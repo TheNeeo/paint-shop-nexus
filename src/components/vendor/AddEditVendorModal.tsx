@@ -93,14 +93,21 @@ export function AddEditVendorModal({
         if (error) throw error;
         toast.success("Vendor updated successfully");
       } else {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from("vendors")
-          .insert([vendorData]);
-        
+          .insert([vendorData])
+          .select()
+          .single();
+
         if (error) throw error;
         toast.success("Vendor created successfully");
+
+        // Call onSuccess callback if provided
+        if (onSuccess && data) {
+          onSuccess(data);
+        }
       }
-      
+
       onClose();
       // Reset form
       setFormData({
