@@ -330,14 +330,6 @@ export default function ProductManagement() {
                     </Badge>
                   </motion.div>
                 </div>
-                <motion.p 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5, duration: 0.5 }}
-                  className="text-sm text-green-700 italic"
-                >
-                  Neo Color Factory ~ The Colors of Your Dreams 🎨
-                </motion.p>
               </div>
               
               <motion.div 
