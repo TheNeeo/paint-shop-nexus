@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Eye, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,12 +22,12 @@ interface VendorTableProps {
   onEditVendor: (vendor: any) => void;
 }
 
-export function VendorTable({
+export const VendorTable = forwardRef<{ fetchVendors: () => void }, VendorTableProps>(function VendorTable({
   searchTerm,
   statusFilter,
   locationFilter,
   onEditVendor,
-}: VendorTableProps) {
+}, ref) {
   const { user } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
   const [vendors, setVendors] = useState<any[]>([]);
@@ -55,6 +56,10 @@ export function VendorTable({
       setLoading(false);
     }
   };
+
+  useImperativeHandle(ref, () => ({
+    fetchVendors
+  }));
 
   const handleView = (vendor: any) => {
     console.log("Viewing vendor:", vendor);
@@ -232,4 +237,6 @@ export function VendorTable({
       </div>
     </div>
   );
-}
+});
+
+VendorTable.displayName = "VendorTable";
