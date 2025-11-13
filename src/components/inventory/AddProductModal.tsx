@@ -322,15 +322,11 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
         created_by_user_id: user.id
       };
 
-      console.log("Product data to be inserted:", productData);
-
       const { data: product, error } = await supabase
         .from("products")
         .insert([productData])
         .select()
         .single();
-
-      console.log("Insert result - data:", product, "error:", error);
 
       if (error) throw error;
 
