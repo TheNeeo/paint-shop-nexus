@@ -133,6 +133,8 @@ const getStockStatus = (quantity: number) => {
 };
 
 export default function ProductManagement() {
+  const navigate = useNavigate();
+
   // Fetch products from database
   const { data: dbProducts = [], isLoading } = useQuery({
     queryKey: ["products"],
