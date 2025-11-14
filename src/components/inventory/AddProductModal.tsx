@@ -230,11 +230,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
     if (formData.sale_price <= 0) {
       errors.sale_price = "Sales rate must be greater than 0";
     }
-    
-    if (formData.mrp <= 0) {
-      errors.mrp = "MRP must be greater than 0";
-    }
-    
+
     if (formData.purchase_qty <= 0) {
       errors.purchase_qty = "Purchase quantity must be greater than 0";
     }
