@@ -46,13 +46,10 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
     unit_price: 0,
     purchase_price: 0,
     sale_price: 0,
-    mrp: 0,
     image_url: "",
     is_variant: false,
     parent_product_id: "",
-    preferred_vendor_id: "",
-    status: "active",
-    description: ""
+    preferred_vendor_id: ""
   });
   
   const [variants, setVariants] = useState([{ name: "", image_url: "", current_stock: 0, threshold_qty: 0, purchase_price: 0, sale_price: 0, mrp: 0 }]);
