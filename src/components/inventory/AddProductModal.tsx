@@ -362,11 +362,12 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
       queryClient.invalidateQueries({ queryKey: ["inventory-summary"] });
       onClose();
       resetForm();
-    } catch (error) {
-      console.error("Error adding product:", error);
+    } catch (error: any) {
+      const errorMessage = error?.message || error?.error_description || JSON.stringify(error);
+      console.error("Error adding product:", errorMessage, error);
       toast({
         title: "Error",
-        description: "Failed to add product",
+        description: errorMessage || "Failed to add product",
         variant: "destructive"
       });
     } finally {
