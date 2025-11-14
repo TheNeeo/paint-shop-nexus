@@ -912,7 +912,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                 )}
               </div>
 
-              <div className="space-y-2 md:col-span-2">
+              <div className="space-y-2">
                 <Label htmlFor="preferred_vendor" className="text-sm font-medium flex items-center gap-2">
                   <Building2 className="w-4 h-4 text-primary" />
                   Preferred Vendor *
@@ -939,8 +939,8 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                         {vendor.name}
                       </SelectItem>
                     ))}
-                    <SelectItem 
-                      value="ADD_NEW" 
+                    <SelectItem
+                      value="ADD_NEW"
                       className="text-primary font-semibold border-t border-border mt-1 pt-2"
                     >
                       <div className="flex items-center gap-2">
@@ -956,6 +956,25 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                     {validationErrors.preferred_vendor_id}
                   </p>
                 )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="status" className="text-sm font-medium flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-primary" />
+                  Status
+                </Label>
+                <div className="flex items-center gap-3 h-12 px-3 border border-input rounded-md bg-background hover:border-primary/50 transition-all duration-200">
+                  <Switch
+                    id="status"
+                    checked={formData.status === "active"}
+                    onCheckedChange={(checked) => {
+                      setFormData({...formData, status: checked ? "active" : "inactive"});
+                    }}
+                  />
+                  <Label htmlFor="status" className="font-medium cursor-pointer">
+                    {formData.status === "active" ? "Active" : "Inactive"}
+                  </Label>
+                </div>
               </div>
             </div>
           </div>
