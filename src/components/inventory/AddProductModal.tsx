@@ -52,7 +52,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
     preferred_vendor_id: ""
   });
   
-  const [variants, setVariants] = useState([{ name: "", image_url: "", current_stock: 0, threshold_qty: 0, purchase_price: 0, sale_price: 0, mrp: 0 }]);
+  const [variants, setVariants] = useState([{ name: "", image_url: "", current_stock: 0, threshold_qty: 0, purchase_price: 0, sale_price: 0 }]);
   const [isLoading, setIsLoading] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
