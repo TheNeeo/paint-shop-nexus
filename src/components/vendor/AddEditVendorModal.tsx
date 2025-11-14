@@ -43,7 +43,6 @@ export function AddEditVendorModal({
     gst_number: "",
     address: "",
     contact_person: "",
-    status: true,
   });
 
   useEffect(() => {
@@ -55,7 +54,6 @@ export function AddEditVendorModal({
         gst_number: vendor.gst_number || "",
         address: vendor.address || "",
         contact_person: vendor.contact_person || "",
-        status: vendor.status === "Active",
       });
     } else {
       setFormData({
@@ -65,7 +63,6 @@ export function AddEditVendorModal({
         gst_number: "",
         address: "",
         contact_person: "",
-        status: true,
       });
     }
   }, [vendor, isOpen]);
@@ -117,7 +114,6 @@ export function AddEditVendorModal({
         gst_number: "",
         address: "",
         contact_person: "",
-        status: true,
       });
     } catch (error: any) {
       toast.error(error.message || "Failed to save vendor");
@@ -232,20 +228,6 @@ export function AddEditVendorModal({
             />
           </div>
 
-          {/* Status Toggle */}
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-            <div>
-              <Label className="text-gray-700 font-medium">Vendor Status</Label>
-              <p className="text-sm text-gray-600">
-                Enable to mark vendor as active
-              </p>
-            </div>
-            <Switch
-              checked={formData.status}
-              onCheckedChange={(checked) => handleInputChange("status", checked)}
-              className="data-[state=checked]:bg-orange-600"
-            />
-          </div>
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-3 pt-4">
