@@ -1197,7 +1197,20 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
               </div>
               <h3 className="text-lg font-semibold text-foreground">Product Description & Notes</h3>
             </div>
-            
+
+            <div className="space-y-2">
+              <Label htmlFor="description" className="text-sm font-medium flex items-center gap-2">
+                <FileText className="w-4 h-4 text-primary" />
+                Description & Notes
+              </Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                placeholder="Enter product description, ingredients, usage instructions, or any other notes..."
+                className="h-24 transition-all duration-200 hover:border-primary/50 focus:border-primary resize-none"
+              />
+            </div>
           </div>
 
           {/* Action Buttons */}
