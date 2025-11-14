@@ -772,6 +772,24 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                 )}
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="mrp" className="text-sm font-medium flex items-center gap-2">
+                  <IndianRupee className="w-4 h-4 text-primary" />
+                  MRP (INR)
+                </Label>
+                <Input
+                  id="mrp"
+                  type="number"
+                  step="0.01"
+                  value={formData.mrp === 0 ? "" : formData.mrp}
+                  onChange={(e) => {
+                    setFormData({...formData, mrp: e.target.value === "" ? 0 : parseFloat(e.target.value)});
+                  }}
+                  placeholder="Enter MRP"
+                  className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                />
+              </div>
+
 
               <div className="space-y-2">
                 <Label htmlFor="purchase_qty" className="text-sm font-medium flex items-center gap-2">
