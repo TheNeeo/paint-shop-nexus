@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, Plus, X, Package, DollarSign, TrendingUp, FileText, Hash, FolderTree, Box, Activity, IndianRupee, ShoppingCart, AlertTriangle, Building2, Package2 } from "lucide-react";
+import { Upload, Plus, X, Package, DollarSign, TrendingUp, FileText, Hash, FolderTree, Box, IndianRupee, ShoppingCart, AlertTriangle, Building2, Package2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { CategoryForm } from "@/components/category/CategoryForm";
