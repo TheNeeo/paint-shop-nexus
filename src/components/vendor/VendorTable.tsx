@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Eye, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
