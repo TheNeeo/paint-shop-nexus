@@ -620,24 +620,6 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                   </Select>
                 </div>
 
-                <div className="space-y-2 md:col-span-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="status" className="text-sm font-medium flex items-center gap-2">
-                      <Activity className="w-4 h-4 text-primary" />
-                      Status
-                    </Label>
-                    <div className="flex items-center gap-3">
-                      <Switch
-                        id="status"
-                        checked={formData.status === "active"}
-                        onCheckedChange={(checked) => setFormData({...formData, status: checked ? "active" : "inactive"})}
-                      />
-                      <span className="text-sm font-medium">
-                        {formData.status === "active" ? "Active" : "Inactive"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
 
