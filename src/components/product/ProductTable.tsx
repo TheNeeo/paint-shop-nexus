@@ -158,6 +158,19 @@ export function ProductTable({
                   </div>
                 </TableCell>
                 <TableCell>
+                  {product.remainingWarranty === "Expired" ? (
+                    <Badge className="bg-red-100 text-red-800 border border-red-200 text-xs font-medium">
+                      {product.remainingWarranty}
+                    </Badge>
+                  ) : product.remainingWarranty === "-" ? (
+                    <span className="text-sm text-gray-500">-</span>
+                  ) : (
+                    <Badge className="bg-green-100 text-green-800 border border-green-200 text-xs font-medium">
+                      {product.remainingWarranty}
+                    </Badge>
+                  )}
+                </TableCell>
+                <TableCell>
                   <ProductRowActions
                     product={product}
                     selectedProduct={selectedProduct}
