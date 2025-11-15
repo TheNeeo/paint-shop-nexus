@@ -61,9 +61,11 @@ export function ProductTable({
             <TableHead className="text-white font-bold text-sm w-12">#</TableHead>
             <TableHead className="text-white font-bold text-sm">Product Name</TableHead>
             <TableHead className="text-white font-bold text-sm">Category</TableHead>
+            <TableHead className="text-white font-bold text-sm">Vendor Name</TableHead>
             <TableHead className="text-white font-bold text-sm">Unit Price</TableHead>
             <TableHead className="text-white font-bold text-sm">Stock</TableHead>
             <TableHead className="text-white font-bold text-sm">Sales</TableHead>
+            <TableHead className="text-white font-bold text-sm">Warranty/Expiry</TableHead>
             <TableHead className="text-white font-bold text-sm w-32">Actions</TableHead>
           </TableRow>
         </TableHeader>
