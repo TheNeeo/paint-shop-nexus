@@ -186,6 +186,7 @@ export function ProductTable({
                 <ProductVariantRows
                   variants={product.variants}
                   getStockStatus={getStockStatus}
+                  onSetSelectedProduct={onSetSelectedProduct}
                 />
               )}
             </React.Fragment>
