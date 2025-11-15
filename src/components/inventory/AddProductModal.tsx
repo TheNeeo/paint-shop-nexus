@@ -493,7 +493,21 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
   };
 
   const addVariant = () => {
-    setVariants([...variants, { name: "", image_url: "", current_stock: 0, threshold_qty: 0, purchase_price: 0, sale_price: 0, mrp: 0 }]);
+    setVariants([...variants, {
+      name: "",
+      image_url: "",
+      current_stock: 0,
+      threshold_qty: 0,
+      purchase_price: 0,
+      sale_price: 0,
+      mrp: 0,
+      shelf_life_details: {
+        manufacture_date: "",
+        warranty_years: 0,
+        expiry_date: "",
+        remaining_warranty: ""
+      }
+    }]);
   };
 
   const removeVariant = (index: number) => {
