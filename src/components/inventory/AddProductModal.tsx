@@ -1061,6 +1061,108 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
             </div>
           </div>
 
+          {/* Product Shelf Life Details Section - Only for Main Product (No Variants) */}
+          {!formData.is_variant && !variants.some(v => v.name.trim()) && (
+            <div className="space-y-6 p-6 rounded-xl bg-gradient-to-br from-rose-50/50 to-red-50/30 dark:from-rose-950/20 dark:to-red-950/10 border border-rose-100/50 dark:border-rose-900/30 animate-fade-in" style={{animationDelay: '0.3s'}}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 rounded-lg bg-rose-500/10">
+                  <FileText className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground">Product Shelf Life Details</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="manufacture_date" className="text-sm font-medium flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-primary" />
+                    Manufacture Date (Month-Year)
+                  </Label>
+                  <Input
+                    id="manufacture_date"
+                    type="month"
+                    value={formData.shelf_life_details.manufacture_date}
+                    onChange={(e) => {
+                      const newDate = e.target.value;
+                      const warrantyYears = formData.shelf_life_details.warranty_years;
+                      const expiryDate = calculateExpiryDate(newDate, warrantyYears);
+                      setFormData({
+                        ...formData,
+                        shelf_life_details: {
+                          ...formData.shelf_life_details,
+                          manufacture_date: newDate,
+                          expiry_date: expiryDate,
+                          remaining_warranty: calculateRemainingWarranty(expiryDate)
+                        }
+                      });
+                    }}
+                    className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="warranty_years" className="text-sm font-medium flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-primary" />
+                    Warranty (Years)
+                  </Label>
+                  <Input
+                    id="warranty_years"
+                    type="number"
+                    min="0"
+                    step="0.5"
+                    value={formData.shelf_life_details.warranty_years === 0 ? "" : formData.shelf_life_details.warranty_years}
+                    onChange={(e) => {
+                      const warrantyYears = e.target.value === "" ? 0 : parseFloat(e.target.value);
+                      const manufactureDate = formData.shelf_life_details.manufacture_date;
+                      const expiryDate = calculateExpiryDate(manufactureDate, warrantyYears);
+                      setFormData({
+                        ...formData,
+                        shelf_life_details: {
+                          ...formData.shelf_life_details,
+                          warranty_years: warrantyYears,
+                          expiry_date: expiryDate,
+                          remaining_warranty: calculateRemainingWarranty(expiryDate)
+                        }
+                      });
+                    }}
+                    placeholder="Enter warranty in years"
+                    className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="expiry_date" className="text-sm font-medium flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-primary" />
+                    Expiry Date (Auto-Calculated)
+                  </Label>
+                  <Input
+                    id="expiry_date"
+                    type="month"
+                    value={formData.shelf_life_details.expiry_date}
+                    disabled
+                    className="h-12 bg-muted transition-all duration-200 cursor-not-allowed opacity-70"
+                  />
+                  <p className="text-xs text-muted-foreground">Auto-calculated from manufacture date + warranty years</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="remaining_warranty" className="text-sm font-medium flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-primary" />
+                    Remaining Warranty
+                  </Label>
+                  <div className="h-12 px-3 border border-input rounded-md bg-muted flex items-center">
+                    <span className={`font-medium ${
+                      formData.shelf_life_details.remaining_warranty === "Expired"
+                        ? "text-red-600 dark:text-red-400"
+                        : "text-green-600 dark:text-green-400"
+                    }`}>
+                      {formData.shelf_life_details.remaining_warranty || "-"}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Time remaining from today</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Product Variants Section */}
           {!formData.is_variant && (
