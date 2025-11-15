@@ -371,15 +371,28 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
       if (!formData.is_variant && variants.some(v => v.name.trim())) {
         const variantData = variants
           .filter(v => v.name.trim())
-          .map(variant => ({
-            ...variant,
-            parent_product_id: product.id,
-            category_id: formData.category_id,
-            unit: formData.unit,
-            unit_price: formData.unit_price,
-            is_variant: true,
-            created_by_user_id: user.id
-          }));
+          .map(variant => {
+            let variantDescription = "";
+            if (variant.shelf_life_details?.manufacture_date) {
+              variantDescription = JSON.stringify({
+                shelf_life_details: variant.shelf_life_details
+              });
+            }
+            return {
+              name: variant.name,
+              image_url: variant.image_url,
+              current_stock: variant.current_stock,
+              threshold_qty: variant.threshold_qty,
+              purchase_price: variant.purchase_price,
+              sale_price: variant.sale_price,
+              parent_product_id: product.id,
+              category_id: formData.category_id,
+              unit: formData.unit,
+              unit_price: formData.unit_price,
+              is_variant: true,
+              created_by_user_id: user.id
+            };
+          });
 
         if (variantData.length > 0) {
           const { error: variantError } = await supabase
