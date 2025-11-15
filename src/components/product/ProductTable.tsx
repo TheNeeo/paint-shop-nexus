@@ -191,7 +191,7 @@ export function ProductTable({
           
           {products.length === 0 && (
             <TableRow>
-              <TableCell colSpan={9} className="text-center py-8 text-gray-500">
+              <TableCell colSpan={11} className="text-center py-8 text-gray-500">
                 <div className="flex flex-col items-center gap-2">
                   <Package className="h-8 w-8 text-gray-300" />
                   <span>No products found</span>
