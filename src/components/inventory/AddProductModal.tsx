@@ -445,6 +445,46 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
     return "0.00";
   };
 
+  // Calculate expiry date from manufacture date and warranty years
+  const calculateExpiryDate = (manufactureDate: string, warrantyYears: number): string => {
+    if (!manufactureDate || !warrantyYears) return "";
+    try {
+      const [year, month] = manufactureDate.split('-');
+      const mfgDate = new Date(parseInt(year), parseInt(month) - 1, 1);
+      const expiryDate = new Date(mfgDate.getFullYear() + warrantyYears, mfgDate.getMonth(), 1);
+      return `${expiryDate.getFullYear()}-${String(expiryDate.getMonth() + 1).padStart(2, '0')}`;
+    } catch {
+      return "";
+    }
+  };
+
+  // Calculate remaining warranty
+  const calculateRemainingWarranty = (expiryDate: string): string => {
+    if (!expiryDate) return "";
+    try {
+      const [year, month] = expiryDate.split('-');
+      const expiry = new Date(parseInt(year), parseInt(month) - 1, 1);
+      const today = new Date();
+
+      const diffMs = expiry.getTime() - today.getTime();
+      if (diffMs <= 0) return "Expired";
+
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      const years = Math.floor(diffDays / 365);
+      const months = Math.floor((diffDays % 365) / 30);
+
+      if (years > 0) {
+        return `${years}y ${months}m`;
+      } else if (months > 0) {
+        return `${months}m`;
+      } else {
+        return `${diffDays}d`;
+      }
+    } catch {
+      return "";
+    }
+  };
+
   // Get stock color indicator
   const getStockColor = (currentStock: number, threshold: number) => {
     if (currentStock === 0) return "text-red-500";
