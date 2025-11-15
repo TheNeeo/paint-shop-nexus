@@ -123,6 +123,11 @@ export function ProductTable({
                   </Badge>
                 </TableCell>
                 <TableCell>
+                  <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">
+                    {product.vendorName}
+                  </span>
+                </TableCell>
+                <TableCell>
                   <span className="text-lg font-bold text-green-700 group-hover:text-green-800 transition-colors duration-200">${product.unitPrice.toFixed(2)}</span>
                 </TableCell>
                 <TableCell>
