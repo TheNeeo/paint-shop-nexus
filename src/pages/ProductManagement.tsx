@@ -135,7 +135,7 @@ const getStockStatus = (quantity: number) => {
 export default function ProductManagement() {
   const navigate = useNavigate();
 
-  // Fetch products from database
+  // Fetch products from database with vendor information
   const { data: dbProducts = [], isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
@@ -145,32 +145,85 @@ export default function ProductManagement() {
           *,
           categories (
             name
+          ),
+          vendors (
+            id,
+            name
           )
         `)
         .is("parent_product_id", null)
         .order("created_at", { ascending: false });
-      
+
       if (error) throw error;
-      
+
+      // Helper function to calculate remaining warranty
+      const calculateRemainingWarranty = (shelfLifeDetails: any): string => {
+        if (!shelfLifeDetails || !shelfLifeDetails.expiry_date) return "-";
+
+        try {
+          const [year, month] = shelfLifeDetails.expiry_date.split('-');
+          const expiry = new Date(parseInt(year), parseInt(month) - 1, 1);
+          const today = new Date();
+
+          const diffMs = expiry.getTime() - today.getTime();
+          if (diffMs <= 0) return "Expired";
+
+          const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+          const years = Math.floor(diffDays / 365);
+          const months = Math.floor((diffDays % 365) / 30);
+
+          if (years > 0 && months > 0) {
+            return `${years} Yr ${months} Mo Left`;
+          } else if (years > 0) {
+            return `${years} Yr Left`;
+          } else if (months > 0) {
+            return `${months} Months Left`;
+          } else {
+            return `${diffDays} Days Left`;
+          }
+        } catch {
+          return "-";
+        }
+      };
+
       // Transform database products to match the format expected by the UI
-      return (data || []).map((product, index) => ({
-        id: product.id,
-        name: product.name,
-        category: product.categories?.name || "Uncategorized",
-        unit: product.unit,
-        unitPrice: Number(product.unit_price) || 0,
-        stockQuantity: product.current_stock || 0,
-        image: product.image_url || "/placeholder.svg",
-        baseCode: product.hsn_code || `PRD${String(index + 1).padStart(3, '0')}`,
-        description: "",
-        dateAdded: new Date(product.created_at).toISOString().split('T')[0],
-        featured: false,
-        rating: 4.5,
-        totalSales: product.sale_qty || 0,
-        lastSold: "",
-        supplier: "",
-        variants: []
-      }));
+      return (data || []).map((product, index) => {
+        let shelfLifeDetails = null;
+        let remainingWarranty = "-";
+
+        // Try to parse shelf_life_details from description if it's JSON
+        try {
+          if (product.description && typeof product.description === 'string' && product.description.startsWith('{')) {
+            const parsed = JSON.parse(product.description);
+            shelfLifeDetails = parsed.shelf_life_details;
+            remainingWarranty = calculateRemainingWarranty(shelfLifeDetails);
+          }
+        } catch {
+          // If parsing fails, description is plain text
+        }
+
+        return {
+          id: product.id,
+          name: product.name,
+          category: product.categories?.name || "Uncategorized",
+          vendorName: product.vendors?.name || "-",
+          unit: product.unit,
+          unitPrice: Number(product.unit_price) || 0,
+          stockQuantity: product.current_stock || 0,
+          image: product.image_url || "/placeholder.svg",
+          baseCode: product.hsn_code || `PRD${String(index + 1).padStart(3, '0')}`,
+          description: "",
+          dateAdded: new Date(product.created_at).toISOString().split('T')[0],
+          featured: false,
+          rating: 4.5,
+          totalSales: product.sale_qty || 0,
+          lastSold: "",
+          supplier: "",
+          shelfLifeDetails: shelfLifeDetails,
+          remainingWarranty: remainingWarranty,
+          variants: []
+        };
+      });
     },
   });
 
