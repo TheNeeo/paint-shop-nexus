@@ -72,31 +72,31 @@ export function ProductTable({
         <TableBody>
           {products.map((product, index) => (
             <React.Fragment key={product.id}>
-              <TableRow className="border-b border-green-100 hover:bg-gradient-to-r hover:from-green-50 hover:to-green-100 transition-all duration-200 group hover:scale-[1.01] hover:shadow-md">
-                <TableCell>
+              <TableRow className="bg-gradient-to-r from-green-50/80 to-green-50/40 hover:from-green-100/60 hover:to-green-100/30 border-b-2 border-green-200 transition-all duration-200 group hover:shadow-md">
+                <TableCell className="bg-gradient-to-r from-green-100/50 to-transparent">
                   <Checkbox
                     checked={selectedProducts.has(product.id)}
                     onCheckedChange={() => onToggleProductSelection(product.id)}
-                    className="border-2 border-green-300 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                    className="border-2 border-green-400 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell className="bg-gradient-to-r from-green-100/50 to-transparent">
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => onToggleRowExpansion(product.id)}
-                    className="p-1 hover:bg-green-100 transition-all duration-200 hover:scale-110"
+                    className="p-1 hover:bg-green-200 transition-all duration-200 hover:scale-110"
                   >
                     {expandedRows.has(product.id) ? (
-                      <ChevronDown className="h-4 w-4 text-green-600" />
+                      <ChevronDown className="h-4 w-4 text-green-700 font-bold" />
                     ) : (
-                      <ChevronRight className="h-4 w-4 text-green-600" />
+                      <ChevronRight className="h-4 w-4 text-green-700 font-bold" />
                     )}
                   </Button>
                 </TableCell>
-                <TableCell>
-                  <div className="w-8 h-8 bg-green-100 rounded-md flex items-center justify-center border border-green-200 group-hover:bg-green-200 transition-colors duration-200">
-                    <span className="text-xs font-medium text-green-700">{index + 1}</span>
+                <TableCell className="bg-gradient-to-r from-green-100/50 to-transparent">
+                  <div className="w-8 h-8 bg-green-200 rounded-md flex items-center justify-center border-2 border-green-400 group-hover:bg-green-300 transition-colors duration-200">
+                    <span className="text-xs font-bold text-green-800">{index + 1}</span>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -104,47 +104,49 @@ export function ProductTable({
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-10 h-10 rounded-lg border-2 border-green-200 object-cover group-hover:scale-110 group-hover:border-green-400 transition-all duration-200"
+                      className="w-12 h-12 rounded-lg border-2 border-green-300 object-cover group-hover:scale-110 group-hover:border-green-500 transition-all duration-200 shadow-sm"
                     />
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-gray-800 group-hover:text-green-700 transition-colors duration-200">{product.name}</span>
+                        <Badge variant="outline" className="bg-green-600 text-white border-green-700 text-xs font-bold px-2 py-0">
+                          PARENT
+                        </Badge>
+                        <span className="font-bold text-gray-900 group-hover:text-green-800 transition-colors duration-200">{product.name}</span>
                         {product.featured && (
-                          <Star className="h-4 w-4 text-coral-500 fill-current animate-pulse" />
+                          <Star className="h-4 w-4 text-yellow-500 fill-current animate-pulse" />
                         )}
                       </div>
-                      <div className="text-sm text-gray-500">Code: {product.baseCode}</div>
+                      <div className="text-xs text-gray-600 font-medium">Code: {product.baseCode}</div>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge className={`${getCategoryColor(product.category)} text-xs font-medium group-hover:scale-110 transition-transform duration-200`}>
+                  <Badge className={`${getCategoryColor(product.category)} text-xs font-bold group-hover:scale-110 transition-transform duration-200`}>
                     {product.category}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200">
+                  <span className="text-sm font-semibold text-gray-800 group-hover:text-gray-900 transition-colors duration-200">
                     {product.vendorName}
                   </span>
                 </TableCell>
                 <TableCell>
-                  <span className="text-lg font-bold text-green-700 group-hover:text-green-800 transition-colors duration-200">${product.unitPrice.toFixed(2)}</span>
+                  <span className="text-lg font-bold text-green-700 group-hover:text-green-900 transition-colors duration-200">${product.unitPrice.toFixed(2)}</span>
                 </TableCell>
                 <TableCell>
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">{product.stockQuantity}</span>
-                      <Badge className={`text-xs ${getStockStatus(product.stockQuantity).color}`}>
+                      <span className="text-sm font-bold">{product.stockQuantity}</span>
+                      <Badge className={`text-xs font-semibold ${getStockStatus(product.stockQuantity).color}`}>
                         {getStockStatus(product.stockQuantity).status}
                       </Badge>
                     </div>
-                    {/* Stock Progress Bar */}
-                    <div className="w-full bg-gray-200 rounded-full h-1.5">
-                      <div 
-                        className={`h-1.5 rounded-full transition-all duration-500 ${
-                          product.stockQuantity === 0 ? 'bg-red-500' : 
-                          product.stockQuantity <= 10 ? 'bg-orange-500' : 
-                          'bg-green-500'
+                    <div className="w-full bg-gray-300 rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full transition-all duration-500 ${
+                          product.stockQuantity === 0 ? 'bg-red-500' :
+                          product.stockQuantity <= 10 ? 'bg-orange-500' :
+                          'bg-green-600'
                         }`}
                         style={{ width: `${Math.min((product.stockQuantity / 150) * 100, 100)}%` }}
                       />
@@ -153,19 +155,19 @@ export function ProductTable({
                 </TableCell>
                 <TableCell>
                   <div className="text-sm">
-                    <div className="font-medium text-gray-700">{product.totalSales} sold</div>
-                    <div className="text-gray-500">⭐ {product.rating}</div>
+                    <div className="font-bold text-gray-900">{product.totalSales} sold</div>
+                    <div className="text-gray-600 font-medium">⭐ {product.rating}</div>
                   </div>
                 </TableCell>
                 <TableCell>
                   {product.remainingWarranty === "Expired" ? (
-                    <Badge className="bg-red-100 text-red-800 border border-red-200 text-xs font-medium">
+                    <Badge className="bg-red-100 text-red-800 border-2 border-red-300 text-xs font-bold">
                       {product.remainingWarranty}
                     </Badge>
                   ) : product.remainingWarranty === "-" ? (
-                    <span className="text-sm text-gray-500">-</span>
+                    <span className="text-sm text-gray-500 font-medium">-</span>
                   ) : (
-                    <Badge className="bg-green-100 text-green-800 border border-green-200 text-xs font-medium">
+                    <Badge className="bg-green-100 text-green-800 border-2 border-green-300 text-xs font-bold">
                       {product.remainingWarranty}
                     </Badge>
                   )}
