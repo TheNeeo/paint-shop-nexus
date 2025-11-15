@@ -330,9 +330,30 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
 
       // Insert main product with created_by_user_id
       // Convert empty string UUIDs to null
+      // Store shelf life details as JSON in description if no variants
+      let descriptionWithShelfLife = formData.description;
+      if (!hasVariants && formData.shelf_life_details.manufacture_date) {
+        const shelfLifeJson = JSON.stringify({
+          shelf_life_details: formData.shelf_life_details,
+          description: formData.description
+        });
+        descriptionWithShelfLife = shelfLifeJson;
+      }
+
       const productData = {
-        ...formData,
+        name: formData.name,
+        category_id: formData.category_id || null,
+        hsn_code: formData.hsn_code,
+        unit: formData.unit,
+        purchase_qty: formData.purchase_qty,
+        sale_qty: formData.sale_qty,
         current_stock: calculatedStock,
+        threshold_qty: formData.threshold_qty,
+        unit_price: formData.unit_price,
+        purchase_price: formData.purchase_price,
+        sale_price: formData.sale_price,
+        image_url: formData.image_url,
+        is_variant: formData.is_variant,
         parent_product_id: formData.parent_product_id || null,
         preferred_vendor_id: formData.preferred_vendor_id || null,
         created_by_user_id: user.id
