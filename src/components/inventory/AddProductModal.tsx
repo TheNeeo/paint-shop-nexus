@@ -1365,6 +1365,89 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                         </div>
                       </div>
                     </div>
+
+                    {/* Variant Shelf Life Details */}
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-5 border-t pt-5 mt-5">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-primary" />
+                          Mfg Date
+                        </Label>
+                        <Input
+                          type="month"
+                          value={variant.shelf_life_details?.manufacture_date || ""}
+                          onChange={(e) => {
+                            const newDate = e.target.value;
+                            const warrantyYears = variant.shelf_life_details?.warranty_years || 0;
+                            const expiryDate = calculateExpiryDate(newDate, warrantyYears);
+                            const remaining = calculateRemainingWarranty(expiryDate);
+                            updateVariant(index, "shelf_life_details", {
+                              manufacture_date: newDate,
+                              warranty_years: warrantyYears,
+                              expiry_date: expiryDate,
+                              remaining_warranty: remaining
+                            });
+                          }}
+                          className="h-10 transition-all duration-200 hover:border-primary/50 focus:border-primary text-sm"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium flex items-center gap-2">
+                          <TrendingUp className="w-4 h-4 text-primary" />
+                          Warranty (Yrs)
+                        </Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          step="0.5"
+                          value={variant.shelf_life_details?.warranty_years === 0 ? "" : variant.shelf_life_details?.warranty_years || ""}
+                          onChange={(e) => {
+                            const warrantyYears = e.target.value === "" ? 0 : parseFloat(e.target.value);
+                            const manufactureDate = variant.shelf_life_details?.manufacture_date || "";
+                            const expiryDate = calculateExpiryDate(manufactureDate, warrantyYears);
+                            const remaining = calculateRemainingWarranty(expiryDate);
+                            updateVariant(index, "shelf_life_details", {
+                              manufacture_date: manufactureDate,
+                              warranty_years: warrantyYears,
+                              expiry_date: expiryDate,
+                              remaining_warranty: remaining
+                            });
+                          }}
+                          placeholder="0"
+                          className="h-10 transition-all duration-200 hover:border-primary/50 focus:border-primary text-sm"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-primary" />
+                          Exp Date
+                        </Label>
+                        <Input
+                          type="month"
+                          value={variant.shelf_life_details?.expiry_date || ""}
+                          disabled
+                          className="h-10 bg-muted text-sm cursor-not-allowed opacity-70"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium flex items-center gap-2">
+                          <AlertTriangle className="w-4 h-4 text-primary" />
+                          Remaining
+                        </Label>
+                        <div className="h-10 px-3 border border-input rounded-md bg-muted flex items-center text-sm">
+                          <span className={`font-medium ${
+                            variant.shelf_life_details?.remaining_warranty === "Expired"
+                              ? "text-red-600 dark:text-red-400"
+                              : "text-green-600 dark:text-green-400"
+                          }`}>
+                            {variant.shelf_life_details?.remaining_warranty || "-"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
