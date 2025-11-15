@@ -52,7 +52,13 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
     parent_product_id: "",
     preferred_vendor_id: "",
     status: "active",
-    description: ""
+    description: "",
+    shelf_life_details: {
+      manufacture_date: "",
+      warranty_years: 0,
+      expiry_date: "",
+      remaining_warranty: ""
+    }
   });
   
   const [variants, setVariants] = useState([{ name: "", image_url: "", current_stock: 0, threshold_qty: 0, purchase_price: 0, sale_price: 0, mrp: 0 }]);
