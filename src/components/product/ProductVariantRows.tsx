@@ -47,7 +47,7 @@ export function ProductVariantRows({ variants, getStockStatus, onSetSelectedProd
             <span className="text-xs text-gray-500">-</span>
           </TableCell>
           <TableCell>
-            <span className="text-sm font-medium text-green-700">${Number(variant.unitPrice || variant.sale_price || 0).toFixed(2)}</span>
+            <span className="text-sm font-medium text-green-700">₹{Number(variant.unitPrice || variant.sale_price || 0).toFixed(2)}</span>
           </TableCell>
           <TableCell>
             <div className="flex items-center gap-2">
