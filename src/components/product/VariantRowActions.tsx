@@ -28,6 +28,8 @@ import {
 } from "lucide-react";
 import { ProductPreview } from "@/components/product/ProductPreview";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface VariantRowActionsProps {
   variant: any;
@@ -36,20 +38,42 @@ interface VariantRowActionsProps {
 
 export function VariantRowActions({ variant, onSetSelectedProduct }: VariantRowActionsProps) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [isDeleting, setIsDeleting] = React.useState(false);
 
   const handleDeleteVariant = async () => {
+    setIsDeleting(true);
     try {
+      const { error } = await supabase
+        .from("products")
+        .delete()
+        .eq("id", variant.id);
+
+      if (error) throw error;
+
       toast({
         title: "Success",
         description: "Variant deleted successfully"
       });
+
+      queryClient.invalidateQueries({ queryKey: ["products"] });
     } catch (error) {
+      console.error("Error deleting variant:", error);
       toast({
         title: "Error",
         description: "Failed to delete variant",
         variant: "destructive"
       });
+    } finally {
+      setIsDeleting(false);
     }
+  };
+
+  const handleEdit = () => {
+    toast({
+      title: "Edit",
+      description: "Opening edit form for this variant"
+    });
   };
 
   return (
@@ -86,6 +110,7 @@ export function VariantRowActions({ variant, onSetSelectedProduct }: VariantRowA
               variant="ghost" 
               size="sm" 
               className="opacity-60 hover:opacity-100 hover:bg-blue-100 transition-all duration-200 group h-8 w-8 p-0"
+              onClick={handleEdit}
             >
               <Edit className="h-3.5 w-3.5 text-blue-600 group-hover:rotate-12 transition-transform duration-200" />
             </Button>
@@ -124,8 +149,8 @@ export function VariantRowActions({ variant, onSetSelectedProduct }: VariantRowA
           </AlertDialogHeader>
           <div className="flex gap-3 justify-end">
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteVariant} className="bg-red-600 hover:bg-red-700">
-              Delete
+            <AlertDialogAction onClick={handleDeleteVariant} disabled={isDeleting} className="bg-red-600 hover:bg-red-700">
+              {isDeleting ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
           </div>
         </AlertDialogContent>
