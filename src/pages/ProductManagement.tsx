@@ -135,7 +135,7 @@ const getStockStatus = (quantity: number) => {
 export default function ProductManagement() {
   const navigate = useNavigate();
 
-  // Fetch products from database with vendor information
+  // Fetch products from database with vendor information and category colors
   const { data: dbProducts = [], isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
@@ -144,7 +144,8 @@ export default function ProductManagement() {
         .select(`
           *,
           categories (
-            name
+            name,
+            color
           ),
           vendors (
             id,
@@ -206,13 +207,15 @@ export default function ProductManagement() {
           id: product.id,
           name: product.name,
           category: product.categories?.name || "Uncategorized",
+          categoryColor: product.categories?.color || "blue",
           vendorName: product.vendors?.name || "-",
           unit: product.unit,
           unitPrice: Number(product.unit_price) || 0,
           stockQuantity: product.current_stock || 0,
           image: product.image_url || "/placeholder.svg",
           baseCode: product.hsn_code || `PRD${String(index + 1).padStart(3, '0')}`,
-          description: "",
+          hsnCode: product.hsn_code || "-",
+          description: product.description || "",
           dateAdded: new Date(product.created_at).toISOString().split('T')[0],
           featured: false,
           rating: 4.5,
