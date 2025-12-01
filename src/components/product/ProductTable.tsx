@@ -40,6 +40,12 @@ export function ProductTable({
   getCategoryColor,
   getStockStatus,
 }: ProductTableProps) {
+  const getCategoryBadgeColor = (product: any) => {
+    if (product.categoryColor) {
+      return getCategoryColor(product.category, product.categoryColor);
+    }
+    return getCategoryColor(product.category);
+  };
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
