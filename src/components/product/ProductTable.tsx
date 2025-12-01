@@ -127,7 +127,7 @@ export function ProductTable({
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge className={`${getCategoryColor(product.category)} text-xs font-bold group-hover:scale-110 transition-transform duration-200`}>
+                  <Badge className={`${getCategoryBadgeColor(product)} text-xs font-bold group-hover:scale-110 transition-transform duration-200`}>
                     {product.category}
                   </Badge>
                 </TableCell>
