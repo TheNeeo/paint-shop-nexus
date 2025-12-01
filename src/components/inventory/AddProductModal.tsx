@@ -595,7 +595,9 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      if (!open) onClose();
+    }}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-background via-background to-muted/20 border-0 shadow-2xl rounded-2xl animate-fade-in">
         <DialogHeader className="pb-6 border-b border-border/50">
           <DialogTitle className="flex items-center gap-4 text-2xl">
