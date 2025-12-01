@@ -116,7 +116,24 @@ const sortOptions = [
   { value: "rating", label: "Rating" },
 ];
 
-const getCategoryColor = (category: string) => {
+const getColorClasses = (colorValue: string) => {
+  const colorMap = {
+    blue: "bg-blue-100 text-blue-800 border-blue-200",
+    red: "bg-red-100 text-red-800 border-red-200",
+    green: "bg-green-100 text-green-800 border-green-200",
+    purple: "bg-purple-100 text-purple-800 border-purple-200",
+    orange: "bg-orange-100 text-orange-800 border-orange-200",
+    pink: "bg-pink-100 text-pink-800 border-pink-200",
+    indigo: "bg-indigo-100 text-indigo-800 border-indigo-200",
+    coral: "bg-orange-100 text-orange-800 border-orange-200",
+  };
+  return colorMap[colorValue] || "bg-slate-100 text-slate-800 border-slate-200";
+};
+
+const getCategoryColor = (category: string, colorValue?: string) => {
+  if (colorValue) {
+    return getColorClasses(colorValue);
+  }
   const colors = {
     Tools: "bg-blue-100 text-blue-800 border-blue-200",
     Paint: "bg-red-100 text-red-800 border-red-200",
