@@ -69,16 +69,16 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
 
   // Auto-calculate main product stock from variants (Condition 3 & 4)
   useEffect(() => {
-    if (!formData.is_variant && variants.some(v => v.name.trim())) {
+    const hasVariants = !formData.is_variant && variants.some(v => v.name.trim());
+    if (hasVariants) {
       const totalStock = variants.reduce((sum, v) => sum + (v.current_stock || 0), 0);
-      const totalPurchaseQty = variants.reduce((sum, v) => sum + (v.current_stock || 0), 0);
       setFormData(prev => ({ 
         ...prev, 
         current_stock: totalStock,
-        purchase_qty: totalPurchaseQty 
+        purchase_qty: totalStock 
       }));
     }
-  }, [variants, formData.is_variant]);
+  }, [variants]);
 
   // Threshold Alert Logic
   useEffect(() => {
@@ -835,7 +835,13 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                   value={formData.purchase_qty === 0 ? "" : formData.purchase_qty}
                   onChange={(e) => {
                     const newQty = e.target.value === "" ? 0 : parseInt(e.target.value);
-                    setFormData({...formData, purchase_qty: newQty, current_stock: newQty});
+                    const hasVariants = variants.some(v => v.name.trim());
+                    // Only update current_stock if no variants (Condition 1 & 2)
+                    if (!hasVariants) {
+                      setFormData({...formData, purchase_qty: newQty, current_stock: newQty});
+                    } else {
+                      setFormData({...formData, purchase_qty: newQty});
+                    }
                     if (validationErrors.purchase_qty) {
                       setValidationErrors(prev => ({...prev, purchase_qty: ""}));
                     }
