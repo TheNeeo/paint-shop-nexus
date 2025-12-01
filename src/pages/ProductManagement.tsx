@@ -428,24 +428,23 @@ export default function ProductManagement() {
                   Export
                 </Button>
               
-                <Dialog open={isAddProductOpen} onOpenChange={setIsAddProductOpen}>
-                  <DialogTrigger asChild>
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl w-full sm:w-auto border-2 border-green-400 transition-all duration-300 relative overflow-hidden group">
-                        <span className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
-                        <Plus className="h-4 w-4 mr-2 relative z-10" />
-                        <span className="relative z-10">Add New Product</span>
-                      </Button>
-                    </motion.div>
-                  </DialogTrigger>
-                </Dialog>
-                
-                <AddProductModal 
-                  isOpen={isAddProductOpen} 
-                  onClose={() => setIsAddProductOpen(false)} 
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Button
+                    onClick={() => setIsAddProductOpen(true)}
+                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl w-full sm:w-auto border-2 border-green-400 transition-all duration-300 relative overflow-hidden group"
+                  >
+                    <span className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
+                    <Plus className="h-4 w-4 mr-2 relative z-10" />
+                    <span className="relative z-10">Add New Product</span>
+                  </Button>
+                </motion.div>
+
+                <AddProductModal
+                  isOpen={isAddProductOpen}
+                  onClose={() => setIsAddProductOpen(false)}
                 />
               </motion.div>
             </div>
