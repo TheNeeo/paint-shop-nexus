@@ -38,6 +38,8 @@ import {
 } from "lucide-react";
 import { ProductPreview } from "@/components/product/ProductPreview";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ProductRowActionsProps {
   product: any;
@@ -48,7 +50,9 @@ interface ProductRowActionsProps {
 
 export function ProductRowActions({ product, selectedProduct, onSetSelectedProduct, isVariant = false }: ProductRowActionsProps) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [isFeatured, setIsFeatured] = React.useState(product.featured || false);
+  const [isDeleting, setIsDeleting] = React.useState(false);
 
   const handleFeatureToggle = () => {
     setIsFeatured(!isFeatured);
@@ -59,17 +63,30 @@ export function ProductRowActions({ product, selectedProduct, onSetSelectedProdu
   };
 
   const handleDeleteProduct = async () => {
+    setIsDeleting(true);
     try {
+      const { error } = await supabase
+        .from("products")
+        .delete()
+        .eq("id", product.id);
+
+      if (error) throw error;
+
       toast({
         title: "Success",
         description: "Product deleted successfully"
       });
+
+      queryClient.invalidateQueries({ queryKey: ["products"] });
     } catch (error) {
+      console.error("Error deleting product:", error);
       toast({
         title: "Error",
         description: "Failed to delete product",
         variant: "destructive"
       });
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -77,6 +94,20 @@ export function ProductRowActions({ product, selectedProduct, onSetSelectedProdu
     toast({
       title: "Success",
       description: "Product duplicated successfully"
+    });
+  };
+
+  const handleAddVariant = () => {
+    toast({
+      title: "Add Variant",
+      description: "Opening variant form for " + product.name
+    });
+  };
+
+  const handleEdit = () => {
+    toast({
+      title: "Edit",
+      description: "Opening edit form for this product"
     });
   };
 
@@ -114,6 +145,7 @@ export function ProductRowActions({ product, selectedProduct, onSetSelectedProdu
               variant="ghost"
               size="sm"
               className="opacity-70 hover:opacity-100 hover:bg-blue-100 transition-all duration-200 group h-9 w-9 p-0"
+              onClick={handleEdit}
             >
               <Edit className="h-4 w-4 text-blue-600 group-hover:rotate-12 transition-transform duration-200" />
             </Button>
@@ -151,6 +183,7 @@ export function ProductRowActions({ product, selectedProduct, onSetSelectedProdu
                   variant="ghost"
                   size="sm"
                   className="opacity-70 hover:opacity-100 hover:bg-purple-100 transition-all duration-200 group h-9 w-9 p-0"
+                  onClick={handleAddVariant}
                 >
                   <Package className="h-4 w-4 text-purple-600 group-hover:scale-110 transition-transform duration-200" />
                 </Button>
@@ -212,8 +245,8 @@ export function ProductRowActions({ product, selectedProduct, onSetSelectedProdu
               </AlertDialogHeader>
               <div className="flex gap-3 justify-end">
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDeleteProduct} className="bg-red-600 hover:bg-red-700">
-                  Delete
+                <AlertDialogAction onClick={handleDeleteProduct} disabled={isDeleting} className="bg-red-600 hover:bg-red-700">
+                  {isDeleting ? 'Deleting...' : 'Delete'}
                 </AlertDialogAction>
               </div>
             </AlertDialogContent>
