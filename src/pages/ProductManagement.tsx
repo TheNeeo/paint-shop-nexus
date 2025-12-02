@@ -184,6 +184,20 @@ export default function ProductManagement() {
 
       if (error) throw error;
 
+      // Fetch variants for all parent products
+      const { data: allVariants = [] } = await supabase
+        .from("products")
+        .select("*")
+        .not("parent_product_id", "is", null);
+
+      const variantsByParent = (allVariants || []).reduce((acc, variant) => {
+        if (!acc[variant.parent_product_id]) {
+          acc[variant.parent_product_id] = [];
+        }
+        acc[variant.parent_product_id].push(variant);
+        return acc;
+      }, {} as Record<string, any[]>);
+
       // Helper function to calculate remaining warranty
       const calculateRemainingWarranty = (shelfLifeDetails: any): string => {
         if (!shelfLifeDetails || !shelfLifeDetails.expiry_date) return "-";
@@ -232,13 +246,29 @@ export default function ProductManagement() {
 
         const categoryName = categories.find(c => c.id === product.category_id)?.name || "Uncategorized";
         const categoryColor = categoryColorMap[product.category_id] || "blue";
+        const vendorName = vendorMap[product.preferred_vendor_id] || "-";
+
+        // Transform variants
+        const variants = (variantsByParent[product.id] || []).map((variant) => {
+          return {
+            id: variant.id,
+            name: variant.name,
+            unitPrice: Number(variant.unit_price) || 0,
+            stockQuantity: variant.current_stock || 0,
+            baseCode: variant.hsn_code || "-",
+            hsnCode: variant.hsn_code || "-",
+            totalSales: variant.sale_qty || 0,
+            currentStock: variant.current_stock || 0,
+            sale_price: Number(variant.unit_price) || 0
+          };
+        });
 
         return {
           id: product.id,
           name: product.name,
           category: categoryName,
           categoryColor: categoryColor,
-          vendorName: "-",
+          vendorName: vendorName,
           unit: product.unit,
           unitPrice: Number(product.unit_price) || 0,
           stockQuantity: product.current_stock || 0,
@@ -254,7 +284,7 @@ export default function ProductManagement() {
           supplier: "",
           shelfLifeDetails: shelfLifeDetails,
           remainingWarranty: remainingWarranty,
-          variants: []
+          variants: variants
         };
       });
     },
