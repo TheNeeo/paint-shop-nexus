@@ -162,8 +162,7 @@ export default function ProductManagement() {
             name
           )
         `)
-        .is("parent_product_id", null)
-        .order("created_at", { ascending: false, nullsFirst: false });
+        .is("parent_product_id", null);
 
       if (error) throw error;
 
