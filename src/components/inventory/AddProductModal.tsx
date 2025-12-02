@@ -413,13 +413,18 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
         }
       }
 
+      console.log("Product added successfully, invalidating queries...");
+
       toast({
         title: "Success",
         description: "Product added successfully"
       });
 
-      queryClient.invalidateQueries({ queryKey: ["products"] });
-      queryClient.invalidateQueries({ queryKey: ["inventory-summary"] });
+      await queryClient.invalidateQueries({ queryKey: ["products"] });
+      await queryClient.invalidateQueries({ queryKey: ["inventory-summary"] });
+
+      console.log("Queries invalidated, closing dialog...");
+
       onClose();
       resetForm();
     } catch (error: any) {
