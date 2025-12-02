@@ -315,8 +315,10 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
 
       // Insert main product with created_by_user_id
       // Convert empty string UUIDs to null
+      // Exclude fields that don't exist in products table (description, status)
+      const { description, status, ...productFields } = formData;
       const productData = {
-        ...formData,
+        ...productFields,
         current_stock: calculatedStock,
         parent_product_id: formData.parent_product_id || null,
         preferred_vendor_id: formData.preferred_vendor_id || null,
