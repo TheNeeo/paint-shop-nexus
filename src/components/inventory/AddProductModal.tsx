@@ -362,13 +362,20 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
         created_by_user_id: user.id
       };
 
+      console.log("Inserting product data:", productData);
+
       const { data: product, error } = await supabase
         .from("products")
         .insert([productData])
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Product insert error:", error);
+        throw error;
+      }
+
+      console.log("Product inserted successfully:", product);
 
       // Insert variants if it's a main product
       if (!formData.is_variant && variants.some(v => v.name.trim())) {
