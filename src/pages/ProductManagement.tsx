@@ -151,17 +151,7 @@ export default function ProductManagement() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select(`
-          *,
-          categories (
-            name,
-            color
-          ),
-          vendors (
-            id,
-            name
-          )
-        `)
+        .select("*")
         .is("parent_product_id", null);
 
       if (error) throw error;
