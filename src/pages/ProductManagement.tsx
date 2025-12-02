@@ -146,6 +146,20 @@ export default function ProductManagement() {
   const navigate = useNavigate();
 
   // Fetch products from database with vendor information and category colors
+  // Fetch categories for color mapping
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data } = await supabase.from("categories").select("*");
+      return data || [];
+    }
+  });
+
+  const categoryColorMap = categories.reduce((acc, cat) => {
+    acc[cat.id] = cat.color;
+    return acc;
+  }, {} as Record<string, string>);
+
   const { data: dbProducts = [], isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
