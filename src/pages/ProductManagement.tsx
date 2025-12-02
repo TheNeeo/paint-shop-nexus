@@ -216,12 +216,15 @@ export default function ProductManagement() {
           // If parsing fails, description is plain text
         }
 
+        const categoryName = categories.find(c => c.id === product.category_id)?.name || "Uncategorized";
+        const categoryColor = categoryColorMap[product.category_id] || "blue";
+
         return {
           id: product.id,
           name: product.name,
-          category: product.categories?.name || "Uncategorized",
-          categoryColor: product.categories?.color || "blue",
-          vendorName: product.vendors?.name || "-",
+          category: categoryName,
+          categoryColor: categoryColor,
+          vendorName: "-",
           unit: product.unit,
           unitPrice: Number(product.unit_price) || 0,
           stockQuantity: product.current_stock || 0,
