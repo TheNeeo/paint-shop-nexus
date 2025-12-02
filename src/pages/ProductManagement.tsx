@@ -155,8 +155,22 @@ export default function ProductManagement() {
     }
   });
 
+  // Fetch vendors for vendor name mapping
+  const { data: vendors = [] } = useQuery({
+    queryKey: ["vendors"],
+    queryFn: async () => {
+      const { data } = await supabase.from("vendors").select("*");
+      return data || [];
+    }
+  });
+
   const categoryColorMap = categories.reduce((acc, cat) => {
     acc[cat.id] = cat.color;
+    return acc;
+  }, {} as Record<string, string>);
+
+  const vendorMap = vendors.reduce((acc, vendor) => {
+    acc[vendor.id] = vendor.name;
     return acc;
   }, {} as Record<string, string>);
 
