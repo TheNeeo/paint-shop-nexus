@@ -474,7 +474,7 @@ export default function ProductManagement() {
               setShowFeaturedOnly={setShowFeaturedOnly}
               viewMode={viewMode}
               setViewMode={setViewMode}
-              categories={categories}
+              categories={["All", ...categories.map(c => c.name)]}
               stockStatuses={stockStatuses}
               sortOptions={sortOptions}
             />
