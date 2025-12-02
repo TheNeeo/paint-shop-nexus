@@ -352,10 +352,13 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
         unit_price: formData.unit_price,
         purchase_price: formData.purchase_price,
         sale_price: formData.sale_price,
+        mrp: formData.mrp || formData.sale_price,
         image_url: formData.image_url,
+        description: descriptionWithShelfLife,
         is_variant: formData.is_variant,
         parent_product_id: formData.parent_product_id || null,
         preferred_vendor_id: formData.preferred_vendor_id || null,
+        status: formData.status,
         created_by_user_id: user.id
       };
 
