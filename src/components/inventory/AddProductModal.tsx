@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, Plus, X, Package, DollarSign, TrendingUp, FileText, Hash, FolderTree, Box, Activity, IndianRupee, ShoppingCart, AlertTriangle, Building2, Package2 } from "lucide-react";
+import { Upload, Plus, X, Package, DollarSign, TrendingUp, FileText, Hash, FolderTree, Box, Activity, IndianRupee, ShoppingCart, AlertTriangle, Building2, Package2, Calendar, Clock } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { CategoryForm } from "@/components/category/CategoryForm";
@@ -53,10 +53,26 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
     parent_product_id: "",
     preferred_vendor_id: "",
     status: "active",
-    description: ""
+    description: "",
+    manufacture_date: "",
+    warranty_years: 0,
+    expiry_date: "",
+    remaining_warranty: ""
   });
   
-  const [variants, setVariants] = useState([{ name: "", image_url: "", current_stock: 0, threshold_qty: 0, purchase_price: 0, sale_price: 0, mrp: 0 }]);
+  const [variants, setVariants] = useState([{ 
+    name: "", 
+    image_url: "", 
+    current_stock: 0, 
+    threshold_qty: 0, 
+    purchase_price: 0, 
+    sale_price: 0, 
+    mrp: 0,
+    manufacture_date: "",
+    warranty_years: 0,
+    expiry_date: "",
+    remaining_warranty: ""
+  }]);
   const [isLoading, setIsLoading] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
@@ -399,9 +415,25 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
       parent_product_id: "",
       preferred_vendor_id: "",
       status: "active",
-      description: ""
+      description: "",
+      manufacture_date: "",
+      warranty_years: 0,
+      expiry_date: "",
+      remaining_warranty: ""
     });
-    setVariants([{ name: "", image_url: "", current_stock: 0, threshold_qty: 0, purchase_price: 0, sale_price: 0, mrp: 0 }]);
+    setVariants([{ 
+      name: "", 
+      image_url: "", 
+      current_stock: 0, 
+      threshold_qty: 0, 
+      purchase_price: 0, 
+      sale_price: 0, 
+      mrp: 0,
+      manufacture_date: "",
+      warranty_years: 0,
+      expiry_date: "",
+      remaining_warranty: ""
+    }]);
     setValidationErrors({});
     setShowLowStockAlert(false);
   };
@@ -421,8 +453,89 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
     return "text-green-500";
   };
 
+  // Calculate expiry date from manufacture date and warranty
+  const calculateExpiryDate = (mfgDate: string, warrantyYears: number): string => {
+    if (!mfgDate || warrantyYears <= 0) return "";
+    try {
+      const [year, month] = mfgDate.split("-");
+      const expiry = new Date(parseInt(year) + warrantyYears, parseInt(month) - 1);
+      return `${expiry.toLocaleString('default', { month: 'long' })}-${expiry.getFullYear()}`;
+    } catch {
+      return "";
+    }
+  };
+
+  // Calculate remaining warranty
+  const calculateRemainingWarranty = (expiryDate: string): string => {
+    if (!expiryDate) return "";
+    try {
+      const [month, year] = expiryDate.split("-");
+      const monthNum = new Date(Date.parse(month + " 1, 2000")).getMonth();
+      const expiry = new Date(parseInt(year), monthNum);
+      const today = new Date();
+      
+      if (expiry <= today) return "Expired";
+      
+      const diffTime = expiry.getTime() - today.getTime();
+      const diffMonths = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 30.44));
+      const years = Math.floor(diffMonths / 12);
+      const months = diffMonths % 12;
+      
+      if (years > 0 && months > 0) return `${years} year${years > 1 ? 's' : ''} ${months} month${months > 1 ? 's' : ''}`;
+      if (years > 0) return `${years} year${years > 1 ? 's' : ''}`;
+      return `${months} month${months > 1 ? 's' : ''}`;
+    } catch {
+      return "";
+    }
+  };
+
+  // Handle manufacture date and warranty changes for main product
+  const handleShelfLifeChange = (field: string, value: any) => {
+    const updatedData = { ...formData, [field]: value };
+    
+    if (field === "manufacture_date" || field === "warranty_years") {
+      const expiry = calculateExpiryDate(
+        field === "manufacture_date" ? value : updatedData.manufacture_date,
+        field === "warranty_years" ? value : updatedData.warranty_years
+      );
+      updatedData.expiry_date = expiry;
+      updatedData.remaining_warranty = calculateRemainingWarranty(expiry);
+    }
+    
+    setFormData(updatedData);
+  };
+
+  // Handle variant shelf life changes
+  const handleVariantShelfLifeChange = (index: number, field: string, value: any) => {
+    const updated = [...variants];
+    updated[index] = { ...updated[index], [field]: value };
+    
+    if (field === "manufacture_date" || field === "warranty_years") {
+      const expiry = calculateExpiryDate(
+        field === "manufacture_date" ? value : updated[index].manufacture_date,
+        field === "warranty_years" ? value : updated[index].warranty_years
+      );
+      updated[index].expiry_date = expiry;
+      updated[index].remaining_warranty = calculateRemainingWarranty(expiry);
+    }
+    
+    setVariants(updated);
+  };
+
   const addVariant = () => {
-    setVariants([...variants, { name: "", image_url: "", current_stock: 0, threshold_qty: 0, purchase_price: 0, sale_price: 0, mrp: 0 }]);
+    setVariants([...variants, { 
+      name: "", 
+      image_url: "", 
+      current_stock: 0, 
+      threshold_qty: 0, 
+      purchase_price: 0, 
+      sale_price: 0, 
+      mrp: 0,
+      manufacture_date: "",
+      warranty_years: 0,
+      expiry_date: "",
+      remaining_warranty: ""
+    }]);
   };
 
   const removeVariant = (index: number) => {
@@ -1005,6 +1118,84 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
           </div>
 
 
+          {/* Product Shelf Life Details Section */}
+          <div className="space-y-6 p-6 rounded-xl bg-gradient-to-br from-rose-50/50 to-pink-50/30 dark:from-rose-950/20 dark:to-pink-950/10 border border-rose-100/50 dark:border-rose-900/30 animate-fade-in" style={{animationDelay: '0.3s'}}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-lg bg-rose-500/10">
+                <Calendar className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-foreground">📋 Product Shelf Life Details</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="manufacture_date" className="text-sm font-medium flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-primary" />
+                  Manufacture Date (Month-Year)
+                </Label>
+                <Input
+                  id="manufacture_date"
+                  type="month"
+                  value={formData.manufacture_date}
+                  onChange={(e) => handleShelfLifeChange("manufacture_date", e.target.value)}
+                  placeholder="Select month-year"
+                  className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="warranty_years" className="text-sm font-medium flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-primary" />
+                  Warranty (Years)
+                </Label>
+                <Input
+                  id="warranty_years"
+                  type="number"
+                  min="0"
+                  value={formData.warranty_years === 0 ? "" : formData.warranty_years}
+                  onChange={(e) => handleShelfLifeChange("warranty_years", e.target.value === "" ? 0 : parseInt(e.target.value))}
+                  placeholder="Enter warranty in years"
+                  className="h-12 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="expiry_date" className="text-sm font-medium flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-primary" />
+                  Expiry Date (Auto-Calculated)
+                </Label>
+                <Input
+                  id="expiry_date"
+                  value={formData.expiry_date}
+                  disabled
+                  placeholder="--------  ----"
+                  className="h-12 bg-muted/50 cursor-not-allowed"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Auto-calculated from manufacture date + warranty years
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="remaining_warranty" className="text-sm font-medium flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-primary" />
+                  Remaining Warranty
+                </Label>
+                <Input
+                  id="remaining_warranty"
+                  value={formData.remaining_warranty}
+                  disabled
+                  placeholder="-"
+                  className="h-12 bg-muted/50 cursor-not-allowed"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Time remaining from today
+                </p>
+              </div>
+            </div>
+          </div>
+
+
           {/* Product Variants Section */}
           {!formData.is_variant && (
             <div className="space-y-6 p-6 rounded-xl bg-gradient-to-br from-indigo-50/50 to-blue-50/30 dark:from-indigo-950/20 dark:to-blue-950/10 border border-indigo-100/50 dark:border-indigo-900/30 animate-fade-in" style={{animationDelay: '0.4s'}}>
@@ -1135,6 +1326,70 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                             placeholder="0"
                             className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
                           />
+                        </div>
+
+                        {/* Variant Shelf Life Fields */}
+                        <div className="md:col-span-2 pt-4 border-t border-border/50">
+                          <h4 className="text-sm font-semibold mb-4 flex items-center gap-2">
+                            <Calendar className="w-4 h-4 text-primary" />
+                            Product Shelf Life Details
+                          </h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div className="space-y-2">
+                              <Label className="text-sm font-medium flex items-center gap-2">
+                                <Calendar className="w-4 h-4 text-primary" />
+                                Mfg Date (Month-Year)
+                              </Label>
+                              <Input
+                                type="month"
+                                value={variant.manufacture_date}
+                                onChange={(e) => handleVariantShelfLifeChange(index, "manufacture_date", e.target.value)}
+                                placeholder="Select month-year"
+                                className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label className="text-sm font-medium flex items-center gap-2">
+                                <Clock className="w-4 h-4 text-primary" />
+                                Warranty (Yrs)
+                              </Label>
+                              <Input
+                                type="number"
+                                min="0"
+                                value={variant.warranty_years === 0 ? "" : variant.warranty_years}
+                                onChange={(e) => handleVariantShelfLifeChange(index, "warranty_years", e.target.value === "" ? 0 : parseInt(e.target.value))}
+                                placeholder="0"
+                                className="h-11 transition-all duration-200 hover:border-primary/50 focus:border-primary"
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label className="text-sm font-medium flex items-center gap-2">
+                                <Calendar className="w-4 h-4 text-primary" />
+                                Exp Date
+                              </Label>
+                              <Input
+                                value={variant.expiry_date}
+                                disabled
+                                placeholder="--------  ----"
+                                className="h-11 bg-muted/50 cursor-not-allowed text-xs"
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label className="text-sm font-medium flex items-center gap-2">
+                                <AlertTriangle className="w-4 h-4 text-primary" />
+                                Remaining
+                              </Label>
+                              <Input
+                                value={variant.remaining_warranty}
+                                disabled
+                                placeholder="-"
+                                className="h-11 bg-muted/50 cursor-not-allowed text-xs"
+                              />
+                            </div>
+                          </div>
                         </div>
                       </div>
 
