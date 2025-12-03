@@ -7,7 +7,7 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
-    hmr: process.env.NODE_ENV === 'production' ? false : undefined,
+    hmr: false,
   },
   plugins: [
     react(),
