@@ -7,11 +7,7 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
-    hmr: {
-      host: "4798d5f266ec418eb6d6b604dcaf2732-92652578f92f481bbd6d2ba7c.fly.dev",
-      port: 443,
-      protocol: "wss",
-    },
+    hmr: process.env.NODE_ENV === 'production' ? false : undefined,
   },
   plugins: [
     react(),
