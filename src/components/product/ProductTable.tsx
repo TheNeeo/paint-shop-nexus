@@ -24,7 +24,7 @@ interface ProductTableProps {
   onSelectAllProducts: () => void;
   onSetSelectedProduct: (product: any) => void;
   selectedProduct: any;
-  getCategoryColor: (category: string) => string;
+  getCategoryColor: (category: string, categoryColor?: string) => string;
   getStockStatus: (quantity: number) => { status: string; color: string };
 }
 
@@ -52,7 +52,7 @@ export function ProductTable({
           <TableRow className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 border-b-2 border-green-800">
             <TableHead className="text-white font-bold text-sm w-12">
               <Checkbox
-                checked={selectedProducts.size === products.length}
+                checked={selectedProducts.size === products.length && products.length > 0}
                 onCheckedChange={onSelectAllProducts}
                 className="border-2 border-white data-[state=checked]:bg-white data-[state=checked]:text-green-600"
               />
@@ -61,10 +61,12 @@ export function ProductTable({
             <TableHead className="text-white font-bold text-sm w-12">#</TableHead>
             <TableHead className="text-white font-bold text-sm">Product Name</TableHead>
             <TableHead className="text-white font-bold text-sm">Category</TableHead>
+            <TableHead className="text-white font-bold text-sm">Vendor Name</TableHead>
             <TableHead className="text-white font-bold text-sm">Unit Price</TableHead>
             <TableHead className="text-white font-bold text-sm">Stock</TableHead>
             <TableHead className="text-white font-bold text-sm">Sales</TableHead>
-            <TableHead className="text-white font-bold text-sm w-32">Actions</TableHead>
+            <TableHead className="text-white font-bold text-sm">Warranty/Expiry</TableHead>
+            <TableHead className="text-white font-bold text-sm w-40">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -106,6 +108,9 @@ export function ProductTable({
                     />
                     <div>
                       <div className="flex items-center gap-2">
+                        {product.variants && product.variants.length > 0 && (
+                          <Badge className="bg-green-500 text-white text-[10px] px-1.5 py-0">PARENT</Badge>
+                        )}
                         <span className="font-semibold text-gray-800 group-hover:text-green-700 transition-colors duration-200">{product.name}</span>
                         {product.featured && (
                           <Star className="h-4 w-4 text-coral-500 fill-current animate-pulse" />
@@ -116,12 +121,15 @@ export function ProductTable({
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge className={`${getCategoryColor(product.category)} text-xs font-medium group-hover:scale-110 transition-transform duration-200`}>
+                  <Badge className={`${getCategoryColor(product.category, product.categoryColor)} text-xs font-medium group-hover:scale-110 transition-transform duration-200`}>
                     {product.category}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <span className="text-lg font-bold text-green-700 group-hover:text-green-800 transition-colors duration-200">${product.unitPrice.toFixed(2)}</span>
+                  <span className="text-sm text-gray-700">{product.vendorName || "-"}</span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-lg font-bold text-green-700 group-hover:text-green-800 transition-colors duration-200">₹{product.unitPrice.toFixed(2)}</span>
                 </TableCell>
                 <TableCell>
                   <div className="space-y-1">
@@ -151,6 +159,20 @@ export function ProductTable({
                   </div>
                 </TableCell>
                 <TableCell>
+                  <div className="text-sm text-gray-600">
+                    {product.expiryDate ? (
+                      <div>
+                        <div className="font-medium">Exp: {product.expiryDate}</div>
+                        {product.remainingWarranty && (
+                          <div className="text-xs text-gray-500">{product.remainingWarranty}</div>
+                        )}
+                      </div>
+                    ) : (
+                      "-"
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell>
                   <ProductRowActions
                     product={product}
                     selectedProduct={selectedProduct}
@@ -160,7 +182,7 @@ export function ProductTable({
               </TableRow>
 
               {/* Product Variants */}
-              {expandedRows.has(product.id) && (
+              {expandedRows.has(product.id) && product.variants && product.variants.length > 0 && (
                 <ProductVariantRows
                   variants={product.variants}
                   getStockStatus={getStockStatus}
@@ -171,7 +193,7 @@ export function ProductTable({
           
           {products.length === 0 && (
             <TableRow>
-              <TableCell colSpan={9} className="text-center py-8 text-gray-500">
+              <TableCell colSpan={11} className="text-center py-8 text-gray-500">
                 <div className="flex flex-col items-center gap-2">
                   <Package className="h-8 w-8 text-gray-300" />
                   <span>No products found</span>

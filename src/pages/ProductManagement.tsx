@@ -114,8 +114,26 @@ const sortOptions = [
   { value: "rating", label: "Rating" },
 ];
 
-const getCategoryColor = (category: string) => {
-  const colors = {
+const getCategoryColor = (category: string, categoryColor?: string) => {
+  // Use category color from database if available
+  if (categoryColor) {
+    const colorMap: Record<string, string> = {
+      blue: "bg-blue-100 text-blue-800 border-blue-200",
+      red: "bg-red-100 text-red-800 border-red-200",
+      green: "bg-green-100 text-green-800 border-green-200",
+      purple: "bg-purple-100 text-purple-800 border-purple-200",
+      orange: "bg-orange-100 text-orange-800 border-orange-200",
+      yellow: "bg-amber-100 text-amber-800 border-amber-200",
+      pink: "bg-pink-100 text-pink-800 border-pink-200",
+      cyan: "bg-cyan-100 text-cyan-800 border-cyan-200",
+      teal: "bg-teal-100 text-teal-800 border-teal-200",
+      indigo: "bg-indigo-100 text-indigo-800 border-indigo-200",
+    };
+    return colorMap[categoryColor] || "bg-slate-100 text-slate-800 border-slate-200";
+  }
+  
+  // Fallback to category name based colors
+  const colors: Record<string, string> = {
     Tools: "bg-blue-100 text-blue-800 border-blue-200",
     Paint: "bg-red-100 text-red-800 border-red-200",
     Canvas: "bg-green-100 text-green-800 border-green-200",
@@ -131,15 +149,20 @@ const getStockStatus = (quantity: number) => {
 };
 
 export default function ProductManagement() {
-  // Fetch products from database
+  // Fetch products from database with vendors and variants
   const { data: dbProducts = [], isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Fetch main products with categories and vendors
+      const { data: mainProducts, error } = await supabase
         .from("products")
         .select(`
           *,
           categories (
+            name,
+            color
+          ),
+          vendors:preferred_vendor_id (
             name
           )
         `)
@@ -147,26 +170,58 @@ export default function ProductManagement() {
         .order("created_at", { ascending: false });
       
       if (error) throw error;
+
+      // Fetch variants for each main product
+      const productsWithVariants = await Promise.all(
+        (mainProducts || []).map(async (product, index) => {
+          const { data: variants } = await supabase
+            .from("products")
+            .select(`
+              *,
+              vendors:preferred_vendor_id (
+                name
+              )
+            `)
+            .eq("parent_product_id", product.id)
+            .order("created_at", { ascending: true });
+
+          return {
+            id: product.id,
+            name: product.name,
+            category: product.categories?.name || "Uncategorized",
+            categoryColor: product.categories?.color || "green",
+            unit: product.unit,
+            unitPrice: Number(product.unit_price) || 0,
+            stockQuantity: product.current_stock || 0,
+            image: product.image_url || "/placeholder.svg",
+            baseCode: product.hsn_code || `PRD${String(index + 1).padStart(3, '0')}`,
+            description: "",
+            dateAdded: new Date(product.created_at).toISOString().split('T')[0],
+            featured: false,
+            rating: 4.5,
+            totalSales: product.sale_qty || 0,
+            lastSold: "",
+            vendorName: product.vendors?.name || "",
+            expiryDate: product.expiry_date || "",
+            remainingWarranty: product.remaining_warranty || "",
+            variants: (variants || []).map(v => ({
+              id: v.id,
+              name: v.name,
+              unitPrice: Number(v.unit_price) || 0,
+              stockQuantity: v.current_stock || 0,
+              currentStock: v.current_stock || 0,
+              sku: v.hsn_code || "",
+              hsnCode: v.hsn_code || "",
+              image: v.image_url || "",
+              vendorName: v.vendors?.name || "",
+              expiryDate: v.expiry_date || "",
+              remainingWarranty: v.remaining_warranty || "",
+            }))
+          };
+        })
+      );
       
-      // Transform database products to match the format expected by the UI
-      return (data || []).map((product, index) => ({
-        id: product.id,
-        name: product.name,
-        category: product.categories?.name || "Uncategorized",
-        unit: product.unit,
-        unitPrice: Number(product.unit_price) || 0,
-        stockQuantity: product.current_stock || 0,
-        image: product.image_url || "/placeholder.svg",
-        baseCode: product.hsn_code || `PRD${String(index + 1).padStart(3, '0')}`,
-        description: "",
-        dateAdded: new Date(product.created_at).toISOString().split('T')[0],
-        featured: false,
-        rating: 4.5,
-        totalSales: product.sale_qty || 0,
-        lastSold: "",
-        supplier: "",
-        variants: []
-      }));
+      return productsWithVariants;
     },
   });
 
