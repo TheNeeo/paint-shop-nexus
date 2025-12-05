@@ -8,26 +8,38 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
+const fetchWithRetry = async (url: string, options?: RequestInit, retries = 3): Promise<Response> => {
+  let lastError: Error | null = null;
+
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await Promise.race([
+        fetch(url, options),
+        new Promise<Response>((_, reject) =>
+          setTimeout(() => reject(new Error('Fetch timeout')), 15000)
+        ),
+      ]);
+      return response;
+    } catch (error) {
+      lastError = error as Error;
+      if (i < retries - 1) {
+        // Wait before retrying (exponential backoff)
+        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+      }
+    }
+  }
+
+  // If all retries failed, throw the last error
+  throw lastError || new Error('All retry attempts failed');
+};
+
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     storage: localStorage,
     persistSession: true,
-    autoRefreshToken: true,
+    autoRefreshToken: false, // Disable auto refresh to prevent aggressive retry loops
   },
   global: {
-    fetch: async (url, options) => {
-      try {
-        const response = await fetch(url, options);
-        return response;
-      } catch (error) {
-        console.error('Supabase fetch error:', error);
-        // Return a failed response instead of throwing to allow graceful error handling
-        return new Response(JSON.stringify({ error: 'Network error' }), {
-          status: 0,
-          statusText: 'Network Error',
-          headers: { 'Content-Type': 'application/json' },
-        });
-      }
-    }
+    fetch: fetchWithRetry,
   }
 });
