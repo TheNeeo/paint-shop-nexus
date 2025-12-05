@@ -68,8 +68,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.warn('Sign out error:', error);
+      // Clear session locally even if sign out fails
+      setSession(null);
+      setUser(null);
+    }
   };
+
+  // Manual token refresh on an interval
+  useEffect(() => {
+    if (!session?.refresh_token) return;
+
+    const refreshInterval = setInterval(async () => {
+      try {
+        const { data, error } = await supabase.auth.refreshSession();
+        if (error) {
+          console.warn('Token refresh failed:', error);
+          // On error, check if session is still valid
+          try {
+            const { data: currentSession } = await supabase.auth.getSession();
+            if (!currentSession.session) {
+              setSession(null);
+              setUser(null);
+            }
+          } catch (e) {
+            console.warn('Failed to check session:', e);
+          }
+        } else if (data.session) {
+          setSession(data.session);
+          setUser(data.session.user);
+        }
+      } catch (error) {
+        console.warn('Token refresh error:', error);
+      }
+    }, 60000); // Refresh every minute
+
+    return () => clearInterval(refreshInterval);
+  }, [session?.refresh_token]);
 
   const value = {
     user,
