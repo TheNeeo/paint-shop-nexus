@@ -320,6 +320,35 @@ export default function ProductManagement() {
             </div>
           ) : (
             <>
+          {/* Breadcrumb - Outside Header Box */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+            className="mb-3"
+          >
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink 
+                    onClick={() => navigate("/")} 
+                    className="cursor-pointer hover:opacity-80 transition-opacity flex items-center"
+                  >
+                    <img src={dashboardHomeIcon} alt="Dashboard" className="h-6 w-6 object-contain bg-transparent" style={{ mixBlendMode: 'multiply' }} />
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="text-green-700 font-medium">Product Management</BreadcrumbPage>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="text-green-800 font-semibold">Product Activity</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </motion.div>
+
           {/* Enhanced Animated Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -335,26 +364,6 @@ export default function ProductManagement() {
             
             <div className="relative z-10 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
               <div className="space-y-3">
-                <Breadcrumb>
-                  <BreadcrumbList>
-                    <BreadcrumbItem>
-                      <BreadcrumbLink 
-                        onClick={() => navigate("/")} 
-                        className="cursor-pointer hover:opacity-80 transition-opacity flex items-center"
-                      >
-                        <img src={dashboardHomeIcon} alt="Dashboard" className="h-6 w-6 object-contain bg-transparent" style={{ mixBlendMode: 'multiply' }} />
-                      </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                      <BreadcrumbPage className="text-green-700 font-medium">Product Management</BreadcrumbPage>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                      <BreadcrumbPage className="text-green-800 font-semibold">Product Activity</BreadcrumbPage>
-                    </BreadcrumbItem>
-                  </BreadcrumbList>
-                </Breadcrumb>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                   <motion.h1 
                     initial={{ opacity: 0, x: -20 }}
