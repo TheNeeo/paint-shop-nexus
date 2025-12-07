@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
@@ -14,6 +15,7 @@ import {
 import {
   Breadcrumb,
   BreadcrumbItem,
+  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
@@ -22,7 +24,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   Plus,
   Download,
-  Home,
   Zap,
   Package,
   RefreshCw,
@@ -35,6 +36,7 @@ import { BulkActions } from "@/components/product/BulkActions";
 import { ProductFooter } from "@/components/product/ProductFooter";
 import { AddProductModal } from "@/components/inventory/AddProductModal";
 import AppLayout from "@/components/layout/AppLayout";
+import dashboardHomeIcon from "@/assets/dashboard-home-icon.png";
 
 // Enhanced mock data with more detailed information
 const mockProducts = [
@@ -149,6 +151,7 @@ const getStockStatus = (quantity: number) => {
 };
 
 export default function ProductManagement() {
+  const navigate = useNavigate();
   // Fetch products from database with vendors and variants
   const { data: dbProducts = [], isLoading } = useQuery({
     queryKey: ["products"],
@@ -335,7 +338,12 @@ export default function ProductManagement() {
                 <Breadcrumb>
                   <BreadcrumbList>
                     <BreadcrumbItem>
-                      <Home className="h-4 w-4 text-green-600" />
+                      <BreadcrumbLink 
+                        onClick={() => navigate("/")} 
+                        className="cursor-pointer hover:opacity-80 transition-opacity flex items-center"
+                      >
+                        <img src={dashboardHomeIcon} alt="Dashboard" className="h-6 w-6 object-contain" />
+                      </BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
@@ -378,7 +386,7 @@ export default function ProductManagement() {
                   transition={{ delay: 0.5, duration: 0.5 }}
                   className="text-sm text-green-700 italic"
                 >
-                  Neo Color Factory ~ The Colors of Your Dreams 🎨
+                  Advanced Product & Variant Control
                 </motion.p>
               </div>
               
