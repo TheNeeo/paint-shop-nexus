@@ -38,7 +38,7 @@ export function ProductStats({
     },
     {
       title: "Total Inventory Value",
-      value: `$${totalValue.toFixed(2)}`,
+      value: `₹${totalValue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       icon: DollarSign,
       color: "text-blue-600",
       bgColor: "bg-gradient-to-br from-blue-100 to-blue-200",
