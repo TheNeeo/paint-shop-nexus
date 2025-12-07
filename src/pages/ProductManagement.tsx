@@ -342,7 +342,7 @@ export default function ProductManagement() {
                         onClick={() => navigate("/")} 
                         className="cursor-pointer hover:opacity-80 transition-opacity flex items-center"
                       >
-                        <img src={dashboardHomeIcon} alt="Dashboard" className="h-6 w-6 object-contain" />
+                        <img src={dashboardHomeIcon} alt="Dashboard" className="h-6 w-6 object-contain bg-transparent" style={{ mixBlendMode: 'multiply' }} />
                       </BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
@@ -368,7 +368,17 @@ export default function ProductManagement() {
                     >
                       <Paintbrush className="h-8 w-8 sm:h-10 sm:w-10 text-green-600" />
                     </motion.div>
-                    Product Activity
+                    <div className="flex flex-col">
+                      <span>Product Activity</span>
+                      <motion.span 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.5, duration: 0.5 }}
+                        className="text-sm font-normal text-green-700 italic ml-[3.5ch]"
+                      >
+                        Advanced Product & Variant Control
+                      </motion.span>
+                    </div>
                   </motion.h1>
                   <motion.div
                     initial={{ scale: 0 }}
@@ -380,14 +390,6 @@ export default function ProductManagement() {
                     </Badge>
                   </motion.div>
                 </div>
-                <motion.p 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5, duration: 0.5 }}
-                  className="text-sm text-green-700 italic"
-                >
-                  Advanced Product & Variant Control
-                </motion.p>
               </div>
               
               <motion.div 
@@ -399,6 +401,7 @@ export default function ProductManagement() {
                 <Button 
                   variant="outline" 
                   size="sm" 
+                  onClick={() => window.location.reload()}
                   className="w-full sm:w-auto bg-white hover:bg-green-50 border-2 border-green-300 text-green-700 hover:border-green-400 transition-all duration-300 shadow-sm hover:shadow-md group"
                 >
                   <RefreshCw className="h-4 w-4 mr-2 group-hover:rotate-180 transition-transform duration-500" />
@@ -407,6 +410,18 @@ export default function ProductManagement() {
                 <Button 
                   variant="outline" 
                   size="sm" 
+                  onClick={() => {
+                    const csvContent = filteredProducts.map(p => 
+                      `${p.name},${p.category},${p.unit},${p.unitPrice},${p.stockQuantity}`
+                    ).join('\n');
+                    const blob = new Blob([`Name,Category,Unit,Price,Stock\n${csvContent}`], { type: 'text/csv' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'products_export.csv';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  }}
                   className="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700 border-blue-600 transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105"
                 >
                   <Download className="h-4 w-4 mr-2" />
