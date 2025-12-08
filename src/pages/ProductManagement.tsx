@@ -28,6 +28,7 @@ import {
   Package,
   RefreshCw,
   Paintbrush,
+  Activity,
 } from "lucide-react";
 import { ProductStats } from "@/components/product/ProductStats";
 import { ProductFilters } from "@/components/product/ProductFilters";
@@ -403,18 +404,25 @@ export default function ProductManagement() {
                 <BreadcrumbItem>
                   <BreadcrumbLink 
                     onClick={() => navigate("/")} 
-                    className="cursor-pointer hover:opacity-80 transition-opacity flex items-center"
+                    className="cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-1.5"
                   >
-                    <img src={dashboardHomeIcon} alt="Dashboard" className="h-6 w-6 object-contain bg-transparent" style={{ mixBlendMode: 'multiply' }} />
+                    <img src={dashboardHomeIcon} alt="Dashboard" className="h-5 w-5 object-contain bg-transparent" style={{ mixBlendMode: 'multiply' }} />
+                    <span className="text-cyan-600 font-medium">Dashboard</span>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage className="text-green-700 font-medium">Product Management</BreadcrumbPage>
+                  <BreadcrumbPage className="flex items-center gap-1.5">
+                    <Package className="h-4 w-4 text-orange-400" />
+                    <span className="text-orange-600 font-medium">Product Management</span>
+                  </BreadcrumbPage>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage className="text-green-800 font-semibold">Product Activity</BreadcrumbPage>
+                  <BreadcrumbPage className="flex items-center gap-1.5">
+                    <Activity className="h-4 w-4 text-green-400" />
+                    <span className="text-green-700 font-semibold">Product Activity</span>
+                  </BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
