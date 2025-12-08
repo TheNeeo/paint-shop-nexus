@@ -72,7 +72,11 @@ export function ProductTable({
         <TableBody>
           {products.map((product, index) => (
             <React.Fragment key={product.id}>
-              <TableRow className="border-b border-green-100 hover:bg-gradient-to-r hover:from-green-50 hover:to-green-100 transition-all duration-200 group hover:scale-[1.01] hover:shadow-md">
+              <TableRow className={`border-b border-green-100 transition-all duration-200 group hover:scale-[1.01] hover:shadow-md ${
+                selectedProducts.has(product.id) 
+                  ? 'bg-gradient-to-r from-green-100 via-green-50 to-emerald-100 border-l-4 border-l-green-500 shadow-inner' 
+                  : 'hover:bg-gradient-to-r hover:from-green-50 hover:to-green-100'
+              }`}>
                 <TableCell>
                   <Checkbox
                     checked={selectedProducts.has(product.id)}
