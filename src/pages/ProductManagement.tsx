@@ -119,6 +119,9 @@ const sortOptions = [
 const getCategoryColor = (category: string, categoryColor?: string) => {
   // Use category color from database if available
   if (categoryColor) {
+    // Normalize color name (lowercase, trim)
+    const normalizedColor = categoryColor.toLowerCase().trim();
+    
     const colorMap: Record<string, string> = {
       blue: "bg-blue-100 text-blue-800 border-blue-200",
       red: "bg-red-100 text-red-800 border-red-200",
@@ -126,12 +129,22 @@ const getCategoryColor = (category: string, categoryColor?: string) => {
       purple: "bg-purple-100 text-purple-800 border-purple-200",
       orange: "bg-orange-100 text-orange-800 border-orange-200",
       yellow: "bg-amber-100 text-amber-800 border-amber-200",
+      amber: "bg-amber-100 text-amber-800 border-amber-200",
       pink: "bg-pink-100 text-pink-800 border-pink-200",
       cyan: "bg-cyan-100 text-cyan-800 border-cyan-200",
       teal: "bg-teal-100 text-teal-800 border-teal-200",
       indigo: "bg-indigo-100 text-indigo-800 border-indigo-200",
+      slate: "bg-slate-100 text-slate-800 border-slate-200",
+      gray: "bg-gray-100 text-gray-800 border-gray-200",
+      rose: "bg-rose-100 text-rose-800 border-rose-200",
+      coral: "bg-coral-100 text-coral-800 border-coral-200",
+      lime: "bg-lime-100 text-lime-800 border-lime-200",
+      emerald: "bg-emerald-100 text-emerald-800 border-emerald-200",
+      sky: "bg-sky-100 text-sky-800 border-sky-200",
+      violet: "bg-violet-100 text-violet-800 border-violet-200",
+      fuchsia: "bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200",
     };
-    return colorMap[categoryColor] || "bg-slate-100 text-slate-800 border-slate-200";
+    return colorMap[normalizedColor] || `bg-${normalizedColor}-100 text-${normalizedColor}-800 border-${normalizedColor}-200`;
   }
   
   // Fallback to category name based colors
@@ -194,7 +207,7 @@ export default function ProductManagement() {
             category: product.categories?.name || "Uncategorized",
             categoryColor: product.categories?.color || "green",
             unit: product.unit,
-            unitPrice: Number(product.unit_price) || 0,
+            unitPrice: Number(product.sale_price) || Number(product.unit_price) || 0,
             stockQuantity: product.current_stock || 0,
             image: product.image_url || "/placeholder.svg",
             baseCode: product.hsn_code || `PRD${String(index + 1).padStart(3, '0')}`,
@@ -210,7 +223,9 @@ export default function ProductManagement() {
             variants: (variants || []).map(v => ({
               id: v.id,
               name: v.name,
-              unitPrice: Number(v.unit_price) || 0,
+              unitPrice: Number(v.sale_price) || Number(v.unit_price) || 0,
+              salePrice: Number(v.sale_price) || 0,
+              purchasePrice: Number(v.purchase_price) || 0,
               stockQuantity: v.current_stock || 0,
               currentStock: v.current_stock || 0,
               sku: v.hsn_code || "",
