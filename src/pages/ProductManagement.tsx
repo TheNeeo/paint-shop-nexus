@@ -304,7 +304,63 @@ export default function ProductManagement() {
   }, [products]);
 
   const handleBulkAction = (action: string) => {
-    console.log(`Bulk action: ${action} on products:`, Array.from(selectedProducts));
+    const selectedProductsList = filteredProducts.filter(p => selectedProducts.has(p.id));
+    
+    switch (action) {
+      case "export":
+        // Export selected products as CSV
+        const headers = ["Product Name", "Category", "Unit", "Unit Price", "Stock Quantity", "Vendor", "HSN Code"];
+        const csvContent = [
+          headers.join(","),
+          ...selectedProductsList.map(product => [
+            `"${product.name}"`,
+            `"${product.category}"`,
+            `"${product.unit}"`,
+            product.unitPrice,
+            product.stockQuantity,
+            `"${product.vendorName || ''}"`,
+            `"${product.baseCode}"`
+          ].join(","))
+        ].join("\n");
+        
+        const blob = new Blob([csvContent], { type: "text/csv" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `selected_products_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        alert(`✅ Exported ${selectedProductsList.length} product(s) successfully!`);
+        break;
+        
+      case "edit":
+        alert(`📝 Bulk Edit: ${selectedProductsList.length} product(s) selected.\n\nProducts:\n${selectedProductsList.map(p => `• ${p.name}`).join('\n')}\n\nBulk edit feature will open a form to update common fields.`);
+        break;
+        
+      case "duplicate":
+        alert(`📋 Duplicate: ${selectedProductsList.length} product(s) will be duplicated.\n\nProducts:\n${selectedProductsList.map(p => `• ${p.name}`).join('\n')}\n\nDuplicate feature coming soon!`);
+        break;
+        
+      case "feature":
+        alert(`⭐ Mark as Featured: ${selectedProductsList.length} product(s) will be marked as featured.\n\nProducts:\n${selectedProductsList.map(p => `• ${p.name}`).join('\n')}`);
+        break;
+        
+      case "tag":
+        alert(`🏷️ Add Tags: Add tags to ${selectedProductsList.length} product(s).\n\nProducts:\n${selectedProductsList.map(p => `• ${p.name}`).join('\n')}\n\nTag management feature coming soon!`);
+        break;
+        
+      case "archive":
+        alert(`📦 Archive: ${selectedProductsList.length} product(s) will be archived.\n\nProducts:\n${selectedProductsList.map(p => `• ${p.name}`).join('\n')}`);
+        break;
+        
+      case "delete":
+        alert(`🗑️ Delete: ${selectedProductsList.length} product(s) will be permanently deleted.\n\nProducts:\n${selectedProductsList.map(p => `• ${p.name}`).join('\n')}\n\nThis action cannot be undone!`);
+        setSelectedProducts(new Set());
+        break;
+        
+      default:
+        console.log(`Unknown action: ${action}`);
+    }
   };
 
   return (
