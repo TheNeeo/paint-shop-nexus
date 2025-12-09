@@ -1,5 +1,6 @@
 
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -12,6 +13,7 @@ import {
 import {
   Breadcrumb,
   BreadcrumbItem,
+  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
@@ -19,15 +21,22 @@ import {
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   Plus,
-  Home,
   Layers,
   Edit,
   Trash2,
   Package,
+  Tags,
+  RefreshCw,
+  Download,
+  CheckCircle,
+  TrendingUp,
+  BarChart3,
 } from "lucide-react";
 import { CategoryForm } from "@/components/category/CategoryForm";
 import { CategoryTable } from "@/components/category/CategoryTable";
 import AppLayout from "@/components/layout/AppLayout";
+import { motion } from "framer-motion";
+import dashboardHomeIcon from "@/assets/dashboard-home-icon.png";
 
 // Mock category data
 const mockCategories = [
@@ -70,6 +79,7 @@ const mockCategories = [
 ];
 
 export default function CategoryManagement() {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState(mockCategories);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
@@ -109,131 +119,219 @@ export default function CategoryManagement() {
 
   const totalProducts = categories.reduce((sum, cat) => sum + cat.productCount, 0);
   const activeCategories = categories.filter(cat => cat.isActive).length;
+  const inactiveCategories = categories.filter(cat => !cat.isActive).length;
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+  };
+
+  const statCards = [
+    {
+      title: "Total Categories",
+      value: categories.length,
+      icon: Layers,
+      iconBg: "bg-gradient-to-br from-blue-100 to-blue-200",
+      iconColor: "text-blue-600",
+      borderColor: "border-blue-200",
+      glowColor: "hover:shadow-blue-200/50",
+    },
+    {
+      title: "Active Categories",
+      value: activeCategories,
+      icon: CheckCircle,
+      iconBg: "bg-gradient-to-br from-green-100 to-green-200",
+      iconColor: "text-green-600",
+      borderColor: "border-green-200",
+      glowColor: "hover:shadow-green-200/50",
+    },
+    {
+      title: "Total Products",
+      value: totalProducts,
+      icon: Package,
+      iconBg: "bg-gradient-to-br from-purple-100 to-purple-200",
+      iconColor: "text-purple-600",
+      borderColor: "border-purple-200",
+      glowColor: "hover:shadow-purple-200/50",
+    },
+    {
+      title: "Avg Products/Category",
+      value: categories.length > 0 ? Math.round(totalProducts / categories.length) : 0,
+      icon: BarChart3,
+      iconBg: "bg-gradient-to-br from-orange-100 to-orange-200",
+      iconColor: "text-orange-600",
+      borderColor: "border-orange-200",
+      glowColor: "hover:shadow-orange-200/50",
+    },
+  ];
 
   return (
     <AppLayout>
       <TooltipProvider>
-        <div className="w-full bg-gradient-to-br from-green-200 via-green-100 to-green-200 min-h-screen p-6">
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
-            <div className="space-y-3">
-              <Breadcrumb>
-                <BreadcrumbList>
-                  <BreadcrumbItem>
-                    <Home className="h-4 w-4" />
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <Package className="h-4 w-4" />
-                    Product Management
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage>Category Management</BreadcrumbPage>
-                  </BreadcrumbItem>
-                </BreadcrumbList>
-              </Breadcrumb>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2">
-                  <Layers className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
-                  Category Management
-                </h1>
-                <Badge className="bg-green-100 text-green-800 w-fit">
-                  {categories.length} categories
-                </Badge>
+        <div className="w-full bg-gradient-to-br from-purple-100 via-purple-50 to-purple-100 min-h-screen p-6">
+          {/* Header Section */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-gradient-to-r from-purple-600 via-purple-500 to-indigo-500 rounded-2xl p-6 mb-6 shadow-xl"
+          >
+            <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
+              <div className="space-y-3">
+                {/* Breadcrumb */}
+                <Breadcrumb>
+                  <BreadcrumbList className="text-purple-100">
+                    <BreadcrumbItem>
+                      <BreadcrumbLink 
+                        onClick={() => navigate("/")} 
+                        className="cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-1.5"
+                      >
+                        <img src={dashboardHomeIcon} alt="Dashboard" className="h-5 w-5 object-contain bg-transparent" style={{ mixBlendMode: 'multiply' }} />
+                        <span className="text-white font-medium">Dashboard</span>
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator className="text-purple-200" />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage className="flex items-center gap-1.5">
+                        <Package className="h-4 w-4 text-orange-300" />
+                        <span className="text-orange-200 font-medium">Product Management</span>
+                      </BreadcrumbPage>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator className="text-purple-200" />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage className="flex items-center gap-1.5">
+                        <Tags className="h-4 w-4 text-purple-200" />
+                        <span className="text-white font-semibold">Category Management</span>
+                      </BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
+
+                {/* Title */}
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-white flex items-center gap-3">
+                    <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                      <Tags className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+                    </div>
+                    Category Management
+                  </h1>
+                  <Badge className="bg-white/20 text-white border-white/30 w-fit backdrop-blur-sm">
+                    {categories.length} categories
+                  </Badge>
+                </div>
+                <p className="text-purple-100 text-sm">Organize and manage your product categories</p>
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="bg-white/10 border-white/30 text-white hover:bg-white/20 backdrop-blur-sm"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Refresh
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="bg-white/10 border-white/30 text-white hover:bg-white/20 backdrop-blur-sm"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+                <Dialog open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
+                  <DialogTrigger asChild>
+                    <Button className="bg-white text-purple-700 hover:bg-purple-50 shadow-lg">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add New Category
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <Tags className="h-5 w-5 text-purple-600" />
+                        Add New Category
+                      </DialogTitle>
+                    </DialogHeader>
+                    <CategoryForm 
+                      onSubmit={handleAddCategory}
+                      onClose={() => setIsAddCategoryOpen(false)}
+                    />
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
-            
-            <Dialog open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg w-full sm:w-auto">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add New Category
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <Layers className="h-5 w-5 text-green-600" />
-                    Add New Category
-                  </DialogTitle>
-                </DialogHeader>
-                <CategoryForm 
-                  onSubmit={handleAddCategory}
-                  onClose={() => setIsAddCategoryOpen(false)}
-                />
-              </DialogContent>
-            </Dialog>
-          </div>
+          </motion.div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white rounded-lg shadow-sm p-6 border border-green-200">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Layers className="h-6 w-6 text-blue-600" />
+          <motion.div 
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+          >
+            {statCards.map((card, index) => (
+              <motion.div
+                key={card.title}
+                variants={itemVariants}
+                whileHover={{ scale: 1.02, y: -4 }}
+                className={`bg-white rounded-2xl shadow-lg p-6 border ${card.borderColor} transition-all duration-300 ${card.glowColor} hover:shadow-xl`}
+              >
+                <div className="flex items-center gap-4">
+                  <motion.div 
+                    whileHover={{ rotate: 10, scale: 1.1 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                    className={`w-14 h-14 ${card.iconBg} rounded-xl flex items-center justify-center shadow-inner`}
+                  >
+                    <card.icon className={`h-7 w-7 ${card.iconColor}`} />
+                  </motion.div>
+                  <div>
+                    <p className="text-sm text-gray-500 font-medium">{card.title}</p>
+                    <motion.p 
+                      className="text-3xl font-bold text-gray-900"
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.1 + 0.3, type: "spring" }}
+                    >
+                      {card.value}
+                    </motion.p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-600">Total Categories</p>
-                  <p className="text-2xl font-bold text-gray-900">{categories.length}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm p-6 border border-green-200">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Package className="h-6 w-6 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Active Categories</p>
-                  <p className="text-2xl font-bold text-gray-900">{activeCategories}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm p-6 border border-green-200">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Package className="h-6 w-6 text-purple-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Total Products</p>
-                  <p className="text-2xl font-bold text-gray-900">{totalProducts}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm p-6 border border-green-200">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <Layers className="h-6 w-6 text-orange-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Avg Products/Category</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {categories.length > 0 ? Math.round(totalProducts / categories.length) : 0}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+              </motion.div>
+            ))}
+          </motion.div>
 
           {/* Category Table */}
-          <div className="bg-white rounded-lg shadow-sm border border-green-200 overflow-hidden">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-white rounded-2xl shadow-lg border border-purple-200 overflow-hidden"
+          >
             <CategoryTable
               categories={categories}
               onEdit={handleEditClick}
               onDelete={handleDeleteCategory}
             />
-          </div>
+          </motion.div>
 
           {/* Edit Category Dialog */}
           <Dialog open={isEditCategoryOpen} onOpenChange={setIsEditCategoryOpen}>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
-                  <Edit className="h-5 w-5 text-green-600" />
+                  <Edit className="h-5 w-5 text-purple-600" />
                   Edit Category
                 </DialogTitle>
               </DialogHeader>
