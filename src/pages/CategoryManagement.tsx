@@ -175,10 +175,75 @@ export default function CategoryManagement() {
     },
   ];
 
+  const handleRefresh = () => {
+    // Re-fetch categories (refresh the page data)
+    window.location.reload();
+  };
+
+  const handleExport = () => {
+    // Export categories as CSV
+    const headers = ["Name", "Description", "Product Count", "Color", "Date Created", "Status"];
+    const csvContent = [
+      headers.join(","),
+      ...categories.map(cat => [
+        `"${cat.name}"`,
+        `"${cat.description || ''}"`,
+        cat.productCount,
+        `"${cat.color}"`,
+        `"${cat.dateCreated}"`,
+        cat.isActive ? "Active" : "Inactive"
+      ].join(","))
+    ].join("\n");
+    
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `categories_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
   return (
     <AppLayout>
       <TooltipProvider>
         <div className="w-full bg-gradient-to-br from-purple-100 via-purple-50 to-purple-100 min-h-screen p-6">
+          {/* Breadcrumb - Outside Header Box */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+            className="mb-3"
+          >
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink 
+                    onClick={() => navigate("/")} 
+                    className="cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-1.5"
+                  >
+                    <img src={dashboardHomeIcon} alt="Dashboard" className="h-5 w-5 object-contain bg-transparent" style={{ mixBlendMode: 'multiply' }} />
+                    <span className="text-cyan-600 font-medium">Dashboard</span>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="flex items-center gap-1.5">
+                    <Package className="h-4 w-4 text-orange-400" />
+                    <span className="text-orange-600 font-medium">Product Management</span>
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="flex items-center gap-1.5">
+                    <Tags className="h-4 w-4 text-purple-400" />
+                    <span className="text-purple-700 font-semibold">Category Management</span>
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </motion.div>
+
           {/* Header Section */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -188,35 +253,6 @@ export default function CategoryManagement() {
           >
             <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
               <div className="space-y-3">
-                {/* Breadcrumb */}
-                <Breadcrumb>
-                  <BreadcrumbList className="text-purple-100">
-                    <BreadcrumbItem>
-                      <BreadcrumbLink 
-                        onClick={() => navigate("/")} 
-                        className="cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-1.5"
-                      >
-                        <img src={dashboardHomeIcon} alt="Dashboard" className="h-5 w-5 object-contain bg-transparent" style={{ mixBlendMode: 'multiply' }} />
-                        <span className="text-white font-medium">Dashboard</span>
-                      </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator className="text-purple-200" />
-                    <BreadcrumbItem>
-                      <BreadcrumbPage className="flex items-center gap-1.5">
-                        <Package className="h-4 w-4 text-orange-300" />
-                        <span className="text-orange-200 font-medium">Product Management</span>
-                      </BreadcrumbPage>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator className="text-purple-200" />
-                    <BreadcrumbItem>
-                      <BreadcrumbPage className="flex items-center gap-1.5">
-                        <Tags className="h-4 w-4 text-purple-200" />
-                        <span className="text-white font-semibold">Category Management</span>
-                      </BreadcrumbPage>
-                    </BreadcrumbItem>
-                  </BreadcrumbList>
-                </Breadcrumb>
-
                 {/* Title */}
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                   <h1 className="text-2xl sm:text-3xl font-bold text-white flex items-center gap-3">
@@ -229,7 +265,7 @@ export default function CategoryManagement() {
                     {categories.length} categories
                   </Badge>
                 </div>
-                <p className="text-purple-100 text-sm">Organize and manage your product categories</p>
+                <p className="text-purple-100 text-sm pl-[52px]">Manage Product Categories with Clarity & Precision.</p>
               </div>
               
               {/* Action Buttons */}
@@ -237,6 +273,7 @@ export default function CategoryManagement() {
                 <Button 
                   variant="outline" 
                   size="sm"
+                  onClick={handleRefresh}
                   className="bg-white/10 border-white/30 text-white hover:bg-white/20 backdrop-blur-sm"
                 >
                   <RefreshCw className="h-4 w-4 mr-2" />
@@ -245,6 +282,7 @@ export default function CategoryManagement() {
                 <Button 
                   variant="outline" 
                   size="sm"
+                  onClick={handleExport}
                   className="bg-white/10 border-white/30 text-white hover:bg-white/20 backdrop-blur-sm"
                 >
                   <Download className="h-4 w-4 mr-2" />
