@@ -116,53 +116,63 @@ export function ProductRows({ categoryName, categoryColor, allCategories, onMove
           </TableCell>
           <TableCell></TableCell>
           <TableCell onClick={(e) => e.stopPropagation()}>
-            <DropdownMenu open={openMenuId === product.id} onOpenChange={(open) => setOpenMenuId(open ? product.id : null)}>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 w-6 p-0 opacity-60 hover:opacity-100 hover:bg-green-100"
-                >
-                  <MoreVertical className="h-3 w-3 text-green-600" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem className="cursor-pointer">
-                  <Eye className="h-4 w-4 mr-2" />
-                  <span>View Product</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer">
-                  <Edit className="h-4 w-4 mr-2" />
-                  <span>Edit Product</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <div className="px-2 py-1.5">
-                  <p className="text-xs font-medium text-gray-600 mb-2">Move to Category</p>
-                  <div className="space-y-1 max-h-48 overflow-y-auto">
-                    {allCategories.map((cat) => (
-                      <DropdownMenuItem
-                        key={cat.id}
-                        className="cursor-pointer text-sm pl-4 flex items-center gap-2"
-                        onClick={() => {
-                          if (onMoveCategory) {
-                            onMoveCategory(product.id, cat.id);
-                          }
-                          setOpenMenuId(null);
-                        }}
-                      >
-                        <div
-                          className="w-2 h-2 rounded-full border border-gray-300"
-                          style={{
-                            backgroundColor: cat.color.startsWith("#") ? cat.color : "#3B82F6"
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 opacity-60 hover:opacity-100 hover:bg-blue-100"
+                title="View Product"
+              >
+                <Eye className="h-4 w-4 text-blue-600" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 opacity-60 hover:opacity-100 hover:bg-green-100"
+                title="Edit Product"
+              >
+                <Edit className="h-4 w-4 text-green-600" />
+              </Button>
+              <DropdownMenu open={openMenuId === product.id} onOpenChange={(open) => setOpenMenuId(open ? product.id : null)}>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0 opacity-60 hover:opacity-100 hover:bg-purple-100"
+                    title="Move to Category"
+                  >
+                    <ArrowRight className="h-4 w-4 text-purple-600" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40">
+                  <div className="px-2 py-2">
+                    <p className="text-xs font-medium text-gray-700 mb-2 px-0">Move to:</p>
+                    <div className="space-y-1 max-h-48 overflow-y-auto">
+                      {allCategories.map((cat) => (
+                        <DropdownMenuItem
+                          key={cat.id}
+                          className="cursor-pointer text-sm flex items-center gap-2"
+                          onClick={() => {
+                            if (onMoveCategory) {
+                              onMoveCategory(product.id, cat.id);
+                            }
+                            setOpenMenuId(null);
                           }}
-                        />
-                        {cat.name}
-                      </DropdownMenuItem>
-                    ))}
+                        >
+                          <div
+                            className="w-2 h-2 rounded-full border border-gray-300"
+                            style={{
+                              backgroundColor: cat.color.startsWith("#") ? cat.color : "#3B82F6"
+                            }}
+                          />
+                          {cat.name}
+                        </DropdownMenuItem>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </TableCell>
         </TableRow>
       ))}
