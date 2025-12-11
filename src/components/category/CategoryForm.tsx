@@ -1,29 +1,11 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { ColorPicker } from "@/components/ui/color-picker";
 import { Switch } from "@/components/ui/switch";
 import { Save, X } from "lucide-react";
-
-const colorOptions = [
-  { value: "blue", label: "Blue", class: "bg-blue-500" },
-  { value: "red", label: "Red", class: "bg-red-500" },
-  { value: "green", label: "Green", class: "bg-green-500" },
-  { value: "purple", label: "Purple", class: "bg-purple-500" },
-  { value: "orange", label: "Orange", class: "bg-orange-500" },
-  { value: "pink", label: "Pink", class: "bg-pink-500" },
-  { value: "indigo", label: "Indigo", class: "bg-indigo-500" },
-  { value: "coral", label: "Coral", class: "bg-coral-500" },
-];
 
 interface CategoryFormData {
   name: string;
