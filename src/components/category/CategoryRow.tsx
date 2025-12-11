@@ -90,7 +90,10 @@ export function CategoryRow({ category, isExpanded, onToggle, onEdit, onDelete }
       
       <TableCell className="font-medium">
         <div className="flex items-center gap-3">
-          <div className={`w-3 h-3 rounded-full ${getColorDot(category.color)}`} />
+          <div
+            className="w-3 h-3 rounded-full border border-gray-300"
+            style={{ backgroundColor: category.color.startsWith("#") ? category.color : "#3B82F6" }}
+          />
           <span className="text-gray-900">{category.name}</span>
         </div>
       </TableCell>
