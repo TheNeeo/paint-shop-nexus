@@ -105,9 +105,15 @@ export function CategoryRow({ category, isExpanded, onToggle, onEdit, onDelete }
       </TableCell>
       
       <TableCell>
-        <Badge className={`${getCategoryColor(category.color)} border`}>
-          {category.color.charAt(0).toUpperCase() + category.color.slice(1)}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <div
+            className="w-5 h-5 rounded border border-gray-300"
+            style={{ backgroundColor: category.color.startsWith("#") ? category.color : "#3B82F6" }}
+          />
+          <span className="text-sm font-medium text-gray-700">
+            {category.color.startsWith("#") ? category.color.toUpperCase() : category.color}
+          </span>
+        </div>
       </TableCell>
       
       <TableCell>
