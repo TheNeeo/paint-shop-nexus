@@ -61,18 +61,18 @@ export function ProductRows({ categoryName, categoryColor, allCategories, onMove
       <TableRow className="bg-gradient-to-r from-green-50 to-green-100 border-l-4 border-green-400">
         <TableCell></TableCell>
         <TableCell className="font-semibold text-green-900">Product Name</TableCell>
-        <TableCell className="font-semibold text-green-900">SKU</TableCell>
+        <TableCell className="font-semibold text-green-900">HSN / Product Code</TableCell>
         <TableCell className="font-semibold text-green-900">Price</TableCell>
         <TableCell className="font-semibold text-green-900">Stock</TableCell>
         <TableCell className="font-semibold text-green-900">Status</TableCell>
         <TableCell></TableCell>
         <TableCell className="font-semibold text-green-900">Actions</TableCell>
       </TableRow>
-      
+
       {/* Product Rows */}
       {products.map((product, index) => (
-        <TableRow 
-          key={product.id} 
+        <TableRow
+          key={product.id}
           className="bg-gradient-to-r from-green-50/30 to-green-50/10 border-l-4 border-green-200 hover:from-green-50/50 hover:to-green-50/20"
         >
           <TableCell className="pl-8">
@@ -80,7 +80,13 @@ export function ProductRows({ categoryName, categoryColor, allCategories, onMove
           </TableCell>
           <TableCell className="pl-4">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+              <div
+                className="w-2.5 h-2.5 rounded-full border border-gray-300"
+                style={{
+                  backgroundColor: categoryColor.startsWith("#") ? categoryColor : "#3B82F6"
+                }}
+                title={categoryName}
+              />
               <span className="text-sm font-medium text-gray-800">{product.name}</span>
             </div>
           </TableCell>
@@ -88,7 +94,7 @@ export function ProductRows({ categoryName, categoryColor, allCategories, onMove
             <span className="text-sm text-gray-600 font-mono">{product.sku}</span>
           </TableCell>
           <TableCell>
-            <span className="text-sm font-semibold text-green-600">${product.price}</span>
+            <span className="text-sm font-semibold text-green-600">₹{(product.price * 83).toFixed(2)}</span>
           </TableCell>
           <TableCell>
             <div className="flex items-center gap-2">
@@ -99,10 +105,10 @@ export function ProductRows({ categoryName, categoryColor, allCategories, onMove
             </div>
           </TableCell>
           <TableCell>
-            <Badge 
+            <Badge
               className={
-                product.status === "Active" 
-                  ? "bg-green-100 text-green-800 border-green-200" 
+                product.status === "Active"
+                  ? "bg-green-100 text-green-800 border-green-200"
                   : "bg-coral-100 text-coral-800 border-coral-200"
               }
             >
@@ -110,23 +116,54 @@ export function ProductRows({ categoryName, categoryColor, allCategories, onMove
             </Badge>
           </TableCell>
           <TableCell></TableCell>
-          <TableCell>
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0 opacity-60 hover:opacity-100 hover:bg-green-100"
-              >
-                <Eye className="h-3 w-3 text-green-600" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0 opacity-60 hover:opacity-100 hover:bg-green-100"
-              >
-                <Edit className="h-3 w-3 text-green-600" />
-              </Button>
-            </div>
+          <TableCell onClick={(e) => e.stopPropagation()}>
+            <DropdownMenu open={openMenuId === product.id} onOpenChange={(open) => setOpenMenuId(open ? product.id : null)}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0 opacity-60 hover:opacity-100 hover:bg-green-100"
+                >
+                  <MoreVertical className="h-3 w-3 text-green-600" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem className="cursor-pointer">
+                  <Eye className="h-4 w-4 mr-2" />
+                  <span>View Product</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer">
+                  <Edit className="h-4 w-4 mr-2" />
+                  <span>Edit Product</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <div className="px-2 py-1.5">
+                  <p className="text-xs font-medium text-gray-600 mb-2">Move to Category</p>
+                  <div className="space-y-1 max-h-48 overflow-y-auto">
+                    {allCategories.map((cat) => (
+                      <DropdownMenuItem
+                        key={cat.id}
+                        className="cursor-pointer text-sm pl-4 flex items-center gap-2"
+                        onClick={() => {
+                          if (onMoveCategory) {
+                            onMoveCategory(product.id, cat.id);
+                          }
+                          setOpenMenuId(null);
+                        }}
+                      >
+                        <div
+                          className="w-2 h-2 rounded-full border border-gray-300"
+                          style={{
+                            backgroundColor: cat.color.startsWith("#") ? cat.color : "#3B82F6"
+                          }}
+                        />
+                        {cat.name}
+                      </DropdownMenuItem>
+                    ))}
+                  </div>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </TableCell>
         </TableRow>
       ))}
