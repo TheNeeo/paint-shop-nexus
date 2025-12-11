@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,32 +12,60 @@ interface CategoryRowProps {
   onDelete: (categoryId: string) => void;
 }
 
-const getCategoryColor = (color: string) => {
-  const colors = {
-    blue: "bg-blue-100 text-blue-800 border-blue-200",
-    red: "bg-red-100 text-red-800 border-red-200",
-    green: "bg-green-100 text-green-800 border-green-200",
-    purple: "bg-purple-100 text-purple-800 border-purple-200",
-    orange: "bg-orange-100 text-orange-800 border-orange-200",
-    pink: "bg-pink-100 text-pink-800 border-pink-200",
-    indigo: "bg-indigo-100 text-indigo-800 border-indigo-200",
-    coral: "bg-coral-100 text-coral-800 border-coral-200",
-  };
-  return colors[color] || "bg-slate-100 text-slate-800 border-slate-200";
+const getLighterHex = (hex: string): string => {
+  // Convert hex to RGB, lighten it, and return the lighter hex
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+
+  const lighter = (val: number) => Math.min(255, Math.round(val + (255 - val) * 0.7));
+
+  const lr = lighter(r).toString(16).padStart(2, '0');
+  const lg = lighter(g).toString(16).padStart(2, '0');
+  const lb = lighter(b).toString(16).padStart(2, '0');
+
+  return `#${lr}${lg}${lb}`;
 };
 
-const getColorDot = (color: string) => {
-  const colors = {
-    blue: "bg-blue-500",
-    red: "bg-red-500",
-    green: "bg-green-500",
-    purple: "bg-purple-500",
-    orange: "bg-orange-500",
-    pink: "bg-pink-500",
-    indigo: "bg-indigo-500",
-    coral: "bg-coral-500",
+const getDarkerHex = (hex: string): string => {
+  // Convert hex to RGB and darken it
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+
+  const darker = (val: number) => Math.round(val * 0.7);
+
+  const dr = darker(r).toString(16).padStart(2, '0');
+  const dg = darker(g).toString(16).padStart(2, '0');
+  const db = darker(b).toString(16).padStart(2, '0');
+
+  return `#${dr}${dg}${db}`;
+};
+
+const getCategoryColor = (color: string) => {
+  // If it's a hex color, generate lighter and darker variants
+  if (color.startsWith("#")) {
+    const lighter = getLighterHex(color);
+    const darker = getDarkerHex(color);
+    return {
+      bg: lighter,
+      text: darker,
+      border: color,
+    };
+  }
+
+  // Fallback for named colors (backward compatibility)
+  const colors: Record<string, { bg: string; text: string; border: string }> = {
+    blue: { bg: "#EFF6FF", text: "#1E40AF", border: "#3B82F6" },
+    red: { bg: "#FEF2F2", text: "#7F1D1D", border: "#EF4444" },
+    green: { bg: "#F0FDF4", text: "#166534", border: "#22C55E" },
+    purple: { bg: "#FAF5FF", text: "#6B21A8", border: "#A855F7" },
+    orange: { bg: "#FFF7ED", text: "#92400E", border: "#F97316" },
+    pink: { bg: "#FDF2F8", text: "#831843", border: "#EC4899" },
+    indigo: { bg: "#EEF2FF", text: "#312E81", border: "#6366F1" },
+    coral: { bg: "#FEF2F2", text: "#7F1D1D", border: "#FF7F50" },
   };
-  return colors[color] || "bg-slate-500";
+  return colors[color] || { bg: "#F8F8F8", text: "#1F2937", border: "#6B7280" };
 };
 
 export function CategoryRow({ category, isExpanded, onToggle, onEdit, onDelete }: CategoryRowProps) {
