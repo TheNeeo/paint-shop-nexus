@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -17,6 +16,7 @@ interface CategoryTableProps {
   categories: any[];
   onEdit: (category: any) => void;
   onDelete: (categoryId: string) => void;
+  onMoveCategory?: (productId: string, targetCategoryId: string) => void;
 }
 
 export function CategoryTable({ categories, onEdit, onDelete }: CategoryTableProps) {
