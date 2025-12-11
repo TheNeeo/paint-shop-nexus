@@ -136,31 +136,11 @@ export function CategoryForm({ category, onSubmit, onClose }: CategoryFormProps)
         </div>
 
         {/* Color Selection */}
-        <div className="space-y-2">
-          <Label className="text-sm font-medium text-gray-700">
-            Category Color
-          </Label>
-          <Select value={formData.color} onValueChange={(value) => handleInputChange("color", value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select a color">
-                <div className="flex items-center gap-2">
-                  <div className={`w-4 h-4 rounded-full ${colorOptions.find(c => c.value === formData.color)?.class}`} />
-                  {colorOptions.find(c => c.value === formData.color)?.label}
-                </div>
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {colorOptions.map((color) => (
-                <SelectItem key={color.value} value={color.value}>
-                  <div className="flex items-center gap-2">
-                    <div className={`w-4 h-4 rounded-full ${color.class}`} />
-                    {color.label}
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <ColorPicker
+          value={formData.color}
+          onChange={(value) => handleInputChange("color", value)}
+          label="Category Color"
+        />
 
         {/* Active Status */}
         <div className="flex items-center justify-between">
