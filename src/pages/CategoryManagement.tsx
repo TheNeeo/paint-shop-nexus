@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,7 +35,7 @@ const mockCategories = [
     name: "Tools",
     description: "Professional painting and crafting tools",
     productCount: 15,
-    color: "blue",
+    color: "#3B82F6",
     dateCreated: "2024-01-15",
     isActive: true,
   },
@@ -45,7 +44,7 @@ const mockCategories = [
     name: "Paint",
     description: "Acrylic and oil-based paints",
     productCount: 28,
-    color: "red",
+    color: "#EF4444",
     dateCreated: "2024-01-10",
     isActive: true,
   },
@@ -54,7 +53,7 @@ const mockCategories = [
     name: "Canvas",
     description: "Premium canvas for professional artists",
     productCount: 12,
-    color: "green",
+    color: "#22C55E",
     dateCreated: "2024-01-08",
     isActive: true,
   },
@@ -63,7 +62,7 @@ const mockCategories = [
     name: "Brushes",
     description: "Various brush types and sizes",
     productCount: 8,
-    color: "purple",
+    color: "#A855F7",
     dateCreated: "2024-01-05",
     isActive: false,
   },
