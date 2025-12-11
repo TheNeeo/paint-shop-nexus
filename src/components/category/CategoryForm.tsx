@@ -29,7 +29,7 @@ export function CategoryForm({ category, onSubmit, onClose }: CategoryFormProps)
   const [formData, setFormData] = useState<CategoryFormData>({
     name: "",
     description: "",
-    color: "blue",
+    color: "#3B82F6",
     isActive: true,
   });
 
