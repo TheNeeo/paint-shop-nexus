@@ -1,9 +1,15 @@
-
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { ChevronRight, Eye, Edit } from "lucide-react";
+import { ChevronRight, Eye, Edit, MoreVertical } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 // Mock products data for each category
 const getMockProducts = (categoryName: string) => {
@@ -27,7 +33,7 @@ const getMockProducts = (categoryName: string) => {
 
   return baseProducts.map((product, index) => ({
     ...product,
-    name: `${categoryName} - ${product.name}`,
+    name: product.name,
     id: `${categoryName.toLowerCase()}-${product.id}`,
   }));
 };
@@ -40,10 +46,14 @@ const getStockStatus = (stock: number) => {
 
 interface ProductRowsProps {
   categoryName: string;
+  categoryColor: string;
+  allCategories: any[];
+  onMoveCategory?: (productId: string, targetCategoryId: string) => void;
 }
 
-export function ProductRows({ categoryName }: ProductRowsProps) {
+export function ProductRows({ categoryName, categoryColor, allCategories, onMoveCategory }: ProductRowsProps) {
   const products = getMockProducts(categoryName);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
   return (
     <>
