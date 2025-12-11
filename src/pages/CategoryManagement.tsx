@@ -107,6 +107,15 @@ export default function CategoryManagement() {
     setIsEditCategoryOpen(true);
   };
 
+  const handleMoveCategory = (productId: string, targetCategoryId: string) => {
+    // For now, just show a confirmation message
+    // In production, this would update the product's category in the database
+    const targetCategory = categories.find(cat => cat.id === targetCategoryId);
+    if (targetCategory) {
+      alert(`Product moved to ${targetCategory.name} category`);
+    }
+  };
+
   const totalProducts = categories.reduce((sum, cat) => sum + cat.productCount, 0);
   const activeCategories = categories.filter(cat => cat.isActive).length;
 
@@ -277,6 +286,7 @@ export default function CategoryManagement() {
               categories={categories}
               onEdit={handleEditClick}
               onDelete={handleDeleteCategory}
+              onMoveCategory={handleMoveCategory}
             />
           </div>
 
