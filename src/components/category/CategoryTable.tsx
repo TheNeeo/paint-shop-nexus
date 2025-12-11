@@ -19,7 +19,7 @@ interface CategoryTableProps {
   onMoveCategory?: (productId: string, targetCategoryId: string) => void;
 }
 
-export function CategoryTable({ categories, onEdit, onDelete }: CategoryTableProps) {
+export function CategoryTable({ categories, onEdit, onDelete, onMoveCategory }: CategoryTableProps) {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
 
   const toggleCategoryExpansion = (categoryId: string) => {
