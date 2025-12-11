@@ -156,7 +156,7 @@ export default function CategoryManagement() {
             </div>
 
             <div className="relative z-10 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                   <motion.h1
                     initial={{ opacity: 0, x: -20 }}
@@ -170,7 +170,7 @@ export default function CategoryManagement() {
                     >
                       <Layers className="h-8 w-8 sm:h-10 sm:w-10 text-green-600" />
                     </motion.div>
-                    Manage Product Categories
+                    Category Management
                   </motion.h1>
                   <motion.div
                     initial={{ scale: 0 }}
