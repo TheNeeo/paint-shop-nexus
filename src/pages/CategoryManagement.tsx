@@ -136,7 +136,7 @@ export default function CategoryManagement() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage className="text-green-800 font-semibold">Category Management</BreadcrumbPage>
+                  <BreadcrumbPage className="text-green-800 font-semibold">Manage Product Categories</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
