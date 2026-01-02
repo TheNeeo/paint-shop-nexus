@@ -181,71 +181,58 @@ const PeriodicReport = () => {
         </Card>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          <Card style={{ borderColor: "hsl(278, 50%, 70%)", backgroundColor: "white" }}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Period</CardTitle>
-              <CalendarIcon className="h-4 w-4" style={{ color: "hsl(278, 50%, 70%)" }} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: "hsl(278, 50%, 30%)" }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-400 via-purple-400 to-indigo-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Period</h3>
+              <p className="text-2xl font-bold text-white">
                 {periodType === "monthly" ? "Monthly" : periodType === "weekly" ? "Weekly" : periodType === "yearly" ? "Yearly" : "Daily"}
-              </div>
-              <p className="text-xs text-muted-foreground">Current view</p>
-            </CardContent>
-          </Card>
+              </p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <CalendarIcon className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
 
-          <Card style={{ borderColor: "hsl(278, 50%, 70%)", backgroundColor: "white" }}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
-              <TrendingUp className="h-4 w-4" style={{ color: "hsl(278, 50%, 70%)" }} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: "hsl(278, 50%, 30%)" }}>
-                ₹{totalSales.toLocaleString()}
-              </div>
-              <p className="text-xs text-muted-foreground">+12% from last period</p>
-            </CardContent>
-          </Card>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-fuchsia-400 via-pink-500 to-rose-500 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Total Sales</h3>
+              <p className="text-2xl font-bold text-white">₹{totalSales.toLocaleString()}</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <TrendingUp className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
 
-          <Card style={{ borderColor: "hsl(278, 50%, 70%)", backgroundColor: "white" }}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Total Purchases</CardTitle>
-              <ShoppingCart className="h-4 w-4" style={{ color: "hsl(278, 50%, 70%)" }} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: "hsl(278, 50%, 30%)" }}>
-                ₹{totalPurchase.toLocaleString()}
-              </div>
-              <p className="text-xs text-muted-foreground">+8% from last period</p>
-            </CardContent>
-          </Card>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-400 via-blue-400 to-cyan-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Total Purchases</h3>
+              <p className="text-2xl font-bold text-white">₹{totalPurchase.toLocaleString()}</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <ShoppingCart className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
 
-          <Card style={{ borderColor: "hsl(278, 50%, 70%)", backgroundColor: "white" }}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Net Profit</CardTitle>
-              <DollarSign className="h-4 w-4" style={{ color: "hsl(278, 50%, 70%)" }} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: "hsl(142, 76%, 36%)" }}>
-                ₹{totalNetProfit.toLocaleString()}
-              </div>
-              <p className="text-xs text-muted-foreground">Healthy margin</p>
-            </CardContent>
-          </Card>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-400 via-green-400 to-teal-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Net Profit</h3>
+              <p className="text-2xl font-bold text-white">₹{totalNetProfit.toLocaleString()}</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <DollarSign className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
 
-          <Card style={{ borderColor: "hsl(278, 50%, 70%)", backgroundColor: "white" }}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">GST Collected</CardTitle>
-              <TrendingUp className="h-4 w-4" style={{ color: "hsl(278, 50%, 70%)" }} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: "hsl(278, 50%, 30%)" }}>
-                ₹{totalGST.toLocaleString()}
-              </div>
-              <p className="text-xs text-muted-foreground">Total tax collected</p>
-            </CardContent>
-          </Card>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-400 via-orange-400 to-red-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">GST Collected</h3>
+              <p className="text-2xl font-bold text-white">₹{totalGST.toLocaleString()}</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <TrendingUp className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
         </div>
 
         {/* Report Table with Tabs */}

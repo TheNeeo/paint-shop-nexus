@@ -219,84 +219,66 @@ const DayBook = () => {
           </div>
 
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-            <Card className="border-coral-200/30 hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                  <Wallet className="h-4 w-4" style={{ color: '#F56E75' }} />
-                  Account Balance
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-gray-900">
-                  {formatCurrency(summaryData.accountBalance)}
-                </div>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-rose-400 via-pink-400 to-red-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+              <div className="relative z-10">
+                <h3 className="text-lg font-semibold text-white/90 mb-1">Account Balance</h3>
+                <p className="text-2xl font-bold text-white">{formatCurrency(summaryData.accountBalance)}</p>
+              </div>
+              <div className="absolute right-4 bottom-4 opacity-80">
+                <Wallet className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+              </div>
+            </div>
 
-            <Card className="border-coral-200/30 hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                  <DollarSign className="h-4 w-4" style={{ color: '#F56E75' }} />
-                  Cash in Hand
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-gray-900">
-                  {formatCurrency(summaryData.cashInHand)}
-                </div>
-              </CardContent>
-            </Card>
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-400 via-orange-400 to-red-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+              <div className="relative z-10">
+                <h3 className="text-lg font-semibold text-white/90 mb-1">Cash in Hand</h3>
+                <p className="text-2xl font-bold text-white">{formatCurrency(summaryData.cashInHand)}</p>
+              </div>
+              <div className="absolute right-4 bottom-4 opacity-80">
+                <DollarSign className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+              </div>
+            </div>
 
-            <Card className="border-coral-200/30 hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-gray-600">Opening Balance</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-gray-900">
-                  {formatCurrency(summaryData.openingBalance)}
-                </div>
-              </CardContent>
-            </Card>
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-400 via-purple-400 to-indigo-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+              <div className="relative z-10">
+                <h3 className="text-lg font-semibold text-white/90 mb-1">Opening Balance</h3>
+                <p className="text-2xl font-bold text-white">{formatCurrency(summaryData.openingBalance)}</p>
+              </div>
+              <div className="absolute right-4 bottom-4 opacity-80">
+                <BookOpen className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+              </div>
+            </div>
 
-            <Card className="border-coral-200/30 hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-green-600" />
-                  Total Cash In
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">
-                  {formatCurrency(summaryData.totalCashIn)}
-                </div>
-              </CardContent>
-            </Card>
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-400 via-green-400 to-teal-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+              <div className="relative z-10">
+                <h3 className="text-lg font-semibold text-white/90 mb-1">Total Cash In</h3>
+                <p className="text-2xl font-bold text-white">{formatCurrency(summaryData.totalCashIn)}</p>
+              </div>
+              <div className="absolute right-4 bottom-4 opacity-80">
+                <TrendingUp className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+              </div>
+            </div>
 
-            <Card className="border-coral-200/30 hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                  <TrendingDown className="h-4 w-4 text-red-600" />
-                  Total Cash Out
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-red-600">
-                  {formatCurrency(summaryData.totalCashOut)}
-                </div>
-              </CardContent>
-            </Card>
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-400 via-rose-500 to-pink-500 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+              <div className="relative z-10">
+                <h3 className="text-lg font-semibold text-white/90 mb-1">Total Cash Out</h3>
+                <p className="text-2xl font-bold text-white">{formatCurrency(summaryData.totalCashOut)}</p>
+              </div>
+              <div className="absolute right-4 bottom-4 opacity-80">
+                <TrendingDown className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+              </div>
+            </div>
 
-            <Card className="border-coral-200/30 hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-gray-600">Closing Balance</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold" style={{ color: '#F56E75' }}>
-                  {formatCurrency(summaryData.closingBalance)}
-                </div>
-              </CardContent>
-            </Card>
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-fuchsia-400 via-pink-500 to-rose-500 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+              <div className="relative z-10">
+                <h3 className="text-lg font-semibold text-white/90 mb-1">Closing Balance</h3>
+                <p className="text-2xl font-bold text-white">{formatCurrency(summaryData.closingBalance)}</p>
+              </div>
+              <div className="absolute right-4 bottom-4 opacity-80">
+                <BookOpen className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+              </div>
+            </div>
           </div>
 
           {/* Transaction Table */}
