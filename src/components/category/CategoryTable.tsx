@@ -33,10 +33,10 @@ export function CategoryTable({ categories, onEdit, onDelete }: CategoryTablePro
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl border-2 border-green-200 overflow-hidden">
+    <div className="bg-white rounded-2xl shadow-xl border-2 border-purple-200 overflow-hidden">
       <Table>
         <TableHeader>
-          <TableRow className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 border-b-2 border-green-800">
+          <TableRow className="bg-gradient-to-r from-purple-600 via-purple-500 to-indigo-500 hover:from-purple-700 hover:via-purple-600 hover:to-indigo-600 border-b-2 border-purple-800">
             <TableHead className="text-white font-bold text-sm w-12"></TableHead>
             <TableHead className="text-white font-bold text-sm">Category</TableHead>
             <TableHead className="text-white font-bold text-sm">Description</TableHead>
