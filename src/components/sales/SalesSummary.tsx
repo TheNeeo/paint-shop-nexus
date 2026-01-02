@@ -1,7 +1,13 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, DollarSign, ShoppingCart, Users } from "lucide-react";
+import { TrendingUp, DollarSign, ShoppingCart, Users, LucideIcon } from "lucide-react";
+
+interface SummaryCard {
+  title: string;
+  value: string | number;
+  Icon: LucideIcon;
+  gradient: string;
+}
 
 export function SalesSummary() {
   const summaryData = {
@@ -17,53 +23,56 @@ export function SalesSummary() {
     lastUpdated: new Date().toLocaleString(),
   };
 
+  const cards: SummaryCard[] = [
+    {
+      title: "Total Sales",
+      value: summaryData.totalSales,
+      Icon: ShoppingCart,
+      gradient: "from-blue-400 via-blue-500 to-indigo-500",
+    },
+    {
+      title: "Total Revenue",
+      value: `₹${summaryData.totalRevenue.toLocaleString()}`,
+      Icon: DollarSign,
+      gradient: "from-emerald-400 via-green-500 to-teal-500",
+    },
+    {
+      title: "This Week",
+      value: summaryData.thisWeekSales,
+      Icon: TrendingUp,
+      gradient: "from-purple-400 via-violet-500 to-indigo-500",
+    },
+    {
+      title: "This Month",
+      value: summaryData.thisMonthSales,
+      Icon: Users,
+      gradient: "from-orange-400 via-amber-500 to-yellow-500",
+    }
+  ];
+
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-black">Total Sales</CardTitle>
-            <ShoppingCart className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-black">{summaryData.totalSales}</div>
-            <p className="text-xs text-black">All time sales count</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-black">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-black">₹{summaryData.totalRevenue.toLocaleString()}</div>
-            <p className="text-xs text-black">Total revenue earned</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-black">This Week</CardTitle>
-            <TrendingUp className="h-4 w-4 text-purple-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-black">{summaryData.thisWeekSales}</div>
-            <p className="text-xs text-black">Sales this week</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-black">This Month</CardTitle>
-            <Users className="h-4 w-4 text-orange-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-black">{summaryData.thisMonthSales}</div>
-            <p className="text-xs text-black">Sales this month</p>
-          </CardContent>
-        </Card>
+        {cards.map((card, index) => (
+          <div
+            key={index}
+            className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.gradient} p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]`}
+          >
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">
+                {card.title}
+              </h3>
+              <p className="text-2xl font-bold text-white">
+                {card.value}
+              </p>
+            </div>
+            
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <card.Icon className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Bottom Section */}

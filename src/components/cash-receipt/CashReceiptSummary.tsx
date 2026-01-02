@@ -1,71 +1,61 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, Receipt, TrendingUp, Award } from "lucide-react";
+import { DollarSign, Receipt, TrendingUp, Award, LucideIcon } from "lucide-react";
+
+interface SummaryCard {
+  title: string;
+  value: string;
+  Icon: LucideIcon;
+  gradient: string;
+}
 
 export function CashReceiptSummary() {
-  const summaryData = [
+  const cards: SummaryCard[] = [
     {
       title: "Total Receipts This Month",
       value: "₹2,45,000",
-      icon: Receipt,
-      color: "#7DBE3C",
-      bgColor: "rgba(125, 190, 60, 0.1)",
+      Icon: Receipt,
+      gradient: "from-lime-400 via-green-500 to-emerald-500",
     },
     {
       title: "Total Cash Inflow",
       value: "₹4,78,500",
-      icon: DollarSign,
-      color: "#16583f",
-      bgColor: "rgba(22, 88, 63, 0.1)",
+      Icon: DollarSign,
+      gradient: "from-emerald-400 via-teal-500 to-cyan-500",
     },
     {
       title: "No. of Receipts",
       value: "142",
-      icon: TrendingUp,
-      color: "#7DBE3C",
-      bgColor: "rgba(125, 190, 60, 0.1)",
+      Icon: TrendingUp,
+      gradient: "from-green-400 via-emerald-500 to-teal-500",
     },
     {
       title: "Highest Single Receipt",
       value: "₹85,000",
-      icon: Award,
-      color: "#16583f",
-      bgColor: "rgba(22, 88, 63, 0.1)",
+      Icon: Award,
+      gradient: "from-teal-400 via-green-500 to-lime-500",
     },
   ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {summaryData.map((item, index) => (
-        <Card 
-          key={index} 
-          className="border-0 shadow-lg"
-          style={{ 
-            backgroundColor: item.bgColor,
-            borderLeft: `4px solid ${item.color}`
-          }}
+      {cards.map((card, index) => (
+        <div
+          key={index}
+          className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.gradient} p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]`}
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle 
-              className="text-sm font-medium"
-              style={{ color: item.color }}
-            >
-              {item.title}
-            </CardTitle>
-            <item.icon 
-              className="h-5 w-5" 
-              style={{ color: item.color }}
-            />
-          </CardHeader>
-          <CardContent>
-            <div 
-              className="text-2xl font-bold"
-              style={{ color: item.color }}
-            >
-              {item.value}
-            </div>
-          </CardContent>
-        </Card>
+          <div className="relative z-10">
+            <h3 className="text-lg font-semibold text-white/90 mb-1">
+              {card.title}
+            </h3>
+            <p className="text-2xl font-bold text-white">
+              {card.value}
+            </p>
+          </div>
+          
+          <div className="absolute right-4 bottom-4 opacity-80">
+            <card.Icon className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+          </div>
+        </div>
       ))}
     </div>
   );
