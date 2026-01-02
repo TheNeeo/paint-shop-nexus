@@ -38,6 +38,7 @@ import AppLayout from "@/components/layout/AppLayout";
 import { motion } from "framer-motion";
 import dashboardHomeIcon from "@/assets/dashboard-home-icon.png";
 import categoriesIcon from "@/assets/categories-icon.png";
+import addCategoryIcon from "@/assets/add-category-icon.png";
 
 // Mock category data
 const mockCategories = [
@@ -296,10 +297,10 @@ export default function CategoryManagement() {
                       Add New Category
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-2xl">
-                    <DialogHeader>
-                      <DialogTitle className="flex items-center gap-2">
-                        <Tags className="h-5 w-5 text-purple-600" />
+                  <DialogContent className="max-w-2xl bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200">
+                    <DialogHeader className="bg-gradient-to-r from-purple-600 via-purple-500 to-indigo-500 -mx-6 -mt-6 px-6 py-4 rounded-t-lg">
+                      <DialogTitle className="flex items-center gap-3 text-white">
+                        <img src={addCategoryIcon} alt="Add Category" className="h-8 w-8 object-contain" />
                         Add New Category
                       </DialogTitle>
                     </DialogHeader>
@@ -367,10 +368,10 @@ export default function CategoryManagement() {
 
           {/* Edit Category Dialog */}
           <Dialog open={isEditCategoryOpen} onOpenChange={setIsEditCategoryOpen}>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  <Edit className="h-5 w-5 text-purple-600" />
+            <DialogContent className="max-w-2xl bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200">
+              <DialogHeader className="bg-gradient-to-r from-purple-600 via-purple-500 to-indigo-500 -mx-6 -mt-6 px-6 py-4 rounded-t-lg">
+                <DialogTitle className="flex items-center gap-3 text-white">
+                  <Edit className="h-5 w-5 text-white" />
                   Edit Category
                 </DialogTitle>
               </DialogHeader>
