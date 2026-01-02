@@ -1,10 +1,16 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, ShoppingCart, TrendingUp, CreditCard } from "lucide-react";
+import { Users, ShoppingCart, TrendingUp, CreditCard, LucideIcon } from "lucide-react";
 import type { VendorHistoryData } from "@/pages/VendorHistory";
 
 interface VendorHistorySummaryProps {
   vendors: VendorHistoryData[];
+}
+
+interface SummaryCard {
+  title: string;
+  subtitle: string;
+  Icon: LucideIcon;
+  gradient: string;
 }
 
 export const VendorHistorySummary: React.FC<VendorHistorySummaryProps> = ({ vendors }) => {
@@ -13,62 +19,53 @@ export const VendorHistorySummary: React.FC<VendorHistorySummaryProps> = ({ vend
   const avgPurchaseAmount = totalPurchases / totalVendors || 0;
   const totalOutstanding = vendors.reduce((sum, vendor) => sum + vendor.outstanding, 0);
 
-  const summaryData = [
+  const summaryData: SummaryCard[] = [
     {
       title: "Total Vendors",
-      value: totalVendors.toString(),
-      icon: Users,
-      change: `${vendors.filter(v => v.status === "Active").length} active`,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
+      subtitle: `${totalVendors} vendors`,
+      Icon: Users,
+      gradient: "from-blue-400 via-blue-500 to-indigo-500",
     },
     {
       title: "Total Purchases",
-      value: `₹${totalPurchases.toLocaleString()}`,
-      icon: ShoppingCart,
-      change: "All time purchases",
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
+      subtitle: `₹${totalPurchases.toLocaleString()}`,
+      Icon: ShoppingCart,
+      gradient: "from-emerald-400 via-green-500 to-teal-500",
     },
     {
       title: "Average Purchase",
-      value: `₹${avgPurchaseAmount.toFixed(0)}`,
-      icon: TrendingUp,
-      change: "Per vendor average",
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
+      subtitle: `₹${avgPurchaseAmount.toFixed(0)}`,
+      Icon: TrendingUp,
+      gradient: "from-purple-400 via-violet-500 to-indigo-500",
     },
     {
       title: "Outstanding Payables",
-      value: `₹${totalOutstanding.toLocaleString()}`,
-      icon: CreditCard,
-      change: `${vendors.filter(v => v.outstanding > 0).length} vendors pending`,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
+      subtitle: `₹${totalOutstanding.toLocaleString()}`,
+      Icon: CreditCard,
+      gradient: "from-orange-400 via-red-400 to-rose-500",
     },
   ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {summaryData.map((card, index) => (
-        <Card key={index} className="border-blue-200 hover:shadow-md transition-shadow bg-white">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+        <div
+          key={index}
+          className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.gradient} p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]`}
+        >
+          <div className="relative z-10">
+            <h3 className="text-lg font-semibold text-white/90 mb-1">
               {card.title}
-            </CardTitle>
-            <div className={`p-2 rounded-lg ${card.bgColor}`}>
-              <card.icon className={`h-4 w-4 ${card.color}`} />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-gray-900 mb-1">
-              {card.value}
-            </div>
-            <p className="text-xs text-gray-500">
-              {card.change}
+            </h3>
+            <p className="text-2xl font-bold text-white">
+              {card.subtitle}
             </p>
-          </CardContent>
-        </Card>
+          </div>
+          
+          <div className="absolute right-4 bottom-4 opacity-80">
+            <card.Icon className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+          </div>
+        </div>
       ))}
     </div>
   );
