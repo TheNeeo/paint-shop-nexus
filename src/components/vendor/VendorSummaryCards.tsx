@@ -1,64 +1,63 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, CreditCard, CheckCircle, Activity } from "lucide-react";
+import { Users, CreditCard, CheckCircle, Activity, LucideIcon } from "lucide-react";
+
+interface SummaryCard {
+  title: string;
+  subtitle: string;
+  Icon: LucideIcon;
+  gradient: string;
+}
 
 export function VendorSummaryCards() {
-  const summaryData = [
+  const summaryData: SummaryCard[] = [
     {
       title: "Total Vendors",
-      value: "125",
-      icon: Users,
-      change: "+12 this month",
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
+      subtitle: "125 vendors",
+      Icon: Users,
+      gradient: "from-violet-400 via-purple-400 to-indigo-400",
     },
     {
       title: "Total Payables",
-      value: "₹2,45,000",
-      icon: CreditCard,
-      change: "₹45K pending",
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
+      subtitle: "₹2,45,000",
+      Icon: CreditCard,
+      gradient: "from-blue-300 via-cyan-300 to-teal-300",
     },
     {
       title: "Active Vendors",
-      value: "98",
-      icon: CheckCircle,
-      change: "78% active rate",
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
+      subtitle: "98 active",
+      Icon: CheckCircle,
+      gradient: "from-rose-300 via-pink-300 to-red-300",
     },
     {
       title: "Recent Transactions",
-      value: "42",
-      icon: Activity,
-      change: "Last 30 days",
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
+      subtitle: "42 this month",
+      Icon: Activity,
+      gradient: "from-emerald-400 via-green-400 to-teal-400",
     },
   ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {summaryData.map((card, index) => (
-        <Card key={index} className="border-gray-200 hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+        <div
+          key={index}
+          className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.gradient} p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]`}
+        >
+          {/* Text Content */}
+          <div className="relative z-10">
+            <h3 className="text-lg font-semibold text-white/90 mb-1">
               {card.title}
-            </CardTitle>
-            <div className={`p-2 rounded-lg ${card.bgColor}`}>
-              <card.icon className={`h-4 w-4 ${card.color}`} />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-gray-900 mb-1">
-              {card.value}
-            </div>
-            <p className="text-xs text-gray-500">
-              {card.change}
+            </h3>
+            <p className="text-sm text-white/70">
+              {card.subtitle}
             </p>
-          </CardContent>
-        </Card>
+          </div>
+          
+          {/* Large Icon on the right */}
+          <div className="absolute right-4 bottom-4 opacity-80">
+            <card.Icon className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+          </div>
+        </div>
       ))}
     </div>
   );
