@@ -37,6 +37,7 @@ import { CategoryTable } from "@/components/category/CategoryTable";
 import AppLayout from "@/components/layout/AppLayout";
 import { motion } from "framer-motion";
 import dashboardHomeIcon from "@/assets/dashboard-home-icon.png";
+import categoriesIcon from "@/assets/categories-icon.png";
 
 // Mock category data
 const mockCategories = [
@@ -257,7 +258,7 @@ export default function CategoryManagement() {
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                   <h1 className="text-2xl sm:text-3xl font-bold text-white flex items-center gap-3">
                     <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                      <Tags className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+                      <img src={categoriesIcon} alt="Categories" className="h-6 w-6 sm:h-8 sm:w-8 object-contain" />
                     </div>
                     Category Management
                   </h1>
