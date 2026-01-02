@@ -222,58 +222,46 @@ export default function InventoryReport() {
         </Card>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card style={{ borderColor: "hsl(45, 81%, 60%)", borderWidth: "2px" }}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Total Stock Items</CardTitle>
-              <Package className="h-4 w-4" style={{ color: "hsl(45, 81%, 60%)" }} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: "hsl(45, 81%, 40%)" }}>
-                {summaryData.totalItems}
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">Active products</p>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-400 to-orange-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Total Stock Items</h3>
+              <p className="text-2xl font-bold text-white">{summaryData.totalItems}</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <Package className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
 
-          <Card style={{ borderColor: "hsl(45, 81%, 60%)", borderWidth: "2px" }}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Total Stock Value</CardTitle>
-              <TrendingUp className="h-4 w-4" style={{ color: "hsl(45, 81%, 60%)" }} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: "hsl(45, 81%, 40%)" }}>
-                ₹{summaryData.totalValue.toLocaleString()}
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">Current valuation</p>
-            </CardContent>
-          </Card>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-400 via-green-400 to-teal-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Total Stock Value</h3>
+              <p className="text-2xl font-bold text-white">₹{summaryData.totalValue.toLocaleString()}</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <TrendingUp className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
 
-          <Card style={{ borderColor: "hsl(45, 81%, 60%)", borderWidth: "2px" }}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Low Stock Alerts</CardTitle>
-              <AlertCircle className="h-4 w-4" style={{ color: "hsl(45, 81%, 60%)" }} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: "hsl(45, 81%, 40%)" }}>
-                {summaryData.lowStockAlerts}
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">Items need reorder</p>
-            </CardContent>
-          </Card>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-400 via-rose-400 to-pink-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Low Stock Alerts</h3>
+              <p className="text-2xl font-bold text-white">{summaryData.lowStockAlerts}</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <AlertCircle className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
 
-          <Card style={{ borderColor: "hsl(45, 81%, 60%)", borderWidth: "2px" }}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Top Moving Products</CardTitle>
-              <Star className="h-4 w-4" style={{ color: "hsl(45, 81%, 60%)" }} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: "hsl(45, 81%, 40%)" }}>
-                {summaryData.topMoving}
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">High demand items</p>
-            </CardContent>
-          </Card>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-400 via-purple-400 to-indigo-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Top Moving Products</h3>
+              <p className="text-2xl font-bold text-white">{summaryData.topMoving}</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <Star className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
         </div>
 
         {/* Report Table */}

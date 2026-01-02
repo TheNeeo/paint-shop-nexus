@@ -188,58 +188,46 @@ export default function InvoiceGenerate() {
         </div>
 
         {/* Hero Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card style={{ borderColor: THEME_COLOR, borderWidth: "2px" }}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <FileText className="h-4 w-4" style={{ color: THEME_COLOR }} />
-                Total Sales Today
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">₹45,231</div>
-              <p className="text-xs text-muted-foreground">+20.1% from yesterday</p>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-300 via-orange-300 to-yellow-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Total Sales Today</h3>
+              <p className="text-2xl font-bold text-white">₹45,231</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <FileText className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
 
-          <Card style={{ borderColor: THEME_COLOR, borderWidth: "2px" }}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <CreditCard className="h-4 w-4" style={{ color: THEME_COLOR }} />
-                Pending Invoices
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">12</div>
-              <p className="text-xs text-muted-foreground">Worth ₹28,450</p>
-            </CardContent>
-          </Card>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-rose-300 via-pink-400 to-red-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Pending Invoices</h3>
+              <p className="text-2xl font-bold text-white">12</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <CreditCard className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
 
-          <Card style={{ borderColor: THEME_COLOR, borderWidth: "2px" }}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <DollarSign className="h-4 w-4" style={{ color: THEME_COLOR }} />
-                Total GST Collected
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">₹8,142</div>
-              <p className="text-xs text-muted-foreground">This month</p>
-            </CardContent>
-          </Card>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-300 via-green-400 to-teal-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Total GST Collected</h3>
+              <p className="text-2xl font-bold text-white">₹8,142</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <DollarSign className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
 
-          <Card style={{ borderColor: THEME_COLOR, borderWidth: "2px" }}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <TrendingUp className="h-4 w-4" style={{ color: THEME_COLOR }} />
-                Avg Invoice Value
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">₹3,769</div>
-              <p className="text-xs text-muted-foreground">+12% from last month</p>
-            </CardContent>
-          </Card>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-400 via-purple-400 to-indigo-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Avg Invoice Value</h3>
+              <p className="text-2xl font-bold text-white">₹3,769</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <TrendingUp className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
         </div>
 
         {/* Invoice Form Section */}

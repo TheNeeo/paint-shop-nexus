@@ -143,37 +143,25 @@ export default function CategoryManagement() {
       title: "Total Categories",
       value: categories.length,
       icon: Layers,
-      iconBg: "bg-gradient-to-br from-blue-100 to-blue-200",
-      iconColor: "text-blue-600",
-      borderColor: "border-blue-200",
-      glowColor: "hover:shadow-blue-200/50",
+      gradient: "from-violet-400 via-purple-400 to-indigo-400",
     },
     {
       title: "Active Categories",
       value: activeCategories,
       icon: CheckCircle,
-      iconBg: "bg-gradient-to-br from-green-100 to-green-200",
-      iconColor: "text-green-600",
-      borderColor: "border-green-200",
-      glowColor: "hover:shadow-green-200/50",
+      gradient: "from-emerald-400 via-green-400 to-teal-400",
     },
     {
       title: "Total Products",
       value: totalProducts,
       icon: Package,
-      iconBg: "bg-gradient-to-br from-purple-100 to-purple-200",
-      iconColor: "text-purple-600",
-      borderColor: "border-purple-200",
-      glowColor: "hover:shadow-purple-200/50",
+      gradient: "from-fuchsia-400 via-pink-500 to-rose-500",
     },
     {
       title: "Avg Products/Category",
       value: categories.length > 0 ? Math.round(totalProducts / categories.length) : 0,
       icon: BarChart3,
-      iconBg: "bg-gradient-to-br from-orange-100 to-orange-200",
-      iconColor: "text-orange-600",
-      borderColor: "border-orange-200",
-      glowColor: "hover:shadow-orange-200/50",
+      gradient: "from-amber-400 via-orange-400 to-red-400",
     },
   ];
 
@@ -326,27 +314,24 @@ export default function CategoryManagement() {
                 key={card.title}
                 variants={itemVariants}
                 whileHover={{ scale: 1.02, y: -4 }}
-                className={`bg-white rounded-2xl shadow-lg p-6 border ${card.borderColor} transition-all duration-300 ${card.glowColor} hover:shadow-xl`}
+                className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.gradient} p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300`}
               >
-                <div className="flex items-center gap-4">
-                  <motion.div 
-                    whileHover={{ rotate: 10, scale: 1.1 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                    className={`w-14 h-14 ${card.iconBg} rounded-xl flex items-center justify-center shadow-inner`}
+                <div className="relative z-10">
+                  <h3 className="text-lg font-semibold text-white/90 mb-1">
+                    {card.title}
+                  </h3>
+                  <motion.p 
+                    className="text-2xl font-bold text-white"
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.1 + 0.3, type: "spring" }}
                   >
-                    <card.icon className={`h-7 w-7 ${card.iconColor}`} />
-                  </motion.div>
-                  <div>
-                    <p className="text-sm text-gray-500 font-medium">{card.title}</p>
-                    <motion.p 
-                      className="text-3xl font-bold text-gray-900"
-                      initial={{ opacity: 0, scale: 0.5 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: index * 0.1 + 0.3, type: "spring" }}
-                    >
-                      {card.value}
-                    </motion.p>
-                  </div>
+                    {card.value}
+                  </motion.p>
+                </div>
+                
+                <div className="absolute right-4 bottom-4 opacity-80">
+                  <card.icon className="h-16 w-16 text-white/40" strokeWidth={1.5} />
                 </div>
               </motion.div>
             ))}

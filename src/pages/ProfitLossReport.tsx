@@ -172,58 +172,46 @@ const ProfitLossReport = () => {
         </Card>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card style={{ borderColor: "hsl(6, 31%, 64%)", backgroundColor: "white" }}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-              <TrendingUp className="h-4 w-4" style={{ color: "hsl(6, 31%, 64%)" }} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: "hsl(6, 31%, 30%)" }}>
-                ₹{totalIncome.toLocaleString()}
-              </div>
-              <p className="text-xs text-muted-foreground">Total income</p>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-rose-400 via-pink-400 to-red-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Total Revenue</h3>
+              <p className="text-2xl font-bold text-white">₹{totalIncome.toLocaleString()}</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <TrendingUp className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
 
-          <Card style={{ borderColor: "hsl(6, 31%, 64%)", backgroundColor: "white" }}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
-              <TrendingDown className="h-4 w-4" style={{ color: "hsl(6, 31%, 64%)" }} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: "hsl(6, 31%, 30%)" }}>
-                ₹{totalExpense.toLocaleString()}
-              </div>
-              <p className="text-xs text-muted-foreground">Total outflow</p>
-            </CardContent>
-          </Card>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-400 via-rose-500 to-pink-500 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Total Expenses</h3>
+              <p className="text-2xl font-bold text-white">₹{totalExpense.toLocaleString()}</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <TrendingDown className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
 
-          <Card style={{ borderColor: "hsl(6, 31%, 64%)", backgroundColor: "white" }}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Gross Profit</CardTitle>
-              <DollarSign className="h-4 w-4" style={{ color: "hsl(6, 31%, 64%)" }} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: grossProfit >= 0 ? "hsl(142, 76%, 36%)" : "hsl(0, 84%, 60%)" }}>
-                ₹{grossProfit.toLocaleString()}
-              </div>
-              <p className="text-xs text-muted-foreground">Revenue - Expenses</p>
-            </CardContent>
-          </Card>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-400 via-green-400 to-teal-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Gross Profit</h3>
+              <p className="text-2xl font-bold text-white">₹{grossProfit.toLocaleString()}</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <DollarSign className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
 
-          <Card style={{ borderColor: "hsl(6, 31%, 64%)", backgroundColor: "white" }}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Net Profit Margin</CardTitle>
-              <Percent className="h-4 w-4" style={{ color: "hsl(6, 31%, 64%)" }} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: "hsl(6, 31%, 30%)" }}>
-                {netProfitMargin}%
-              </div>
-              <p className="text-xs text-muted-foreground">Profit percentage</p>
-            </CardContent>
-          </Card>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-400 via-purple-400 to-indigo-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Net Profit Margin</h3>
+              <p className="text-2xl font-bold text-white">{netProfitMargin}%</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <Percent className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
         </div>
 
         {/* Report Table */}
