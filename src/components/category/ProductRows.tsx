@@ -3,7 +3,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { ChevronRight, Eye, Edit } from "lucide-react";
+import { ChevronRight, Eye, Edit, MoveRight } from "lucide-react";
 
 // Mock products data for each category
 const getMockProducts = (categoryName: string) => {
@@ -40,37 +40,54 @@ const getStockStatus = (stock: number) => {
 
 interface ProductRowsProps {
   categoryName: string;
+  categoryColor?: string;
 }
 
-export function ProductRows({ categoryName }: ProductRowsProps) {
+const getColorClasses = (color: string) => {
+  const colorMap: Record<string, { bg: string; border: string; text: string; light: string; dot: string }> = {
+    blue: { bg: "from-blue-50 to-blue-100", border: "border-blue-400", text: "text-blue-900", light: "from-blue-50/30 to-blue-50/10", dot: "bg-blue-400" },
+    green: { bg: "from-green-50 to-green-100", border: "border-green-400", text: "text-green-900", light: "from-green-50/30 to-green-50/10", dot: "bg-green-400" },
+    red: { bg: "from-red-50 to-red-100", border: "border-red-400", text: "text-red-900", light: "from-red-50/30 to-red-50/10", dot: "bg-red-400" },
+    yellow: { bg: "from-yellow-50 to-yellow-100", border: "border-yellow-400", text: "text-yellow-900", light: "from-yellow-50/30 to-yellow-50/10", dot: "bg-yellow-400" },
+    purple: { bg: "from-purple-50 to-purple-100", border: "border-purple-400", text: "text-purple-900", light: "from-purple-50/30 to-purple-50/10", dot: "bg-purple-400" },
+    pink: { bg: "from-pink-50 to-pink-100", border: "border-pink-400", text: "text-pink-900", light: "from-pink-50/30 to-pink-50/10", dot: "bg-pink-400" },
+    orange: { bg: "from-orange-50 to-orange-100", border: "border-orange-400", text: "text-orange-900", light: "from-orange-50/30 to-orange-50/10", dot: "bg-orange-400" },
+    cyan: { bg: "from-cyan-50 to-cyan-100", border: "border-cyan-400", text: "text-cyan-900", light: "from-cyan-50/30 to-cyan-50/10", dot: "bg-cyan-400" },
+    indigo: { bg: "from-indigo-50 to-indigo-100", border: "border-indigo-400", text: "text-indigo-900", light: "from-indigo-50/30 to-indigo-50/10", dot: "bg-indigo-400" },
+  };
+  return colorMap[color] || colorMap.green;
+};
+
+export function ProductRows({ categoryName, categoryColor = "green" }: ProductRowsProps) {
   const products = getMockProducts(categoryName);
+  const colors = getColorClasses(categoryColor);
 
   return (
     <>
       {/* Products Header */}
-      <TableRow className="bg-gradient-to-r from-green-50 to-green-100 border-l-4 border-green-400">
+      <TableRow className={`bg-gradient-to-r ${colors.bg} border-l-4 ${colors.border}`}>
         <TableCell></TableCell>
-        <TableCell className="font-semibold text-green-900">Product Name</TableCell>
-        <TableCell className="font-semibold text-green-900">SKU</TableCell>
-        <TableCell className="font-semibold text-green-900">Price</TableCell>
-        <TableCell className="font-semibold text-green-900">Stock</TableCell>
-        <TableCell className="font-semibold text-green-900">Status</TableCell>
+        <TableCell className={`font-semibold ${colors.text}`}>Product Name</TableCell>
+        <TableCell className={`font-semibold ${colors.text}`}>Product No/HSN Code</TableCell>
+        <TableCell className={`font-semibold ${colors.text}`}>Price</TableCell>
+        <TableCell className={`font-semibold ${colors.text}`}>Stock</TableCell>
+        <TableCell className={`font-semibold ${colors.text}`}>Status</TableCell>
         <TableCell></TableCell>
-        <TableCell className="font-semibold text-green-900">Actions</TableCell>
+        <TableCell className={`font-semibold ${colors.text}`}>Actions</TableCell>
       </TableRow>
       
       {/* Product Rows */}
       {products.map((product, index) => (
         <TableRow 
           key={product.id} 
-          className="bg-gradient-to-r from-green-50/30 to-green-50/10 border-l-4 border-green-200 hover:from-green-50/50 hover:to-green-50/20"
+          className={`bg-gradient-to-r ${colors.light} border-l-4 ${colors.border} hover:opacity-80`}
         >
           <TableCell className="pl-8">
-            <ChevronRight className="h-3 w-3 text-green-400" />
+            <ChevronRight className={`h-3 w-3 ${colors.text}`} />
           </TableCell>
           <TableCell className="pl-4">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+              <div className={`w-2 h-2 ${colors.dot} rounded-full`}></div>
               <span className="text-sm font-medium text-gray-800">{product.name}</span>
             </div>
           </TableCell>
@@ -78,7 +95,7 @@ export function ProductRows({ categoryName }: ProductRowsProps) {
             <span className="text-sm text-gray-600 font-mono">{product.sku}</span>
           </TableCell>
           <TableCell>
-            <span className="text-sm font-semibold text-green-600">${product.price}</span>
+            <span className={`text-sm font-semibold ${colors.text}`}>₹{product.price}</span>
           </TableCell>
           <TableCell>
             <div className="flex items-center gap-2">
@@ -105,16 +122,26 @@ export function ProductRows({ categoryName }: ProductRowsProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 w-6 p-0 opacity-60 hover:opacity-100 hover:bg-green-100"
+                className={`h-6 w-6 p-0 opacity-60 hover:opacity-100`}
+                title="View"
               >
-                <Eye className="h-3 w-3 text-green-600" />
+                <Eye className={`h-3 w-3 ${colors.text}`} />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 w-6 p-0 opacity-60 hover:opacity-100 hover:bg-green-100"
+                className={`h-6 w-6 p-0 opacity-60 hover:opacity-100`}
+                title="Edit"
               >
-                <Edit className="h-3 w-3 text-green-600" />
+                <Edit className={`h-3 w-3 ${colors.text}`} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`h-6 w-6 p-0 opacity-60 hover:opacity-100`}
+                title="Move to another category"
+              >
+                <MoveRight className={`h-3 w-3 ${colors.text}`} />
               </Button>
             </div>
           </TableCell>
