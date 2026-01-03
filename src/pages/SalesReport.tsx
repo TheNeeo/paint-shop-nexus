@@ -185,58 +185,46 @@ const SalesReport = () => {
         </Card>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card style={{ borderColor: "hsl(41, 31%, 48%)", backgroundColor: "white" }}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Total Sales Amount</CardTitle>
-              <DollarSign className="h-4 w-4" style={{ color: "hsl(41, 31%, 48%)" }} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: "hsl(41, 31%, 30%)" }}>
-                ₹{totalSales.toLocaleString()}
-              </div>
-              <p className="text-xs text-muted-foreground">+12% from last month</p>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-400 to-orange-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Total Sales Amount</h3>
+              <p className="text-2xl font-bold text-white">₹{totalSales.toLocaleString()}</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <DollarSign className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
 
-          <Card style={{ borderColor: "hsl(41, 31%, 48%)", backgroundColor: "white" }}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Total GST Collected</CardTitle>
-              <TrendingUp className="h-4 w-4" style={{ color: "hsl(41, 31%, 48%)" }} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: "hsl(41, 31%, 30%)" }}>
-                ₹{totalGST.toLocaleString()}
-              </div>
-              <p className="text-xs text-muted-foreground">18% GST average</p>
-            </CardContent>
-          </Card>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-400 via-green-400 to-teal-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Total GST Collected</h3>
+              <p className="text-2xl font-bold text-white">₹{totalGST.toLocaleString()}</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <TrendingUp className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
 
-          <Card style={{ borderColor: "hsl(41, 31%, 48%)", backgroundColor: "white" }}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">No. of Invoices</CardTitle>
-              <FileText className="h-4 w-4" style={{ color: "hsl(41, 31%, 48%)" }} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: "hsl(41, 31%, 30%)" }}>
-                {invoiceCount}
-              </div>
-              <p className="text-xs text-muted-foreground">This period</p>
-            </CardContent>
-          </Card>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-rose-400 via-pink-400 to-red-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">No. of Invoices</h3>
+              <p className="text-2xl font-bold text-white">{invoiceCount}</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <FileText className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
 
-          <Card style={{ borderColor: "hsl(41, 31%, 48%)", backgroundColor: "white" }}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Avg. Invoice Value</CardTitle>
-              <BarChart3 className="h-4 w-4" style={{ color: "hsl(41, 31%, 48%)" }} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: "hsl(41, 31%, 30%)" }}>
-                ₹{avgInvoiceValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-              </div>
-              <p className="text-xs text-muted-foreground">Per invoice</p>
-            </CardContent>
-          </Card>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-400 via-purple-400 to-indigo-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Avg. Invoice Value</h3>
+              <p className="text-2xl font-bold text-white">₹{avgInvoiceValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <BarChart3 className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
         </div>
 
         {/* Report Table */}

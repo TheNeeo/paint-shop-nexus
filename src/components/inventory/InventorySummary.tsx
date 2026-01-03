@@ -1,9 +1,14 @@
-
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package, AlertTriangle, DollarSign, Tags } from "lucide-react";
+import { Package, AlertTriangle, DollarSign, Tags, LucideIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+
+interface SummaryCard {
+  title: string;
+  value: string | number;
+  Icon: LucideIcon;
+  gradient: string;
+}
 
 export function InventorySummary() {
   const { data: summary } = useQuery({
@@ -32,59 +37,53 @@ export function InventorySummary() {
     }
   });
 
-  const cards = [
+  const cards: SummaryCard[] = [
     {
       title: "Total Products",
       value: summary?.totalProducts || 0,
-      icon: Package,
-      color: "cyan",
-      bgColor: "bg-cyan-100",
-      textColor: "text-cyan-800",
-      iconColor: "text-cyan-600"
+      Icon: Package,
+      gradient: "from-cyan-400 via-teal-500 to-emerald-500",
     },
     {
       title: "Low Stock Count",
       value: summary?.lowStockCount || 0,
-      icon: AlertTriangle,
-      color: "red",
-      bgColor: "bg-red-100",
-      textColor: "text-red-800",
-      iconColor: "text-red-600"
+      Icon: AlertTriangle,
+      gradient: "from-red-400 via-rose-500 to-pink-500",
     },
     {
       title: "Total Stock Value",
       value: `₹${(summary?.totalValue || 0).toLocaleString()}`,
-      icon: DollarSign,
-      color: "green",
-      bgColor: "bg-green-100",
-      textColor: "text-green-800",
-      iconColor: "text-green-600"
+      Icon: DollarSign,
+      gradient: "from-emerald-400 via-green-500 to-teal-500",
     },
     {
       title: "Categories",
       value: summary?.uniqueCategories || 0,
-      icon: Tags,
-      color: "purple",
-      bgColor: "bg-purple-100",
-      textColor: "text-purple-800",
-      iconColor: "text-purple-600"
+      Icon: Tags,
+      gradient: "from-purple-400 via-violet-500 to-indigo-500",
     }
   ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {cards.map((card) => (
-        <Card key={card.title} className={`${card.bgColor} border-${card.color}-200 hover:shadow-lg transition-shadow`}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className={`text-sm font-medium ${card.textColor}`}>
+      {cards.map((card, index) => (
+        <div
+          key={index}
+          className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.gradient} p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]`}
+        >
+          <div className="relative z-10">
+            <h3 className="text-lg font-semibold text-white/90 mb-1">
               {card.title}
-            </CardTitle>
-            <card.icon className={`h-4 w-4 ${card.iconColor}`} />
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${card.textColor}`}>{card.value}</div>
-          </CardContent>
-        </Card>
+            </h3>
+            <p className="text-2xl font-bold text-white">
+              {card.value}
+            </p>
+          </div>
+          
+          <div className="absolute right-4 bottom-4 opacity-80">
+            <card.Icon className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+          </div>
+        </div>
       ))}
     </div>
   );

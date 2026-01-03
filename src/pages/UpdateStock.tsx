@@ -169,52 +169,46 @@ export default function UpdateStock() {
         </div>
 
         {/* Hero Cards Row */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card style={{ backgroundColor: "#F0F3FC", borderColor: "#96A3CC" }}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Stock Quantity</CardTitle>
-              <Package className="h-4 w-4" style={{ color: "#96A3CC" }} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: "#96A3CC" }}>
-                {totalStock}
-              </div>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-400 via-blue-400 to-cyan-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Total Stock Quantity</h3>
+              <p className="text-2xl font-bold text-white">{totalStock}</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <Package className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
 
-          <Card style={{ backgroundColor: "#F0F3FC", borderColor: "#96A3CC" }}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Low Stock Items</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-coral-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-coral-600">{lowStockItems}</div>
-            </CardContent>
-          </Card>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-400 via-rose-400 to-pink-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Low Stock Items</h3>
+              <p className="text-2xl font-bold text-white">{lowStockItems}</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <AlertTriangle className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
 
-          <Card style={{ backgroundColor: "#F0F3FC", borderColor: "#96A3CC" }}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Inventory Value</CardTitle>
-              <DollarSign className="h-4 w-4" style={{ color: "#96A3CC" }} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: "#96A3CC" }}>
-                ₹{totalValue.toFixed(2)}
-              </div>
-            </CardContent>
-          </Card>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-400 via-green-400 to-teal-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Inventory Value</h3>
+              <p className="text-2xl font-bold text-white">₹{totalValue.toFixed(2)}</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <DollarSign className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
 
-          <Card style={{ backgroundColor: "#F0F3FC", borderColor: "#96A3CC" }}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Number of SKUs</CardTitle>
-              <Layers className="h-4 w-4" style={{ color: "#96A3CC" }} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: "#96A3CC" }}>
-                {totalSKUs}
-              </div>
-            </CardContent>
-          </Card>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-400 via-purple-400 to-indigo-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Number of SKUs</h3>
+              <p className="text-2xl font-bold text-white">{totalSKUs}</p>
+            </div>
+            <div className="absolute right-4 bottom-4 opacity-80">
+              <Layers className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            </div>
+          </div>
         </div>
 
         {/* Update Stock Panel */}

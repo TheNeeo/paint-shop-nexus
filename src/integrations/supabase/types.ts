@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       categories: {
         Row: {
+          color: string | null
           created_at: string
           created_by_user_id: string | null
           description: string | null
@@ -24,6 +25,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          color?: string | null
           created_at?: string
           created_by_user_id?: string | null
           description?: string | null
@@ -32,6 +34,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          color?: string | null
           created_at?: string
           created_by_user_id?: string | null
           description?: string | null
@@ -47,63 +50,75 @@ export type Database = {
           created_at: string
           created_by_user_id: string | null
           current_stock: number
+          expiry_date: string | null
           hsn_code: string | null
           id: string
           image_url: string | null
           is_variant: boolean
+          manufacture_date: string | null
           name: string
           parent_product_id: string | null
           preferred_vendor_id: string | null
           purchase_price: number | null
           purchase_qty: number
+          remaining_warranty: string | null
           sale_price: number | null
           sale_qty: number
           threshold_qty: number
           unit: string
           unit_price: number
           updated_at: string
+          warranty_years: number | null
         }
         Insert: {
           category_id?: string | null
           created_at?: string
           created_by_user_id?: string | null
           current_stock?: number
+          expiry_date?: string | null
           hsn_code?: string | null
           id?: string
           image_url?: string | null
           is_variant?: boolean
+          manufacture_date?: string | null
           name: string
           parent_product_id?: string | null
           preferred_vendor_id?: string | null
           purchase_price?: number | null
           purchase_qty?: number
+          remaining_warranty?: string | null
           sale_price?: number | null
           sale_qty?: number
           threshold_qty?: number
           unit?: string
           unit_price?: number
           updated_at?: string
+          warranty_years?: number | null
         }
         Update: {
           category_id?: string | null
           created_at?: string
           created_by_user_id?: string | null
           current_stock?: number
+          expiry_date?: string | null
           hsn_code?: string | null
           id?: string
           image_url?: string | null
           is_variant?: boolean
+          manufacture_date?: string | null
           name?: string
           parent_product_id?: string | null
           preferred_vendor_id?: string | null
           purchase_price?: number | null
           purchase_qty?: number
+          remaining_warranty?: string | null
           sale_price?: number | null
           sale_qty?: number
           threshold_qty?: number
           unit?: string
           unit_price?: number
           updated_at?: string
+          warranty_years?: number | null
         }
         Relationships: [
           {

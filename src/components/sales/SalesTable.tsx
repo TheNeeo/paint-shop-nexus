@@ -86,22 +86,22 @@ export function SalesTable({ filters, onViewInvoice }: SalesTableProps) {
 
   const getPaymentStatusBadge = (status: string) => {
     const variants = {
-      paid: "bg-green-100 text-green-800",
-      partial: "bg-coral-100 text-coral-800",
-      pending: "bg-red-100 text-red-800",
+      paid: "bg-green-100 text-green-800 border border-green-200",
+      partial: "bg-amber-100 text-amber-800 border border-amber-200",
+      pending: "bg-red-100 text-red-800 border border-red-200",
     };
     return variants[status as keyof typeof variants] || variants.pending;
   };
 
   const getPaymentModeBadge = (mode: string) => {
     const variants = {
-      "UPI": "bg-purple-100 text-purple-800",
-      "Credit Card": "bg-blue-100 text-blue-800",
-      "Cash": "bg-green-100 text-green-800",
-      "Bank Transfer": "bg-indigo-100 text-indigo-800",
-      "Cheque": "bg-orange-100 text-orange-800",
+      "UPI": "bg-purple-100 text-purple-800 border border-purple-200",
+      "Credit Card": "bg-blue-100 text-blue-800 border border-blue-200",
+      "Cash": "bg-green-100 text-green-800 border border-green-200",
+      "Bank Transfer": "bg-indigo-100 text-indigo-800 border border-indigo-200",
+      "Cheque": "bg-orange-100 text-orange-800 border border-orange-200",
     };
-    return variants[mode as keyof typeof variants] || "bg-gray-100 text-gray-800";
+    return variants[mode as keyof typeof variants] || "bg-gray-100 text-gray-800 border border-gray-200";
   };
 
   const toggleRowExpansion = (rowId: number) => {
@@ -132,36 +132,42 @@ export function SalesTable({ filters, onViewInvoice }: SalesTableProps) {
   });
 
   return (
-    <div className="bg-white rounded-lg border shadow-sm">
-      <div className="p-4 border-b">
-        <h2 className="text-lg font-semibold text-black">Sales Records</h2>
+    <div className="bg-white rounded-xl border-2 shadow-lg overflow-hidden" style={{ borderColor: '#fce7f3' }}>
+      <div 
+        className="p-4 border-b-2" 
+        style={{ 
+          background: 'linear-gradient(to right, #fdf2f8, #fff1f2)',
+          borderColor: '#fce7f3'
+        }}
+      >
+        <h2 className="text-lg font-semibold" style={{ color: '#831843' }}>Sales Records</h2>
       </div>
       
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead className="w-12 text-black font-semibold">
+          <TableRow style={{ backgroundColor: '#fdf2f8' }}>
+            <TableHead className="w-12 font-semibold" style={{ color: '#831843' }}>
               <Checkbox />
             </TableHead>
-            <TableHead className="w-8 text-black font-semibold"></TableHead>
-            <TableHead className="text-black font-semibold">Date</TableHead>
-            <TableHead className="text-black font-semibold">Invoice #</TableHead>
-            <TableHead className="text-black font-semibold">Customer</TableHead>
-            <TableHead className="text-black font-semibold">Product</TableHead>
-            <TableHead className="text-black font-semibold">Unit Price</TableHead>
-            <TableHead className="text-black font-semibold">Qty</TableHead>
-            <TableHead className="text-black font-semibold">Total Amount</TableHead>
-            <TableHead className="text-black font-semibold">Paid Amount</TableHead>
-            <TableHead className="text-black font-semibold">Payment Mode</TableHead>
-            <TableHead className="text-black font-semibold">Status</TableHead>
-            <TableHead className="text-black font-semibold">Actions</TableHead>
+            <TableHead className="w-8 font-semibold" style={{ color: '#831843' }}></TableHead>
+            <TableHead className="font-semibold" style={{ color: '#831843' }}>Date</TableHead>
+            <TableHead className="font-semibold" style={{ color: '#831843' }}>Invoice #</TableHead>
+            <TableHead className="font-semibold" style={{ color: '#831843' }}>Customer</TableHead>
+            <TableHead className="font-semibold" style={{ color: '#831843' }}>Product</TableHead>
+            <TableHead className="font-semibold" style={{ color: '#831843' }}>Unit Price</TableHead>
+            <TableHead className="font-semibold" style={{ color: '#831843' }}>Qty</TableHead>
+            <TableHead className="font-semibold" style={{ color: '#831843' }}>Total Amount</TableHead>
+            <TableHead className="font-semibold" style={{ color: '#831843' }}>Paid Amount</TableHead>
+            <TableHead className="font-semibold" style={{ color: '#831843' }}>Payment Mode</TableHead>
+            <TableHead className="font-semibold" style={{ color: '#831843' }}>Status</TableHead>
+            <TableHead className="font-semibold" style={{ color: '#831843' }}>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {filteredSales.map((sale) => (
             <React.Fragment key={sale.id}>
               {/* Main Row */}
-              <TableRow className="hover:bg-gray-50">
+              <TableRow className="hover:bg-pink-50/50 transition-colors duration-200">
                 <TableCell>
                   <Checkbox
                     checked={selectedRows.includes(sale.id)}
@@ -173,7 +179,8 @@ export function SalesTable({ filters, onViewInvoice }: SalesTableProps) {
                     variant="ghost"
                     size="sm"
                     onClick={() => toggleRowExpansion(sale.id)}
-                    className="p-1"
+                    className="p-1 hover:bg-pink-100"
+                    style={{ color: '#af0568' }}
                   >
                     {expandedRows.includes(sale.id) ? (
                       <ChevronDown className="h-4 w-4" />
@@ -182,21 +189,22 @@ export function SalesTable({ filters, onViewInvoice }: SalesTableProps) {
                     )}
                   </Button>
                 </TableCell>
-                <TableCell>{sale.date}</TableCell>
-                <TableCell className="font-medium">{sale.invoiceNumber}</TableCell>
-                <TableCell>{sale.customerName}</TableCell>
+                <TableCell className="text-gray-700">{sale.date}</TableCell>
+                <TableCell className="font-medium" style={{ color: '#af0568' }}>{sale.invoiceNumber}</TableCell>
+                <TableCell className="text-gray-700">{sale.customerName}</TableCell>
                 <TableCell>
                   <button
                     onClick={() => toggleRowExpansion(sale.id)}
-                    className="text-blue-600 hover:text-blue-800 font-medium"
+                    className="font-medium hover:underline"
+                    style={{ color: '#af0568' }}
                   >
                     {sale.productName}
                   </button>
                 </TableCell>
-                <TableCell>₹{sale.unitPrice}</TableCell>
-                <TableCell>{sale.quantity}</TableCell>
-                <TableCell>₹{sale.totalAmount}</TableCell>
-                <TableCell>₹{sale.paidAmount}</TableCell>
+                <TableCell className="text-gray-700">₹{sale.unitPrice}</TableCell>
+                <TableCell className="text-gray-700">{sale.quantity}</TableCell>
+                <TableCell className="font-semibold" style={{ color: '#831843' }}>₹{sale.totalAmount}</TableCell>
+                <TableCell className="font-semibold text-green-700">₹{sale.paidAmount}</TableCell>
                 <TableCell>
                   <Badge className={getPaymentModeBadge(sale.paymentMode)}>
                     {sale.paymentMode}
@@ -211,24 +219,32 @@ export function SalesTable({ filters, onViewInvoice }: SalesTableProps) {
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="hover:bg-pink-100"
+                        style={{ color: '#af0568' }}
+                      >
                         Actions
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem onClick={() => onViewInvoice(sale)}>
-                        <Eye className="h-4 w-4 mr-2" />
+                    <DropdownMenuContent className="bg-white border-2" style={{ borderColor: '#fce7f3' }}>
+                      <DropdownMenuItem 
+                        onClick={() => onViewInvoice(sale)}
+                        className="hover:bg-pink-50 cursor-pointer"
+                      >
+                        <Eye className="h-4 w-4 mr-2" style={{ color: '#af0568' }} />
                         View
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Download className="h-4 w-4 mr-2" />
+                      <DropdownMenuItem className="hover:bg-pink-50 cursor-pointer">
+                        <Download className="h-4 w-4 mr-2" style={{ color: '#af0568' }} />
                         Print
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Edit className="h-4 w-4 mr-2" />
+                      <DropdownMenuItem className="hover:bg-pink-50 cursor-pointer">
+                        <Edit className="h-4 w-4 mr-2" style={{ color: '#af0568' }} />
                         Edit
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600">
+                      <DropdownMenuItem className="text-red-600 hover:bg-red-50 cursor-pointer">
                         <Trash className="h-4 w-4 mr-2" />
                         Delete
                       </DropdownMenuItem>
@@ -239,18 +255,22 @@ export function SalesTable({ filters, onViewInvoice }: SalesTableProps) {
 
               {/* Expanded Variants Rows */}
               {expandedRows.includes(sale.id) && sale.variants.map((variant, index) => (
-                <TableRow key={`${sale.id}-variant-${index}`} className="bg-gray-50">
+                <TableRow 
+                  key={`${sale.id}-variant-${index}`} 
+                  style={{ backgroundColor: '#fdf2f8' }}
+                  className="border-l-4"
+                >
                   <TableCell></TableCell>
                   <TableCell className="pl-8"></TableCell>
                   <TableCell></TableCell>
                   <TableCell></TableCell>
                   <TableCell></TableCell>
-                  <TableCell className="pl-8 text-sm text-gray-600">
+                  <TableCell className="pl-8 text-sm" style={{ color: '#9d174d' }}>
                     └ {variant.name}
                   </TableCell>
-                  <TableCell className="text-sm">₹{variant.unitPrice}</TableCell>
-                  <TableCell className="text-sm">{variant.stockQuantity}</TableCell>
-                  <TableCell className="text-sm">₹{variant.totalAmount}</TableCell>
+                  <TableCell className="text-sm text-gray-600">₹{variant.unitPrice}</TableCell>
+                  <TableCell className="text-sm text-gray-600">{variant.stockQuantity}</TableCell>
+                  <TableCell className="text-sm font-medium" style={{ color: '#831843' }}>₹{variant.totalAmount}</TableCell>
                   <TableCell></TableCell>
                   <TableCell></TableCell>
                   <TableCell></TableCell>

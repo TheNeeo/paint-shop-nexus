@@ -1,75 +1,71 @@
-
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, Package, DollarSign, Clock } from 'lucide-react';
+import { AlertTriangle, Package, DollarSign, Clock, LucideIcon } from 'lucide-react';
 import { ReorderProduct } from '@/pages/ReorderProductList';
 
 interface ReorderSummaryCardsProps {
   products: ReorderProduct[];
 }
 
+interface SummaryCard {
+  title: string;
+  value: string | number;
+  Icon: LucideIcon;
+  gradient: string;
+}
+
 export function ReorderSummaryCards({ products }: ReorderSummaryCardsProps) {
   const totalLowStock = products.filter(p => p.status === 'low' || p.status === 'critical').length;
   const criticalAlerts = products.filter(p => p.status === 'critical').length;
   const totalEstimatedCost = products.reduce((sum, p) => sum + (p.suggestedQty * p.purchaseRate), 0);
-  const avgLeadTime = 7; // Mock average lead time
+  const avgLeadTime = 7;
 
-  const cards = [
+  const cards: SummaryCard[] = [
     {
       title: 'Total Low Stock Items',
       value: totalLowStock,
-      icon: Package,
-      description: 'Items below threshold',
-      color: 'text-pink-600',
-      bgColor: 'bg-pink-100',
-      cardBg: 'bg-pink-50'
+      Icon: Package,
+      gradient: 'from-pink-400 via-rose-400 to-red-400',
     },
     {
       title: 'Critical Stock Alerts',
       value: criticalAlerts,
-      icon: AlertTriangle,
-      description: 'Urgent reorder required',
-      color: 'text-rose-600',
-      bgColor: 'bg-rose-100',
-      cardBg: 'bg-rose-50'
+      Icon: AlertTriangle,
+      gradient: 'from-red-400 via-rose-500 to-pink-500',
     },
     {
       title: 'Total Estimated Cost',
       value: `₹${totalEstimatedCost.toLocaleString()}`,
-      icon: DollarSign,
-      description: 'For suggested quantities',
-      color: 'text-pink-600',
-      bgColor: 'bg-pink-100',
-      cardBg: 'bg-pink-50'
+      Icon: DollarSign,
+      gradient: 'from-fuchsia-400 via-pink-500 to-rose-500',
     },
     {
       title: 'Average Lead Time',
       value: `${avgLeadTime} days`,
-      icon: Clock,
-      description: 'Expected delivery time',
-      color: 'text-pink-600',
-      bgColor: 'bg-pink-100',
-      cardBg: 'bg-pink-50'
+      Icon: Clock,
+      gradient: 'from-purple-400 via-fuchsia-500 to-pink-500',
     }
   ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {cards.map((card, index) => (
-        <Card key={index} className={`border-pink-200 hover:shadow-md transition-shadow ${card.cardBg}`}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-pink-700">
+        <div
+          key={index}
+          className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.gradient} p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]`}
+        >
+          <div className="relative z-10">
+            <h3 className="text-lg font-semibold text-white/90 mb-1">
               {card.title}
-            </CardTitle>
-            <div className={`p-2 rounded-lg ${card.bgColor}`}>
-              <card.icon className={`h-4 w-4 ${card.color}`} />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-pink-800">{card.value}</div>
-            <p className="text-xs text-pink-600 mt-1">{card.description}</p>
-          </CardContent>
-        </Card>
+            </h3>
+            <p className="text-2xl font-bold text-white">
+              {card.value}
+            </p>
+          </div>
+          
+          <div className="absolute right-4 bottom-4 opacity-80">
+            <card.Icon className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+          </div>
+        </div>
       ))}
     </div>
   );
