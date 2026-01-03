@@ -137,7 +137,7 @@ export function ProductTable({
                   </span>
                 </TableCell>
                 <TableCell>
-                  <span className="text-lg font-bold text-green-700 group-hover:text-green-900 transition-colors duration-200">₹{product.unitPrice.toFixed(2)}</span>
+                  <span className="text-lg font-bold text-green-700 group-hover:text-green-900 transition-colors duration-200">₹{(product.unitPrice ?? 0).toFixed(2)}</span>
                 </TableCell>
                 <TableCell>
                   <div className="space-y-1">
