@@ -60,7 +60,12 @@ export function CategoryTable({ categories, onEdit, onDelete }: CategoryTablePro
 
               {/* Products Rows (when expanded) */}
               {expandedCategories.has(category.id) && (
-                <ProductRows categoryName={category.name} categoryColor={category.color} />
+                <ProductRows 
+                  categoryName={category.name} 
+                  categoryColor={category.color}
+                  categoryId={category.id}
+                  allCategories={categories}
+                />
               )}
             </React.Fragment>
           ))}

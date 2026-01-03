@@ -1,9 +1,16 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { ChevronRight, Eye, Edit, MoveRight } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 
 // Mock products data for each category
 const getMockProducts = (categoryName: string) => {
@@ -38,9 +45,17 @@ const getStockStatus = (stock: number) => {
   return { status: "In Stock", color: "bg-green-100 text-green-800 border-green-200" };
 };
 
+interface Category {
+  id: string;
+  name: string;
+  color: string;
+}
+
 interface ProductRowsProps {
   categoryName: string;
   categoryColor?: string;
+  categoryId: string;
+  allCategories: Category[];
 }
 
 const getColorClasses = (color: string) => {
@@ -58,9 +73,16 @@ const getColorClasses = (color: string) => {
   return colorMap[color] || colorMap.green;
 };
 
-export function ProductRows({ categoryName, categoryColor = "green" }: ProductRowsProps) {
+export function ProductRows({ categoryName, categoryColor = "green", categoryId, allCategories }: ProductRowsProps) {
   const products = getMockProducts(categoryName);
   const colors = getColorClasses(categoryColor);
+
+  const handleMoveProduct = (productId: string, productName: string, targetCategory: Category) => {
+    // TODO: Implement actual move logic with database
+    toast.success(`"${productName}" moved to "${targetCategory.name}"`);
+  };
+
+  const availableCategories = allCategories.filter(cat => cat.id !== categoryId);
 
   return (
     <>
@@ -135,14 +157,38 @@ export function ProductRows({ categoryName, categoryColor = "green" }: ProductRo
               >
                 <Edit className={`h-3 w-3 ${colors.text}`} />
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className={`h-6 w-6 p-0 opacity-60 hover:opacity-100`}
-                title="Move to another category"
-              >
-                <MoveRight className={`h-3 w-3 ${colors.text}`} />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`h-6 w-6 p-0 opacity-60 hover:opacity-100`}
+                    title="Move to another category"
+                  >
+                    <MoveRight className={`h-3 w-3 ${colors.text}`} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 bg-white z-50">
+                  {availableCategories.length > 0 ? (
+                    availableCategories.map((targetCategory) => (
+                      <DropdownMenuItem
+                        key={targetCategory.id}
+                        onClick={() => handleMoveProduct(product.id, product.name, targetCategory)}
+                        className="cursor-pointer flex items-center gap-2"
+                      >
+                        <div 
+                          className={`w-3 h-3 rounded-full ${getColorClasses(targetCategory.color || 'green').dot}`}
+                        />
+                        {targetCategory.name}
+                      </DropdownMenuItem>
+                    ))
+                  ) : (
+                    <DropdownMenuItem disabled className="text-gray-400">
+                      No other categories
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </TableCell>
         </TableRow>
