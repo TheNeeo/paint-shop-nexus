@@ -147,7 +147,7 @@ export default function SalesManagement() {
                   className="text-sm italic"
                   style={{ color: '#9d174d' }}
                 >
-                  Neo Color Factory ~ The Colors of Your Dreams 🎨
+                  Streamline your sales ~ Designed for smarter selling 💰
                 </motion.p>
               </div>
 
