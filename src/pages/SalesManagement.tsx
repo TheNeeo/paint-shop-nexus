@@ -190,11 +190,11 @@ export default function SalesManagement() {
           {/* Sales Summary Cards */}
           <SalesSummary />
 
-          {/* Search & Filter Bar */}
-          <SalesFilters filters={filters} onFiltersChange={setFilters} />
-
           {/* Sales Chart */}
           <SalesChart />
+
+          {/* Search & Filter Bar - Between Chart and Table */}
+          <SalesFilters filters={filters} onFiltersChange={setFilters} />
 
           {/* Sales Invoice Table */}
           <SalesTable filters={filters} onViewInvoice={handleViewInvoice} />
