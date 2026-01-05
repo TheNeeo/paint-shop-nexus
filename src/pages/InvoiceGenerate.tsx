@@ -42,10 +42,14 @@ import {
   Mail,
   MessageSquare,
   Calendar,
+  Home,
+  ChevronRight,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import invoiceGenerateIcon from "@/assets/invoice-generate-icon.png";
 
 // Champagne Pink theme color
 const THEME_COLOR = "#F4DDCB";
@@ -156,36 +160,97 @@ export default function InvoiceGenerate() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        {/* Page Title Bar */}
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-3xl font-bold" style={{ color: THEME_COLOR }}>
-              Sales Management
-            </h1>
-            <Breadcrumb className="mt-2">
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/sales">Sales</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Invoice Generate</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+        {/* Header Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="relative overflow-hidden rounded-2xl p-6"
+          style={{
+            background: 'linear-gradient(135deg, #F4DDCB 0%, #E8C5A8 50%, #D4A574 100%)',
+            boxShadow: '0 10px 40px rgba(244, 221, 203, 0.3)',
+          }}
+        >
+          {/* Background decorative elements */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -translate-y-1/2 translate-x-1/2" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full translate-y-1/2 -translate-x-1/2" />
           </div>
-          <Button
-            style={{ backgroundColor: THEME_COLOR, color: "#333" }}
-            onClick={handleSaveDraft}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Create New Invoice
-          </Button>
-        </div>
+
+          <div className="relative z-10">
+            {/* Breadcrumb */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+              className="flex items-center gap-2 text-sm mb-4"
+              style={{ color: '#8B4513' }}
+            >
+              <Home className="h-4 w-4" style={{ color: '#8B4513' }} />
+              <span>Home</span>
+              <ChevronRight className="h-4 w-4" />
+              <span>Sales</span>
+              <ChevronRight className="h-4 w-4" />
+              <span className="font-semibold">Invoice Generate</span>
+            </motion.div>
+
+            {/* Title with icon */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ delay: 0.3, duration: 0.5, type: "spring" }}
+                >
+                  <img 
+                    src={invoiceGenerateIcon} 
+                    alt="Invoice Generate" 
+                    className="h-14 w-14 object-contain"
+                    style={{ filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))' }}
+                  />
+                </motion.div>
+                <div>
+                  <motion.h1
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.4, duration: 0.4 }}
+                    className="text-3xl font-bold"
+                    style={{ color: '#5D3A1A' }}
+                  >
+                    Invoice Generate
+                  </motion.h1>
+                  <motion.p
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5, duration: 0.4 }}
+                    className="text-sm italic mt-1"
+                    style={{ color: '#8B4513' }}
+                  >
+                    Invoices, intelligently generated. 📝
+                  </motion.p>
+                </div>
+              </div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.6, duration: 0.4 }}
+              >
+                <Button
+                  style={{ 
+                    backgroundColor: '#5D3A1A', 
+                    color: '#fff',
+                    boxShadow: '0 4px 14px rgba(93, 58, 26, 0.3)'
+                  }}
+                  className="hover:opacity-90 transition-opacity"
+                  onClick={handleSaveDraft}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create New Invoice
+                </Button>
+              </motion.div>
+            </div>
+          </div>
+        </motion.div>
 
         {/* Hero Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
