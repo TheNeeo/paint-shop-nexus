@@ -17,6 +17,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, Upload, Save, Printer } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import addCashReceiptIcon from "@/assets/add-cash-receipt-icon.png";
+
+const THEME_PRIMARY = "#16583f";
+const THEME_SECONDARY = "#7DBE3C";
+const THEME_BG = "#dcfce7";
+const THEME_BORDER = "#86efac";
 
 interface AddEditReceiptModalProps {
   isOpen: boolean;
@@ -81,25 +87,34 @@ export function AddEditReceiptModal({ isOpen, onClose, receipt }: AddEditReceipt
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
         className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto"
-        style={{ borderTop: "4px solid #7DBE3C" }}
+        style={{ borderTop: `4px solid ${THEME_SECONDARY}` }}
       >
         <DialogHeader>
-          <DialogTitle 
-            className="text-xl font-bold"
-            style={{ color: "#16583f" }}
-          >
-            {receipt ? "Edit Receipt" : "Add New Receipt"}
-          </DialogTitle>
-          <DialogDescription>
-            Fill in the receipt details below. All fields marked with * are required.
-          </DialogDescription>
+          <div className="flex items-center gap-3">
+            <img 
+              src={addCashReceiptIcon} 
+              alt="Add Cash Receipt" 
+              className="w-10 h-10 object-contain"
+            />
+            <div>
+              <DialogTitle 
+                className="text-xl font-bold"
+                style={{ color: THEME_PRIMARY }}
+              >
+                {receipt ? "Edit Receipt" : "Add New Receipt"}
+              </DialogTitle>
+              <DialogDescription>
+                Fill in the receipt details below. All fields marked with * are required.
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Receipt Date */}
             <div className="space-y-2">
-              <Label htmlFor="receiptDate">Receipt Date *</Label>
+              <Label htmlFor="receiptDate" style={{ color: THEME_PRIMARY }}>Receipt Date *</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -108,8 +123,9 @@ export function AddEditReceiptModal({ isOpen, onClose, receipt }: AddEditReceipt
                       "w-full justify-start text-left font-normal",
                       !formData.receiptDate && "text-muted-foreground"
                     )}
+                    style={{ borderColor: THEME_SECONDARY }}
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    <CalendarIcon className="mr-2 h-4 w-4" style={{ color: THEME_PRIMARY }} />
                     {formData.receiptDate ? format(formData.receiptDate, "PPP") : "Pick a date"}
                   </Button>
                 </PopoverTrigger>
@@ -127,20 +143,20 @@ export function AddEditReceiptModal({ isOpen, onClose, receipt }: AddEditReceipt
 
             {/* Payer Name */}
             <div className="space-y-2">
-              <Label htmlFor="payerName">Payer Name *</Label>
+              <Label htmlFor="payerName" style={{ color: THEME_PRIMARY }}>Payer Name *</Label>
               <Input
                 id="payerName"
                 value={formData.payerName}
                 onChange={(e) => setFormData({ ...formData, payerName: e.target.value })}
                 placeholder="Enter payer name"
                 required
-                className="focus:border-[#7DBE3C] focus:ring-[#7DBE3C]"
+                style={{ borderColor: THEME_SECONDARY }}
               />
             </div>
 
             {/* Amount */}
             <div className="space-y-2">
-              <Label htmlFor="amount">Amount *</Label>
+              <Label htmlFor="amount" style={{ color: THEME_PRIMARY }}>Amount *</Label>
               <Input
                 id="amount"
                 type="number"
@@ -148,19 +164,19 @@ export function AddEditReceiptModal({ isOpen, onClose, receipt }: AddEditReceipt
                 onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                 placeholder="Enter amount"
                 required
-                className="focus:border-[#7DBE3C] focus:ring-[#7DBE3C]"
+                style={{ borderColor: THEME_SECONDARY }}
               />
             </div>
 
             {/* Payment Mode */}
             <div className="space-y-2">
-              <Label htmlFor="paymentMode">Payment Mode *</Label>
+              <Label htmlFor="paymentMode" style={{ color: THEME_PRIMARY }}>Payment Mode *</Label>
               <Select
                 value={formData.paymentMode}
                 onValueChange={(value) => setFormData({ ...formData, paymentMode: value })}
                 required
               >
-                <SelectTrigger className="focus:border-[#7DBE3C] focus:ring-[#7DBE3C]">
+                <SelectTrigger style={{ borderColor: THEME_SECONDARY }}>
                   <SelectValue placeholder="Select payment mode" />
                 </SelectTrigger>
                 <SelectContent>
@@ -175,59 +191,64 @@ export function AddEditReceiptModal({ isOpen, onClose, receipt }: AddEditReceipt
 
           {/* Reason for Payment */}
           <div className="space-y-2">
-            <Label htmlFor="reason">Reason for Payment *</Label>
+            <Label htmlFor="reason" style={{ color: THEME_PRIMARY }}>Reason for Payment *</Label>
             <Input
               id="reason"
               value={formData.reason}
               onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
               placeholder="Enter reason for payment"
               required
-              className="focus:border-[#7DBE3C] focus:ring-[#7DBE3C]"
+              style={{ borderColor: THEME_SECONDARY }}
             />
           </div>
 
           {/* Notes / Remarks */}
           <div className="space-y-2">
-            <Label htmlFor="notes">Notes / Remarks</Label>
+            <Label htmlFor="notes" style={{ color: THEME_PRIMARY }}>Notes / Remarks</Label>
             <Textarea
               id="notes"
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               placeholder="Enter any additional notes or remarks"
               rows={3}
-              className="focus:border-[#7DBE3C] focus:ring-[#7DBE3C]"
+              style={{ borderColor: THEME_SECONDARY }}
             />
           </div>
 
           {/* Upload Signature / Stamp */}
           <div className="space-y-2">
-            <Label htmlFor="signature">Upload Signature / Stamp (Optional)</Label>
+            <Label htmlFor="signature" style={{ color: THEME_PRIMARY }}>Upload Signature / Stamp (Optional)</Label>
             <div className="flex items-center gap-2">
               <Input
                 id="signature"
                 type="file"
                 accept="image/*"
                 onChange={handleFileChange}
-                className="focus:border-[#7DBE3C] focus:ring-[#7DBE3C]"
+                style={{ borderColor: THEME_SECONDARY }}
               />
-              <Upload className="h-4 w-4 text-gray-400" />
+              <Upload className="h-4 w-4" style={{ color: THEME_PRIMARY }} />
             </div>
             {formData.signatureFile && (
-              <p className="text-sm text-gray-600">
+              <p className="text-sm" style={{ color: THEME_PRIMARY }}>
                 Selected: {formData.signatureFile.name}
               </p>
             )}
           </div>
 
           <DialogFooter className="flex gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose}
+              style={{ borderColor: THEME_SECONDARY, color: THEME_PRIMARY }}
+            >
               Cancel
             </Button>
             <Button
               type="button"
               onClick={handleSaveAndPrint}
               style={{ 
-                backgroundColor: "#16583f",
+                backgroundColor: THEME_PRIMARY,
                 color: "white"
               }}
               className="hover:opacity-90"
@@ -238,7 +259,7 @@ export function AddEditReceiptModal({ isOpen, onClose, receipt }: AddEditReceipt
             <Button
               type="submit"
               style={{ 
-                backgroundColor: "#7DBE3C",
+                backgroundColor: THEME_SECONDARY,
                 color: "white"
               }}
               className="hover:opacity-90"
