@@ -147,7 +147,7 @@ export default function SalesManagement() {
                   className="text-sm italic"
                   style={{ color: '#9d174d' }}
                 >
-                  Neo Color Factory ~ The Colors of Your Dreams 🎨
+                  Streamline your sales ~ Designed for smarter selling 💰
                 </motion.p>
               </div>
 
@@ -190,11 +190,11 @@ export default function SalesManagement() {
           {/* Sales Summary Cards */}
           <SalesSummary />
 
-          {/* Search & Filter Bar */}
-          <SalesFilters filters={filters} onFiltersChange={setFilters} />
-
           {/* Sales Chart */}
           <SalesChart />
+
+          {/* Search & Filter Bar - Between Chart and Table */}
+          <SalesFilters filters={filters} onFiltersChange={setFilters} />
 
           {/* Sales Invoice Table */}
           <SalesTable filters={filters} onViewInvoice={handleViewInvoice} />
