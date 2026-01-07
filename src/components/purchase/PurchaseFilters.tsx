@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, Search, Filter, Download } from 'lucide-react';
+import { CalendarIcon, Search, Filter } from 'lucide-react';
 import { format } from 'date-fns';
 
 export const PurchaseFilters = () => {
@@ -31,31 +31,24 @@ export const PurchaseFilters = () => {
     setPaymentModeFilter('');
   };
 
-  const handleExportCSV = () => {
-    // Export functionality would be implemented here
-    console.log('Exporting CSV...');
-  };
 
   return (
-    <div className="bg-gradient-to-r from-pink-50 to-purple-50 p-4 rounded-lg shadow-sm border border-pink-200 space-y-4">
+    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg shadow-sm border space-y-4" style={{ borderColor: '#93c5fd' }}>
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-pink-800">Filters & Search</h3>
-        <Button onClick={handleExportCSV} variant="outline" size="sm" className="bg-pink-600 hover:bg-pink-700 text-white border-pink-600">
-          <Download className="w-4 h-4 mr-2" />
-          Export CSV
-        </Button>
+        <h3 className="text-lg font-semibold" style={{ color: '#1e40af' }}>Filters & Search</h3>
       </div>
 
       <div className="flex items-center gap-4 flex-wrap">
         {/* Search Bar */}
         <div className="flex-1 min-w-[300px]">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-pink-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: '#3b82f6' }} />
             <Input
               placeholder="Search by Bill No., Vendor, Product, HSN..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 border-pink-300 focus:border-pink-500 focus:ring-pink-500 bg-white"
+              className="pl-10 bg-white"
+              style={{ borderColor: '#93c5fd' }}
             />
           </div>
         </div>
@@ -64,7 +57,7 @@ export const PurchaseFilters = () => {
         <div className="flex items-center gap-2">
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-[140px] justify-start text-left font-normal bg-pink-600 hover:bg-pink-700 text-white border-pink-600">
+              <Button variant="outline" className="w-[140px] justify-start text-left font-normal text-white" style={{ backgroundColor: '#1e40af', borderColor: '#1e40af' }}>
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {dateFrom ? format(dateFrom, "MMM dd") : "From Date"}
               </Button>
@@ -81,7 +74,7 @@ export const PurchaseFilters = () => {
 
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-[140px] justify-start text-left font-normal bg-pink-600 hover:bg-pink-700 text-white border-pink-600">
+              <Button variant="outline" className="w-[140px] justify-start text-left font-normal text-white" style={{ backgroundColor: '#1e40af', borderColor: '#1e40af' }}>
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {dateTo ? format(dateTo, "MMM dd") : "To Date"}
               </Button>
@@ -101,7 +94,7 @@ export const PurchaseFilters = () => {
       <div className="flex items-center gap-4 flex-wrap">
         {/* Vendor Filter */}
         <Select value={vendorFilter} onValueChange={setVendorFilter}>
-          <SelectTrigger className="w-[180px] bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500">
+          <SelectTrigger className="w-[180px] text-white" style={{ backgroundColor: '#1e40af', borderColor: '#1e40af' }}>
             <SelectValue placeholder="Select Vendor" />
           </SelectTrigger>
           <SelectContent>
@@ -115,7 +108,7 @@ export const PurchaseFilters = () => {
 
         {/* Payment Mode Filter */}
         <Select value={paymentModeFilter} onValueChange={setPaymentModeFilter}>
-          <SelectTrigger className="w-[150px] bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500">
+          <SelectTrigger className="w-[150px] text-white" style={{ backgroundColor: '#1e40af', borderColor: '#1e40af' }}>
             <SelectValue placeholder="Payment Mode" />
           </SelectTrigger>
           <SelectContent>
@@ -130,7 +123,7 @@ export const PurchaseFilters = () => {
 
         {/* Status Filter */}
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[150px] bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500">
+          <SelectTrigger className="w-[150px] text-white" style={{ backgroundColor: '#1e40af', borderColor: '#1e40af' }}>
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
@@ -143,7 +136,7 @@ export const PurchaseFilters = () => {
           </SelectContent>
         </Select>
 
-        <Button variant="outline" size="sm" onClick={handleClearFilters} className="bg-pink-600 hover:bg-pink-700 text-white border-pink-600">
+        <Button variant="outline" size="sm" onClick={handleClearFilters} className="text-white" style={{ backgroundColor: '#1e40af', borderColor: '#1e40af' }}>
           <Filter className="w-4 h-4 mr-2" />
           Clear Filters
         </Button>
