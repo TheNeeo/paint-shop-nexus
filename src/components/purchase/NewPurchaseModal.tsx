@@ -25,9 +25,38 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Plus, Trash2, Upload, X, FileImage } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Vendor } from '@/types/purchase';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import purchaseInvoiceIcon from '@/assets/purchase-invoice-icon.png';
+
+// Blue theme colors
+const THEME_PRIMARY = '#1e40af';
+const THEME_SECONDARY = '#3b82f6';
+const THEME_BG = 'rgba(59, 130, 246, 0.1)';
+const THEME_BORDER = 'rgba(59, 130, 246, 0.3)';
+
+// Validation schema
+const purchaseSchema = z.object({
+  vendorId: z.string().min(1, { message: 'Please select a vendor' }),
+  billNumber: z.string().min(1, { message: 'Bill number is required' }),
+  purchaseDate: z.string().min(1, { message: 'Purchase date is required' }),
+  paymentMethod: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+type PurchaseFormData = z.infer<typeof purchaseSchema>;
 
 interface PurchaseItem {
   product_name: string;
@@ -51,19 +80,26 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
   onPurchaseCreated
 }) => {
   const [vendors, setVendors] = useState<Vendor[]>([]);
-  const [selectedVendor, setSelectedVendor] = useState('');
-  const [billNumber, setBillNumber] = useState('');
-  const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().split('T')[0]);
   const [items, setItems] = useState<PurchaseItem[]>([
     { product_name: '', quantity: 1, unit: 'PCS', unit_price: 0, tax_rate: 18, discount_rate: 0, total_amount: 0 }
   ]);
   const [discountAmount, setDiscountAmount] = useState(0);
   const [paidAmount, setPaidAmount] = useState(0);
-  const [paymentMethod, setPaymentMethod] = useState('');
-  const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [billImage, setBillImage] = useState<File | null>(null);
   const [billImagePreview, setBillImagePreview] = useState<string>('');
+  const [itemsError, setItemsError] = useState<string>('');
+
+  const form = useForm<PurchaseFormData>({
+    resolver: zodResolver(purchaseSchema),
+    defaultValues: {
+      vendorId: '',
+      billNumber: '',
+      purchaseDate: new Date().toISOString().split('T')[0],
+      paymentMethod: '',
+      notes: '',
+    },
+  });
 
   useEffect(() => {
     if (isOpen) {
@@ -91,7 +127,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const random = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
-    setBillNumber(`BILL-${year}${month}-${random}`);
+    form.setValue('billNumber', `BILL-${year}${month}-${random}`);
   };
 
   const addItem = () => {
@@ -117,12 +153,13 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
     // Calculate total amount for the item
     const item = updatedItems[index];
     const subtotal = item.quantity * item.unit_price;
-    const discountAmount = (subtotal * item.discount_rate) / 100;
-    const afterDiscount = subtotal - discountAmount;
+    const discountAmt = (subtotal * item.discount_rate) / 100;
+    const afterDiscount = subtotal - discountAmt;
     const taxAmount = (afterDiscount * item.tax_rate) / 100;
     item.total_amount = afterDiscount + taxAmount;
     
     setItems(updatedItems);
+    setItemsError('');
   };
 
   const handleBillImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -145,14 +182,14 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
   const calculateTotals = () => {
     const subtotal = items.reduce((sum, item) => {
       const itemSubtotal = item.quantity * item.unit_price;
-      const discountAmount = (itemSubtotal * item.discount_rate) / 100;
-      return sum + (itemSubtotal - discountAmount);
+      const discountAmt = (itemSubtotal * item.discount_rate) / 100;
+      return sum + (itemSubtotal - discountAmt);
     }, 0);
 
     const taxAmount = items.reduce((sum, item) => {
       const itemSubtotal = item.quantity * item.unit_price;
-      const discountAmount = (itemSubtotal * item.discount_rate) / 100;
-      const afterDiscount = itemSubtotal - discountAmount;
+      const discountAmt = (itemSubtotal * item.discount_rate) / 100;
+      const afterDiscount = itemSubtotal - discountAmt;
       return sum + ((afterDiscount * item.tax_rate) / 100);
     }, 0);
 
@@ -163,11 +200,19 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
     return { subtotal, taxAmount, total, balance };
   };
 
-  const handleSubmit = async () => {
-    if (!selectedVendor || !billNumber || items.length === 0) {
-      alert('Please fill in all required fields');
-      return;
+  const validateItems = () => {
+    const hasValidItems = items.some(item => 
+      item.product_name.trim() !== '' && item.quantity > 0 && item.unit_price > 0
+    );
+    if (!hasValidItems) {
+      setItemsError('At least one item with product name, quantity, and price is required');
+      return false;
     }
+    return true;
+  };
+
+  const handleSubmit = async (data: PurchaseFormData) => {
+    if (!validateItems()) return;
 
     setLoading(true);
     try {
@@ -177,17 +222,17 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
       const { data: purchase, error: purchaseError } = await supabase
         .from('purchases')
         .insert({
-          invoice_number: billNumber,
-          vendor_id: selectedVendor,
-          purchase_date: purchaseDate,
+          invoice_number: data.billNumber,
+          vendor_id: data.vendorId,
+          purchase_date: data.purchaseDate,
           subtotal: totals.subtotal,
           tax_amount: totals.taxAmount,
           discount_amount: discountAmount,
           total_amount: totals.total,
           paid_amount: paidAmount,
           balance_amount: totals.balance,
-          payment_method: paymentMethod,
-          notes: notes,
+          payment_method: data.paymentMethod || null,
+          notes: data.notes || null,
           status: 'pending'
         })
         .select()
@@ -202,7 +247,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
       }
 
       // Create purchase items with created_by_user_id
-      const purchaseItems = items.map(item => ({
+      const purchaseItems = items.filter(item => item.product_name.trim() !== '').map(item => ({
         purchase_id: purchase.id,
         product_name: item.product_name,
         quantity: item.quantity,
@@ -230,293 +275,384 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
   };
 
   const resetForm = () => {
-    setSelectedVendor('');
-    setBillNumber('');
-    setPurchaseDate(new Date().toISOString().split('T')[0]);
+    form.reset();
     setItems([{ product_name: '', quantity: 1, unit: 'PCS', unit_price: 0, tax_rate: 18, discount_rate: 0, total_amount: 0 }]);
     setDiscountAmount(0);
     setPaidAmount(0);
-    setPaymentMethod('');
-    setNotes('');
     setBillImage(null);
     setBillImagePreview('');
+    setItemsError('');
   };
 
   const totals = calculateTotals();
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-pink-50 to-purple-50">
+      <DialogContent 
+        className="max-w-6xl max-h-[90vh] overflow-y-auto"
+        style={{ 
+          background: `linear-gradient(135deg, ${THEME_BG} 0%, rgba(30, 64, 175, 0.05) 100%)`,
+          borderColor: THEME_SECONDARY 
+        }}
+      >
         <DialogHeader>
-          <DialogTitle className="text-pink-800">Add Purchase Entry</DialogTitle>
+          <DialogTitle className="flex items-center gap-3" style={{ color: THEME_PRIMARY }}>
+            <img src={purchaseInvoiceIcon} alt="Purchase" className="w-8 h-8" />
+            Add Purchase Entry
+          </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Basic Information */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <Label htmlFor="vendor" className="text-pink-700">Vendor *</Label>
-              <Select value={selectedVendor} onValueChange={setSelectedVendor}>
-                <SelectTrigger className="bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500">
-                  <SelectValue placeholder="Select Vendor" />
-                </SelectTrigger>
-                <SelectContent>
-                  {vendors.map(vendor => (
-                    <SelectItem key={vendor.id} value={vendor.id}>
-                      {vendor.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="billNumber" className="text-pink-700">Bill Number *</Label>
-              <Input
-                id="billNumber"
-                value={billNumber}
-                onChange={(e) => setBillNumber(e.target.value)}
-                className="bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500 placeholder:text-pink-200"
-              />
-            </div>
-            <div>
-              <Label htmlFor="date" className="text-pink-700">Purchase Date</Label>
-              <Input
-                id="date"
-                type="date"
-                value={purchaseDate}
-                onChange={(e) => setPurchaseDate(e.target.value)}
-                className="border-pink-300 focus:border-pink-500 focus:ring-pink-500"
-              />
-            </div>
-            <div>
-              <Label htmlFor="method" className="text-pink-700">Payment Mode</Label>
-              <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                <SelectTrigger className="bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500">
-                  <SelectValue placeholder="Select payment method" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="cash">Cash</SelectItem>
-                  <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                  <SelectItem value="cheque">Cheque</SelectItem>
-                  <SelectItem value="upi">UPI</SelectItem>
-                  <SelectItem value="credit_card">Credit Card</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Items Section */}
-          <div>
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-pink-800">Purchase Items</h3>
-              <Button onClick={addItem} size="sm" className="bg-pink-600 hover:bg-pink-700 text-white">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Item
-              </Button>
-            </div>
-
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-gradient-to-r from-pink-100 to-purple-100">
-                  <TableHead className="text-pink-800">Product Name</TableHead>
-                  <TableHead className="text-pink-800">Unit</TableHead>
-                  <TableHead className="text-pink-800">Qty</TableHead>
-                  <TableHead className="text-pink-800">Rate</TableHead>
-                  <TableHead className="text-pink-800">GST %</TableHead>
-                  <TableHead className="text-pink-800">Disc %</TableHead>
-                  <TableHead className="text-pink-800">Total</TableHead>
-                  <TableHead></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {items.map((item, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <Input
-                        value={item.product_name}
-                        onChange={(e) => updateItem(index, 'product_name', e.target.value)}
-                        placeholder="Product name"
-                        className="bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500 placeholder:text-pink-200"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Select 
-                        value={item.unit} 
-                        onValueChange={(value) => updateItem(index, 'unit', value)}
-                      >
-                        <SelectTrigger className="w-20 bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500">
-                          <SelectValue />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+            {/* Basic Information */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <FormField
+                control={form.control}
+                name="vendorId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: THEME_PRIMARY }}>Vendor *</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}>
+                          <SelectValue placeholder="Select Vendor" />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="PCS">PCS</SelectItem>
-                          <SelectItem value="KG">KG</SelectItem>
-                          <SelectItem value="LTR">LTR</SelectItem>
-                          <SelectItem value="MTR">MTR</SelectItem>
-                          <SelectItem value="BOX">BOX</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell>
+                      </FormControl>
+                      <SelectContent>
+                        {vendors.map(vendor => (
+                          <SelectItem key={vendor.id} value={vendor.id}>
+                            {vendor.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="billNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: THEME_PRIMARY }}>Bill Number *</FormLabel>
+                    <FormControl>
                       <Input
-                        type="number"
-                        value={item.quantity}
-                        onChange={(e) => updateItem(index, 'quantity', parseInt(e.target.value) || 0)}
-                        className="w-20 bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500"
+                        {...field}
+                        style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
                       />
-                    </TableCell>
-                    <TableCell>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="purchaseDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: THEME_PRIMARY }}>Purchase Date *</FormLabel>
+                    <FormControl>
                       <Input
-                        type="number"
-                        value={item.unit_price}
-                        onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
-                        className="w-24 bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500"
+                        {...field}
+                        type="date"
+                        style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
                       />
-                    </TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={item.tax_rate}
-                        onChange={(e) => updateItem(index, 'tax_rate', parseFloat(e.target.value) || 0)}
-                        className="w-20 bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={item.discount_rate}
-                        onChange={(e) => updateItem(index, 'discount_rate', parseFloat(e.target.value) || 0)}
-                        className="w-20 bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500"
-                      />
-                    </TableCell>
-                    <TableCell className="text-pink-700 font-medium">₹{item.total_amount.toFixed(2)}</TableCell>
-                    <TableCell>
-                      {items.length > 1 && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeItem(index)}
-                          className="text-red-600 hover:bg-red-100"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="paymentMethod"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: THEME_PRIMARY }}>Payment Mode</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}>
+                          <SelectValue placeholder="Select payment method" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="cash">Cash</SelectItem>
+                        <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                        <SelectItem value="cheque">Cheque</SelectItem>
+                        <SelectItem value="upi">UPI</SelectItem>
+                        <SelectItem value="credit_card">Credit Card</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-          {/* Bottom Section with Bill Upload and Totals */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Bill Upload */}
+            {/* Items Section */}
             <div>
-              <h3 className="text-lg font-semibold mb-4 text-pink-800">Attach Bill Image (Optional)</h3>
-              {!billImagePreview ? (
-                <div className="border-2 border-dashed border-pink-300 rounded-lg p-6 text-center bg-pink-50">
-                  <Upload className="mx-auto h-12 w-12 text-pink-400" />
-                  <p className="mt-2 text-sm text-pink-600">
-                    Drag and drop your bill image here, or click to browse
-                  </p>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleBillImageUpload}
-                    className="hidden"
-                    id="bill-upload"
-                  />
-                  <Button variant="outline" className="mt-2 bg-pink-600 hover:bg-pink-700 text-white border-pink-600" onClick={() => document.getElementById('bill-upload')?.click()}>
-                    Choose File
-                  </Button>
-                </div>
-              ) : (
-                <div className="relative">
-                  <img 
-                    src={billImagePreview} 
-                    alt="Bill preview" 
-                    className="w-full h-48 object-cover rounded-lg border border-pink-300"
-                  />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white"
-                    onClick={removeBillImage}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                  <div className="mt-2 flex items-center gap-2">
-                    <FileImage className="h-4 w-4 text-pink-600" />
-                    <span className="text-sm text-pink-600">{billImage?.name}</span>
-                  </div>
-                </div>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold" style={{ color: THEME_PRIMARY }}>Purchase Items</h3>
+                <Button 
+                  type="button"
+                  onClick={addItem} 
+                  size="sm" 
+                  style={{ backgroundColor: THEME_SECONDARY }}
+                  className="text-white hover:opacity-90"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Item
+                </Button>
+              </div>
+
+              {itemsError && (
+                <p className="text-sm text-red-500 mb-2">{itemsError}</p>
               )}
 
-              <div className="mt-4">
-                <Label htmlFor="notes" className="text-pink-700">Notes</Label>
-                <Textarea
-                  id="notes"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Additional notes..."
-                  className="bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500 placeholder:text-pink-200"
-                />
+              <Table>
+                <TableHeader>
+                  <TableRow style={{ background: `linear-gradient(90deg, ${THEME_BG} 0%, rgba(30, 64, 175, 0.15) 100%)` }}>
+                    <TableHead style={{ color: THEME_PRIMARY }}>Product Name</TableHead>
+                    <TableHead style={{ color: THEME_PRIMARY }}>Unit</TableHead>
+                    <TableHead style={{ color: THEME_PRIMARY }}>Qty</TableHead>
+                    <TableHead style={{ color: THEME_PRIMARY }}>Rate</TableHead>
+                    <TableHead style={{ color: THEME_PRIMARY }}>GST %</TableHead>
+                    <TableHead style={{ color: THEME_PRIMARY }}>Disc %</TableHead>
+                    <TableHead style={{ color: THEME_PRIMARY }}>Total</TableHead>
+                    <TableHead></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {items.map((item, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <Input
+                          value={item.product_name}
+                          onChange={(e) => updateItem(index, 'product_name', e.target.value)}
+                          placeholder="Product name"
+                          style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Select 
+                          value={item.unit} 
+                          onValueChange={(value) => updateItem(index, 'unit', value)}
+                        >
+                          <SelectTrigger className="w-20" style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="PCS">PCS</SelectItem>
+                            <SelectItem value="KG">KG</SelectItem>
+                            <SelectItem value="LTR">LTR</SelectItem>
+                            <SelectItem value="MTR">MTR</SelectItem>
+                            <SelectItem value="BOX">BOX</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          value={item.quantity}
+                          onChange={(e) => updateItem(index, 'quantity', parseInt(e.target.value) || 0)}
+                          className="w-20"
+                          style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          value={item.unit_price}
+                          onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                          className="w-24"
+                          style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          value={item.tax_rate}
+                          onChange={(e) => updateItem(index, 'tax_rate', parseFloat(e.target.value) || 0)}
+                          className="w-20"
+                          style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          value={item.discount_rate}
+                          onChange={(e) => updateItem(index, 'discount_rate', parseFloat(e.target.value) || 0)}
+                          className="w-20"
+                          style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                        />
+                      </TableCell>
+                      <TableCell className="font-medium" style={{ color: THEME_PRIMARY }}>₹{item.total_amount.toFixed(2)}</TableCell>
+                      <TableCell>
+                        {items.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeItem(index)}
+                            className="text-red-600 hover:bg-red-100"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Bottom Section with Bill Upload and Totals */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Bill Upload */}
+              <div>
+                <h3 className="text-lg font-semibold mb-4" style={{ color: THEME_PRIMARY }}>Attach Bill Image (Optional)</h3>
+                {!billImagePreview ? (
+                  <div 
+                    className="border-2 border-dashed rounded-lg p-6 text-center"
+                    style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                  >
+                    <Upload className="mx-auto h-12 w-12" style={{ color: THEME_SECONDARY }} />
+                    <p className="mt-2 text-sm" style={{ color: THEME_PRIMARY }}>
+                      Drag and drop your bill image here, or click to browse
+                    </p>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleBillImageUpload}
+                      className="hidden"
+                      id="bill-upload"
+                    />
+                    <Button 
+                      type="button"
+                      variant="outline" 
+                      className="mt-2 text-white"
+                      style={{ backgroundColor: THEME_SECONDARY, borderColor: THEME_SECONDARY }}
+                      onClick={() => document.getElementById('bill-upload')?.click()}
+                    >
+                      Choose File
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <img 
+                      src={billImagePreview} 
+                      alt="Bill preview" 
+                      className="w-full h-48 object-cover rounded-lg border"
+                      style={{ borderColor: THEME_SECONDARY }}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white"
+                      onClick={removeBillImage}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                    <div className="mt-2 flex items-center gap-2">
+                      <FileImage className="h-4 w-4" style={{ color: THEME_SECONDARY }} />
+                      <span className="text-sm" style={{ color: THEME_PRIMARY }}>{billImage?.name}</span>
+                    </div>
+                  </div>
+                )}
+
+                <div className="mt-4">
+                  <FormField
+                    control={form.control}
+                    name="notes"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel style={{ color: THEME_PRIMARY }}>Notes</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            placeholder="Additional notes..."
+                            style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              {/* Purchase Summary */}
+              <div>
+                <h3 className="text-lg font-semibold mb-4" style={{ color: THEME_PRIMARY }}>Purchase Summary</h3>
+                <div 
+                  className="p-4 rounded-lg space-y-3 border"
+                  style={{ 
+                    background: `linear-gradient(90deg, ${THEME_BG} 0%, rgba(30, 64, 175, 0.15) 100%)`,
+                    borderColor: THEME_SECONDARY 
+                  }}
+                >
+                  <div className="flex justify-between">
+                    <span style={{ color: THEME_PRIMARY }}>Subtotal:</span>
+                    <span style={{ color: THEME_PRIMARY }}>₹{totals.subtotal.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span style={{ color: THEME_PRIMARY }}>Tax Amount:</span>
+                    <span style={{ color: THEME_PRIMARY }}>₹{totals.taxAmount.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <Label style={{ color: THEME_PRIMARY }}>Discount Amount:</Label>
+                    <Input
+                      type="number"
+                      value={discountAmount}
+                      onChange={(e) => setDiscountAmount(parseFloat(e.target.value) || 0)}
+                      className="w-24 text-right"
+                      style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                    />
+                  </div>
+                  <div className="flex justify-between font-semibold text-lg border-t pt-2" style={{ color: THEME_PRIMARY, borderColor: THEME_BORDER }}>
+                    <span>Total Amount:</span>
+                    <span>₹{totals.total.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-green-600">
+                    <Label style={{ color: THEME_PRIMARY }}>Paid Amount:</Label>
+                    <Input
+                      type="number"
+                      value={paidAmount}
+                      onChange={(e) => setPaidAmount(parseFloat(e.target.value) || 0)}
+                      className="w-24 text-right"
+                      style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-red-600">
+                    <span>Balance Due:</span>
+                    <span>₹{totals.balance.toFixed(2)}</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Purchase Summary */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4 text-pink-800">Purchase Summary</h3>
-              <div className="bg-gradient-to-r from-pink-100 to-purple-100 p-4 rounded-lg space-y-3 border border-pink-300">
-                <div className="flex justify-between">
-                  <span className="text-pink-700">Subtotal:</span>
-                  <span className="text-pink-700">₹{totals.subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-pink-700">Tax Amount:</span>
-                  <span className="text-pink-700">₹{totals.taxAmount.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <Label htmlFor="discount" className="text-pink-700">Discount Amount:</Label>
-                  <Input
-                    id="discount"
-                    type="number"
-                    value={discountAmount}
-                    onChange={(e) => setDiscountAmount(parseFloat(e.target.value) || 0)}
-                    className="w-24 text-right bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500"
-                  />
-                </div>
-                <div className="flex justify-between font-semibold text-lg border-t pt-2 text-pink-800">
-                  <span>Total Amount:</span>
-                  <span>₹{totals.total.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between items-center text-green-600">
-                  <Label htmlFor="paid" className="text-pink-700">Paid Amount:</Label>
-                  <Input
-                    id="paid"
-                    type="number"
-                    value={paidAmount}
-                    onChange={(e) => setPaidAmount(parseFloat(e.target.value) || 0)}
-                    className="w-24 text-right bg-pink-600 hover:bg-pink-700 text-white border-pink-600 focus:border-pink-500 focus:ring-pink-500"
-                  />
-                </div>
-                <div className="flex justify-between text-red-600">
-                  <span>Balance Due:</span>
-                  <span>₹{totals.balance.toFixed(2)}</span>
-                </div>
-              </div>
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-4 pt-4 border-t" style={{ borderColor: THEME_BORDER }}>
+              <Button 
+                type="button"
+                variant="outline" 
+                onClick={onClose}
+                style={{ borderColor: THEME_SECONDARY, color: THEME_PRIMARY }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit"
+                disabled={loading} 
+                className="text-white"
+                style={{ backgroundColor: THEME_PRIMARY }}
+              >
+                {loading ? 'Saving...' : 'Save Purchase'}
+              </Button>
             </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex justify-end gap-4 pt-4 border-t border-pink-300">
-            <Button variant="outline" onClick={onClose} className="bg-pink-600 hover:bg-pink-700 text-white border-pink-600">
-              Cancel
-            </Button>
-            <Button onClick={handleSubmit} disabled={loading} className="bg-pink-600 hover:bg-pink-700 text-white">
-              {loading ? 'Saving...' : 'Save Purchase'}
-            </Button>
-          </div>
-        </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
