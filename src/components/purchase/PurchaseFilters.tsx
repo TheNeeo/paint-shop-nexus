@@ -56,7 +56,7 @@ export const PurchaseFilters = () => {
         <div className="flex items-center gap-2">
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-[140px] justify-start text-left font-normal text-white" style={{ backgroundColor: '#1e40af', borderColor: '#1e40af' }}>
+              <Button className="w-[140px] justify-start text-left font-medium text-white hover:opacity-90" style={{ backgroundColor: '#1e40af', borderColor: '#1e40af' }}>
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {dateFrom ? format(dateFrom, "MMM dd") : "From Date"}
               </Button>
@@ -73,7 +73,7 @@ export const PurchaseFilters = () => {
 
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-[140px] justify-start text-left font-normal text-white" style={{ backgroundColor: '#1e40af', borderColor: '#1e40af' }}>
+              <Button className="w-[140px] justify-start text-left font-medium text-white hover:opacity-90" style={{ backgroundColor: '#1e40af', borderColor: '#1e40af' }}>
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {dateTo ? format(dateTo, "MMM dd") : "To Date"}
               </Button>
