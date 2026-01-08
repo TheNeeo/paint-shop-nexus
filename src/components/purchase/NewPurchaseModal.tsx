@@ -456,7 +456,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                           value={item.quantity}
                           onChange={(e) => updateItem(index, 'quantity', parseInt(e.target.value) || 0)}
                           className="w-20"
-                          style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                          style={{ borderColor: INPUT_BORDER, backgroundColor: INPUT_BG }}
                         />
                       </TableCell>
                       <TableCell>
@@ -465,7 +465,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                           value={item.unit_price}
                           onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
                           className="w-24"
-                          style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                          style={{ borderColor: INPUT_BORDER, backgroundColor: INPUT_BG }}
                         />
                       </TableCell>
                       <TableCell>
@@ -474,7 +474,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                           value={item.tax_rate}
                           onChange={(e) => updateItem(index, 'tax_rate', parseFloat(e.target.value) || 0)}
                           className="w-20"
-                          style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                          style={{ borderColor: INPUT_BORDER, backgroundColor: INPUT_BG }}
                         />
                       </TableCell>
                       <TableCell>
@@ -483,7 +483,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                           value={item.discount_rate}
                           onChange={(e) => updateItem(index, 'discount_rate', parseFloat(e.target.value) || 0)}
                           className="w-20"
-                          style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                          style={{ borderColor: INPUT_BORDER, backgroundColor: INPUT_BG }}
                         />
                       </TableCell>
                       <TableCell className="font-medium" style={{ color: THEME_PRIMARY }}>₹{item.total_amount.toFixed(2)}</TableCell>
