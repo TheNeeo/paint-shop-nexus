@@ -350,7 +350,7 @@ export default function UpdateStock() {
                 <div>
                   <Label>New Stock (Preview)</Label>
                   <Input
-                    value={newStock}
+                    value={isNaN(newStock) ? 0 : newStock}
                     disabled
                     className="font-bold"
                     style={{ color: newStock < 0 ? "#EF4444" : "#96A3CC" }}
