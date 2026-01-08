@@ -609,7 +609,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                       style={{ borderColor: INPUT_BORDER, backgroundColor: INPUT_BG }}
                     />
                   </div>
-                  <div className="flex justify-between font-semibold text-lg border-t pt-2" style={{ color: THEME_PRIMARY, borderColor: THEME_BORDER }}>
+                  <div className="flex justify-between font-semibold text-lg border-t pt-2" style={{ color: THEME_PRIMARY, borderColor: INPUT_BORDER }}>
                     <span>Total Amount:</span>
                     <span>₹{totals.total.toFixed(2)}</span>
                   </div>
@@ -632,7 +632,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
             </div>
 
             {/* Action Buttons */}
-            <div className="flex justify-end gap-4 pt-4 border-t" style={{ borderColor: THEME_BORDER }}>
+            <div className="flex justify-end gap-4 pt-4 border-t" style={{ borderColor: INPUT_BORDER }}>
               <Button 
                 type="button"
                 variant="outline" 
