@@ -411,8 +411,8 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
 
               <Table>
                 <TableHeader>
-                  <TableRow style={{ background: `linear-gradient(90deg, ${THEME_BG} 0%, rgba(30, 64, 175, 0.15) 100%)` }}>
-                    <TableHead style={{ color: THEME_PRIMARY }}>Product Name</TableHead>
+                  <TableRow style={{ backgroundColor: THEME_BG, borderBottom: `2px solid ${INPUT_BORDER}` }}>
+                    <TableHead style={{ color: THEME_PRIMARY, fontWeight: 'bold' }}>Product Name</TableHead>
                     <TableHead style={{ color: THEME_PRIMARY }}>Unit</TableHead>
                     <TableHead style={{ color: THEME_PRIMARY }}>Qty</TableHead>
                     <TableHead style={{ color: THEME_PRIMARY }}>Rate</TableHead>
