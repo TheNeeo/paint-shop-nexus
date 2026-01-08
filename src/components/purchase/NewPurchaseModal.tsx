@@ -571,7 +571,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                           <Textarea
                             {...field}
                             placeholder="Additional notes..."
-                            style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                            style={{ borderColor: INPUT_BORDER, backgroundColor: INPUT_BG }}
                           />
                         </FormControl>
                         <FormMessage />
