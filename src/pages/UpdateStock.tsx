@@ -332,8 +332,8 @@ export default function UpdateStock() {
                   <Label>Adjust Quantity (+/-)</Label>
                   <Input
                     type="number"
-                    value={adjustQuantity}
-                    onChange={(e) => setAdjustQuantity(Number(e.target.value))}
+                    value={isNaN(adjustQuantity) ? 0 : adjustQuantity}
+                    onChange={(e) => setAdjustQuantity(Number(e.target.value) || 0)}
                     placeholder="Enter positive or negative number"
                   />
                 </div>
