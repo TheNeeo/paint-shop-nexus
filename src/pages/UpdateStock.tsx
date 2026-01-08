@@ -82,12 +82,18 @@ export default function UpdateStock() {
   });
 
   const selectedProduct = products.find((p) => p.id === selectedProductId);
-  const newStock = selectedProduct ? selectedProduct.current_stock + adjustQuantity : 0;
+  const newStock = selectedProduct
+    ? (Number(selectedProduct.current_stock) || 0) + (Number(adjustQuantity) || 0)
+    : 0;
 
   // Calculate summary stats
-  const totalStock = products.reduce((sum, p) => sum + p.current_stock, 0);
-  const lowStockItems = products.filter((p) => p.current_stock <= p.threshold_qty).length;
-  const totalValue = products.reduce((sum, p) => sum + (p.current_stock * p.unit_price), 0);
+  const totalStock = products.reduce((sum, p) => sum + (Number(p.current_stock) || 0), 0);
+  const lowStockItems = products.filter((p) => (Number(p.current_stock) || 0) <= (Number(p.threshold_qty) || 0)).length;
+  const totalValue = products.reduce((sum, p) => {
+    const stock = Number(p.current_stock) || 0;
+    const price = Number(p.unit_price) || 0;
+    return sum + (stock * price);
+  }, 0);
   const totalSKUs = products.length;
 
   // Low stock and out of stock products
