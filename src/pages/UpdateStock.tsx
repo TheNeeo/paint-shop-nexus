@@ -98,9 +98,13 @@ export default function UpdateStock() {
 
   // Low stock and out of stock products
   const lowStockProducts = products.filter(
-    (p) => p.current_stock > 0 && p.current_stock <= p.threshold_qty
+    (p) => {
+      const stock = Number(p.current_stock) || 0;
+      const threshold = Number(p.threshold_qty) || 0;
+      return stock > 0 && stock <= threshold;
+    }
   );
-  const outOfStockProducts = products.filter((p) => p.current_stock === 0);
+  const outOfStockProducts = products.filter((p) => (Number(p.current_stock) || 0) === 0);
 
   const handleSave = async () => {
     if (!selectedProductId || adjustQuantity === 0 || !reason) {
