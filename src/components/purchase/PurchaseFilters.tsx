@@ -46,8 +46,8 @@ export const PurchaseFilters = () => {
               placeholder="Search by Bill No., Vendor, Product, HSN..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-white"
-              style={{ borderColor: '#93c5fd' }}
+              className="pl-10 bg-white font-medium"
+              style={{ borderColor: '#3b82f6' }}
             />
           </div>
         </div>
