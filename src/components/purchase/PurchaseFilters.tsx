@@ -135,7 +135,7 @@ export const PurchaseFilters = () => {
           </SelectContent>
         </Select>
 
-        <Button variant="outline" size="sm" onClick={handleClearFilters} className="text-white" style={{ backgroundColor: '#1e40af', borderColor: '#1e40af' }}>
+        <Button size="sm" onClick={handleClearFilters} className="text-white font-medium hover:opacity-90" style={{ backgroundColor: '#1e40af', borderColor: '#1e40af' }}>
           <Filter className="w-4 h-4 mr-2" />
           Clear Filters
         </Button>
