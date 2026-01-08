@@ -93,7 +93,7 @@ export const PurchaseFilters = () => {
       <div className="flex items-center gap-4 flex-wrap">
         {/* Vendor Filter */}
         <Select value={vendorFilter} onValueChange={setVendorFilter}>
-          <SelectTrigger className="w-[180px] text-white" style={{ backgroundColor: '#1e40af', borderColor: '#1e40af' }}>
+          <SelectTrigger className="w-[180px] text-white font-medium hover:opacity-90" style={{ backgroundColor: '#1e40af', borderColor: '#1e40af' }}>
             <SelectValue placeholder="Select Vendor" />
           </SelectTrigger>
           <SelectContent>
@@ -107,7 +107,7 @@ export const PurchaseFilters = () => {
 
         {/* Payment Mode Filter */}
         <Select value={paymentModeFilter} onValueChange={setPaymentModeFilter}>
-          <SelectTrigger className="w-[150px] text-white" style={{ backgroundColor: '#1e40af', borderColor: '#1e40af' }}>
+          <SelectTrigger className="w-[150px] text-white font-medium hover:opacity-90" style={{ backgroundColor: '#1e40af', borderColor: '#1e40af' }}>
             <SelectValue placeholder="Payment Mode" />
           </SelectTrigger>
           <SelectContent>
@@ -122,7 +122,7 @@ export const PurchaseFilters = () => {
 
         {/* Status Filter */}
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[150px] text-white" style={{ backgroundColor: '#1e40af', borderColor: '#1e40af' }}>
+          <SelectTrigger className="w-[150px] text-white font-medium hover:opacity-90" style={{ backgroundColor: '#1e40af', borderColor: '#1e40af' }}>
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
