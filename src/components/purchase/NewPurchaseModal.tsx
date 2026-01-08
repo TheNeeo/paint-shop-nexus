@@ -413,12 +413,12 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                 <TableHeader>
                   <TableRow style={{ backgroundColor: THEME_BG, borderBottom: `2px solid ${INPUT_BORDER}` }}>
                     <TableHead style={{ color: THEME_PRIMARY, fontWeight: 'bold' }}>Product Name</TableHead>
-                    <TableHead style={{ color: THEME_PRIMARY }}>Unit</TableHead>
-                    <TableHead style={{ color: THEME_PRIMARY }}>Qty</TableHead>
-                    <TableHead style={{ color: THEME_PRIMARY }}>Rate</TableHead>
-                    <TableHead style={{ color: THEME_PRIMARY }}>GST %</TableHead>
-                    <TableHead style={{ color: THEME_PRIMARY }}>Disc %</TableHead>
-                    <TableHead style={{ color: THEME_PRIMARY }}>Total</TableHead>
+                    <TableHead style={{ color: THEME_PRIMARY, fontWeight: 'bold' }}>Unit</TableHead>
+                    <TableHead style={{ color: THEME_PRIMARY, fontWeight: 'bold' }}>Qty</TableHead>
+                    <TableHead style={{ color: THEME_PRIMARY, fontWeight: 'bold' }}>Rate</TableHead>
+                    <TableHead style={{ color: THEME_PRIMARY, fontWeight: 'bold' }}>GST %</TableHead>
+                    <TableHead style={{ color: THEME_PRIMARY, fontWeight: 'bold' }}>Disc %</TableHead>
+                    <TableHead style={{ color: THEME_PRIMARY, fontWeight: 'bold' }}>Total</TableHead>
                     <TableHead></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -430,7 +430,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                           value={item.product_name}
                           onChange={(e) => updateItem(index, 'product_name', e.target.value)}
                           placeholder="Product name"
-                          style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                          style={{ borderColor: INPUT_BORDER, backgroundColor: INPUT_BG }}
                         />
                       </TableCell>
                       <TableCell>
@@ -438,7 +438,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                           value={item.unit} 
                           onValueChange={(value) => updateItem(index, 'unit', value)}
                         >
-                          <SelectTrigger className="w-20" style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}>
+                          <SelectTrigger className="w-20" style={{ borderColor: INPUT_BORDER, backgroundColor: INPUT_BG }}>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
