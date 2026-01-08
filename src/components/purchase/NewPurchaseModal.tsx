@@ -314,7 +314,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                     <FormLabel style={{ color: THEME_PRIMARY }}>Vendor *</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}>
+                        <SelectTrigger style={{ borderColor: INPUT_BORDER, backgroundColor: INPUT_BG }}>
                           <SelectValue placeholder="Select Vendor" />
                         </SelectTrigger>
                       </FormControl>
