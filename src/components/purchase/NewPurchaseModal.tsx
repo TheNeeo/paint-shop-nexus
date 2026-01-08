@@ -633,11 +633,12 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
 
             {/* Action Buttons */}
             <div className="flex justify-end gap-4 pt-4 border-t" style={{ borderColor: INPUT_BORDER }}>
-              <Button 
+              <Button
                 type="button"
-                variant="outline" 
+                variant="outline"
                 onClick={onClose}
-                style={{ borderColor: THEME_SECONDARY, color: THEME_PRIMARY }}
+                style={{ borderColor: INPUT_BORDER, color: THEME_PRIMARY }}
+                className="hover:bg-gray-50"
               >
                 Cancel
               </Button>
