@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,8 +43,10 @@ import purchaseInvoiceIcon from '@/assets/purchase-invoice-icon.png';
 // Blue theme colors
 const THEME_PRIMARY = '#1e40af';
 const THEME_SECONDARY = '#3b82f6';
-const THEME_BG = 'rgba(59, 130, 246, 0.1)';
-const THEME_BORDER = 'rgba(59, 130, 246, 0.3)';
+const THEME_BG = '#f0f9ff';
+const THEME_BORDER = '#93c5fd';
+const INPUT_BG = '#ffffff';
+const INPUT_BORDER = '#93c5fd';
 
 // Validation schema
 const purchaseSchema = z.object({
