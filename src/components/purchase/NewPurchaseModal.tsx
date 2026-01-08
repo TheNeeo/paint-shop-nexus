@@ -289,11 +289,10 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
-        className="max-w-6xl max-h-[90vh] overflow-y-auto"
-        style={{ 
-          background: `linear-gradient(135deg, ${THEME_BG} 0%, rgba(30, 64, 175, 0.05) 100%)`,
-          borderColor: THEME_SECONDARY 
+      <DialogContent
+        className="max-w-6xl max-h-[90vh] overflow-y-auto bg-white"
+        style={{
+          borderColor: THEME_SECONDARY
         }}
       >
         <DialogHeader>
