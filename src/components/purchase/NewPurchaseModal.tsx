@@ -606,7 +606,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                       value={discountAmount}
                       onChange={(e) => setDiscountAmount(parseFloat(e.target.value) || 0)}
                       className="w-24 text-right"
-                      style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                      style={{ borderColor: INPUT_BORDER, backgroundColor: INPUT_BG }}
                     />
                   </div>
                   <div className="flex justify-between font-semibold text-lg border-t pt-2" style={{ color: THEME_PRIMARY, borderColor: THEME_BORDER }}>
@@ -620,7 +620,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                       value={paidAmount}
                       onChange={(e) => setPaidAmount(parseFloat(e.target.value) || 0)}
                       className="w-24 text-right"
-                      style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                      style={{ borderColor: INPUT_BORDER, backgroundColor: INPUT_BG }}
                     />
                   </div>
                   <div className="flex justify-between text-red-600">
