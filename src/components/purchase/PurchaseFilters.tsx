@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,9 +32,9 @@ export const PurchaseFilters = () => {
 
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg shadow-sm border space-y-4" style={{ borderColor: '#93c5fd' }}>
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold" style={{ color: '#1e40af' }}>Filters & Search</h3>
+    <div className="bg-white p-6 rounded-lg shadow-md border space-y-4" style={{ borderColor: '#93c5fd' }}>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-bold" style={{ color: '#1e40af' }}>Filters & Search</h3>
       </div>
 
       <div className="flex items-center gap-4 flex-wrap">
