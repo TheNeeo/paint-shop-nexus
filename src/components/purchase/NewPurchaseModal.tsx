@@ -339,7 +339,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                     <FormControl>
                       <Input
                         {...field}
-                        style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                        style={{ borderColor: INPUT_BORDER, backgroundColor: INPUT_BG }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -371,7 +371,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                     <FormLabel style={{ color: THEME_PRIMARY }}>Payment Mode</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}>
+                        <SelectTrigger style={{ borderColor: INPUT_BORDER, backgroundColor: INPUT_BG }}>
                           <SelectValue placeholder="Select payment method" />
                         </SelectTrigger>
                       </FormControl>
