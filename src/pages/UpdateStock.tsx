@@ -199,7 +199,7 @@ export default function UpdateStock() {
           <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-400 via-green-400 to-teal-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
             <div className="relative z-10">
               <h3 className="text-lg font-semibold text-white/90 mb-1">Inventory Value</h3>
-              <p className="text-2xl font-bold text-white">₹{totalValue.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-white">₹{(isNaN(totalValue) ? 0 : totalValue).toFixed(2)}</p>
             </div>
             <div className="absolute right-4 bottom-4 opacity-80">
               <DollarSign className="h-16 w-16 text-white/40" strokeWidth={1.5} />
