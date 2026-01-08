@@ -512,12 +512,12 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
               <div>
                 <h3 className="text-lg font-semibold mb-4" style={{ color: THEME_PRIMARY }}>Attach Bill Image (Optional)</h3>
                 {!billImagePreview ? (
-                  <div 
+                  <div
                     className="border-2 border-dashed rounded-lg p-6 text-center"
-                    style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                    style={{ borderColor: INPUT_BORDER, backgroundColor: THEME_BG }}
                   >
                     <Upload className="mx-auto h-12 w-12" style={{ color: THEME_SECONDARY }} />
-                    <p className="mt-2 text-sm" style={{ color: THEME_PRIMARY }}>
+                    <p className="mt-2 text-sm font-medium" style={{ color: THEME_PRIMARY }}>
                       Drag and drop your bill image here, or click to browse
                     </p>
                     <input
@@ -527,10 +527,9 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                       className="hidden"
                       id="bill-upload"
                     />
-                    <Button 
+                    <Button
                       type="button"
-                      variant="outline" 
-                      className="mt-2 text-white"
+                      className="mt-2 text-white hover:opacity-90"
                       style={{ backgroundColor: THEME_SECONDARY, borderColor: THEME_SECONDARY }}
                       onClick={() => document.getElementById('bill-upload')?.click()}
                     >
@@ -539,11 +538,11 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                   </div>
                 ) : (
                   <div className="relative">
-                    <img 
-                      src={billImagePreview} 
-                      alt="Bill preview" 
+                    <img
+                      src={billImagePreview}
+                      alt="Bill preview"
                       className="w-full h-48 object-cover rounded-lg border"
-                      style={{ borderColor: THEME_SECONDARY }}
+                      style={{ borderColor: INPUT_BORDER }}
                     />
                     <Button
                       type="button"
@@ -556,7 +555,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                     </Button>
                     <div className="mt-2 flex items-center gap-2">
                       <FileImage className="h-4 w-4" style={{ color: THEME_SECONDARY }} />
-                      <span className="text-sm" style={{ color: THEME_PRIMARY }}>{billImage?.name}</span>
+                      <span className="text-sm font-medium" style={{ color: THEME_PRIMARY }}>{billImage?.name}</span>
                     </div>
                   </div>
                 )}
