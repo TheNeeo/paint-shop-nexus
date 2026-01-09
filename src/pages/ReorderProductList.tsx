@@ -82,54 +82,55 @@ const ReorderProductList = () => {
 
   return (
     <AppLayout>
-      <div className="p-6 space-y-6 bg-pink-50 min-h-screen">
-        <ReorderHeader />
-        <ReorderSummaryCards products={mockProducts} />
-        <ReorderFilters 
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          categoryFilter={categoryFilter}
-          setCategoryFilter={setCategoryFilter}
-          supplierFilter={supplierFilter}
-          setSupplierFilter={setSupplierFilter}
-          stockStatusFilter={stockStatusFilter}
-          setStockStatusFilter={setStockStatusFilter}
-        />
-        <ReorderTable 
-          products={mockProducts}
-          selectedProducts={selectedProducts}
-          setSelectedProducts={setSelectedProducts}
-          searchTerm={searchTerm}
-          categoryFilter={categoryFilter}
-          supplierFilter={supplierFilter}
-          stockStatusFilter={stockStatusFilter}
-        />
-        
-        {selectedProducts.length > 0 && (
-          <BulkActionBar 
-            selectedCount={selectedProducts.length}
-            totalCost={totalEstimatedCost}
-            onClearSelection={() => setSelectedProducts([])}
-            onAddToPurchaseOrder={() => {
-              console.log('Adding to purchase order:', selectedProducts);
-              // Handle add to purchase order
-            }}
+      <div className="w-full bg-gradient-to-br from-pink-50 via-white to-rose-50 min-h-screen p-6">
+        <div className="space-y-6">
+          <ReorderHeader />
+          <ReorderSummaryCards products={mockProducts} />
+          <ReorderFilters 
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            categoryFilter={categoryFilter}
+            setCategoryFilter={setCategoryFilter}
+            supplierFilter={supplierFilter}
+            setSupplierFilter={setSupplierFilter}
+            stockStatusFilter={stockStatusFilter}
+            setStockStatusFilter={setStockStatusFilter}
           />
-        )}
+          <ReorderTable 
+            products={mockProducts}
+            selectedProducts={selectedProducts}
+            setSelectedProducts={setSelectedProducts}
+            searchTerm={searchTerm}
+            categoryFilter={categoryFilter}
+            supplierFilter={supplierFilter}
+            stockStatusFilter={stockStatusFilter}
+          />
+          
+          {selectedProducts.length > 0 && (
+            <BulkActionBar 
+              selectedCount={selectedProducts.length}
+              totalCost={totalEstimatedCost}
+              onClearSelection={() => setSelectedProducts([])}
+              onAddToPurchaseOrder={() => {
+                console.log('Adding to purchase order:', selectedProducts);
+              }}
+            />
+          )}
 
-        {/* Footer */}
-        <div className="flex justify-between items-center pt-6 border-t border-pink-200">
-          <Button
-            variant="outline"
-            onClick={() => navigate('/purchase')}
-            className="border-pink-300 text-pink-700 hover:bg-pink-100"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Purchase Management
-          </Button>
-          <p className="text-sm text-pink-600">
-            Last updated: {new Date().toLocaleString()}
-          </p>
+          {/* Footer */}
+          <div className="flex justify-between items-center pt-6 border-t border-pink-200">
+            <Button
+              variant="outline"
+              onClick={() => navigate('/purchase')}
+              className="border-pink-300 text-pink-700 hover:bg-pink-100"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Purchase Management
+            </Button>
+            <p className="text-sm text-pink-600">
+              Last updated: {new Date().toLocaleString()}
+            </p>
+          </div>
         </div>
       </div>
     </AppLayout>
