@@ -1,13 +1,16 @@
 
 import React, { useState } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
-import { PurchaseOrderHeader } from '@/components/purchase-order/PurchaseOrderHeader';
 import { SupplierSelection } from '@/components/purchase-order/SupplierSelection';
 import { OrderInformation } from '@/components/purchase-order/OrderInformation';
 import { ProductSelection } from '@/components/purchase-order/ProductSelection';
 import { OrderSummary } from '@/components/purchase-order/OrderSummary';
 import { TermsConditions } from '@/components/purchase-order/TermsConditions';
 import { ActionButtons } from '@/components/purchase-order/ActionButtons';
+import { X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import purchaseOrderIcon from '@/assets/purchase-order-icon.png';
 
 export interface PurchaseOrderProduct {
   id: string;
@@ -41,6 +44,7 @@ export interface SupplierData {
 }
 
 const GeneratePurchaseOrder = () => {
+  const navigate = useNavigate();
   const [selectedSupplier, setSelectedSupplier] = useState<SupplierData | null>(null);
   const [products, setProducts] = useState<PurchaseOrderProduct[]>([
     {
@@ -112,15 +116,28 @@ const GeneratePurchaseOrder = () => {
   return (
     <AppLayout>
       <div className="min-h-screen bg-gray-50 p-6">
-        <PurchaseOrderHeader />
-        
         {/* Main Form Container */}
-        <div className="max-w-7xl mx-auto mt-6">
+        <div className="max-w-7xl mx-auto">
           <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-            {/* Form Header */}
-            <div className="bg-gradient-to-r from-pink-50 to-rose-50 px-6 py-4 border-b border-pink-200">
-              <h2 className="text-xl font-semibold text-pink-800">Purchase Order Form</h2>
-              <p className="text-pink-600 text-sm mt-1">Complete all sections to generate your purchase order</p>
+            {/* Form Header with Icon and Close Button */}
+            <div className="bg-gradient-to-r from-pink-50 to-rose-50 px-6 py-4 border-b border-pink-200 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center shadow-md">
+                  <img src={purchaseOrderIcon} alt="Purchase Order" className="w-6 h-6 filter brightness-0 invert" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-pink-800">Purchase Order Form</h2>
+                  <p className="text-pink-600 text-sm">Complete all sections to generate your purchase order</p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate('/purchase/reorder')}
+                className="h-8 w-8 rounded-full hover:bg-pink-100 text-pink-600 hover:text-pink-800"
+              >
+                <X className="h-5 w-5" />
+              </Button>
             </div>
             
             {/* Form Content */}
