@@ -176,8 +176,7 @@ export default function CategoryManagement() {
     }
   };
 
-  const totalProducts = categories.reduce((sum, cat) => sum + cat.productCount, 0);
-  const activeCategories = categories.filter(cat => cat.isActive).length;
+  const activeCategories = categories.filter(cat => cat.is_active !== false).length;
 
   return (
     <AppLayout>
