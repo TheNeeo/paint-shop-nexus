@@ -19,6 +19,7 @@ import { InventoryFilters } from "@/components/inventory/InventoryFilters";
 import { InventoryTable } from "@/components/inventory/InventoryTable";
 import { AddProductModal } from "@/components/inventory/AddProductModal";
 import { EditProductModal } from "@/components/inventory/EditProductModal";
+import { StockAdjustmentModal } from "@/components/inventory/StockAdjustmentModal";
 import dashboardHomeIcon from "@/assets/dashboard-home-icon.png";
 import inventoryIcon from "@/assets/inventory-icon.png";
 
@@ -26,7 +27,8 @@ export default function InventoryManagement() {
   const navigate = useNavigate();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isAdjustmentModalOpen, setIsAdjustmentModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [stockStatusFilter, setStockStatusFilter] = useState("");
@@ -34,6 +36,11 @@ export default function InventoryManagement() {
   const handleEditProduct = (product: any) => {
     setSelectedProduct(product);
     setIsEditModalOpen(true);
+  };
+
+  const handleAdjustStock = (product: any) => {
+    setSelectedProduct(product);
+    setIsAdjustmentModalOpen(true);
   };
 
   const handleExportCSV = () => {
@@ -200,6 +207,7 @@ export default function InventoryManagement() {
             categoryFilter={categoryFilter}
             stockStatusFilter={stockStatusFilter}
             onEditProduct={handleEditProduct}
+            onAdjustStock={handleAdjustStock}
           />
 
           {/* Modals */}
@@ -211,6 +219,12 @@ export default function InventoryManagement() {
           <EditProductModal
             isOpen={isEditModalOpen}
             onClose={() => setIsEditModalOpen(false)}
+            product={selectedProduct}
+          />
+
+          <StockAdjustmentModal
+            isOpen={isAdjustmentModalOpen}
+            onClose={() => setIsAdjustmentModalOpen(false)}
             product={selectedProduct}
           />
         </div>
