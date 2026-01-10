@@ -39,6 +39,8 @@ export interface CustomerFilters {
 }
 
 const CustomerInformation: React.FC = () => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [filters, setFilters] = useState<CustomerFilters>({
@@ -47,34 +49,143 @@ const CustomerInformation: React.FC = () => {
     balanceStatus: 'all'
   });
 
-  // Mock data - replace with actual data fetching
-  const [customers, setCustomers] = useState<Customer[]>([
-    {
-      id: '1',
-      name: 'Rajesh Kumar',
-      mobile: '+91 98765 43210',
-      email: 'rajesh@example.com',
-      gstNo: '07AABCU9603R1ZX',
-      address: '123 MG Road, Delhi - 110001',
-      customerType: 'wholesale',
-      totalSales: 125000,
-      outstandingBalance: 15000,
-      status: 'active',
-      createdAt: new Date('2024-01-15')
+  // Fetch customers from database
+  const { data: customers = [], isLoading, error } = useQuery({
+    queryKey: ["customers"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      const { data, error } = await supabase
+        .from("customers")
+        .select("*")
+        .eq("created_by_user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return (data || []).map(c => ({
+        id: c.id,
+        name: c.name,
+        mobile: c.mobile,
+        email: c.email || '',
+        gstNo: c.gst_no || '',
+        address: c.address,
+        customerType: c.customer_type as 'retail' | 'wholesale',
+        totalSales: Number(c.total_sales) || 0,
+        outstandingBalance: Number(c.outstanding_balance) || 0,
+        status: c.status as 'active' | 'inactive',
+        createdAt: new Date(c.created_at)
+      }));
     },
-    {
-      id: '2',
-      name: 'Priya Sharma',
-      mobile: '+91 87654 32109',
-      email: 'priya@example.com',
-      address: '456 Park Street, Mumbai - 400001',
-      customerType: 'retail',
-      totalSales: 45000,
-      outstandingBalance: 0,
-      status: 'active',
-      createdAt: new Date('2024-02-20')
-    }
-  ]);
+  });
+
+  // Mutation to create customer
+  const createCustomerMutation = useMutation({
+    mutationFn: async (customerData: Omit<Customer, 'id' | 'createdAt'>) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      const { error } = await supabase
+        .from("customers")
+        .insert([
+          {
+            name: customerData.name,
+            mobile: customerData.mobile,
+            email: customerData.email,
+            gst_no: customerData.gstNo,
+            address: customerData.address,
+            customer_type: customerData.customerType,
+            total_sales: customerData.totalSales,
+            outstanding_balance: customerData.outstandingBalance,
+            status: customerData.status,
+            created_by_user_id: user.id,
+          },
+        ]);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
+      toast({
+        title: "Success",
+        description: "Customer created successfully",
+      });
+      setIsModalOpen(false);
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create customer",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation to update customer
+  const updateCustomerMutation = useMutation({
+    mutationFn: async (customerData: Omit<Customer, 'id' | 'createdAt'>) => {
+      if (!editingCustomer?.id) throw new Error("No customer selected");
+
+      const { error } = await supabase
+        .from("customers")
+        .update({
+          name: customerData.name,
+          mobile: customerData.mobile,
+          email: customerData.email,
+          gst_no: customerData.gstNo,
+          address: customerData.address,
+          customer_type: customerData.customerType,
+          total_sales: customerData.totalSales,
+          outstanding_balance: customerData.outstandingBalance,
+          status: customerData.status,
+        })
+        .eq("id", editingCustomer.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
+      toast({
+        title: "Success",
+        description: "Customer updated successfully",
+      });
+      setIsModalOpen(false);
+      setEditingCustomer(null);
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update customer",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation to delete customer
+  const deleteCustomerMutation = useMutation({
+    mutationFn: async (customerId: string) => {
+      const { error } = await supabase
+        .from("customers")
+        .delete()
+        .eq("id", customerId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
+      toast({
+        title: "Success",
+        description: "Customer deleted successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete customer",
+        variant: "destructive",
+      });
+    },
+  });
 
   const handleAddCustomer = () => {
     setEditingCustomer(null);
