@@ -5,15 +5,18 @@ import { CustomerSummaryCards } from '@/components/customer/CustomerSummaryCards
 import { CustomerFilters } from '@/components/customer/CustomerFilters';
 import { CustomerTable } from '@/components/customer/CustomerTable';
 import { AddEditCustomerModal } from '@/components/customer/AddEditCustomerModal';
-import { 
-  Breadcrumb, 
-  BreadcrumbItem, 
-  BreadcrumbLink, 
-  BreadcrumbList, 
-  BreadcrumbPage, 
-  BreadcrumbSeparator 
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
 } from '@/components/ui/breadcrumb';
-import { Home, Users } from 'lucide-react';
+import { Home, Users, RefreshCw } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 export interface Customer {
   id: string;
