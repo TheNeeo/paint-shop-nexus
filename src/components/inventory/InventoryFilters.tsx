@@ -42,20 +42,21 @@ export function InventoryFilters({
   });
 
   return (
-    <div className="flex flex-col md:flex-row gap-4 p-4 bg-white rounded-lg border border-cyan-200 shadow-sm">
+    <div className="flex flex-col md:flex-row gap-4 p-4 bg-white rounded-lg border-2 shadow-sm" style={{ borderColor: '#EADE71' }}>
       <div className="flex-1 relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-500 h-4 w-4" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" style={{ color: '#a16207' }} />
         <Input
           placeholder="Search by Product Name or HSN Code..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-10 border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
+          className="pl-10 bg-white"
+          style={{ borderColor: '#EADE71' }}
         />
       </div>
       
       <div className="flex gap-2">
         <Select value={categoryFilter || "all"} onValueChange={(value) => onCategoryChange(value === "all" ? "" : value)}>
-          <SelectTrigger className="w-48 border-cyan-200 focus:border-cyan-500 bg-white hover:bg-cyan-50">
+          <SelectTrigger className="w-48 bg-white hover:bg-amber-50" style={{ borderColor: '#EADE71' }}>
             <SelectValue placeholder="All Categories" />
           </SelectTrigger>
           <SelectContent className="bg-white">
@@ -69,7 +70,7 @@ export function InventoryFilters({
         </Select>
         
         <Select value={stockStatusFilter || "all"} onValueChange={(value) => onStockStatusChange(value === "all" ? "" : value)}>
-          <SelectTrigger className="w-48 border-cyan-200 focus:border-cyan-500 bg-white hover:bg-cyan-50">
+          <SelectTrigger className="w-48 bg-white hover:bg-amber-50" style={{ borderColor: '#EADE71' }}>
             <SelectValue placeholder="Stock Status" />
           </SelectTrigger>
           <SelectContent className="bg-white">
@@ -83,7 +84,8 @@ export function InventoryFilters({
         <Button 
           variant="outline" 
           size="icon"
-          className="border-cyan-200 text-cyan-600 hover:bg-cyan-50 bg-white"
+          className="bg-white hover:bg-amber-50"
+          style={{ borderColor: '#EADE71', color: '#a16207' }}
         >
           <Filter className="h-4 w-4" />
         </Button>
