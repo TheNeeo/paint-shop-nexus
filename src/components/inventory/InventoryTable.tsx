@@ -18,7 +18,8 @@ import {
   Trash2, 
   ChevronDown, 
   ChevronRight,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Settings2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +28,7 @@ interface InventoryTableProps {
   categoryFilter: string;
   stockStatusFilter: string;
   onEditProduct: (product: any) => void;
+  onAdjustStock: (product: any) => void;
 }
 
 interface Product {
@@ -53,7 +55,8 @@ export function InventoryTable({
   searchTerm,
   categoryFilter,
   stockStatusFilter,
-  onEditProduct
+  onEditProduct,
+  onAdjustStock
 }: InventoryTableProps) {
   const [expandedProducts, setExpandedProducts] = useState<Set<string>>(new Set());
 
@@ -140,10 +143,10 @@ export function InventoryTable({
   }
 
   return (
-    <div className="bg-white rounded-lg border border-cyan-200 shadow-sm overflow-x-auto">
+    <div className="bg-white rounded-lg border-2 shadow-sm overflow-x-auto" style={{ borderColor: '#EADE71' }}>
       <Table>
         <TableHeader>
-          <TableRow className="bg-cyan-50">
+          <TableRow style={{ backgroundColor: '#fef9c3' }}>
             <TableHead className="w-12">S.No</TableHead>
             <TableHead>Product Details</TableHead>
             <TableHead className="w-20">Image</TableHead>
@@ -169,7 +172,7 @@ export function InventoryTable({
               <React.Fragment key={product.id}>
                 <TableRow 
                   className={cn(
-                    "hover:bg-cyan-50 transition-colors",
+                    "hover:bg-amber-50 transition-colors",
                     stockStatus === "low-stock" && "bg-red-50",
                     stockStatus === "out-of-stock" && "bg-red-100"
                   )}
@@ -193,7 +196,7 @@ export function InventoryTable({
                       )}
                       <div>
                         <div className="font-medium text-gray-900">{product.name}</div>
-                        <Badge variant="outline" className="text-xs mt-1">
+                        <Badge variant="outline" className="text-xs mt-1" style={{ borderColor: '#EADE71', color: '#a16207' }}>
                           {product.categories?.name || "No Category"}
                         </Badge>
                       </div>
@@ -222,14 +225,25 @@ export function InventoryTable({
                   <TableCell>{getStockBadge(stockStatus)}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
-                      <Button variant="ghost" size="sm" className="text-cyan-600 hover:text-cyan-700 hover:bg-cyan-50">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => onAdjustStock(product)}
+                        className="hover:bg-amber-100 bg-amber-50"
+                        style={{ color: '#a16207' }}
+                        title="Adjust Stock"
+                      >
+                        <Settings2 className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" className="hover:bg-amber-50" style={{ color: '#a16207' }}>
                         <Eye className="h-4 w-4" />
                       </Button>
                       <Button 
                         variant="ghost" 
                         size="sm" 
                         onClick={() => onEditProduct(product)}
-                        className="text-cyan-600 hover:text-cyan-700 hover:bg-cyan-50"
+                        className="hover:bg-amber-50"
+                        style={{ color: '#a16207' }}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -249,7 +263,7 @@ export function InventoryTable({
                     <TableRow 
                       key={variant.id} 
                       className={cn(
-                        "bg-gray-50 hover:bg-cyan-25 transition-colors",
+                        "bg-amber-25 hover:bg-amber-50 transition-colors",
                         variantStockStatus === "low-stock" && "bg-red-25",
                         variantStockStatus === "out-of-stock" && "bg-red-50"
                       )}
@@ -260,7 +274,7 @@ export function InventoryTable({
                       <TableCell>
                         <div className="pl-6">
                           <div className="font-medium text-gray-800 text-sm">↳ {variant.name}</div>
-                          <Badge variant="outline" className="text-xs mt-1 bg-cyan-50 text-cyan-700">
+                          <Badge variant="outline" className="text-xs mt-1 bg-amber-50" style={{ borderColor: '#EADE71', color: '#a16207' }}>
                             Variant
                           </Badge>
                         </div>
@@ -288,14 +302,25 @@ export function InventoryTable({
                       <TableCell>{getStockBadge(variantStockStatus)}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
-                          <Button variant="ghost" size="sm" className="text-cyan-600 hover:text-cyan-700 hover:bg-cyan-50">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => onAdjustStock(variant)}
+                            className="hover:bg-amber-100 bg-amber-50"
+                            style={{ color: '#a16207' }}
+                            title="Adjust Stock"
+                          >
+                            <Settings2 className="h-3 w-3" />
+                          </Button>
+                          <Button variant="ghost" size="sm" className="hover:bg-amber-50" style={{ color: '#a16207' }}>
                             <Eye className="h-3 w-3" />
                           </Button>
                           <Button 
                             variant="ghost" 
                             size="sm" 
                             onClick={() => onEditProduct(variant)}
-                            className="text-cyan-600 hover:text-cyan-700 hover:bg-cyan-50"
+                            className="hover:bg-amber-50"
+                            style={{ color: '#a16207' }}
                           >
                             <Edit className="h-3 w-3" />
                           </Button>
