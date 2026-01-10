@@ -42,7 +42,7 @@ export function InventorySummary() {
       title: "Total Products",
       value: summary?.totalProducts || 0,
       Icon: Package,
-      gradient: "from-cyan-400 via-teal-500 to-emerald-500",
+      gradient: "from-amber-400 via-yellow-500 to-amber-500",
     },
     {
       title: "Low Stock Count",
@@ -60,7 +60,7 @@ export function InventorySummary() {
       title: "Categories",
       value: summary?.uniqueCategories || 0,
       Icon: Tags,
-      gradient: "from-purple-400 via-violet-500 to-indigo-500",
+      gradient: "from-orange-400 via-amber-500 to-yellow-500",
     }
   ];
 
