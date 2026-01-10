@@ -268,7 +268,7 @@ ${product.remainingWarranty ? `Warranty Remaining: ${product.remainingWarranty}`
             <div>
               <p className="text-sm text-gray-600 font-medium">Total Stock Value</p>
               <p className="text-2xl font-bold text-blue-600">
-                ₹{(product.unitPrice * product.stockQuantity).toFixed(2)}
+                ₹{((Number(product.unitPrice) || 0) * (Number(product.stockQuantity) || 0)).toFixed(2)}
               </p>
             </div>
           </div>
