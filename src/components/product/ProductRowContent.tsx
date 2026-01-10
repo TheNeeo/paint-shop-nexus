@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { TableCell } from "@/components/ui/table";
@@ -66,9 +65,9 @@ export function ProductRowContent({
       
       <TableCell className="bg-white">
         <div className="space-y-1">
-          <div className="font-medium text-lg text-green-700">${product.unitPrice.toFixed(2)}</div>
+          <div className="font-medium text-lg text-green-700">${(Number(product.unitPrice) || 0).toFixed(2)}</div>
           <div className="text-xs text-gray-500">
-            Total: ${(product.unitPrice * product.stockQuantity).toFixed(2)}
+            Total: ${((Number(product.unitPrice) || 0) * (Number(product.stockQuantity) || 0)).toFixed(2)}
           </div>
         </div>
       </TableCell>
