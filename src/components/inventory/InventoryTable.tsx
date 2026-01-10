@@ -18,7 +18,8 @@ import {
   Trash2, 
   ChevronDown, 
   ChevronRight,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Settings2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +28,7 @@ interface InventoryTableProps {
   categoryFilter: string;
   stockStatusFilter: string;
   onEditProduct: (product: any) => void;
+  onAdjustStock: (product: any) => void;
 }
 
 interface Product {
@@ -53,7 +55,8 @@ export function InventoryTable({
   searchTerm,
   categoryFilter,
   stockStatusFilter,
-  onEditProduct
+  onEditProduct,
+  onAdjustStock
 }: InventoryTableProps) {
   const [expandedProducts, setExpandedProducts] = useState<Set<string>>(new Set());
 
@@ -222,6 +225,16 @@ export function InventoryTable({
                   <TableCell>{getStockBadge(stockStatus)}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => onAdjustStock(product)}
+                        className="hover:bg-amber-100 bg-amber-50"
+                        style={{ color: '#a16207' }}
+                        title="Adjust Stock"
+                      >
+                        <Settings2 className="h-4 w-4" />
+                      </Button>
                       <Button variant="ghost" size="sm" className="hover:bg-amber-50" style={{ color: '#a16207' }}>
                         <Eye className="h-4 w-4" />
                       </Button>
@@ -289,6 +302,16 @@ export function InventoryTable({
                       <TableCell>{getStockBadge(variantStockStatus)}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => onAdjustStock(variant)}
+                            className="hover:bg-amber-100 bg-amber-50"
+                            style={{ color: '#a16207' }}
+                            title="Adjust Stock"
+                          >
+                            <Settings2 className="h-3 w-3" />
+                          </Button>
                           <Button variant="ghost" size="sm" className="hover:bg-amber-50" style={{ color: '#a16207' }}>
                             <Eye className="h-3 w-3" />
                           </Button>
