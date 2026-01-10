@@ -24,81 +24,141 @@ import {
   Edit,
   Trash2,
   Package,
+  RefreshCw,
 } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { CategoryForm } from "@/components/category/CategoryForm";
 import { CategoryTable } from "@/components/category/CategoryTable";
 import AppLayout from "@/components/layout/AppLayout";
 
-// Mock category data
-const mockCategories = [
-  {
-    id: "1",
-    name: "Tools",
-    description: "Professional painting and crafting tools",
-    productCount: 15,
-    color: "#3B82F6",
-    dateCreated: "2024-01-15",
-    isActive: true,
-  },
-  {
-    id: "2",
-    name: "Paint",
-    description: "Acrylic and oil-based paints",
-    productCount: 28,
-    color: "#EF4444",
-    dateCreated: "2024-01-10",
-    isActive: true,
-  },
-  {
-    id: "3",
-    name: "Canvas",
-    description: "Premium canvas for professional artists",
-    productCount: 12,
-    color: "#22C55E",
-    dateCreated: "2024-01-08",
-    isActive: true,
-  },
-  {
-    id: "4",
-    name: "Brushes",
-    description: "Various brush types and sizes",
-    productCount: 8,
-    color: "#A855F7",
-    dateCreated: "2024-01-05",
-    isActive: false,
-  },
-];
-
 export default function CategoryManagement() {
-  const [categories, setCategories] = useState(mockCategories);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [isEditCategoryOpen, setIsEditCategoryOpen] = useState(false);
 
+  // Fetch categories from database
+  const { data: categories = [], isLoading, error } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      const { data, error } = await supabase
+        .from("categories")
+        .select("*")
+        .eq("created_by_user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Mutation to create category
+  const createCategoryMutation = useMutation({
+    mutationFn: async (categoryData) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      const { error } = await supabase
+        .from("categories")
+        .insert([
+          {
+            ...categoryData,
+            created_by_user_id: user.id,
+          },
+        ]);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      toast({
+        title: "Success",
+        description: "Category created successfully",
+      });
+      setIsAddCategoryOpen(false);
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create category",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation to update category
+  const updateCategoryMutation = useMutation({
+    mutationFn: async (categoryData) => {
+      if (!selectedCategory?.id) throw new Error("No category selected");
+
+      const { error } = await supabase
+        .from("categories")
+        .update(categoryData)
+        .eq("id", selectedCategory.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      toast({
+        title: "Success",
+        description: "Category updated successfully",
+      });
+      setIsEditCategoryOpen(false);
+      setSelectedCategory(null);
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update category",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation to delete category
+  const deleteCategoryMutation = useMutation({
+    mutationFn: async (categoryId) => {
+      const { error } = await supabase
+        .from("categories")
+        .delete()
+        .eq("id", categoryId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      toast({
+        title: "Success",
+        description: "Category deleted successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete category",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleAddCategory = (categoryData) => {
-    const newCategory = {
-      id: String(categories.length + 1),
-      ...categoryData,
-      productCount: 0,
-      dateCreated: new Date().toISOString().split('T')[0],
-    };
-    setCategories([...categories, newCategory]);
-    setIsAddCategoryOpen(false);
+    createCategoryMutation.mutate(categoryData);
   };
 
   const handleEditCategory = (categoryData) => {
-    setCategories(categories.map(cat => 
-      cat.id === selectedCategory.id 
-        ? { ...selectedCategory, ...categoryData }
-        : cat
-    ));
-    setIsEditCategoryOpen(false);
-    setSelectedCategory(null);
+    updateCategoryMutation.mutate(categoryData);
   };
 
   const handleDeleteCategory = (categoryId) => {
     if (window.confirm("Are you sure you want to delete this category?")) {
-      setCategories(categories.filter(cat => cat.id !== categoryId));
+      deleteCategoryMutation.mutate(categoryId);
     }
   };
 
