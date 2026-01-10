@@ -198,27 +198,19 @@ const CustomerInformation: React.FC = () => {
   };
 
   const handleDeleteCustomer = (customerId: string) => {
-    setCustomers(prev => prev.filter(c => c.id !== customerId));
+    if (window.confirm("Are you sure you want to delete this customer?")) {
+      deleteCustomerMutation.mutate(customerId);
+    }
   };
 
   const handleSaveCustomer = (customerData: Omit<Customer, 'id' | 'createdAt'>) => {
     if (editingCustomer) {
       // Update existing customer
-      setCustomers(prev => prev.map(c => 
-        c.id === editingCustomer.id 
-          ? { ...customerData, id: c.id, createdAt: c.createdAt }
-          : c
-      ));
+      updateCustomerMutation.mutate(customerData);
     } else {
       // Add new customer
-      const newCustomer: Customer = {
-        ...customerData,
-        id: Date.now().toString(),
-        createdAt: new Date()
-      };
-      setCustomers(prev => [...prev, newCustomer]);
+      createCustomerMutation.mutate(customerData);
     }
-    setIsModalOpen(false);
   };
 
   const filteredCustomers = customers.filter(customer => {
