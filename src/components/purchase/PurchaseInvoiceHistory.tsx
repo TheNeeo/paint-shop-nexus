@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,42 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Search, Filter, Download, Eye, Edit, Trash2, FileDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
-interface InvoiceHistory {
-  id: string;
-  invoiceNo: string;
-  supplierName: string;
-  date: string;
-  totalAmount: number;
-  paymentStatus: 'Paid' | 'Partial' | 'Pending';
-}
-
-const mockInvoices: InvoiceHistory[] = [
-  {
-    id: '1',
-    invoiceNo: 'PI-2024-001',
-    supplierName: 'ABC Suppliers',
-    date: '2024-01-15',
-    totalAmount: 25000,
-    paymentStatus: 'Paid'
-  },
-  {
-    id: '2',
-    invoiceNo: 'PI-2024-002',
-    supplierName: 'XYZ Industries',
-    date: '2024-01-16',
-    totalAmount: 18500,
-    paymentStatus: 'Partial'
-  },
-  {
-    id: '3',
-    invoiceNo: 'PI-2024-003',
-    supplierName: 'DEF Traders',
-    date: '2024-01-17',
-    totalAmount: 12000,
-    paymentStatus: 'Pending'
-  }
-];
+import { mockInvoices, type InvoiceHistory } from '@/mocks/mockInvoices';
 
 export const PurchaseInvoiceHistory = () => {
   const { toast } = useToast();
