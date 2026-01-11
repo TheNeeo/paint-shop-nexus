@@ -80,17 +80,11 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
         </div>
       </div>
 
-      {/* Add Product Dialog */}
-      <Dialog open={isAddProductOpen} onOpenChange={setIsAddProductOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white border-2 border-green-200">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-green-800">
-              Add New Product
-            </DialogTitle>
-          </DialogHeader>
-          <ProductForm onClose={() => setIsAddProductOpen(false)} />
-        </DialogContent>
-      </Dialog>
+      {/* Add Product Modal - Shared with Product Activity page */}
+      <AddProductModal
+        isOpen={isAddProductOpen}
+        onClose={() => setIsAddProductOpen(false)}
+      />
     </>
   );
 }
