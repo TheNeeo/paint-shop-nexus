@@ -264,13 +264,13 @@ export default function ProductManagement() {
 
   const filteredProducts = useMemo(() => {
     return products.filter(product => {
-      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           product.baseCode.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = (product.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           (product.baseCode || "").toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = categoryFilter === "All" || product.category === categoryFilter;
       const stockStatus = getStockStatus(product.stockQuantity).status;
       const matchesStock = stockFilter === "All" || stockStatus === stockFilter;
       const matchesFeatured = !showFeaturedOnly || product.featured;
-      
+
       return matchesSearch && matchesCategory && matchesStock && matchesFeatured;
     }).sort((a, b) => {
       switch (sortBy) {
