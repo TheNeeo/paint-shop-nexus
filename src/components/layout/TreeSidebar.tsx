@@ -1,17 +1,10 @@
-
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import { TreeNode } from "./TreeNode";
 import { menuData } from "./menuData";
 import { TreeSidebarProps } from "./types";
 import { useLocation } from "react-router-dom";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { ProductForm } from "@/components/product/ProductForm";
+import { AddProductModal } from "@/components/inventory/AddProductModal";
 
 export function TreeSidebar({ collapsed }: TreeSidebarProps) {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
