@@ -58,6 +58,25 @@ export default function CategoryManagement() {
     },
   });
 
+  // Fetch products to calculate total products count
+  const { data: products = [] } = useQuery({
+    queryKey: ["products"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      const { data, error } = await supabase
+        .from("products")
+        .select("id")
+        .eq("created_by_user_id", user.id);
+
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  const totalProducts = products.length;
+
   // Mutation to create category
   const createCategoryMutation = useMutation({
     mutationFn: async (categoryData) => {
