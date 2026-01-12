@@ -184,11 +184,12 @@ const CustomerInformation: React.FC = () => {
           >
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div 
-                  className="w-16 h-16 rounded-xl flex items-center justify-center shadow-lg"
-                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
-                >
-                  <img src={customerIcon} alt="Customer" className="w-10 h-10 object-contain" />
+                <div className="w-16 h-16 rounded-xl flex items-center justify-center shadow-lg animate-bounce hover:animate-pulse transition-all duration-300">
+                  <img 
+                    src={customerIcon} 
+                    alt="Customer" 
+                    className="w-12 h-12 object-contain drop-shadow-lg filter brightness-0 invert" 
+                  />
                 </div>
                 <div>
                   <h1 className="text-2xl lg:text-3xl font-bold text-white drop-shadow-md">

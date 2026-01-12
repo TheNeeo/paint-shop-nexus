@@ -12,22 +12,28 @@ interface CustomerFiltersProps {
 
 export const CustomerFilters: React.FC<CustomerFiltersProps> = ({ filters, setFilters }) => {
   return (
-    <Card className="border-blue-200 shadow-sm mb-6 bg-gradient-to-r from-blue-50 to-sky-50">
+    <Card 
+      className="shadow-md mb-6 border-2"
+      style={{ 
+        background: 'linear-gradient(135deg, #E8F5EE 0%, #D1F2E0 100%)',
+        borderColor: '#35CA7B40'
+      }}
+    >
       <CardContent className="p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Filter className="h-5 w-5 text-blue-600" />
-          <h3 className="text-lg font-semibold text-blue-900">Search & Filters</h3>
+          <Filter className="h-5 w-5" style={{ color: '#35CA7B' }} />
+          <h3 className="text-lg font-semibold" style={{ color: '#1D7A4A' }}>Search & Filters</h3>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Search Input */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" style={{ color: '#35CA7B' }} />
             <Input
               placeholder="Search by Name / Mobile / GST No"
               value={filters.searchTerm}
               onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
-              className="pl-10 border-blue-200 focus:border-blue-400 focus:ring-blue-400 bg-white"
+              className="pl-10 bg-white border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500"
             />
           </div>
 
@@ -38,7 +44,7 @@ export const CustomerFilters: React.FC<CustomerFiltersProps> = ({ filters, setFi
               setFilters(prev => ({ ...prev, customerType: value }))
             }
           >
-            <SelectTrigger className="border-blue-200 focus:border-blue-400 focus:ring-blue-400 bg-white">
+            <SelectTrigger className="bg-white border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500">
               <SelectValue placeholder="Customer Type" />
             </SelectTrigger>
             <SelectContent>
@@ -55,7 +61,7 @@ export const CustomerFilters: React.FC<CustomerFiltersProps> = ({ filters, setFi
               setFilters(prev => ({ ...prev, balanceStatus: value }))
             }
           >
-            <SelectTrigger className="border-blue-200 focus:border-blue-400 focus:ring-blue-400 bg-white">
+            <SelectTrigger className="bg-white border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500">
               <SelectValue placeholder="Balance Status" />
             </SelectTrigger>
             <SelectContent>

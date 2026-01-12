@@ -37,11 +37,21 @@ export const CustomerTable: React.FC<CustomerTableProps> = ({
   };
 
   return (
-    <Card className="border-blue-200 shadow-sm">
-      <CardHeader className="bg-gradient-to-r from-blue-50 to-sky-50 border-b border-blue-200">
-        <CardTitle className="text-blue-900 flex items-center gap-2">
+    <Card className="border-0 shadow-none">
+      <CardHeader 
+        className="border-b-2"
+        style={{ 
+          background: 'linear-gradient(135deg, #E8F5EE 0%, #D1F2E0 100%)',
+          borderColor: '#35CA7B40'
+        }}
+      >
+        <CardTitle className="flex items-center gap-2" style={{ color: '#1D7A4A' }}>
           Customer Directory
-          <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+          <Badge 
+            variant="secondary" 
+            className="text-white font-semibold"
+            style={{ backgroundColor: '#35CA7B' }}
+          >
             {customers.length} customers
           </Badge>
         </CardTitle>
@@ -50,23 +60,26 @@ export const CustomerTable: React.FC<CustomerTableProps> = ({
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="bg-gradient-to-r from-blue-100 to-sky-100 hover:bg-gradient-to-r hover:from-blue-100 hover:to-sky-100">
-                <TableHead className="text-blue-900 font-semibold">S.No</TableHead>
-                <TableHead className="text-blue-900 font-semibold">Name</TableHead>
-                <TableHead className="text-blue-900 font-semibold">Mobile No</TableHead>
-                <TableHead className="text-blue-900 font-semibold">GST No</TableHead>
-                <TableHead className="text-blue-900 font-semibold">Address</TableHead>
-                <TableHead className="text-blue-900 font-semibold">Type</TableHead>
-                <TableHead className="text-blue-900 font-semibold">Total Sales</TableHead>
-                <TableHead className="text-blue-900 font-semibold">Outstanding</TableHead>
-                <TableHead className="text-blue-900 font-semibold">Status</TableHead>
-                <TableHead className="text-blue-900 font-semibold text-center">Actions</TableHead>
+              <TableRow 
+                className="hover:bg-transparent"
+                style={{ background: 'linear-gradient(135deg, #35CA7B 0%, #2DB86A 100%)' }}
+              >
+                <TableHead className="text-white font-semibold">S.No</TableHead>
+                <TableHead className="text-white font-semibold">Name</TableHead>
+                <TableHead className="text-white font-semibold">Mobile No</TableHead>
+                <TableHead className="text-white font-semibold">GST No</TableHead>
+                <TableHead className="text-white font-semibold">Address</TableHead>
+                <TableHead className="text-white font-semibold">Type</TableHead>
+                <TableHead className="text-white font-semibold">Total Sales</TableHead>
+                <TableHead className="text-white font-semibold">Outstanding</TableHead>
+                <TableHead className="text-white font-semibold">Status</TableHead>
+                <TableHead className="text-white font-semibold text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {customers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={10} className="text-center py-8 text-blue-600">
+                  <TableCell colSpan={10} className="text-center py-8" style={{ color: '#35CA7B' }}>
                     No customers found
                   </TableCell>
                 </TableRow>
@@ -74,17 +87,18 @@ export const CustomerTable: React.FC<CustomerTableProps> = ({
                 customers.map((customer, index) => (
                   <TableRow 
                     key={customer.id}
-                    className={`hover:bg-blue-50/50 transition-colors ${
-                      customer.outstandingBalance > 10000 ? 'bg-blue-100/40' : 'bg-white'
-                    }`}
+                    className="transition-colors hover:bg-emerald-50/50"
+                    style={{ 
+                      backgroundColor: customer.outstandingBalance > 10000 ? '#E8F5EE' : 'white'
+                    }}
                   >
-                    <TableCell className="font-medium text-blue-800">
+                    <TableCell className="font-medium" style={{ color: '#1D7A4A' }}>
                       {index + 1}
                     </TableCell>
                     <TableCell>
                       <div className="font-medium text-gray-900">{customer.name}</div>
                       {customer.email && (
-                        <div className="text-sm text-blue-600">{customer.email}</div>
+                        <div className="text-sm" style={{ color: '#35CA7B' }}>{customer.email}</div>
                       )}
                     </TableCell>
                     <TableCell className="text-gray-700">{customer.mobile}</TableCell>
@@ -98,14 +112,15 @@ export const CustomerTable: React.FC<CustomerTableProps> = ({
                       <Badge 
                         variant={customer.customerType === 'wholesale' ? 'default' : 'secondary'}
                         className={customer.customerType === 'wholesale' 
-                          ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' 
+                          ? 'text-white hover:opacity-90' 
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }
+                        style={customer.customerType === 'wholesale' ? { backgroundColor: '#35CA7B' } : {}}
                       >
                         {customer.customerType === 'wholesale' ? 'Wholesale' : 'Retail'}
                       </Badge>
                     </TableCell>
-                    <TableCell className="font-medium text-green-600">
+                    <TableCell className="font-medium" style={{ color: '#1D7A4A' }}>
                       {formatCurrency(customer.totalSales)}
                     </TableCell>
                     <TableCell>
@@ -113,7 +128,7 @@ export const CustomerTable: React.FC<CustomerTableProps> = ({
                         {customer.outstandingBalance > 10000 && (
                           <AlertCircle className="h-4 w-4 text-red-500" />
                         )}
-                        <span className={customer.outstandingBalance > 0 ? 'text-red-600 font-medium' : 'text-green-600'}>
+                        <span className={customer.outstandingBalance > 0 ? 'text-red-600 font-medium' : 'font-medium'} style={customer.outstandingBalance <= 0 ? { color: '#35CA7B' } : {}}>
                           {formatCurrency(customer.outstandingBalance)}
                         </span>
                       </div>
@@ -122,9 +137,10 @@ export const CustomerTable: React.FC<CustomerTableProps> = ({
                       <Badge 
                         variant={customer.status === 'active' ? 'default' : 'secondary'}
                         className={customer.status === 'active'
-                          ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                          ? 'text-white hover:opacity-90'
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         }
+                        style={customer.status === 'active' ? { backgroundColor: '#35CA7B' } : {}}
                       >
                         {customer.status === 'active' ? 'Active' : 'Inactive'}
                       </Badge>
@@ -135,7 +151,8 @@ export const CustomerTable: React.FC<CustomerTableProps> = ({
                           variant="ghost"
                           size="sm"
                           onClick={() => handleViewCustomer(customer)}
-                          className="h-8 w-8 p-0 text-blue-600 hover:bg-blue-100"
+                          className="h-8 w-8 p-0 hover:bg-emerald-100"
+                          style={{ color: '#35CA7B' }}
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
@@ -143,7 +160,7 @@ export const CustomerTable: React.FC<CustomerTableProps> = ({
                           variant="ghost"
                           size="sm"
                           onClick={() => onEditCustomer(customer)}
-                          className="h-8 w-8 p-0 text-green-600 hover:bg-green-100"
+                          className="h-8 w-8 p-0 text-amber-600 hover:bg-amber-100"
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -165,13 +182,19 @@ export const CustomerTable: React.FC<CustomerTableProps> = ({
         </div>
         
         {/* Pagination Footer */}
-        <div className="flex items-center justify-between p-4 border-t border-blue-200 bg-gradient-to-r from-blue-50 to-sky-50">
-          <div className="text-sm text-blue-700">
+        <div 
+          className="flex items-center justify-between p-4 border-t-2"
+          style={{ 
+            background: 'linear-gradient(135deg, #E8F5EE 0%, #D1F2E0 100%)',
+            borderColor: '#35CA7B40'
+          }}
+        >
+          <div className="text-sm" style={{ color: '#1D7A4A' }}>
             Total Outstanding: <span className="font-semibold text-red-600">
               {formatCurrency(customers.reduce((sum, c) => sum + c.outstandingBalance, 0))}
             </span>
           </div>
-          <div className="text-sm text-blue-600">
+          <div className="text-sm" style={{ color: '#35CA7B' }}>
             Showing {customers.length} customers
           </div>
         </div>
