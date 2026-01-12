@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Customer } from '@/pages/CustomerInformation';
+import addNewCustomerIcon from '@/assets/add-new-customer-icon.png';
 
 interface AddEditCustomerModalProps {
   isOpen: boolean;
@@ -116,9 +117,18 @@ export const AddEditCustomerModal: React.FC<AddEditCustomerModalProps> = ({
         }}
       >
         <DialogHeader>
-          <DialogTitle className="text-xl" style={{ color: '#1D7A4A' }}>
-            {customer ? 'Edit Customer' : 'Add New Customer'}
-          </DialogTitle>
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center animate-bounce">
+              <img 
+                src={addNewCustomerIcon} 
+                alt="Customer" 
+                className="w-10 h-10 object-contain" 
+              />
+            </div>
+            <DialogTitle className="text-xl" style={{ color: '#1D7A4A' }}>
+              {customer ? 'Edit Customer' : 'Add New Customer'}
+            </DialogTitle>
+          </div>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
