@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
-import { CustomerHeader } from '@/components/customer/CustomerHeader';
 import { CustomerSummaryCards } from '@/components/customer/CustomerSummaryCards';
-import { CustomerFilters } from '@/components/customer/CustomerFilters';
 import { CustomerTable } from '@/components/customer/CustomerTable';
 import { AddEditCustomerModal } from '@/components/customer/AddEditCustomerModal';
 import { 
@@ -13,7 +11,17 @@ import {
   BreadcrumbPage, 
   BreadcrumbSeparator 
 } from '@/components/ui/breadcrumb';
-import { Home, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Home, Users, Plus, Download, Search, X } from 'lucide-react';
+import customerIcon from '@/assets/customer-icon.png';
 
 export interface Customer {
   id: string;
@@ -89,14 +97,12 @@ const CustomerInformation: React.FC = () => {
 
   const handleSaveCustomer = (customerData: Omit<Customer, 'id' | 'createdAt'>) => {
     if (editingCustomer) {
-      // Update existing customer
       setCustomers(prev => prev.map(c => 
         c.id === editingCustomer.id 
           ? { ...customerData, id: c.id, createdAt: c.createdAt }
           : c
       ));
     } else {
-      // Add new customer
       const newCustomer: Customer = {
         ...customerData,
         id: Date.now().toString(),
@@ -105,6 +111,18 @@ const CustomerInformation: React.FC = () => {
       setCustomers(prev => [...prev, newCustomer]);
     }
     setIsModalOpen(false);
+  };
+
+  const handleExportCSV = () => {
+    console.log('Exporting CSV...');
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      searchTerm: '',
+      customerType: 'all',
+      balanceStatus: 'all'
+    });
   };
 
   const filteredCustomers = customers.filter(customer => {
@@ -123,55 +141,175 @@ const CustomerInformation: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-sky-50 to-cyan-50 p-6">
-        {/* Breadcrumbs */}
-        <div className="mb-6">
+      <div className="min-h-screen" style={{ backgroundColor: '#E8F5EE' }}>
+        <div className="p-6 space-y-6">
+          {/* Breadcrumb */}
           <Breadcrumb>
-            <BreadcrumbList>
+            <BreadcrumbList className="text-sm">
               <BreadcrumbItem>
-                <BreadcrumbLink href="/" className="flex items-center gap-2 text-blue-600 hover:text-blue-800">
+                <BreadcrumbLink 
+                  href="/" 
+                  className="flex items-center gap-1.5 text-emerald-700 hover:text-emerald-900 transition-colors"
+                >
                   <Home className="h-4 w-4" />
-                  Dashboard
+                  <span>Home</span>
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
+              <BreadcrumbSeparator className="text-emerald-400" />
               <BreadcrumbItem>
-                <BreadcrumbLink href="#" className="flex items-center gap-2 text-blue-600 hover:text-blue-800">
+                <BreadcrumbLink 
+                  href="#" 
+                  className="flex items-center gap-1.5 text-emerald-700 hover:text-emerald-900 transition-colors"
+                >
                   <Users className="h-4 w-4" />
-                  Customer Management
+                  <span>Contact Management</span>
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbPage className="text-blue-800 font-medium">
-                Customer Information
-              </BreadcrumbPage>
+              <BreadcrumbSeparator className="text-emerald-400" />
+              <BreadcrumbItem>
+                <BreadcrumbPage className="font-semibold" style={{ color: '#35CA7B' }}>
+                  Customer Information
+                </BreadcrumbPage>
+              </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
+
+          {/* Header - Like Purchase Activity */}
+          <div 
+            className="rounded-xl shadow-lg border-2 p-6"
+            style={{ 
+              background: 'linear-gradient(135deg, #35CA7B 0%, #2DB86A 50%, #25A65C 100%)',
+              borderColor: '#2DB86A'
+            }}
+          >
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div 
+                  className="w-16 h-16 rounded-xl flex items-center justify-center shadow-lg"
+                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
+                >
+                  <img src={customerIcon} alt="Customer" className="w-10 h-10 object-contain" />
+                </div>
+                <div>
+                  <h1 className="text-2xl lg:text-3xl font-bold text-white drop-shadow-md">
+                    Customer Information
+                  </h1>
+                  <p className="text-emerald-100 text-sm lg:text-base mt-1">
+                    Manage your customer database and track outstanding balances
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  variant="outline"
+                  onClick={handleExportCSV}
+                  className="bg-white/20 border-white/40 text-white hover:bg-white/30 hover:border-white/60"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export CSV
+                </Button>
+                
+                <Button
+                  onClick={handleAddCustomer}
+                  className="text-emerald-800 font-semibold shadow-lg hover:shadow-xl transition-all"
+                  style={{ backgroundColor: 'white' }}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Customer
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Customer Summary Cards */}
+          <CustomerSummaryCards customers={customers} />
+
+          {/* Filters Section */}
+          <div 
+            className="rounded-xl shadow-md border-2 p-5"
+            style={{ 
+              backgroundColor: 'white',
+              borderColor: '#35CA7B40'
+            }}
+          >
+            <div className="flex flex-col lg:flex-row gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-emerald-500" />
+                <Input
+                  placeholder="Search by name, mobile, or GST number..."
+                  value={filters.searchTerm}
+                  onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
+                  className="pl-10 border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500"
+                />
+              </div>
+              
+              <Select 
+                value={filters.customerType} 
+                onValueChange={(value: 'all' | 'retail' | 'wholesale') => 
+                  setFilters(prev => ({ ...prev, customerType: value }))
+                }
+              >
+                <SelectTrigger className="w-full lg:w-[180px] border-emerald-200 focus:border-emerald-500">
+                  <SelectValue placeholder="Customer Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="retail">Retail</SelectItem>
+                  <SelectItem value="wholesale">Wholesale</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Select 
+                value={filters.balanceStatus} 
+                onValueChange={(value: 'all' | 'due' | 'cleared') => 
+                  setFilters(prev => ({ ...prev, balanceStatus: value }))
+                }
+              >
+                <SelectTrigger className="w-full lg:w-[180px] border-emerald-200 focus:border-emerald-500">
+                  <SelectValue placeholder="Balance Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="due">Payment Due</SelectItem>
+                  <SelectItem value="cleared">Cleared</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Button 
+                variant="outline" 
+                onClick={clearFilters}
+                className="border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+              >
+                <X className="h-4 w-4 mr-2" />
+                Clear
+              </Button>
+            </div>
+          </div>
+
+          {/* Customer Table */}
+          <div 
+            className="rounded-xl shadow-md border-2 overflow-hidden"
+            style={{ 
+              backgroundColor: 'white',
+              borderColor: '#35CA7B40'
+            }}
+          >
+            <CustomerTable 
+              customers={filteredCustomers}
+              onEditCustomer={handleEditCustomer}
+              onDeleteCustomer={handleDeleteCustomer}
+            />
+          </div>
+
+          {/* Add/Edit Customer Modal */}
+          <AddEditCustomerModal 
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            customer={editingCustomer}
+            onSave={handleSaveCustomer}
+          />
         </div>
-
-        {/* Page Header */}
-        <CustomerHeader onAddCustomer={handleAddCustomer} />
-
-        {/* Customer Summary Cards */}
-        <CustomerSummaryCards customers={customers} />
-
-        {/* Search & Filter Bar */}
-        <CustomerFilters filters={filters} setFilters={setFilters} />
-
-        {/* Customer Table */}
-        <CustomerTable 
-          customers={filteredCustomers}
-          onEditCustomer={handleEditCustomer}
-          onDeleteCustomer={handleDeleteCustomer}
-        />
-
-        {/* Add/Edit Customer Modal */}
-        <AddEditCustomerModal 
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          customer={editingCustomer}
-          onSave={handleSaveCustomer}
-        />
       </div>
     </AppLayout>
   );
