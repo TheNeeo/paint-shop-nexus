@@ -167,7 +167,7 @@ export const menuData = [
   },
   {
     id: "customer-management",
-    title: "Customer Management",
+    title: "Contact Management",
     icon: Users,
     iconColor: "text-violet-400",
     children: [
