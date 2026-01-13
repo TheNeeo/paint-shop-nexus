@@ -24,19 +24,19 @@ export const CustomerHistorySummary: React.FC<CustomerHistorySummaryProps> = ({ 
       title: 'Total Customers',
       value: totalCustomers.toString(),
       Icon: Users,
-      gradient: 'from-[#0EACDD] via-[#0A8CB3] to-[#087A9E]',
+      gradient: 'from-blue-500 via-blue-600 to-blue-700',
     },
     {
       title: 'Total Sales Value',
       value: `₹${totalSalesValue.toLocaleString()}`,
       Icon: DollarSign,
-      gradient: 'from-[#0EACDD] via-[#0D9BC7] to-[#0A8CB3]',
+      gradient: 'from-emerald-500 via-green-500 to-teal-600',
     },
     {
       title: 'Average Purchase',
       value: `₹${Math.round(averagePurchase).toLocaleString()}`,
       Icon: ShoppingCart,
-      gradient: 'from-[#0D9BC7] via-[#0EACDD] to-[#12C4F5]',
+      gradient: 'from-purple-500 via-violet-500 to-indigo-600',
     },
     {
       title: 'Outstanding Dues',
