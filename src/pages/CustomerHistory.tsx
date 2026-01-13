@@ -148,27 +148,27 @@ const CustomerHistory: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100 p-6">
-        {/* Breadcrumbs */}
+      <div className="min-h-screen p-6" style={{ background: 'linear-gradient(135deg, #E8F8FC 0%, #D1F1F9 50%, #B8EAF5 100%)' }}>
+        {/* Breadcrumbs - styled like Sales Activity */}
         <div className="mb-6">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/" className="flex items-center gap-2 text-gray-600 hover:text-gray-800">
-                  <Home className="h-4 w-4" />
-                  Dashboard
+                <BreadcrumbLink href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity" style={{ color: '#0EACDD' }}>
+                  <Home className="h-4 w-4" style={{ color: '#0EACDD' }} />
+                  <span className="font-medium">Dashboard</span>
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
+              <BreadcrumbSeparator style={{ color: '#0EACDD' }} />
               <BreadcrumbItem>
-                <BreadcrumbLink href="/customers" className="flex items-center gap-2 text-gray-600 hover:text-gray-800">
-                  <Users className="h-4 w-4" />
-                  Customer Management
+                <BreadcrumbLink href="/customers" className="flex items-center gap-2 hover:opacity-80 transition-opacity" style={{ color: '#0EACDD' }}>
+                  <Users className="h-4 w-4" style={{ color: '#0EACDD' }} />
+                  <span className="font-medium">Contact Management</span>
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbPage className="text-gray-800 font-medium flex items-center gap-2">
-                <History className="h-4 w-4" />
+              <BreadcrumbSeparator style={{ color: '#0EACDD' }} />
+              <BreadcrumbPage className="font-semibold flex items-center gap-2" style={{ color: '#087A9E' }}>
+                <History className="h-4 w-4" style={{ color: '#087A9E' }} />
                 Customer History
               </BreadcrumbPage>
             </BreadcrumbList>

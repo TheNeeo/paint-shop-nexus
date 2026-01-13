@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, FileText, Palette } from 'lucide-react';
+import { Download, FileText } from 'lucide-react';
+import customerHistoryIcon from '@/assets/customer-history-icon.png';
 
 export const CustomerHistoryHeader: React.FC = () => {
   const handleExportPDF = () => {
@@ -11,23 +12,37 @@ export const CustomerHistoryHeader: React.FC = () => {
     console.log('Exporting Excel...');
   };
 
-  const handleThemeToggle = () => {
-    console.log('Theme toggle...');
-  };
-
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+    <div 
+      className="rounded-xl shadow-lg border p-6 mb-6"
+      style={{
+        background: 'linear-gradient(135deg, #0EACDD 0%, #0A8CB3 50%, #087A9E 100%)',
+        borderColor: '#0EACDD'
+      }}
+    >
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Customer History</h1>
-          <p className="text-gray-600">Track customer purchase history and analyze customer behavior patterns</p>
+        <div className="flex items-center gap-4">
+          <div 
+            className="w-14 h-14 rounded-xl flex items-center justify-center shadow-lg animate-bounce hover:animate-pulse"
+            style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
+          >
+            <img 
+              src={customerHistoryIcon} 
+              alt="Customer History" 
+              className="w-10 h-10 object-contain filter brightness-0 invert" 
+            />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-white mb-1">Customer History</h1>
+            <p className="text-white/80">Track customer purchase history and analyze customer behavior patterns</p>
+          </div>
         </div>
         
         <div className="flex flex-wrap gap-3">
           <Button
             variant="outline"
             onClick={handleExportPDF}
-            className="border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
+            className="bg-white/10 border-white/30 text-white hover:bg-white/20 hover:border-white/50 backdrop-blur-sm"
           >
             <FileText className="h-4 w-4 mr-2" />
             Export PDF
@@ -36,19 +51,10 @@ export const CustomerHistoryHeader: React.FC = () => {
           <Button
             variant="outline"
             onClick={handleExportExcel}
-            className="border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
+            className="bg-white/10 border-white/30 text-white hover:bg-white/20 hover:border-white/50 backdrop-blur-sm"
           >
             <Download className="h-4 w-4 mr-2" />
             Export Excel
-          </Button>
-
-          <Button
-            variant="outline"
-            onClick={handleThemeToggle}
-            className="border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"
-          >
-            <Palette className="h-4 w-4 mr-2" />
-            Theme
           </Button>
         </div>
       </div>
