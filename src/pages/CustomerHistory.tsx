@@ -154,23 +154,25 @@ const CustomerHistory: React.FC = () => {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity" style={{ color: '#0EACDD' }}>
-                  <Home className="h-4 w-4" style={{ color: '#0EACDD' }} />
-                  <span className="font-medium">Dashboard</span>
+                <BreadcrumbLink href="/" className="flex items-center gap-1.5 hover:opacity-80 transition-opacity cursor-pointer">
+                  <Home className="h-4 w-4 text-cyan-600" />
+                  <span className="text-cyan-600 font-medium">Dashboard</span>
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator style={{ color: '#0EACDD' }} />
+              <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink href="/customers" className="flex items-center gap-2 hover:opacity-80 transition-opacity" style={{ color: '#0EACDD' }}>
-                  <Users className="h-4 w-4" style={{ color: '#0EACDD' }} />
-                  <span className="font-medium">Contact Management</span>
+                <BreadcrumbLink href="/customers" className="flex items-center gap-1.5 hover:opacity-80 transition-opacity cursor-pointer">
+                  <Users className="h-4 w-4 text-orange-400" />
+                  <span className="text-orange-600 font-medium">Contact Management</span>
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator style={{ color: '#0EACDD' }} />
-              <BreadcrumbPage className="font-semibold flex items-center gap-2" style={{ color: '#087A9E' }}>
-                <History className="h-4 w-4" style={{ color: '#087A9E' }} />
-                Customer History
-              </BreadcrumbPage>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage className="flex items-center gap-1.5">
+                  <History className="h-4 w-4" style={{ color: '#0EACDD' }} />
+                  <span className="font-semibold" style={{ color: '#0EACDD' }}>Customer History</span>
+                </BreadcrumbPage>
+              </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </div>
