@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import AppLayout from '@/components/layout/AppLayout';
 import { CustomerSummaryCards } from '@/components/customer/CustomerSummaryCards';
 import { CustomerTable } from '@/components/customer/CustomerTable';
@@ -12,6 +13,7 @@ import {
   BreadcrumbSeparator 
 } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -149,79 +151,133 @@ const CustomerInformation: React.FC = () => {
               <BreadcrumbItem>
                 <BreadcrumbLink 
                   href="/" 
-                  className="flex items-center gap-1.5 text-emerald-700 hover:text-emerald-900 transition-colors"
+                  className="flex items-center gap-1.5 hover:opacity-80 transition-opacity cursor-pointer"
                 >
-                  <Home className="h-4 w-4" />
-                  <span>Home</span>
+                  <Home className="h-4 w-4 text-cyan-600" />
+                  <span className="text-cyan-600 font-medium">Dashboard</span>
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator className="text-emerald-400" />
+              <BreadcrumbSeparator />
               <BreadcrumbItem>
                 <BreadcrumbLink 
                   href="#" 
-                  className="flex items-center gap-1.5 text-emerald-700 hover:text-emerald-900 transition-colors"
+                  className="flex items-center gap-1.5 hover:opacity-80 transition-opacity cursor-pointer"
                 >
-                  <Users className="h-4 w-4" />
-                  <span>Contact Management</span>
+                  <Users className="h-4 w-4 text-orange-400" />
+                  <span className="text-orange-600 font-medium">Contact Management</span>
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator className="text-emerald-400" />
+              <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage className="font-semibold" style={{ color: '#35CA7B' }}>
-                  Customer Information
+                <BreadcrumbPage className="flex items-center gap-1.5">
+                  <Users className="h-4 w-4" style={{ color: '#35CA7B' }} />
+                  <span className="font-semibold" style={{ color: '#35CA7B' }}>Customer Information</span>
                 </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
 
-          {/* Header - Like Purchase Activity */}
-          <div 
-            className="rounded-xl shadow-lg border-2 p-6"
+          {/* Header - Like Sales Activity */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="rounded-3xl p-6 shadow-lg border-2 relative overflow-hidden"
             style={{ 
-              background: 'linear-gradient(135deg, #35CA7B 0%, #2DB86A 50%, #25A65C 100%)',
-              borderColor: '#2DB86A'
+              background: 'linear-gradient(to right, #E8F5EE, #D4F1E0, #E8F5EE)',
+              borderColor: '#35CA7B'
             }}
           >
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-xl flex items-center justify-center shadow-lg animate-bounce hover:animate-pulse transition-all duration-300">
-                  <img 
-                    src={customerIcon} 
-                    alt="Customer" 
-                    className="w-12 h-12 object-contain drop-shadow-lg filter brightness-0 invert" 
-                  />
-                </div>
-                <div>
-                  <h1 className="text-2xl lg:text-3xl font-bold text-white drop-shadow-md">
+            {/* Animated background pattern */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 left-0 w-40 h-40 rounded-full blur-3xl animate-pulse" style={{ backgroundColor: '#35CA7B' }}></div>
+              <div className="absolute bottom-0 right-0 w-40 h-40 rounded-full blur-3xl animate-pulse delay-1000" style={{ backgroundColor: '#25A65C' }}></div>
+            </div>
+
+            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              <div className="space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                  <motion.h1
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2, duration: 0.5 }}
+                    className="text-2xl lg:text-4xl font-bold flex items-center gap-3"
+                    style={{ color: '#1A7F42' }}
+                  >
+                    <motion.div
+                      animate={{ rotate: [0, 10, -10, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                    >
+                      <img 
+                        src={customerIcon} 
+                        alt="Customer" 
+                        className="h-10 w-10 lg:h-12 lg:w-12 object-contain" 
+                        style={{ mixBlendMode: 'multiply' }}
+                      />
+                    </motion.div>
                     Customer Information
-                  </h1>
-                  <p className="text-emerald-100 text-sm lg:text-base mt-1">
-                    Manage your customer database and track outstanding balances
-                  </p>
+                  </motion.h1>
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
+                  >
+                    <Badge 
+                      className="text-white border-none text-sm px-4 py-1 shadow-md"
+                      style={{ background: 'linear-gradient(to right, #35CA7B, #25A65C)' }}
+                    >
+                      Live Directory
+                    </Badge>
+                  </motion.div>
                 </div>
+
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                  className="text-sm italic"
+                  style={{ color: '#2DB86A' }}
+                >
+                  Manage your customer database ~ Track outstanding balances 💼
+                </motion.p>
               </div>
               
-              <div className="flex flex-wrap gap-3">
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+                className="flex flex-wrap gap-2"
+              >
                 <Button
                   variant="outline"
                   onClick={handleExportCSV}
-                  className="bg-white/20 border-white/40 text-white hover:bg-white/30 hover:border-white/60"
+                  className="bg-white transition-all duration-300 shadow-sm hover:shadow-md"
+                  style={{ 
+                    borderColor: '#35CA7B',
+                    color: '#1A7F42'
+                  }}
                 >
                   <Download className="h-4 w-4 mr-2" />
                   Export CSV
                 </Button>
                 
-                <Button
-                  onClick={handleAddCustomer}
-                  className="text-emerald-800 font-semibold shadow-lg hover:shadow-xl transition-all"
-                  style={{ backgroundColor: 'white' }}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Customer
-                </Button>
-              </div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    onClick={handleAddCustomer}
+                    className="shadow-lg hover:shadow-xl border-2 transition-all duration-300 relative overflow-hidden group text-white"
+                    style={{ 
+                      background: 'linear-gradient(to right, #35CA7B, #25A65C)',
+                      borderColor: '#35CA7B'
+                    }}
+                  >
+                    <span className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
+                    <Plus className="h-4 w-4 mr-2 relative z-10" />
+                    <span className="relative z-10">Add Customer</span>
+                  </Button>
+                </motion.div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Customer Summary Cards */}
           <CustomerSummaryCards customers={customers} />

@@ -150,7 +150,7 @@ export default function InventoryMovementHistory() {
                     className="cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-1.5"
                   >
                     <img src={dashboardHomeIcon} alt="Dashboard" className="h-5 w-5 object-contain bg-transparent" style={{ mixBlendMode: 'multiply' }} />
-                    <span className="font-medium" style={{ color: ELECTRIC_AQUA_DARK }}>Dashboard</span>
+                    <span className="text-cyan-600 font-medium">Dashboard</span>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
@@ -159,8 +159,8 @@ export default function InventoryMovementHistory() {
                     onClick={() => navigate("/inventory")} 
                     className="cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-1.5"
                   >
-                    <Boxes className="h-4 w-4" style={{ color: ELECTRIC_AQUA_DARK }} />
-                    <span className="font-medium" style={{ color: ELECTRIC_AQUA_DARK }}>Inventory Management</span>
+                    <Boxes className="h-4 w-4 text-orange-400" />
+                    <span className="text-orange-600 font-medium">Inventory Management</span>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
