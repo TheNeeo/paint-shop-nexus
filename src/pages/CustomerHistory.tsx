@@ -148,7 +148,7 @@ const CustomerHistory: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="min-h-screen p-6" style={{ background: 'linear-gradient(135deg, #E8F8FC 0%, #D1F1F9 50%, #B8EAF5 100%)' }}>
+      <div className="min-h-screen p-6" style={{ background: 'linear-gradient(135deg, #E8EDE5 0%, #D5DDD1 50%, #C8D4C2 100%)' }}>
         {/* Breadcrumbs - styled like Sales Activity */}
         <div className="mb-6">
           <Breadcrumb>
@@ -169,8 +169,8 @@ const CustomerHistory: React.FC = () => {
               <BreadcrumbSeparator />
               <BreadcrumbItem>
                 <BreadcrumbPage className="flex items-center gap-1.5">
-                  <History className="h-4 w-4" style={{ color: '#0EACDD' }} />
-                  <span className="font-semibold" style={{ color: '#0EACDD' }}>Customer History</span>
+                  <History className="h-4 w-4" style={{ color: '#6B7B65' }} />
+                  <span className="font-semibold" style={{ color: '#4A5746' }}>Customer History</span>
                 </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>

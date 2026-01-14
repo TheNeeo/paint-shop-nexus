@@ -13,6 +13,12 @@ import {
 import { Eye, Edit, Trash2, ChevronDown, ChevronRight, FileText, AlertCircle } from 'lucide-react';
 import { CustomerHistoryData } from '@/pages/CustomerHistory';
 
+// Ash Grey theme colors
+const THEME_PRIMARY = "#6B7B65"; // Dark Ash Grey
+const THEME_SECONDARY = "#8A9A84"; // Medium Ash Grey
+const THEME_BORDER = "#B6C2AE"; // Ash Grey border
+const THEME_TEXT = "#4A5746"; // Dark text for Ash Grey
+
 interface CustomerHistoryTableProps {
   customers: CustomerHistoryData[];
   onViewDetails: (customer: CustomerHistoryData) => void;
@@ -66,8 +72,8 @@ export const CustomerHistoryTable: React.FC<CustomerHistoryTableProps> = ({
   };
 
   return (
-    <Card className="shadow-lg" style={{ borderColor: '#0EACDD' }}>
-      <CardHeader style={{ background: 'linear-gradient(135deg, #0EACDD 0%, #0A8CB3 100%)', borderBottom: '1px solid #0EACDD' }}>
+    <Card className="shadow-lg" style={{ borderColor: THEME_BORDER }}>
+      <CardHeader style={{ background: `linear-gradient(135deg, ${THEME_PRIMARY} 0%, ${THEME_SECONDARY} 100%)`, borderBottom: `1px solid ${THEME_BORDER}` }}>
         <CardTitle className="text-white flex items-center gap-2">
           Customer Purchase History
           <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
@@ -79,23 +85,23 @@ export const CustomerHistoryTable: React.FC<CustomerHistoryTableProps> = ({
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow style={{ background: 'linear-gradient(135deg, rgba(14, 172, 221, 0.15) 0%, rgba(14, 172, 221, 0.1) 100%)' }}>
-                <TableHead className="font-semibold w-12" style={{ color: '#087A9E' }}></TableHead>
-                <TableHead className="font-semibold" style={{ color: '#087A9E' }}>S.No</TableHead>
-                <TableHead className="font-semibold" style={{ color: '#087A9E' }}>Customer Name</TableHead>
-                <TableHead className="font-semibold" style={{ color: '#087A9E' }}>Mobile Number</TableHead>
-                <TableHead className="font-semibold" style={{ color: '#087A9E' }}>Email</TableHead>
-                <TableHead className="font-semibold" style={{ color: '#087A9E' }}>Total Invoices</TableHead>
-                <TableHead className="font-semibold" style={{ color: '#087A9E' }}>Total Purchase Value</TableHead>
-                <TableHead className="font-semibold" style={{ color: '#087A9E' }}>Last Purchase Date</TableHead>
-                <TableHead className="font-semibold" style={{ color: '#087A9E' }}>Outstanding Balance</TableHead>
-                <TableHead className="font-semibold text-center" style={{ color: '#087A9E' }}>Actions</TableHead>
+              <TableRow style={{ background: `linear-gradient(135deg, rgba(182, 194, 174, 0.2) 0%, rgba(182, 194, 174, 0.15) 100%)` }}>
+                <TableHead className="font-semibold w-12" style={{ color: THEME_TEXT }}></TableHead>
+                <TableHead className="font-semibold" style={{ color: THEME_TEXT }}>S.No</TableHead>
+                <TableHead className="font-semibold" style={{ color: THEME_TEXT }}>Customer Name</TableHead>
+                <TableHead className="font-semibold" style={{ color: THEME_TEXT }}>Mobile Number</TableHead>
+                <TableHead className="font-semibold" style={{ color: THEME_TEXT }}>Email</TableHead>
+                <TableHead className="font-semibold" style={{ color: THEME_TEXT }}>Total Invoices</TableHead>
+                <TableHead className="font-semibold" style={{ color: THEME_TEXT }}>Total Purchase Value</TableHead>
+                <TableHead className="font-semibold" style={{ color: THEME_TEXT }}>Last Purchase Date</TableHead>
+                <TableHead className="font-semibold" style={{ color: THEME_TEXT }}>Outstanding Balance</TableHead>
+                <TableHead className="font-semibold text-center" style={{ color: THEME_TEXT }}>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {customers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={10} className="text-center py-8" style={{ color: '#087A9E' }}>
+                  <TableCell colSpan={10} className="text-center py-8" style={{ color: THEME_TEXT }}>
                     No customer history found
                   </TableCell>
                 </TableRow>
@@ -104,16 +110,16 @@ export const CustomerHistoryTable: React.FC<CustomerHistoryTableProps> = ({
                   <React.Fragment key={customer.id}>
                     {/* Parent Row */}
                     <TableRow 
-                      className={`hover:bg-cyan-50/50 transition-colors border-b ${getRowBackgroundColor(customer)}`}
-                      style={{ borderColor: 'rgba(14, 172, 221, 0.2)' }}
+                      className={`hover:bg-green-50/50 transition-colors border-b ${getRowBackgroundColor(customer)}`}
+                      style={{ borderColor: `rgba(182, 194, 174, 0.3)` }}
                     >
                       <TableCell className="py-4">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => toggleRow(customer.id)}
-                          className="h-8 w-8 p-0 hover:bg-cyan-100"
-                          style={{ color: '#0EACDD' }}
+                          className="h-8 w-8 p-0 hover:bg-green-100"
+                          style={{ color: THEME_PRIMARY }}
                         >
                           {expandedRows.has(customer.id) ? (
                             <ChevronDown className="h-4 w-4" />
@@ -122,32 +128,32 @@ export const CustomerHistoryTable: React.FC<CustomerHistoryTableProps> = ({
                           )}
                         </Button>
                       </TableCell>
-                      <TableCell className="font-medium py-4" style={{ color: '#087A9E' }}>
+                      <TableCell className="font-medium py-4" style={{ color: THEME_TEXT }}>
                         {index + 1}
                       </TableCell>
                       <TableCell className="py-4">
-                        <div className="font-medium" style={{ color: '#087A9E' }}>{customer.name}</div>
+                        <div className="font-medium" style={{ color: THEME_TEXT }}>{customer.name}</div>
                         <Badge 
                           variant={customer.customerType === 'wholesale' ? 'default' : 'secondary'}
                           className={customer.customerType === 'wholesale' 
-                            ? 'bg-cyan-100 text-cyan-700 hover:bg-cyan-200' 
+                            ? 'bg-green-100 text-green-700 hover:bg-green-200' 
                             : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                           }
                         >
                           {customer.customerType === 'wholesale' ? 'Wholesale' : 'Retail'}
                         </Badge>
                       </TableCell>
-                      <TableCell className="py-4" style={{ color: '#087A9E' }}>{customer.mobile}</TableCell>
-                      <TableCell className="py-4" style={{ color: '#087A9E' }}>
+                      <TableCell className="py-4" style={{ color: THEME_TEXT }}>{customer.mobile}</TableCell>
+                      <TableCell className="py-4" style={{ color: THEME_TEXT }}>
                         {customer.email || <span className="text-gray-400">-</span>}
                       </TableCell>
-                      <TableCell className="font-medium py-4" style={{ color: '#087A9E' }}>
+                      <TableCell className="font-medium py-4" style={{ color: THEME_TEXT }}>
                         {customer.totalInvoices}
                       </TableCell>
                       <TableCell className="font-medium text-green-600 py-4">
                         {formatCurrency(customer.totalPurchaseValue)}
                       </TableCell>
-                      <TableCell className="py-4" style={{ color: '#087A9E' }}>
+                      <TableCell className="py-4" style={{ color: THEME_TEXT }}>
                         {formatDate(customer.lastPurchaseDate)}
                       </TableCell>
                       <TableCell className="py-4">
@@ -166,8 +172,8 @@ export const CustomerHistoryTable: React.FC<CustomerHistoryTableProps> = ({
                             variant="ghost"
                             size="sm"
                             onClick={() => onViewDetails(customer)}
-                            className="h-8 w-8 p-0 hover:bg-cyan-100"
-                            style={{ color: '#0EACDD' }}
+                            className="h-8 w-8 p-0 hover:bg-green-100"
+                            style={{ color: THEME_PRIMARY }}
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -175,8 +181,8 @@ export const CustomerHistoryTable: React.FC<CustomerHistoryTableProps> = ({
                             variant="ghost"
                             size="sm"
                             onClick={() => onEditCustomer(customer)}
-                            className="h-8 w-8 p-0 hover:bg-cyan-100"
-                            style={{ color: '#0EACDD' }}
+                            className="h-8 w-8 p-0 hover:bg-green-100"
+                            style={{ color: THEME_PRIMARY }}
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -197,41 +203,41 @@ export const CustomerHistoryTable: React.FC<CustomerHistoryTableProps> = ({
                       <TableRow 
                         className="border-b"
                         style={{ 
-                          background: 'linear-gradient(135deg, rgba(14, 172, 221, 0.05) 0%, rgba(14, 172, 221, 0.08) 100%)',
-                          borderColor: 'rgba(14, 172, 221, 0.2)'
+                          background: `linear-gradient(135deg, rgba(182, 194, 174, 0.08) 0%, rgba(182, 194, 174, 0.12) 100%)`,
+                          borderColor: `rgba(182, 194, 174, 0.3)`
                         }}
                       >
                         <TableCell colSpan={10} className="p-0">
                           <div className="p-4">
                             <div 
                               className="bg-white rounded-lg border p-4"
-                              style={{ borderColor: '#0EACDD' }}
+                              style={{ borderColor: THEME_BORDER }}
                             >
-                              <h4 className="font-semibold mb-3 flex items-center gap-2" style={{ color: '#087A9E' }}>
-                                <FileText className="h-4 w-4" style={{ color: '#0EACDD' }} />
+                              <h4 className="font-semibold mb-3 flex items-center gap-2" style={{ color: THEME_TEXT }}>
+                                <FileText className="h-4 w-4" style={{ color: THEME_PRIMARY }} />
                                 Invoice History
                               </h4>
                               <div className="overflow-x-auto">
                                 <Table>
                                   <TableHeader>
-                                    <TableRow style={{ background: 'rgba(14, 172, 221, 0.08)' }}>
-                                      <TableHead className="font-medium" style={{ color: '#087A9E' }}>Invoice No</TableHead>
-                                      <TableHead className="font-medium" style={{ color: '#087A9E' }}>Date</TableHead>
-                                      <TableHead className="font-medium" style={{ color: '#087A9E' }}>Amount</TableHead>
-                                      <TableHead className="font-medium" style={{ color: '#087A9E' }}>Payment Status</TableHead>
-                                      <TableHead className="font-medium" style={{ color: '#087A9E' }}>Action</TableHead>
+                                    <TableRow style={{ background: `rgba(182, 194, 174, 0.15)` }}>
+                                      <TableHead className="font-medium" style={{ color: THEME_TEXT }}>Invoice No</TableHead>
+                                      <TableHead className="font-medium" style={{ color: THEME_TEXT }}>Date</TableHead>
+                                      <TableHead className="font-medium" style={{ color: THEME_TEXT }}>Amount</TableHead>
+                                      <TableHead className="font-medium" style={{ color: THEME_TEXT }}>Payment Status</TableHead>
+                                      <TableHead className="font-medium" style={{ color: THEME_TEXT }}>Action</TableHead>
                                     </TableRow>
                                   </TableHeader>
                                   <TableBody>
                                     {customer.invoiceHistory.map((invoice) => (
-                                      <TableRow key={invoice.invoiceNo} className="hover:bg-cyan-50/50">
-                                        <TableCell className="font-medium py-3" style={{ color: '#087A9E' }}>
+                                      <TableRow key={invoice.invoiceNo} className="hover:bg-green-50/50">
+                                        <TableCell className="font-medium py-3" style={{ color: THEME_TEXT }}>
                                           {invoice.invoiceNo}
                                         </TableCell>
-                                        <TableCell className="py-3" style={{ color: '#087A9E' }}>
+                                        <TableCell className="py-3" style={{ color: THEME_TEXT }}>
                                           {formatDate(invoice.date)}
                                         </TableCell>
-                                        <TableCell className="font-medium py-3" style={{ color: '#087A9E' }}>
+                                        <TableCell className="font-medium py-3" style={{ color: THEME_TEXT }}>
                                           {formatCurrency(invoice.amount)}
                                         </TableCell>
                                         <TableCell className="py-3">
@@ -243,8 +249,8 @@ export const CustomerHistoryTable: React.FC<CustomerHistoryTableProps> = ({
                                           <Button
                                             variant="outline"
                                             size="sm"
-                                            className="hover:bg-cyan-50"
-                                            style={{ borderColor: '#0EACDD', color: '#0EACDD' }}
+                                            className="hover:bg-green-50"
+                                            style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}
                                           >
                                             View Invoice
                                           </Button>
@@ -270,16 +276,16 @@ export const CustomerHistoryTable: React.FC<CustomerHistoryTableProps> = ({
         <div 
           className="flex items-center justify-between p-4 border-t"
           style={{ 
-            background: 'linear-gradient(135deg, rgba(14, 172, 221, 0.08) 0%, rgba(14, 172, 221, 0.12) 100%)',
-            borderColor: '#0EACDD'
+            background: `linear-gradient(135deg, rgba(182, 194, 174, 0.12) 0%, rgba(182, 194, 174, 0.18) 100%)`,
+            borderColor: THEME_BORDER
           }}
         >
-          <div className="text-sm" style={{ color: '#087A9E' }}>
+          <div className="text-sm" style={{ color: THEME_TEXT }}>
             Total Outstanding: <span className="font-semibold text-red-600">
               {formatCurrency(customers.reduce((sum, c) => sum + c.outstandingBalance, 0))}
             </span>
           </div>
-          <div className="text-sm" style={{ color: '#087A9E' }}>
+          <div className="text-sm" style={{ color: THEME_TEXT }}>
             Showing {customers.length} customers
           </div>
         </div>
