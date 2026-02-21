@@ -81,7 +81,7 @@ export const menuData = [
         id: "new-sales-entry",
         title: "New Sales Entry",
         icon: Plus,
-        path: "/sales/new",
+        action: "add-sale",
         iconColor: "text-blue-400",
       },
       {
