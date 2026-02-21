@@ -13,11 +13,13 @@ import {
 } from "@/components/ui/dialog";
 import { ProductForm } from "@/components/product/ProductForm";
 import { AddEditVendorModal } from "@/components/vendor/AddEditVendorModal";
+import { AddEditCustomerModal } from "@/components/customer/AddEditCustomerModal";
 
 export function TreeSidebar({ collapsed }: TreeSidebarProps) {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const [isAddVendorOpen, setIsAddVendorOpen] = useState(false);
+  const [isAddCustomerOpen, setIsAddCustomerOpen] = useState(false);
   const location = useLocation();
 
   const handleToggle = (id: string) => {
@@ -37,6 +39,8 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
       setIsAddProductOpen(true);
     } else if (action === "add-vendor") {
       setIsAddVendorOpen(true);
+    } else if (action === "add-customer") {
+      setIsAddCustomerOpen(true);
     }
   };
 
@@ -108,6 +112,14 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
         isOpen={isAddVendorOpen}
         onClose={() => setIsAddVendorOpen(false)}
         vendor={null}
+      />
+
+      {/* Add Customer Modal */}
+      <AddEditCustomerModal
+        isOpen={isAddCustomerOpen}
+        onClose={() => setIsAddCustomerOpen(false)}
+        customer={null}
+        onSave={() => {}}
       />
     </>
   );
