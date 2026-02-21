@@ -203,7 +203,7 @@ export const menuData = [
         id: "add-new-vendor",
         title: "Add New Vendor",
         icon: UserPlus,
-        path: "/vendors/new",
+        action: "add-vendor",
         iconColor: "text-emerald-400",
       },
       {
