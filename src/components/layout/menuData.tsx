@@ -182,7 +182,7 @@ export const menuData = [
         id: "add-new-customer",
         title: "Add New Customer",
         icon: Plus,
-        path: "/customers/new",
+        action: "add-customer",
         iconColor: "text-green-400",
       },
       {
