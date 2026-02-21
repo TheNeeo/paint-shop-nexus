@@ -14,12 +14,14 @@ import {
 import { ProductForm } from "@/components/product/ProductForm";
 import { AddEditVendorModal } from "@/components/vendor/AddEditVendorModal";
 import { AddEditCustomerModal } from "@/components/customer/AddEditCustomerModal";
+import { NewInvoiceModal } from "@/components/sales/NewInvoiceModal";
 
 export function TreeSidebar({ collapsed }: TreeSidebarProps) {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const [isAddVendorOpen, setIsAddVendorOpen] = useState(false);
   const [isAddCustomerOpen, setIsAddCustomerOpen] = useState(false);
+  const [isNewSaleOpen, setIsNewSaleOpen] = useState(false);
   const location = useLocation();
 
   const handleToggle = (id: string) => {
@@ -41,6 +43,8 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
       setIsAddVendorOpen(true);
     } else if (action === "add-customer") {
       setIsAddCustomerOpen(true);
+    } else if (action === "add-sale") {
+      setIsNewSaleOpen(true);
     }
   };
 
@@ -120,6 +124,12 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
         onClose={() => setIsAddCustomerOpen(false)}
         customer={null}
         onSave={() => {}}
+      />
+
+      {/* New Sale/Invoice Modal */}
+      <NewInvoiceModal
+        isOpen={isNewSaleOpen}
+        onClose={() => setIsNewSaleOpen(false)}
       />
     </>
   );
