@@ -87,8 +87,8 @@ const VendorHistory: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="space-y-6 p-6 bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen">
-        <VendorHistoryHeader />
+      <div className="space-y-6 p-6 min-h-screen" style={{ background: 'linear-gradient(to bottom right, #e8f5f5, #f0fafa)' }}>
+        <VendorHistoryHeader vendorCount={vendorHistoryData.length} />
         <VendorHistorySummary vendors={vendorHistoryData} />
         <VendorHistoryFilters filters={filters} setFilters={setFilters} />
         <VendorHistoryTable vendors={vendorHistoryData} filters={filters} />
