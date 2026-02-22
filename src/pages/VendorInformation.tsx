@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import { VendorHeader } from "@/components/vendor/VendorHeader";
 import { VendorSummaryCards } from "@/components/vendor/VendorSummaryCards";
@@ -13,6 +14,13 @@ export default function VendorInformation() {
   const [statusFilter, setStatusFilter] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const vendorTableRef = useRef<{ fetchVendors: () => void }>(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname === "/vendors/new") {
+      setIsAddVendorOpen(true);
+    }
+  }, [location.pathname]);
 
   const handleAddVendor = () => {
     setEditingVendor(null);

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import { CustomerSummaryCards } from '@/components/customer/CustomerSummaryCards';
 import { CustomerTable } from '@/components/customer/CustomerTable';
@@ -53,6 +54,13 @@ const CustomerInformation: React.FC = () => {
     customerType: 'all',
     balanceStatus: 'all'
   });
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname === '/customers/new') {
+      setIsModalOpen(true);
+    }
+  }, [location.pathname]);
 
   // Mock data - replace with actual data fetching
   const [customers, setCustomers] = useState<Customer[]>([

@@ -54,6 +54,7 @@ const App = () => (
               <Route path="/product/category" element={<ProtectedRoute><CategoryManagement /></ProtectedRoute>} />
               <Route path="/sales" element={<ProtectedRoute><SalesManagement /></ProtectedRoute>} />
               <Route path="/sales/activity" element={<ProtectedRoute><SalesManagement /></ProtectedRoute>} />
+              <Route path="/sales/new" element={<ProtectedRoute><SalesManagement /></ProtectedRoute>} />
               <Route path="/sales/invoice" element={<ProtectedRoute><InvoiceGenerate /></ProtectedRoute>} />
           <Route path="/reports/sales" element={<ProtectedRoute><SalesReport /></ProtectedRoute>} />
           <Route path="/reports/inventory" element={<ProtectedRoute><InventoryReport /></ProtectedRoute>} />
@@ -69,10 +70,13 @@ const App = () => (
               <Route path="/inventory/update" element={<ProtectedRoute><UpdateStock /></ProtectedRoute>} />
               <Route path="/inventory/history" element={<ProtectedRoute><InventoryMovementHistory /></ProtectedRoute>} />
               <Route path="/customers" element={<ProtectedRoute><CustomerInformation /></ProtectedRoute>} />
+              <Route path="/customers/new" element={<ProtectedRoute><CustomerInformation /></ProtectedRoute>} />
               <Route path="/customers/history" element={<ProtectedRoute><CustomerHistory /></ProtectedRoute>} />
               <Route path="/vendors" element={<ProtectedRoute><VendorInformation /></ProtectedRoute>} />
+              <Route path="/vendors/new" element={<ProtectedRoute><VendorInformation /></ProtectedRoute>} />
               <Route path="/vendors/history" element={<ProtectedRoute><VendorHistory /></ProtectedRoute>} />
               <Route path="/expenses" element={<ProtectedRoute><ExpenseActivity /></ProtectedRoute>} />
+              <Route path="/expenses/new" element={<ProtectedRoute><ExpenseActivity /></ProtectedRoute>} />
               <Route path="/expenses/report" element={<ProtectedRoute><ExpenseReport /></ProtectedRoute>} />
               <Route path="/settings/app" element={<ProtectedRoute><ApplicationSettings /></ProtectedRoute>} />
               <Route path="/settings/ui" element={<ProtectedRoute><UserInterfaceSettings /></ProtectedRoute>} />

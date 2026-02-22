@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
@@ -231,6 +231,13 @@ export default function ProductManagement() {
   const [sortBy, setSortBy] = useState("name");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname === "/product/add") {
+      setIsAddProductOpen(true);
+    }
+  }, [location.pathname]);
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
 

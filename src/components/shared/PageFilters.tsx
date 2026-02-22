@@ -46,7 +46,7 @@ interface PageFiltersProps {
   viewMode?: "table" | "grid";
   onViewModeChange?: (mode: "table" | "grid") => void;
   showViewToggle?: boolean;
-  accentColor?: "green" | "blue" | "purple" | "orange" | "coral";
+  accentColor?: "green" | "blue" | "purple" | "orange" | "coral" | "pink";
   className?: string;
 }
 
@@ -115,6 +115,19 @@ const colorConfig = {
     focusRing: "focus:border-rose-500 focus:ring-rose-500",
     badge: "bg-rose-100 text-rose-800 border-rose-200",
     iconColor: "text-rose-500",
+  },
+  pink: {
+    selectBg: "bg-pink-100",
+    selectBorder: "border-pink-300",
+    selectText: "text-pink-800",
+    checkboxBorder: "border-pink-500",
+    checkboxChecked: "data-[state=checked]:bg-pink-600",
+    toggleBg: "bg-pink-100",
+    toggleActive: "bg-pink-600 text-white",
+    toggleInactive: "text-pink-700 hover:bg-pink-200",
+    focusRing: "focus:border-pink-500 focus:ring-pink-500",
+    badge: "bg-pink-100 text-pink-800 border-pink-200",
+    iconColor: "text-pink-500",
   },
 };
 

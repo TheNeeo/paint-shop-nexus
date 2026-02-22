@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import { ExpenseActivityHeader } from "@/components/expense/ExpenseActivityHeader";
 import { ExpenseActivitySummary } from "@/components/expense/ExpenseActivitySummary";
@@ -9,6 +10,13 @@ import { AddEditExpenseModal } from "@/components/expense/AddEditExpenseModal";
 const ExpenseActivity = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname === "/expenses/new") {
+      setIsAddModalOpen(true);
+    }
+  }, [location.pathname]);
 
   return (
     <AppLayout>

@@ -1,7 +1,6 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import {
   Breadcrumb,
@@ -28,6 +27,7 @@ export default function SalesManagement() {
   const [isNewInvoiceModalOpen, setIsNewInvoiceModalOpen] = useState(false);
   const [isInvoiceViewerOpen, setIsInvoiceViewerOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const location = useLocation();
   const [filters, setFilters] = useState({
     customer: "all",
     status: "all",
@@ -35,6 +35,12 @@ export default function SalesManagement() {
     search: "",
     dateRange: null,
   });
+
+  useEffect(() => {
+    if (location.pathname === "/sales/new") {
+      setIsNewInvoiceModalOpen(true);
+    }
+  }, [location.pathname]);
 
   const handleViewInvoice = (invoice: any) => {
     setSelectedInvoice(invoice);
