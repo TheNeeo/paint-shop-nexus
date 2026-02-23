@@ -12,23 +12,34 @@ const fetchWithRetry = async (url: string, options?: RequestInit, retries = 3): 
   let lastError: Error | null = null;
 
   for (let i = 0; i < retries; i++) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
-
     try {
-      const response = await fetch(url, {
-        ...options,
-        signal: controller.signal
-      });
-      clearTimeout(timeoutId);
-      return response;
-    } catch (error) {
-      clearTimeout(timeoutId);
-      lastError = error as Error;
+      // Use a simpler timeout approach that doesn't rely on AbortController for the race
+      // although AbortController is generally better, we want to be as standard as possible here
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000);
 
-      // Only retry on network errors or timeouts
-      const isRetryable = error instanceof TypeError || (error instanceof Error && error.name === 'AbortError');
-      if (!isRetryable || i === retries - 1) {
+      try {
+        const response = await fetch(url, {
+          ...options,
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        return response;
+      } catch (e) {
+        clearTimeout(timeoutId);
+        throw e;
+      }
+    } catch (error: any) {
+      lastError = error;
+
+      // Check for common network failure patterns
+      const isNetworkError =
+        error?.name === 'TypeError' ||
+        error?.message?.includes('Failed to fetch') ||
+        error?.name === 'AbortError' ||
+        error?.message?.includes('NetworkError');
+
+      if (!isNetworkError || i === retries - 1) {
         break;
       }
 
@@ -37,7 +48,6 @@ const fetchWithRetry = async (url: string, options?: RequestInit, retries = 3): 
     }
   }
 
-  // If all retries failed, throw the last error
   throw lastError || new Error('All retry attempts failed');
 };
 

@@ -276,19 +276,19 @@ const SalesReport = () => {
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
-                    <PaginationPrevious href="#" />
+                    <PaginationPrevious onClick={(e) => e.preventDefault()} className="cursor-pointer" />
                   </PaginationItem>
                   <PaginationItem>
-                    <PaginationLink href="#" isActive>1</PaginationLink>
+                    <PaginationLink onClick={(e) => e.preventDefault()} isActive className="cursor-pointer">1</PaginationLink>
                   </PaginationItem>
                   <PaginationItem>
-                    <PaginationLink href="#">2</PaginationLink>
+                    <PaginationLink onClick={(e) => e.preventDefault()} className="cursor-pointer">2</PaginationLink>
                   </PaginationItem>
                   <PaginationItem>
-                    <PaginationLink href="#">3</PaginationLink>
+                    <PaginationLink onClick={(e) => e.preventDefault()} className="cursor-pointer">3</PaginationLink>
                   </PaginationItem>
                   <PaginationItem>
-                    <PaginationNext href="#" />
+                    <PaginationNext onClick={(e) => e.preventDefault()} className="cursor-pointer" />
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>
