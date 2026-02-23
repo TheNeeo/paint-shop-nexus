@@ -12,20 +12,28 @@ const fetchWithRetry = async (url: string, options?: RequestInit, retries = 3): 
   let lastError: Error | null = null;
 
   for (let i = 0; i < retries; i++) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
     try {
-      const response = await Promise.race([
-        fetch(url, options),
-        new Promise<Response>((_, reject) =>
-          setTimeout(() => reject(new Error('Fetch timeout')), 15000)
-        ),
-      ]);
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
       return response;
     } catch (error) {
+      clearTimeout(timeoutId);
       lastError = error as Error;
-      if (i < retries - 1) {
-        // Wait before retrying (exponential backoff)
-        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+
+      // Only retry on network errors or timeouts
+      const isRetryable = error instanceof TypeError || (error instanceof Error && error.name === 'AbortError');
+      if (!isRetryable || i === retries - 1) {
+        break;
       }
+
+      // Wait before retrying (exponential backoff)
+      await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
     }
   }
 
