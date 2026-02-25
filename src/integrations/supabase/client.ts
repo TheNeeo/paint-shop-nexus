@@ -13,7 +13,7 @@ const fetchWithRetry = async (url: string, options?: RequestInit, retries = 5): 
 
   for (let i = 0; i < retries; i++) {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s timeout
 
     try {
       const response = await fetch(url, {
@@ -50,7 +50,7 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   auth: {
     storage: localStorage,
     persistSession: true,
-    autoRefreshToken: false, // Disable auto refresh to prevent aggressive retry loops
+    autoRefreshToken: true,
   },
   global: {
     fetch: fetchWithRetry,
