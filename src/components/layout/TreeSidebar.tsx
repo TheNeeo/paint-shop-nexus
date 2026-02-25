@@ -15,6 +15,7 @@ import { ProductForm } from "@/components/product/ProductForm";
 import { AddEditVendorModal } from "@/components/vendor/AddEditVendorModal";
 import { AddEditCustomerModal } from "@/components/customer/AddEditCustomerModal";
 import { NewInvoiceModal } from "@/components/sales/NewInvoiceModal";
+import { AddEditExpenseModal } from "@/components/expense/AddEditExpenseModal";
 
 export function TreeSidebar({ collapsed }: TreeSidebarProps) {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
@@ -22,16 +23,15 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
   const [isAddVendorOpen, setIsAddVendorOpen] = useState(false);
   const [isAddCustomerOpen, setIsAddCustomerOpen] = useState(false);
   const [isNewSaleOpen, setIsNewSaleOpen] = useState(false);
+  const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const location = useLocation();
 
   const handleToggle = (id: string) => {
     const newExpanded = new Set<string>();
     
-    // If the item is not currently expanded, expand only this item (accordion behavior)
     if (!expandedItems.has(id)) {
       newExpanded.add(id);
     }
-    // If the item is currently expanded, close it (newExpanded remains empty)
     
     setExpandedItems(newExpanded);
   };
@@ -45,6 +45,8 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
       setIsAddCustomerOpen(true);
     } else if (action === "add-sale") {
       setIsNewSaleOpen(true);
+    } else if (action === "add-expense") {
+      setIsAddExpenseOpen(true);
     }
   };
 
@@ -130,6 +132,12 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
       <NewInvoiceModal
         isOpen={isNewSaleOpen}
         onClose={() => setIsNewSaleOpen(false)}
+      />
+
+      {/* Add Expense Modal */}
+      <AddEditExpenseModal
+        open={isAddExpenseOpen}
+        onOpenChange={setIsAddExpenseOpen}
       />
     </>
   );
