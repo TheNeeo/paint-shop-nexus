@@ -104,7 +104,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } catch (error) {
         console.warn('Token refresh error:', error);
       }
-    }, 60000); // Refresh every minute
+    }, 120000); // Refresh every 2 minutes instead of 1 to reduce network load
 
     return () => clearInterval(refreshInterval);
   }, [session?.refresh_token]);

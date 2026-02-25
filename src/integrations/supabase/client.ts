@@ -8,31 +8,25 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-const fetchWithRetry = async (url: string, options?: RequestInit, retries = 3): Promise<Response> => {
+const fetchWithRetry = async (url: string, options?: RequestInit, retries = 5): Promise<Response> => {
   let lastError: Error | null = null;
 
   for (let i = 0; i < retries; i++) {
-    try {
-      // Use a simpler timeout approach that doesn't rely on AbortController for the race
-      // although AbortController is generally better, we want to be as standard as possible here
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
 
-      try {
-        const response = await fetch(url, {
-          ...options,
-          signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-        return response;
-      } catch (e) {
-        clearTimeout(timeoutId);
-        throw e;
-      }
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      return response;
     } catch (error: any) {
+      clearTimeout(timeoutId);
       lastError = error;
 
-      // Check for common network failure patterns
+      // Log only on the final failure or if it's not a standard network error
       const isNetworkError =
         error?.name === 'TypeError' ||
         error?.message?.includes('Failed to fetch') ||
@@ -44,7 +38,8 @@ const fetchWithRetry = async (url: string, options?: RequestInit, retries = 3): 
       }
 
       // Wait before retrying (exponential backoff)
-      await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+      const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
 

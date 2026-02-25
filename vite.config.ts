@@ -10,9 +10,11 @@ export default defineConfig(({ mode }) => ({
     strictPort: true,
     hmr: {
       overlay: false,
+      clientPort: 443,
     },
     watch: {
       usePolling: true,
+      interval: 1000,
     },
   },
   plugins: [
