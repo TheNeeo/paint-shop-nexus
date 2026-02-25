@@ -275,7 +275,7 @@ export const menuData = [
         id: "add-new-expense",
         title: "Add New Expense",
         icon: Plus,
-        path: "/expenses/new",
+        action: "add-expense",
         iconColor: "text-blue-400",
       },
       {
