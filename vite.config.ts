@@ -9,6 +9,7 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
     strictPort: true,
     hmr: {
+      clientPort: 443,
       overlay: false,
     },
     watch: {

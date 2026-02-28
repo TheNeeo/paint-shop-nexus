@@ -36,7 +36,14 @@ import InventoryReport from "./pages/InventoryReport";
 import ProfitLossReport from "./pages/ProfitLossReport";
 import PeriodicReport from "./pages/PeriodicReport";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 5,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    },
+  },
+});
 
 const App = () => (
   <ErrorBoundary>

@@ -78,37 +78,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Manual token refresh on an interval
-  useEffect(() => {
-    if (!session?.refresh_token) return;
-
-    const refreshInterval = setInterval(async () => {
-      try {
-        const { data, error } = await supabase.auth.refreshSession();
-        if (error) {
-          console.warn('Token refresh failed:', error);
-          // On error, check if session is still valid
-          try {
-            const { data: currentSession } = await supabase.auth.getSession();
-            if (!currentSession.session) {
-              setSession(null);
-              setUser(null);
-            }
-          } catch (e) {
-            console.warn('Failed to check session:', e);
-          }
-        } else if (data.session) {
-          setSession(data.session);
-          setUser(data.session.user);
-        }
-      } catch (error) {
-        console.warn('Token refresh error:', error);
-      }
-    }, 120000); // Refresh every 2 minutes instead of 1 to reduce network load
-
-    return () => clearInterval(refreshInterval);
-  }, [session?.refresh_token]);
-
   const value = {
     user,
     session,
