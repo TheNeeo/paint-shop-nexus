@@ -12,13 +12,31 @@ import './index.css'
     try {
       return await originalFetch(...args);
     } catch (error: any) {
-      const url = typeof args[0] === 'string' ? args[0] : (args[0] instanceof Request ? args[0].url : '');
-      if (url.includes('/__vite_ping') || error.message?.includes('Failed to fetch')) {
-        if (url.includes('/__vite_ping')) {
-          // Returning a dummy response for Vite pings stops the error from being reported globally
-          return new Response(null, { status: 204 });
-        }
+      let url = '';
+      if (typeof args[0] === 'string') {
+        url = args[0];
+      } else if (args[0] instanceof Request) {
+        url = args[0].url;
+      } else if (args[0] instanceof URL) {
+        url = args[0].toString();
       }
+
+      const isVitePing = url.includes('__vite_ping');
+      const isViteClient = url.includes('@vite/client') || url.includes('vite/dist/client');
+      const isHmrLoad = url.includes('?t=') || url.includes('?v=') || url.includes('&v=');
+      const isTransientNetworkError = error.message?.includes('Failed to fetch') || error.message?.includes('Load failed');
+
+      if (isVitePing || (isTransientNetworkError && (isViteClient || isHmrLoad))) {
+        // Silently handle Vite-related network pings and client module loads
+        return new Response(null, { status: 204 });
+      }
+
+      // If it's a network error on a data fetch, we log it but still throw
+      // so it can be caught by fetchWithRetry or other error handlers
+      if (isTransientNetworkError) {
+        console.warn(`Transient fetch error for ${url}:`, error.message);
+      }
+
       throw error;
     }
   };

@@ -19,9 +19,14 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    // Don't expose internal error details in production
-    return { 
-      hasError: true, 
+    // Don't show error boundary for transient network errors unless they're unrecoverable
+    const isNetworkError =
+      error.message?.includes('Failed to fetch') ||
+      error.message?.includes('Load failed') ||
+      error.name === 'TypeError' && error.message?.includes('network');
+
+    return {
+      hasError: !isNetworkError,
       errorMessage: process.env.NODE_ENV === 'development' ? error.message : undefined
     };
   }

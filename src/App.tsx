@@ -39,8 +39,9 @@ import PeriodicReport from "./pages/PeriodicReport";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 5,
+      retry: 10,
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      staleTime: 30000,
     },
   },
 });

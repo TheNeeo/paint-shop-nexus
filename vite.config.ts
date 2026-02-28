@@ -9,7 +9,9 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
     strictPort: true,
     hmr: {
+      protocol: "wss",
       clientPort: 443,
+      path: "vite-hmr",
       overlay: false,
     },
     watch: {
