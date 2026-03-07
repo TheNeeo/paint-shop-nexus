@@ -99,6 +99,10 @@ const ExpenseActivity = () => {
   useEffect(() => {
     fetchExpenses();
   }, []);
+  const totalPages = Math.ceil(expenses.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentExpenses = expenses.slice(startIndex, endIndex);
 
   const getExpenseTypeBadge = (type: string) => {
     const colors: Record<string, { bg: string; text: string }> = {
