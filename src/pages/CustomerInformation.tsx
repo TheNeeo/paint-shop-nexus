@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import AppLayout from '@/components/layout/AppLayout';
 import { CustomerSummaryCards } from '@/components/customer/CustomerSummaryCards';
 import { CustomerTable } from '@/components/customer/CustomerTable';
