@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Download, Printer, RefreshCw, Plus, DollarSign, FileText, TrendingUp, Target, BarChart3, Search, Filter, Calendar as CalendarIcon, CreditCard, X, Eye, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
