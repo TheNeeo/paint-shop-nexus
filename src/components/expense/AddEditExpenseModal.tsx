@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -62,10 +64,34 @@ export const AddEditExpenseModal = ({ open, onOpenChange, expense }: AddEditExpe
     }
   }, [expense]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Saving expense:", formData);
-    onOpenChange(false);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { toast.error("Not authenticated"); return; }
+
+      const dbData = {
+        date: formData.date,
+        type: formData.type,
+        amount: formData.amount,
+        payment_mode: formData.paymentMode || null,
+        description: formData.description || null,
+        ref_no: formData.refNo || null,
+        created_by_user_id: user.id,
+      };
+
+      if (expense?.id) {
+        // For editing we'd need the real UUID, skipping for now
+        toast.info("Edit not supported yet");
+      } else {
+        const { error } = await supabase.from('expenses').insert([dbData]);
+        if (error) throw error;
+        toast.success("Expense saved successfully!");
+      }
+      onOpenChange(false);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save expense");
+    }
   };
 
   const handleAddNewType = () => {

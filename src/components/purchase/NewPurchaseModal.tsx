@@ -218,10 +218,16 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
     try {
       const totals = calculateTotals();
       
+      // Get current user
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) {
+        throw new Error("User not authenticated");
+      }
+
       // Create purchase record
       const { data: purchase, error: purchaseError } = await supabase
         .from('purchases')
-        .insert({
+        .insert([{
           invoice_number: data.billNumber,
           vendor_id: data.vendorId,
           purchase_date: data.purchaseDate,
@@ -233,29 +239,24 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
           balance_amount: totals.balance,
           payment_method: data.paymentMethod || null,
           notes: data.notes || null,
-          status: 'pending'
-        })
+          status: 'pending',
+          created_by_user_id: currentUser.id
+        }])
         .select()
         .single();
 
       if (purchaseError) throw purchaseError;
 
-      // Get current user for purchase items
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        throw new Error("User not authenticated");
-      }
-
       // Create purchase items with created_by_user_id
       const purchaseItems = items.filter(item => item.product_name.trim() !== '').map(item => ({
-        purchase_id: purchase.id,
+        purchase_id: purchase!.id,
         product_name: item.product_name,
         quantity: item.quantity,
         unit_price: item.unit_price,
         tax_rate: item.tax_rate,
         discount_rate: item.discount_rate,
         total_amount: item.total_amount,
-        created_by_user_id: user.id
+        created_by_user_id: currentUser.id
       }));
 
       const { error: itemsError } = await supabase

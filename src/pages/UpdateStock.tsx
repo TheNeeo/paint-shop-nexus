@@ -141,16 +141,16 @@ export default function UpdateStock() {
 
     try {
       // Insert stock adjustment record
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
       const { error: adjustmentError } = await supabase
         .from("stock_adjustments")
-        .insert({
+        .insert([{
           product_id: selectedProductId,
-          quantity_change: adjustQuantity,
-          previous_stock: selectedProduct?.current_stock || 0,
-          new_stock: newStock,
-          reason_code: reason,
-          notes: notes || null,
-        });
+          adjustment_type: adjustQuantity > 0 ? 'increase' : 'decrease',
+          quantity: adjustQuantity,
+          reason: `${reason}: ${notes || 'N/A'}`,
+          created_by_user_id: currentUser?.id || '',
+        }]);
 
       if (adjustmentError) throw adjustmentError;
 
