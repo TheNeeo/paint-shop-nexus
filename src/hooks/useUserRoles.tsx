@@ -87,7 +87,7 @@ export function useUserRoles() {
     mutationFn: async ({ userId, role }: { userId: string; role: AppRole }) => {
       const { error } = await supabase
         .from('user_roles')
-        .insert({ user_id: userId, role, created_by: user?.id });
+        .insert([{ user_id: userId, role, created_by_user_id: user?.id }]);
       
       if (error) throw error;
     },

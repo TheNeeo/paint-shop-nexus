@@ -79,7 +79,13 @@ export function AddEditVendorModal({
     setLoading(true);
     try {
       const vendorData = {
-        ...formData,
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        gst_number: formData.gst_number,
+        address: formData.address,
+        contact_person: formData.contact_person,
+        status: formData.status ? 'active' : 'inactive',
         created_by_user_id: user.id,
       };
 

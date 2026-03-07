@@ -112,15 +112,13 @@ export function StockAdjustmentModal({ isOpen, onClose, product }: StockAdjustme
       // Insert stock adjustment record
       const { error: adjustmentError } = await supabase
         .from("stock_adjustments")
-        .insert({
+        .insert([{
           product_id: product.id,
-          quantity_change: quantityChange,
-          previous_stock: product.current_stock,
-          new_stock: calculatedNewStock,
-          reason_code: reasonCode,
-          notes: notes.trim() || null,
+          adjustment_type: adjustmentType,
+          quantity: quantityChange,
+          reason: `${reasonCode}: ${notes.trim() || 'N/A'}`,
           created_by_user_id: user.id
-        });
+        }]);
 
       if (adjustmentError) throw adjustmentError;
 

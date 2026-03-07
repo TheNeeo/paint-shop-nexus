@@ -221,7 +221,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
       // Create purchase record
       const { data: purchase, error: purchaseError } = await supabase
         .from('purchases')
-        .insert({
+        .insert([{
           invoice_number: data.billNumber,
           vendor_id: data.vendorId,
           purchase_date: data.purchaseDate,
@@ -233,8 +233,9 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
           balance_amount: totals.balance,
           payment_method: data.paymentMethod || null,
           notes: data.notes || null,
-          status: 'pending'
-        })
+          status: 'pending',
+          created_by_user_id: user!.id
+        }])
         .select()
         .single();
 
