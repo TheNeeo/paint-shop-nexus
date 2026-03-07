@@ -53,25 +53,52 @@ const ExpenseActivity = () => {
   const [dateRange, setDateRange] = useState("all");
   const itemsPerPage = 10;
 
-  const expenses: Expense[] = [
-    { id: 1, date: "2024-01-25", type: "Transport", amount: 850, paymentMode: "UPI", description: "Fuel for delivery truck", refNo: "TXN001" },
-    { id: 2, date: "2024-01-24", type: "Utilities", amount: 2500, paymentMode: "Bank", description: "Electricity bill payment", refNo: "BILL202401" },
-    { id: 3, date: "2024-01-23", type: "Office", amount: 1200, paymentMode: "Cash", description: "Office stationery purchase", refNo: "CASH001" },
-    { id: 4, date: "2024-01-22", type: "Rent", amount: 8500, paymentMode: "Cheque", description: "Monthly office rent", refNo: "CHQ001" },
-    { id: 5, date: "2024-01-21", type: "Marketing", amount: 3200, paymentMode: "UPI", description: "Social media advertising", refNo: "ADV001" },
-  ];
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [summaryCards, setSummaryCards] = useState([
+    { title: "Total Expenses (This Month)", value: "₹0", icon: DollarSign, gradient: "from-amber-400 via-yellow-500 to-orange-400" },
+    { title: "No. of Expense Entries", value: "0", icon: FileText, gradient: "from-teal-400 via-cyan-500 to-blue-500" },
+    { title: "Most Frequent Expense Type", value: "-", icon: TrendingUp, gradient: "from-emerald-400 via-green-500 to-teal-500" },
+    { title: "Highest Single Expense", value: "₹0", icon: Target, gradient: "from-rose-400 via-pink-500 to-fuchsia-500" },
+  ]);
 
-  const totalPages = Math.ceil(expenses.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentExpenses = expenses.slice(startIndex, endIndex);
+  const fetchExpenses = async () => {
+    const { data, error } = await supabase
+      .from('expenses')
+      .select('*')
+      .order('date', { ascending: false });
 
-  const summaryCards = [
-    { title: "Total Expenses (This Month)", value: "₹45,250", icon: DollarSign, gradient: "from-amber-400 via-yellow-500 to-orange-400" },
-    { title: "No. of Expense Entries", value: "124", icon: FileText, gradient: "from-teal-400 via-cyan-500 to-blue-500" },
-    { title: "Most Frequent Expense Type", value: "Transport", icon: TrendingUp, gradient: "from-emerald-400 via-green-500 to-teal-500" },
-    { title: "Highest Single Expense", value: "₹8,500", icon: Target, gradient: "from-rose-400 via-pink-500 to-fuchsia-500" },
-  ];
+    if (!error && data) {
+      setExpenses(data.map((e, idx) => ({
+        id: idx + 1,
+        date: e.date,
+        type: e.type,
+        amount: Number(e.amount),
+        paymentMode: e.payment_mode || '',
+        description: e.description || '',
+        refNo: e.ref_no || '',
+      })));
+
+      // Update summary
+      const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+      const monthExpenses = data.filter(e => e.date >= monthStart);
+      const totalMonth = monthExpenses.reduce((sum, e) => sum + Number(e.amount), 0);
+      const highest = data.length > 0 ? Math.max(...data.map(e => Number(e.amount))) : 0;
+      const typeCounts: Record<string, number> = {};
+      data.forEach(e => { typeCounts[e.type] = (typeCounts[e.type] || 0) + 1; });
+      const mostFrequent = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || '-';
+
+      setSummaryCards([
+        { title: "Total Expenses (This Month)", value: `₹${totalMonth.toLocaleString()}`, icon: DollarSign, gradient: "from-amber-400 via-yellow-500 to-orange-400" },
+        { title: "No. of Expense Entries", value: data.length.toString(), icon: FileText, gradient: "from-teal-400 via-cyan-500 to-blue-500" },
+        { title: "Most Frequent Type", value: mostFrequent, icon: TrendingUp, gradient: "from-emerald-400 via-green-500 to-teal-500" },
+        { title: "Highest Single Expense", value: `₹${highest.toLocaleString()}`, icon: Target, gradient: "from-rose-400 via-pink-500 to-fuchsia-500" },
+      ]);
+    }
+  };
+
+  useEffect(() => {
+    fetchExpenses();
+  }, []);
 
   const getExpenseTypeBadge = (type: string) => {
     const colors: Record<string, { bg: string; text: string }> = {
