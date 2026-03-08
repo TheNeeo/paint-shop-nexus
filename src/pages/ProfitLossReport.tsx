@@ -54,7 +54,7 @@ const ProfitLossReport = () => {
       const transactions = [
         ...sales.map((s) => ({ date: s.invoice_date, description: "Sales Revenue", income: Number(s.total_amount), expense: 0, net: Number(s.total_amount) })),
         ...purchases.map((p) => ({ date: p.purchase_date, description: "Purchase", income: 0, expense: Number(p.total_amount), net: -Number(p.total_amount) })),
-        ...expenses.map((e) => ({ date: e.date, description: `Expense: ${e.type || ""}`, income: 0, expense: Number(e.amount), net: -Number(e.amount) })),
+        ...expenses.map((e) => ({ date: e.date, description: "Expense", income: 0, expense: Number(e.amount), net: -Number(e.amount) })),
       ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
       return { totalIncome, totalCost, grossProfit, margin, trend, transactions };
