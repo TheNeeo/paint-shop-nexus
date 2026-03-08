@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      cash_receipts: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by_user_id: string
+          id: string
+          notes: string | null
+          payer_name: string
+          payment_mode: string
+          reason: string | null
+          receipt_date: string
+          receipt_no: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          created_by_user_id: string
+          id?: string
+          notes?: string | null
+          payer_name: string
+          payment_mode?: string
+          reason?: string | null
+          receipt_date?: string
+          receipt_no: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by_user_id?: string
+          id?: string
+          notes?: string | null
+          payer_name?: string
+          payment_mode?: string
+          reason?: string | null
+          receipt_date?: string
+          receipt_no?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           color: string | null
