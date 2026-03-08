@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
-import { QuickActions } from "@/components/dashboard/QuickActions";
+
 import { PaintChart } from "@/components/dashboard/PaintChart";
 import { supabase } from "@/integrations/supabase/client";
 import { 
