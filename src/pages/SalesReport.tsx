@@ -5,478 +5,162 @@ import AppLayout from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import {
-  Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList,
-  BreadcrumbPage, BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
-import { RefreshCw, Download, TrendingUp, DollarSign, FileText, BarChart3, Search, Calendar, ShoppingCart } from "lucide-react";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { RefreshCw, Download, TrendingUp, DollarSign, FileText, BarChart3, Calendar } from "lucide-react";
 import { format } from "date-fns";
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import dashboardHomeIcon from "@/assets/smart-home-3d-icon-2.png";
 import salesReportIcon from "@/assets/sales-report-icon.png";
 
-// Theme colors
 const THEME = {
-  primary: '#c4686e',
-  primaryDark: '#8b3a3f',
-  primaryLight: '#F5CBCB',
-  primaryLighter: '#fae8e8',
-  primaryLightest: '#fdf2f2',
-  border: '#e8a5a8',
-  gradientFrom: '#f5cbcb',
-  gradientMid: '#fae8e8',
-  gradientTo: '#fdf2f2',
+  primary: '#c4686e', primaryDark: '#8b3a3f', primaryLight: '#F5CBCB',
+  primaryLighter: '#fae8e8', primaryLightest: '#fdf2f2', border: '#e8a5a8',
+  gradientFrom: '#f5cbcb', gradientMid: '#fae8e8', gradientTo: '#fdf2f2',
 };
-
-const mockSalesData = [
-  { date: "2025-01-01", invoiceNo: "INV-001", customerName: "John Doe", category: "Paints", product: "Asian Paints Premium", qty: 10, rate: 500, gst: 90, total: 5090, paymentMode: "Cash" },
-  { date: "2025-01-02", invoiceNo: "INV-002", customerName: "Jane Smith", category: "Hardware", product: "Steel Rods", qty: 20, rate: 300, gst: 1080, total: 7080, paymentMode: "UPI" },
-  { date: "2025-01-03", invoiceNo: "INV-003", customerName: "Bob Wilson", category: "Paints", product: "Nerolac Excel", qty: 15, rate: 450, gst: 1215, total: 8215, paymentMode: "Card" },
-  { date: "2025-01-04", invoiceNo: "INV-004", customerName: "Alice Brown", category: "Cement", product: "UltraTech Cement", qty: 25, rate: 400, gst: 1800, total: 11800, paymentMode: "Cash" },
-  { date: "2025-01-05", invoiceNo: "INV-005", customerName: "Charlie Davis", category: "Hardware", product: "TMT Bars", qty: 30, rate: 550, gst: 2970, total: 19470, paymentMode: "UPI" },
-];
-
-const trendData = [
-  { month: "Jan", sales: 45000 }, { month: "Feb", sales: 52000 }, { month: "Mar", sales: 48000 },
-  { month: "Apr", sales: 61000 }, { month: "May", sales: 55000 }, { month: "Jun", sales: 67000 },
-];
-
-const categoryData = [
-  { category: "Paints", amount: 85000 }, { category: "Hardware", amount: 65000 },
-  { category: "Cement", amount: 95000 }, { category: "Tools", amount: 45000 },
-];
-
-const gstData = [
-  { name: "CGST", value: 15000, color: "#c4686e" },
-  { name: "SGST", value: 15000, color: "#e8a5a8" },
-  { name: "IGST", value: 8000, color: "#8b3a3f" },
-];
 
 const SalesReport = () => {
   const navigate = useNavigate();
   const [dateFrom, setDateFrom] = useState<Date>();
   const [dateTo, setDateTo] = useState<Date>();
 
-  const totalSales = mockSalesData.reduce((sum, item) => sum + item.total, 0);
-  const totalGST = mockSalesData.reduce((sum, item) => sum + item.gst, 0);
-  const invoiceCount = mockSalesData.length;
-  const avgInvoiceValue = totalSales / invoiceCount;
+  const { data: salesData = [] } = useQuery({
+    queryKey: ["sales-report", dateFrom, dateTo],
+    queryFn: async () => {
+      let query = supabase.from("sales").select("*, sale_items(*)").order("invoice_date", { ascending: false });
+      if (dateFrom) query = query.gte("invoice_date", format(dateFrom, "yyyy-MM-dd"));
+      if (dateTo) query = query.lte("invoice_date", format(dateTo, "yyyy-MM-dd"));
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  const { data: trendData = [] } = useQuery({
+    queryKey: ["sales-trend"],
+    queryFn: async () => {
+      const { data } = await supabase.from("sales").select("invoice_date, total_amount");
+      if (!data) return [];
+      const monthMap: Record<string, number> = {};
+      data.forEach((s) => {
+        const m = new Date(s.invoice_date).toLocaleString("default", { month: "short" });
+        monthMap[m] = (monthMap[m] || 0) + Number(s.total_amount);
+      });
+      return Object.entries(monthMap).map(([month, sales]) => ({ month, sales }));
+    },
+  });
+
+  const totalSales = salesData.reduce((sum, s) => sum + Number(s.total_amount), 0);
+  const totalGST = salesData.reduce((sum, s) => sum + Number(s.tax_amount), 0);
+  const invoiceCount = salesData.length;
+  const avgInvoiceValue = invoiceCount > 0 ? totalSales / invoiceCount : 0;
 
   return (
     <AppLayout>
       <div className="min-h-screen p-6 space-y-6" style={{ background: `linear-gradient(to bottom right, ${THEME.primaryLightest}, ${THEME.primaryLighter}, #fff)` }}>
-
         {/* Breadcrumb */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3 }}
-          className="mb-3"
-        >
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="mb-3">
           <Breadcrumb>
             <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink
-                  onClick={() => navigate("/")}
-                  className="cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-1.5"
-                >
-                  <img src={dashboardHomeIcon} alt="Dashboard" className="h-5 w-5 object-contain bg-transparent" style={{ mixBlendMode: 'multiply' }} />
-                  <span className="text-cyan-600 font-medium">Dashboard</span>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
+              <BreadcrumbItem><BreadcrumbLink onClick={() => navigate("/")} className="cursor-pointer flex items-center gap-1.5"><img src={dashboardHomeIcon} alt="Dashboard" className="h-5 w-5 object-contain" style={{ mixBlendMode: "multiply" }} /><span className="text-cyan-600 font-medium">Dashboard</span></BreadcrumbLink></BreadcrumbItem>
               <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage className="flex items-center gap-1.5">
-                  <BarChart3 className="h-4 w-4 text-orange-400" />
-                  <span className="text-orange-600 font-medium">Reports & Analytics</span>
-                </BreadcrumbPage>
-              </BreadcrumbItem>
+              <BreadcrumbItem><BreadcrumbPage className="flex items-center gap-1.5"><BarChart3 className="h-4 w-4 text-orange-400" /><span className="text-orange-600 font-medium">Reports</span></BreadcrumbPage></BreadcrumbItem>
               <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage className="flex items-center gap-1.5">
-                  <img src={salesReportIcon} alt="Sales Report" className="h-5 w-5 object-contain" style={{ mixBlendMode: 'multiply' }} />
-                  <span className="font-semibold" style={{ color: THEME.primary }}>Sales Report</span>
-                </BreadcrumbPage>
-              </BreadcrumbItem>
+              <BreadcrumbItem><BreadcrumbPage className="flex items-center gap-1.5"><img src={salesReportIcon} alt="Sales" className="h-5 w-5 object-contain" style={{ mixBlendMode: "multiply" }} /><span className="font-semibold" style={{ color: THEME.primary }}>Sales Report</span></BreadcrumbPage></BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </motion.div>
 
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="rounded-3xl p-6 mb-8 shadow-lg border-2 relative overflow-hidden"
-          style={{
-            background: `linear-gradient(to right, ${THEME.gradientFrom}, ${THEME.gradientMid}, ${THEME.gradientTo})`,
-            borderColor: THEME.border,
-          }}
-        >
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 left-0 w-40 h-40 rounded-full blur-3xl animate-pulse" style={{ backgroundColor: THEME.primary }}></div>
-            <div className="absolute bottom-0 right-0 w-40 h-40 rounded-full blur-3xl animate-pulse delay-1000" style={{ backgroundColor: THEME.border }}></div>
-          </div>
-
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="rounded-3xl p-6 shadow-lg border-2 relative overflow-hidden" style={{ background: `linear-gradient(to right, ${THEME.gradientFrom}, ${THEME.gradientMid}, ${THEME.gradientTo})`, borderColor: THEME.border }}>
           <div className="relative z-10 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
-            <div className="space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <motion.h1
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2, duration: 0.5 }}
-                  className="text-2xl sm:text-4xl font-bold flex items-center gap-3"
-                  style={{ color: THEME.primaryDark }}
-                >
-                  <motion.div
-                    animate={{ rotate: [0, 10, -10, 0] }}
-                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-                  >
-                    <img src={salesReportIcon} alt="Sales Report" className="h-8 w-8 sm:h-10 sm:w-10 object-contain" />
-                  </motion.div>
-                  <div className="flex flex-col">
-                    <span>Sales Report</span>
-                    <motion.span
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.5, duration: 0.5 }}
-                      className="text-sm font-normal italic ml-[3.5ch]"
-                      style={{ color: THEME.primary }}
-                    >
-                      Track all customer sales transactions & performance trends
-                    </motion.span>
-                  </div>
-                </motion.h1>
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
-                >
-                  <Badge className="text-white border-none text-sm px-4 py-1 shadow-md" style={{ background: `linear-gradient(to right, ${THEME.primary}, ${THEME.primaryDark})` }}>
-                    {invoiceCount} Records
-                  </Badge>
-                </motion.div>
-              </div>
+            <div className="space-y-2">
+              <h1 className="text-2xl sm:text-4xl font-bold flex items-center gap-3" style={{ color: THEME.primaryDark }}>
+                <img src={salesReportIcon} alt="Sales" className="h-8 w-8 sm:h-10 sm:w-10 object-contain" /> Sales Report
+              </h1>
+              <p className="text-sm italic" style={{ color: THEME.primary }}>Track all customer sales transactions & performance trends</p>
             </div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-              className="flex flex-col sm:flex-row gap-2"
-            >
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => window.location.reload()}
-                className="w-full sm:w-auto bg-white transition-all duration-300 shadow-sm hover:shadow-md group"
-                style={{ borderColor: THEME.border, color: THEME.primary }}
-              >
-                <RefreshCw className="h-4 w-4 mr-2 group-hover:rotate-180 transition-transform duration-500" />
-                Refresh
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full sm:w-auto text-white hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105"
-                style={{ background: `linear-gradient(to right, ${THEME.primary}, ${THEME.primaryDark})`, borderColor: THEME.primary }}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-            </motion.div>
+            <Badge className="text-white text-sm px-4 py-1" style={{ background: `linear-gradient(to right, ${THEME.primary}, ${THEME.primaryDark})` }}>{invoiceCount} Records</Badge>
           </div>
         </motion.div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-400 to-orange-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
-            <div className="relative z-10">
-              <h3 className="text-lg font-semibold text-white/90 mb-1">Total Sales Amount</h3>
-              <p className="text-2xl font-bold text-white">₹{totalSales.toLocaleString()}</p>
+          {[
+            { title: "Total Sales Amount", value: `₹${totalSales.toLocaleString()}`, icon: DollarSign, gradient: "from-amber-400 via-yellow-400 to-orange-400" },
+            { title: "Total GST Collected", value: `₹${totalGST.toLocaleString()}`, icon: TrendingUp, gradient: "from-emerald-400 via-green-400 to-teal-400" },
+            { title: "No. of Invoices", value: String(invoiceCount), icon: FileText, gradient: "from-rose-400 via-pink-400 to-red-400" },
+            { title: "Avg. Invoice Value", value: `₹${avgInvoiceValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, icon: BarChart3, gradient: "from-violet-400 via-purple-400 to-indigo-400" },
+          ].map((card) => (
+            <div key={card.title} className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.gradient} p-6 min-h-[140px] shadow-lg`}>
+              <div className="relative z-10">
+                <h3 className="text-lg font-semibold text-white/90 mb-1">{card.title}</h3>
+                <p className="text-2xl font-bold text-white">{card.value}</p>
+              </div>
+              <div className="absolute right-4 bottom-4 opacity-80"><card.icon className="h-16 w-16 text-white/40" strokeWidth={1.5} /></div>
             </div>
-            <div className="absolute right-4 bottom-4 opacity-80">
-              <DollarSign className="h-16 w-16 text-white/40" strokeWidth={1.5} />
-            </div>
-          </div>
-
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-400 via-green-400 to-teal-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
-            <div className="relative z-10">
-              <h3 className="text-lg font-semibold text-white/90 mb-1">Total GST Collected</h3>
-              <p className="text-2xl font-bold text-white">₹{totalGST.toLocaleString()}</p>
-            </div>
-            <div className="absolute right-4 bottom-4 opacity-80">
-              <TrendingUp className="h-16 w-16 text-white/40" strokeWidth={1.5} />
-            </div>
-          </div>
-
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-rose-400 via-pink-400 to-red-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
-            <div className="relative z-10">
-              <h3 className="text-lg font-semibold text-white/90 mb-1">No. of Invoices</h3>
-              <p className="text-2xl font-bold text-white">{invoiceCount}</p>
-            </div>
-            <div className="absolute right-4 bottom-4 opacity-80">
-              <FileText className="h-16 w-16 text-white/40" strokeWidth={1.5} />
-            </div>
-          </div>
-
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-400 via-purple-400 to-indigo-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
-            <div className="relative z-10">
-              <h3 className="text-lg font-semibold text-white/90 mb-1">Avg. Invoice Value</h3>
-              <p className="text-2xl font-bold text-white">₹{avgInvoiceValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
-            </div>
-            <div className="absolute right-4 bottom-4 opacity-80">
-              <BarChart3 className="h-16 w-16 text-white/40" strokeWidth={1.5} />
-            </div>
-          </div>
+          ))}
         </div>
 
-        {/* Filter Controls */}
-        <div
-          className="p-4 rounded-xl border-2 shadow-sm"
-          style={{
-            background: `linear-gradient(to right, ${THEME.gradientFrom}, ${THEME.gradientMid})`,
-            borderColor: THEME.border,
-          }}
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium" style={{ color: THEME.primaryDark }}>Date From</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal bg-white hover:opacity-90 transition-colors"
-                    style={{ borderColor: THEME.border, color: THEME.primary }}
-                  >
-                    <Calendar className="mr-2 h-4 w-4" style={{ color: THEME.primary }} />
-                    {dateFrom ? format(dateFrom, "PPP") : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <CalendarComponent mode="single" selected={dateFrom} onSelect={setDateFrom} initialFocus className="pointer-events-auto" />
-                </PopoverContent>
-              </Popover>
-            </div>
+        {/* Chart */}
+        {trendData.length > 0 && (
+          <Card className="border-2" style={{ borderColor: THEME.primaryLight }}>
+            <CardHeader><CardTitle style={{ color: THEME.primaryDark }}>Sales Trend</CardTitle></CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={trendData}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="month" /><YAxis /><Tooltip /><Legend /><Bar dataKey="sales" fill={THEME.primary} name="Sales (₹)" /></BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        )}
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium" style={{ color: THEME.primaryDark }}>Date To</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal bg-white hover:opacity-90 transition-colors"
-                    style={{ borderColor: THEME.border, color: THEME.primary }}
-                  >
-                    <Calendar className="mr-2 h-4 w-4" style={{ color: THEME.primary }} />
-                    {dateTo ? format(dateTo, "PPP") : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <CalendarComponent mode="single" selected={dateTo} onSelect={setDateTo} initialFocus className="pointer-events-auto" />
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium" style={{ color: THEME.primaryDark }}>Category</label>
-              <Select>
-                <SelectTrigger className="bg-white hover:opacity-90 transition-colors" style={{ borderColor: THEME.border, color: THEME.primary }}>
-                  <SelectValue placeholder="All Categories" />
-                </SelectTrigger>
-                <SelectContent className="bg-white border-2" style={{ borderColor: THEME.primaryLight }}>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  <SelectItem value="paints">Paints</SelectItem>
-                  <SelectItem value="hardware">Hardware</SelectItem>
-                  <SelectItem value="cement">Cement</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium" style={{ color: THEME.primaryDark }}>Customer</label>
-              <Select>
-                <SelectTrigger className="bg-white hover:opacity-90 transition-colors" style={{ borderColor: THEME.border, color: THEME.primary }}>
-                  <SelectValue placeholder="All Customers" />
-                </SelectTrigger>
-                <SelectContent className="bg-white border-2" style={{ borderColor: THEME.primaryLight }}>
-                  <SelectItem value="all">All Customers</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium" style={{ color: THEME.primaryDark }}>Payment Mode</label>
-              <Select>
-                <SelectTrigger className="bg-white hover:opacity-90 transition-colors" style={{ borderColor: THEME.border, color: THEME.primary }}>
-                  <SelectValue placeholder="All Modes" />
-                </SelectTrigger>
-                <SelectContent className="bg-white border-2" style={{ borderColor: THEME.primaryLight }}>
-                  <SelectItem value="all">All Modes</SelectItem>
-                  <SelectItem value="cash">Cash</SelectItem>
-                  <SelectItem value="upi">UPI</SelectItem>
-                  <SelectItem value="card">Card</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="flex gap-2 mt-4">
-            <Button className="text-white hover:opacity-90" style={{ backgroundColor: THEME.primary }}>
-              Generate Report
-            </Button>
-            <Button variant="outline" className="bg-white" style={{ borderColor: THEME.border, color: THEME.primary }}>
-              Reset
-            </Button>
-          </div>
-        </div>
-
-        {/* Sales Transactions Table */}
+        {/* Sales Table */}
         <div className="bg-white rounded-xl border-2 shadow-lg overflow-hidden" style={{ borderColor: THEME.primaryLight }}>
-          <div
-            className="p-4 border-b-2"
-            style={{
-              background: `linear-gradient(to right, ${THEME.gradientFrom}, ${THEME.gradientMid})`,
-              borderColor: THEME.primaryLight,
-            }}
-          >
+          <div className="p-4 border-b-2" style={{ background: `linear-gradient(to right, ${THEME.gradientFrom}, ${THEME.gradientMid})`, borderColor: THEME.primaryLight }}>
             <h2 className="text-lg font-semibold" style={{ color: THEME.primaryDark }}>Sales Transactions</h2>
           </div>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow style={{ backgroundColor: THEME.primaryLightest }}>
-                  <TableHead className="font-semibold" style={{ color: THEME.primaryDark }}>Date</TableHead>
-                  <TableHead className="font-semibold" style={{ color: THEME.primaryDark }}>Invoice No</TableHead>
-                  <TableHead className="font-semibold" style={{ color: THEME.primaryDark }}>Customer Name</TableHead>
-                  <TableHead className="font-semibold" style={{ color: THEME.primaryDark }}>Category</TableHead>
-                  <TableHead className="font-semibold" style={{ color: THEME.primaryDark }}>Product</TableHead>
-                  <TableHead className="text-right font-semibold" style={{ color: THEME.primaryDark }}>Qty</TableHead>
-                  <TableHead className="text-right font-semibold" style={{ color: THEME.primaryDark }}>Rate</TableHead>
-                  <TableHead className="text-right font-semibold" style={{ color: THEME.primaryDark }}>GST</TableHead>
-                  <TableHead className="text-right font-semibold" style={{ color: THEME.primaryDark }}>Total</TableHead>
-                  <TableHead className="font-semibold" style={{ color: THEME.primaryDark }}>Payment Mode</TableHead>
+                  <TableHead style={{ color: THEME.primaryDark }}>Date</TableHead>
+                  <TableHead style={{ color: THEME.primaryDark }}>Invoice No</TableHead>
+                  <TableHead style={{ color: THEME.primaryDark }}>Customer</TableHead>
+                  <TableHead className="text-right" style={{ color: THEME.primaryDark }}>Subtotal</TableHead>
+                  <TableHead className="text-right" style={{ color: THEME.primaryDark }}>GST</TableHead>
+                  <TableHead className="text-right" style={{ color: THEME.primaryDark }}>Total</TableHead>
+                  <TableHead style={{ color: THEME.primaryDark }}>Payment</TableHead>
+                  <TableHead style={{ color: THEME.primaryDark }}>Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {mockSalesData.map((row, idx) => (
-                  <TableRow key={idx} className="transition-colors duration-200" style={{ borderColor: THEME.primaryLight }} onMouseEnter={e => (e.currentTarget.style.backgroundColor = THEME.primaryLightest)} onMouseLeave={e => (e.currentTarget.style.backgroundColor = '')}>
-                    <TableCell className="text-gray-700">{row.date}</TableCell>
-                    <TableCell className="font-medium" style={{ color: THEME.primary }}>{row.invoiceNo}</TableCell>
-                    <TableCell className="text-gray-700">{row.customerName}</TableCell>
+                {salesData.length === 0 ? (
+                  <TableRow><TableCell colSpan={8} className="text-center py-8 text-gray-500">No sales data found</TableCell></TableRow>
+                ) : salesData.map((sale) => (
+                  <TableRow key={sale.id} className="hover:bg-red-50/30">
+                    <TableCell>{sale.invoice_date}</TableCell>
+                    <TableCell className="font-medium" style={{ color: THEME.primary }}>{sale.invoice_number}</TableCell>
+                    <TableCell>{sale.customer_name || "Walk-in"}</TableCell>
+                    <TableCell className="text-right">₹{Number(sale.subtotal).toLocaleString()}</TableCell>
+                    <TableCell className="text-right">₹{Number(sale.tax_amount).toLocaleString()}</TableCell>
+                    <TableCell className="text-right font-bold" style={{ color: THEME.primaryDark }}>₹{Number(sale.total_amount).toLocaleString()}</TableCell>
+                    <TableCell>{sale.payment_mode || "-"}</TableCell>
                     <TableCell>
-                      <span className="px-2 py-1 rounded text-xs" style={{ backgroundColor: THEME.primaryLight, color: THEME.primaryDark }}>{row.category}</span>
-                    </TableCell>
-                    <TableCell className="text-gray-700">{row.product}</TableCell>
-                    <TableCell className="text-right text-gray-700">{row.qty}</TableCell>
-                    <TableCell className="text-right text-gray-700">₹{row.rate}</TableCell>
-                    <TableCell className="text-right text-gray-700">₹{row.gst}</TableCell>
-                    <TableCell className="text-right font-semibold" style={{ color: THEME.primaryDark }}>₹{row.total}</TableCell>
-                    <TableCell>
-                      <Badge style={{ backgroundColor: THEME.primaryLight, color: THEME.primaryDark, border: `1px solid ${THEME.border}` }}>{row.paymentMode}</Badge>
+                      <Badge className={sale.payment_status === "paid" ? "bg-green-100 text-green-800" : sale.payment_status === "partial" ? "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800"}>
+                        {sale.payment_status}
+                      </Badge>
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </div>
-
-          <div className="p-4 border-t" style={{ borderColor: THEME.primaryLight }}>
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem><PaginationPrevious href="#" /></PaginationItem>
-                <PaginationItem><PaginationLink href="#" isActive>1</PaginationLink></PaginationItem>
-                <PaginationItem><PaginationLink href="#">2</PaginationLink></PaginationItem>
-                <PaginationItem><PaginationLink href="#">3</PaginationLink></PaginationItem>
-                <PaginationItem><PaginationNext href="#" /></PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </div>
         </div>
-
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="bg-white shadow-lg" style={{ borderColor: THEME.border }}>
-            <CardHeader>
-              <CardTitle style={{ color: THEME.primaryDark }}>Sales Trend</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={trendData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={THEME.primaryLight} />
-                  <XAxis dataKey="month" stroke={THEME.primary} />
-                  <YAxis stroke={THEME.primary} />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="sales" stroke={THEME.primary} strokeWidth={2} name="Sales (₹)" />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white shadow-lg" style={{ borderColor: THEME.border }}>
-            <CardHeader>
-              <CardTitle style={{ color: THEME.primaryDark }}>Category-wise Sales</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={categoryData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={THEME.primaryLight} />
-                  <XAxis dataKey="category" stroke={THEME.primary} />
-                  <YAxis stroke={THEME.primary} />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="amount" fill={THEME.primary} name="Amount (₹)" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* GST Pie Chart */}
-        <Card className="bg-white shadow-lg" style={{ borderColor: THEME.border }}>
-          <CardHeader>
-            <CardTitle style={{ color: THEME.primaryDark }}>GST Contribution</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie data={gstData} cx="50%" cy="50%" labelLine={false} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} outerRadius={100} fill="#8884d8" dataKey="value">
-                  {gstData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Footer */}
-        <Card className="bg-white shadow-lg" style={{ borderColor: THEME.border }}>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-lg font-semibold" style={{ color: THEME.primaryDark }}>
-                  Grand Total: ₹{totalSales.toLocaleString()}
-                </p>
-                <p className="text-sm" style={{ color: THEME.primary }}>
-                  GST Total: ₹{totalGST.toLocaleString()}
-                </p>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Last Updated: {format(new Date(), "PPpp")}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </AppLayout>
   );
