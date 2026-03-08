@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Sidebar } from "./Sidebar";
 import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
+import { FloatingActionButton } from "./FloatingActionButton";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         
         <div className="container mx-auto p-6">{children}</div>
       </main>
+      <FloatingActionButton />
     </div>
   );
 }
