@@ -58,6 +58,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         
         <div className="container mx-auto p-6">{children}</div>
       </main>
+      <FloatingActionButton />
     </div>
   );
 }
