@@ -5,6 +5,8 @@ import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
 
 import { PaintChart } from "@/components/dashboard/PaintChart";
+import { WeatherWidget } from "@/components/dashboard/WeatherWidget";
+import { TodoWidget } from "@/components/dashboard/TodoWidget";
 import { supabase } from "@/integrations/supabase/client";
 import { 
   ShoppingCart, 
@@ -114,6 +116,13 @@ const Index = () => {
 
         
 
+        {/* Row 2: Weather + Todo */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <WeatherWidget />
+          <TodoWidget />
+        </div>
+
+        {/* Row 3: Chart + Activity + Mini cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <PaintChart />
           <div className="space-y-6">
