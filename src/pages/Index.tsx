@@ -5,6 +5,8 @@ import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
 
 import { PaintChart } from "@/components/dashboard/PaintChart";
+import { WeatherWidget } from "@/components/dashboard/WeatherWidget";
+import { TodoWidget } from "@/components/dashboard/TodoWidget";
 import { supabase } from "@/integrations/supabase/client";
 import { 
   ShoppingCart, 
