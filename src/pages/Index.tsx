@@ -117,9 +117,13 @@ const Index = () => {
         
 
         {/* Row 2: Weather + Todo */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <WeatherWidget />
-          <TodoWidget />
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          <div className="lg:col-span-3">
+            <WeatherWidget />
+          </div>
+          <div className="lg:col-span-2">
+            <TodoWidget />
+          </div>
         </div>
 
         {/* Row 3: Chart + Activity + Mini cards */}
