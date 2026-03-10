@@ -31,6 +31,22 @@ import './index.css'
         return new Response(null, { status: 204 });
       }
 
+      // To stop the browser from logging "Failed to fetch" as a red error in the console
+      // where possible, we return a synthetic 503 response.
+      if (isTransientNetworkError) {
+        return new Response(JSON.stringify({
+          error: 'Transient network failure intercepted',
+          message: error.message
+        }), {
+          status: 503,
+          statusText: 'Service Unavailable (Network Failure)',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Transient-Failure': 'true'
+          }
+        });
+      }
+
       throw error;
     }
   };
@@ -46,6 +62,19 @@ import './index.css'
       event.stopPropagation();
     }
   }, true);
+
+  // Global rejection handler for transient network errors
+  window.addEventListener('unhandledrejection', (event) => {
+    const error = event.reason;
+    const isTransientNetworkError =
+      error && (error.message?.includes('Failed to fetch') || error.message?.includes('Load failed')) &&
+      (error.stack && (error.stack.includes('@vite/client') || error.stack.includes('node_modules')));
+
+    if (isTransientNetworkError) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  });
 })();
 
 createRoot(document.getElementById("root")!).render(<App />);

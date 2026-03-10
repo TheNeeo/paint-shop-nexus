@@ -12,6 +12,7 @@ export default defineConfig(({ mode }) => ({
       protocol: "wss",
       clientPort: 443,
       path: "vite-hmr",
+      timeout: 30000,
       overlay: false,
     },
     watch: {

@@ -21,7 +21,28 @@ const fetchWithRetry = async (url: string, options?: RequestInit, retries = 15):
         signal: controller.signal
       });
       clearTimeout(timeoutId);
-      return response;
+
+      // Check if we got a retryable response (either synthetic from wrapper or server 5xx)
+      const isTransientResponse = response.headers.get('X-Transient-Failure') === 'true';
+      const isServerError = !response.ok && response.status >= 500;
+
+      if (!isTransientResponse && !isServerError) {
+        return response;
+      }
+
+      // If we got a real 4xx error (not 5xx), it's probably not transient
+      if (!response.ok && response.status < 500 && !isTransientResponse) {
+        return response;
+      }
+
+      // We found a transient failure, but we have retries left.
+      if (i < retries - 1) {
+        const errorLabel = isTransientResponse ? 'Network Failure' : `Server Error (${response.status})`;
+        const msg = isTransientResponse ? 'intercepted by wrapper' : `status ${response.status}`;
+        lastError = new Error(`${errorLabel}: ${msg}`);
+      } else {
+        return response;
+      }
     } catch (error: any) {
       clearTimeout(timeoutId);
       lastError = error;
@@ -40,33 +61,33 @@ const fetchWithRetry = async (url: string, options?: RequestInit, retries = 15):
         }
         break;
       }
+    }
 
-      // Exponential backoff with jitter
-      const delay = Math.min(Math.pow(2, i) * 1000 + Math.random() * 3000, 30000);
+    // Common retry logic for both synthetic responses and real exceptions
+    const delay = Math.min(Math.pow(2, i) * 1000 + Math.random() * 3000, 30000);
 
-      if (i > 0) {
-        console.warn(`Transient network error at ${url}. Retrying (${i + 1}/${retries}) in ${Math.round(delay/1000)}s...`, error.message);
-      }
+    if (i > 0) {
+      console.warn(`Transient issue at ${url}. Retrying (${i + 1}/${retries}) in ${Math.round(delay/1000)}s...`, lastError?.message);
+    }
 
-      if (!navigator.onLine) {
-        // Wait for online status or a fixed delay if offline
-        await new Promise(resolve => {
-          const checkOnline = () => {
-            if (navigator.onLine) {
-              window.removeEventListener('online', checkOnline);
-              resolve(null);
-            }
-          };
-          window.addEventListener('online', checkOnline);
-          setTimeout(() => {
+    if (!navigator.onLine) {
+      // Wait for online status or a fixed delay if offline
+      await new Promise(resolve => {
+        const checkOnline = () => {
+          if (navigator.onLine) {
             window.removeEventListener('online', checkOnline);
             resolve(null);
-          }, 15000); // Max wait for online 15s
-        });
-      }
-
-      await new Promise(resolve => setTimeout(resolve, delay));
+          }
+        };
+        window.addEventListener('online', checkOnline);
+        setTimeout(() => {
+          window.removeEventListener('online', checkOnline);
+          resolve(null);
+        }, 15000); // Max wait for online 15s
+      });
     }
+
+    await new Promise(resolve => setTimeout(resolve, delay));
   }
 
   // Instead of throwing a TypeError (which browser reports as a crash),
