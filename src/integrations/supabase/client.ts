@@ -8,7 +8,7 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-const fetchWithRetry = async (url: string, options?: RequestInit, retries = 10): Promise<Response> => {
+const fetchWithRetry = async (url: string, options?: RequestInit, retries = 15): Promise<Response> => {
   let lastError: Error | null = null;
 
   for (let i = 0; i < retries; i++) {
@@ -30,20 +30,24 @@ const fetchWithRetry = async (url: string, options?: RequestInit, retries = 10):
       const isNetworkError =
         error?.name === 'TypeError' ||
         error?.message?.includes('Failed to fetch') ||
+        error?.message?.includes('Load failed') ||
         error?.name === 'AbortError' ||
-        error?.message?.includes('NetworkError') ||
-        error?.message?.includes('Load failed');
+        error?.message?.includes('NetworkError');
 
       if (!isNetworkError || i === retries - 1) {
-        if (i === retries - 1) {
-          console.error(`Final retry attempt failed for ${url}:`, error);
+        if (i === retries - 1 && isNetworkError) {
+          console.error(`Final retry attempt (${i + 1}/${retries}) failed for ${url}:`, error.message);
         }
         break;
       }
 
-      console.warn(`Transient network error at ${url}. Retrying (${i + 1}/${retries})...`, error.message);
+      // Exponential backoff with jitter
+      const delay = Math.min(Math.pow(2, i) * 1000 + Math.random() * 3000, 30000);
 
-      // Wait before retrying (exponential backoff with jitter)
+      if (i > 0) {
+        console.warn(`Transient network error at ${url}. Retrying (${i + 1}/${retries}) in ${Math.round(delay/1000)}s...`, error.message);
+      }
+
       if (!navigator.onLine) {
         // Wait for online status or a fixed delay if offline
         await new Promise(resolve => {
@@ -57,16 +61,30 @@ const fetchWithRetry = async (url: string, options?: RequestInit, retries = 10):
           setTimeout(() => {
             window.removeEventListener('online', checkOnline);
             resolve(null);
-          }, 10000); // Max wait for online 10s
+          }, 15000); // Max wait for online 15s
         });
       }
 
-      const delay = Math.min(Math.pow(2, i) * 1000 + Math.random() * 2000, 30000);
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
 
-  throw lastError || new Error('All retry attempts failed');
+  // Instead of throwing a TypeError (which browser reports as a crash),
+  // return a 503 response so the SDK handles it as a normal API error
+  const errorMessage = lastError?.message || 'Connection unstable. All retry attempts failed.';
+  console.error('Fetch exhausted all retries. Returning error response:', errorMessage);
+
+  return new Response(JSON.stringify({
+    message: errorMessage,
+    error: 'NETWORK_FAILURE',
+    error_description: errorMessage,
+    status: 503,
+    msg: errorMessage
+  }), {
+    status: 503,
+    statusText: 'Service Unavailable (Network Failure)',
+    headers: { 'Content-Type': 'application/json' }
+  });
 };
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {

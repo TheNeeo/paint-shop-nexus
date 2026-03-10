@@ -67,12 +67,18 @@ const Auth = () => {
           setError('Invalid email or password. Please check your credentials.');
         } else if (error.message.includes('Email not confirmed')) {
           setError('Please check your email and confirm your account before signing in.');
+        } else if (error.message.includes('Failed to fetch') || error.status === 503) {
+          setError('Network connection unstable. Please check your internet and try again.');
         } else {
           setError(error.message);
         }
       }
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
+    } catch (err: any) {
+      if (err.message?.includes('Failed to fetch')) {
+        setError('Network connection unstable. Please check your internet and try again.');
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -115,6 +121,8 @@ const Auth = () => {
       if (error) {
         if (error.message.includes('User already registered')) {
           setError('An account with this email already exists. Please sign in instead.');
+        } else if (error.message.includes('Failed to fetch') || error.status === 503) {
+          setError('Network connection unstable. Please check your internet and try again.');
         } else {
           setError(error.message);
         }
@@ -122,8 +130,12 @@ const Auth = () => {
         setMessage('Account created successfully! Please check your email to confirm your account.');
         setSignUpData({ email: '', password: '', fullName: '', companyName: '' });
       }
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
+    } catch (err: any) {
+      if (err.message?.includes('Failed to fetch')) {
+        setError('Network connection unstable. Please check your internet and try again.');
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }

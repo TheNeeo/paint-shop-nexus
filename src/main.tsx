@@ -31,12 +31,6 @@ import './index.css'
         return new Response(null, { status: 204 });
       }
 
-      // If it's a network error on a data fetch, we log it but still throw
-      // so it can be caught by fetchWithRetry or other error handlers
-      if (isTransientNetworkError) {
-        console.warn(`Transient fetch error for ${url}:`, error.message);
-      }
-
       throw error;
     }
   };
