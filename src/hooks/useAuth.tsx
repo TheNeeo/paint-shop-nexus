@@ -352,9 +352,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         );
 
-        // THEN check for existing session
+        // THEN check for existing session with timeout
+        const getSessionWithTimeout = async () => {
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Session fetch timeout')), 10000)
+          );
+          return Promise.race([
+            supabase.auth.getSession(),
+            timeoutPromise
+          ]);
+        };
+
         try {
-          const { data: { session } } = await supabase.auth.getSession();
+          const result = await getSessionWithTimeout();
+          const { data: { session } } = result as { data: { session: any } };
           if (isMounted) {
             if (session) {
               setSession(session);
