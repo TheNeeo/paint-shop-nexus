@@ -53,7 +53,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
                 <p>
                   We apologize for the inconvenience. An error occurred while loading the application.
                 </p>
-                {this.state.errorMessage && process.env.NODE_ENV === 'development' && (
+                {this.state.errorMessage && import.meta.env.DEV && (
                   <p className="text-sm font-mono bg-muted p-2 rounded">
                     {this.state.errorMessage}
                   </p>
