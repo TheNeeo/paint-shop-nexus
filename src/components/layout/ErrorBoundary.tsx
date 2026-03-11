@@ -22,7 +22,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
     // Don't expose internal error details in production
     return { 
       hasError: true, 
-      errorMessage: process.env.NODE_ENV === 'development' ? error.message : undefined
+      errorMessage: import.meta.env.DEV ? error.message : undefined
     };
   }
 
