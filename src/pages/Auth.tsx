@@ -8,6 +8,13 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import {
+  isNetworkAuthError,
+  shouldUseOfflinePreviewAuth,
+  persistOfflineSession,
+  isPreviewHostname,
+  getOfflinePreviewNotice
+} from '@/hooks/useAuth';
 import { signInSchema, signUpSchema, validateInput } from '@/lib/validation';
 import { Mail, Lock, User, Building2, Palette, Brush, Droplets, Sparkles } from 'lucide-react';
 
@@ -45,15 +52,35 @@ const Auth = () => {
     setIsLoading(true);
     setError('');
 
+    const timeoutId = setTimeout(() => {
+      // If sign-in hasn't resolved after 60 seconds, assume network failure
+      if (isLoading) {
+        setIsLoading(false);
+        if (isPreviewHostname()) {
+          try {
+            persistOfflineSession(signInData.email);
+            setMessage(getOfflinePreviewNotice());
+            setTimeout(() => navigate('/'), 1500);
+          } catch (e) {
+            setError('Sign-in is taking too long. Please check your internet connection and try again.');
+          }
+        } else {
+          setError('Sign-in is taking too long. Please check your internet connection and try again.');
+        }
+      }
+    }, 60000);
+
     try {
       // Validate input
       const validation = validateInput(signInSchema, {
         email: signInData.email,
         password: signInData.password,
       });
-      
+
       if (!validation.success) {
+        clearTimeout(timeoutId);
         setError(validation.error || 'Invalid input');
+        setIsLoading(false);
         return;
       }
 
@@ -62,20 +89,46 @@ const Auth = () => {
         password: validation.data.password,
       });
 
+      clearTimeout(timeoutId);
+
       if (error) {
         if (error.message.includes('Invalid login credentials')) {
           setError('Invalid email or password. Please check your credentials.');
         } else if (error.message.includes('Email not confirmed')) {
           setError('Please check your email and confirm your account before signing in.');
-        } else if (error.message.includes('Failed to fetch') || error.status === 503) {
-          setError('Network connection unstable. Please check your internet and try again.');
+        } else if (isNetworkAuthError(error)) {
+          // Network error during sign-in - try to enable offline preview mode
+          if (isPreviewHostname()) {
+            try {
+              persistOfflineSession(validation.data.email);
+              setMessage(getOfflinePreviewNotice());
+              // Redirect after a short delay
+              setTimeout(() => navigate('/'), 1500);
+            } catch (e) {
+              setError('Network connection unstable. Please check your internet and try again.');
+            }
+          } else {
+            setError('Network connection unstable. Please check your internet and try again.');
+          }
         } else {
           setError(error.message);
         }
       }
     } catch (err: any) {
-      if (err.message?.includes('Failed to fetch')) {
-        setError('Network connection unstable. Please check your internet and try again.');
+      clearTimeout(timeoutId);
+      if (isNetworkAuthError(err)) {
+        // Catch-block network error during sign-in - try offline preview
+        if (isPreviewHostname()) {
+          try {
+            persistOfflineSession(signInData.email);
+            setMessage(getOfflinePreviewNotice());
+            setTimeout(() => navigate('/'), 1500);
+          } catch (e) {
+            setError('Network connection unstable. Please check your internet and try again.');
+          }
+        } else {
+          setError('Network connection unstable. Please check your internet and try again.');
+        }
       } else {
         setError('An unexpected error occurred. Please try again.');
       }
