@@ -52,24 +52,6 @@ const Auth = () => {
     setIsLoading(true);
     setError('');
 
-    const timeoutId = setTimeout(() => {
-      // If sign-in hasn't resolved after 60 seconds, assume network failure
-      if (isLoading) {
-        setIsLoading(false);
-        if (isPreviewHostname()) {
-          try {
-            persistOfflineSession(signInData.email);
-            setMessage(getOfflinePreviewNotice());
-            setTimeout(() => navigate('/'), 1500);
-          } catch (e) {
-            setError('Sign-in is taking too long. Please check your internet connection and try again.');
-          }
-        } else {
-          setError('Sign-in is taking too long. Please check your internet connection and try again.');
-        }
-      }
-    }, 60000);
-
     try {
       // Validate input
       const validation = validateInput(signInSchema, {
@@ -78,18 +60,48 @@ const Auth = () => {
       });
 
       if (!validation.success) {
-        clearTimeout(timeoutId);
         setError(validation.error || 'Invalid input');
         setIsLoading(false);
         return;
       }
 
-      const { error } = await supabase.auth.signInWithPassword({
-        email: validation.data.email,
-        password: validation.data.password,
-      });
+      // Create a timeout promise that rejects after 20 seconds
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Sign-in request timed out')), 20000)
+      );
 
-      clearTimeout(timeoutId);
+      // Race the actual sign-in against the timeout
+      let result;
+      try {
+        result = await Promise.race([
+          supabase.auth.signInWithPassword({
+            email: validation.data.email,
+            password: validation.data.password,
+          }),
+          timeoutPromise
+        ]);
+      } catch (timeoutErr: any) {
+        // Timeout occurred or network error - activate offline preview immediately
+        if (isPreviewHostname()) {
+          try {
+            persistOfflineSession(validation.data.email);
+            setMessage(getOfflinePreviewNotice());
+            setIsLoading(false);
+            setTimeout(() => navigate('/'), 1000);
+            return;
+          } catch (e) {
+            setError('Network unstable. Offline mode unavailable. Please check your internet.');
+            setIsLoading(false);
+            return;
+          }
+        } else {
+          setError('Sign-in is taking too long. Please check your internet connection.');
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      const { error } = result;
 
       if (error) {
         if (error.message.includes('Invalid login credentials')) {
@@ -97,37 +109,40 @@ const Auth = () => {
         } else if (error.message.includes('Email not confirmed')) {
           setError('Please check your email and confirm your account before signing in.');
         } else if (isNetworkAuthError(error)) {
-          // Network error during sign-in - try to enable offline preview mode
+          // Network error - activate offline preview immediately
           if (isPreviewHostname()) {
             try {
               persistOfflineSession(validation.data.email);
               setMessage(getOfflinePreviewNotice());
-              // Redirect after a short delay
-              setTimeout(() => navigate('/'), 1500);
+              setIsLoading(false);
+              setTimeout(() => navigate('/'), 1000);
+              return;
             } catch (e) {
-              setError('Network connection unstable. Please check your internet and try again.');
+              setError('Network unstable. Offline mode unavailable.');
             }
           } else {
-            setError('Network connection unstable. Please check your internet and try again.');
+            setError('Network connection unstable. Please try again.');
           }
         } else {
           setError(error.message);
         }
       }
     } catch (err: any) {
-      clearTimeout(timeoutId);
+      // Any other error
       if (isNetworkAuthError(err)) {
-        // Catch-block network error during sign-in - try offline preview
+        // Network error - activate offline preview immediately
         if (isPreviewHostname()) {
           try {
             persistOfflineSession(signInData.email);
             setMessage(getOfflinePreviewNotice());
-            setTimeout(() => navigate('/'), 1500);
+            setIsLoading(false);
+            setTimeout(() => navigate('/'), 1000);
+            return;
           } catch (e) {
-            setError('Network connection unstable. Please check your internet and try again.');
+            setError('Network unstable. Offline mode unavailable.');
           }
         } else {
-          setError('Network connection unstable. Please check your internet and try again.');
+          setError('Network connection unstable. Please try again.');
         }
       } else {
         setError('An unexpected error occurred. Please try again.');
