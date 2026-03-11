@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState, useCallback } from "react";
-import { Cloud, Sun, CloudRain, CloudSnow, CloudLightning, CloudDrizzle, Wind, Droplets, Gauge, MapPin, RefreshCw, CloudFog, Thermometer } from "lucide-react";
+import { Cloud, Sun, CloudRain, CloudSnow, CloudLightning, CloudDrizzle, Wind, Droplets, Gauge, MapPin, RefreshCw, CloudFog } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface WeatherData {
@@ -40,6 +40,12 @@ const getCityName = async (lat: number, lon: number): Promise<string> => {
 };
 
 const DAY_NAMES = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+
+// Background cloud shapes SVG for texture
+const CLOUD_TEXTURE_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1400 700'%3E%3Cdefs%3E%3CradialGradient id='g1' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23fff' stop-opacity='0.08'/%3E%3Cstop offset='100%25' stop-color='%23fff' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cellipse cx='200' cy='180' rx='220' ry='140' fill='url(%23g1)'/%3E%3Cellipse cx='650' cy='120' rx='160' ry='100' fill='url(%23g1)'/%3E%3Cellipse cx='1000' cy='200' rx='200' ry='130' fill='url(%23g1)'/%3E%3Cellipse cx='400' cy='400' rx='180' ry='100' fill='url(%23g1)'/%3E%3Cellipse cx='1100' cy='450' rx='140' ry='80' fill='url(%23g1)'/%3E%3Cellipse cx='750' cy='550' rx='200' ry='90' fill='url(%23g1)'/%3E%3C/svg%3E")`;
+
+// World map outline SVG
+const WORLD_MAP_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 600'%3E%3Cpath d='M150,200 Q200,100 300,150 Q350,80 420,130 Q500,90 550,160 Q600,120 680,170 Q720,130 780,180 Q850,100 920,160 Q980,120 1050,180' stroke='%23fff' stroke-width='1.5' fill='none' opacity='0.06'/%3E%3Cpath d='M100,300 Q180,250 280,290 Q350,240 430,280 Q520,230 600,270 Q680,220 760,280 Q840,240 920,300 Q1000,260 1100,320' stroke='%23fff' stroke-width='1.5' fill='none' opacity='0.05'/%3E%3Cpath d='M200,400 Q280,360 370,390 Q440,350 520,380 Q600,340 680,370 Q760,330 840,380 Q920,350 1000,400' stroke='%23fff' stroke-width='1' fill='none' opacity='0.04'/%3E%3Cellipse cx='300' cy='220' rx='120' ry='70' fill='%23fff' opacity='0.02'/%3E%3Cellipse cx='700' cy='250' rx='150' ry='80' fill='%23fff' opacity='0.02'/%3E%3Cellipse cx='500' cy='380' rx='100' ry='50' fill='%23fff' opacity='0.015'/%3E%3C/svg%3E")`;
 
 export function WeatherWidget() {
   const [weather, setWeather] = useState<WeatherData | null>(null);
@@ -114,9 +120,9 @@ export function WeatherWidget() {
 
   if (loading) {
     return (
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-300 via-sky-200 to-blue-200 p-6 min-h-[420px] flex items-center justify-center shadow-xl">
+      <div className="relative overflow-hidden p-8 flex items-center justify-center" style={{ borderRadius: 28, minHeight: 480, background: "linear-gradient(135deg, #7EC8E3 0%, #A8D8EA 30%, #B8E4F0 60%, #C5EBF5 100%)", boxShadow: "0 20px 60px -15px rgba(100,180,220,0.4), 0 8px 24px -8px rgba(0,0,0,0.1)" }}>
         <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }}>
-          <RefreshCw className="h-8 w-8 text-sky-600/70" />
+          <RefreshCw className="h-8 w-8 text-white/60" />
         </motion.div>
       </div>
     );
@@ -124,114 +130,209 @@ export function WeatherWidget() {
 
   if (error || !weather) {
     return (
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-300 via-sky-200 to-blue-200 p-6 min-h-[420px] flex items-center justify-center shadow-xl">
-        <p className="text-sky-800/80 text-sm">{error || "No weather data"}</p>
+      <div className="relative overflow-hidden p-8 flex items-center justify-center" style={{ borderRadius: 28, minHeight: 480, background: "linear-gradient(135deg, #7EC8E3 0%, #A8D8EA 30%, #B8E4F0 60%, #C5EBF5 100%)", boxShadow: "0 20px 60px -15px rgba(100,180,220,0.4), 0 8px 24px -8px rgba(0,0,0,0.1)" }}>
+        <p className="text-white/80 text-sm font-medium">{error || "No weather data"}</p>
       </div>
     );
   }
 
-  const { icon: WeatherIcon } = getWeatherInfo(weather.weatherCode);
+  const { icon: WeatherIcon, color: weatherColor } = getWeatherInfo(weather.weatherCode);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#87CEEB] via-[#B0D9F1] to-[#A8D8EA] shadow-xl hover:shadow-2xl hover:scale-[1.005] transition-all duration-300"
-      style={{ minHeight: 420 }}
+      transition={{ duration: 0.5 }}
+      className="relative overflow-hidden"
+      style={{
+        borderRadius: 28,
+        minHeight: 480,
+        background: "linear-gradient(145deg, #6BB8D6 0%, #7EC8E3 15%, #A8D8EA 40%, #B8E4F0 65%, #D0F0FA 100%)",
+        boxShadow: "0 25px 60px -15px rgba(80,160,210,0.45), 0 10px 30px -10px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.3)",
+      }}
     >
-      {/* World map watermark */}
-      <div className="absolute inset-0 opacity-[0.06]" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 600'%3E%3Cellipse cx='250' cy='220' rx='200' ry='130' fill='%23000'/%3E%3Cellipse cx='600' cy='180' rx='120' ry='80' fill='%23000'/%3E%3Cellipse cx='800' cy='250' rx='180' ry='120' fill='%23000'/%3E%3Cellipse cx='450' cy='380' rx='120' ry='70' fill='%23000'/%3E%3Cellipse cx='900' cy='350' rx='80' ry='50' fill='%23000'/%3E%3C/svg%3E")`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
+      {/* Layer 1: World map texture */}
+      <div className="absolute inset-0" style={{ backgroundImage: WORLD_MAP_SVG, backgroundSize: "cover", backgroundPosition: "center" }} />
+
+      {/* Layer 2: Cloud texture shapes */}
+      <div className="absolute inset-0" style={{ backgroundImage: CLOUD_TEXTURE_SVG, backgroundSize: "cover", backgroundPosition: "center" }} />
+
+      {/* Layer 3: Glass overlay for depth */}
+      <div className="absolute inset-0" style={{
+        background: "linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 40%, rgba(255,255,255,0.06) 100%)",
+        backdropFilter: "blur(1px)",
       }} />
 
-      <div className="relative z-10 flex flex-col h-full p-5 pb-4">
-        {/* Top: Location + Temperature */}
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-1.5 mb-0.5">
-              <MapPin className="h-4 w-4 text-sky-700" />
-              <span className="text-sky-800 text-base font-bold tracking-wide">{weather.city}</span>
-            </div>
-          </div>
-          {/* Temperature box */}
-          <div className="bg-white/30 backdrop-blur-md rounded-2xl px-5 py-2.5 border border-white/40 shadow-sm">
-            <div className="flex items-start gap-0.5">
-              <span className="text-4xl font-extrabold text-sky-900 leading-none">+{weather.temp}</span>
-              <span className="text-sky-700 text-base font-light mt-0.5">°C</span>
-            </div>
-            <p className="text-sky-700 text-[11px] font-medium text-center mt-1">Feels like {weather.feelsLike}°C</p>
-          </div>
-        </div>
+      {/* Layer 4: Decorative floating clouds in background */}
+      <motion.div
+        animate={{ x: [0, 30, 0] }}
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-8 right-[15%] opacity-[0.08]"
+      >
+        <Cloud className="h-32 w-32 text-white" fill="white" strokeWidth={0.5} />
+      </motion.div>
+      <motion.div
+        animate={{ x: [0, -20, 0] }}
+        transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute bottom-28 left-[5%] opacity-[0.06]"
+      >
+        <Cloud className="h-24 w-24 text-white" fill="white" strokeWidth={0.5} />
+      </motion.div>
 
-        {/* Middle: Day name + metrics + large weather icon */}
-        <div className="flex items-center justify-between mt-1 flex-1">
-          <div>
-            <h2 className="text-2xl font-bold text-sky-900 mb-2">{dayName}</h2>
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <Droplets className="h-4 w-4 text-sky-700/80" />
-                <span className="text-sky-800 text-sm font-semibold">{weather.humidity}%</span>
+      {/* Content */}
+      <div className="relative z-10 flex flex-col h-full p-6 pb-5" style={{ minHeight: 480 }}>
+
+        {/* === TOP SECTION === */}
+        <div className="flex items-start justify-between mb-2">
+          {/* Left: Location + Day */}
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-full bg-white/20 backdrop-blur-sm">
+                <MapPin className="h-4 w-4 text-white" strokeWidth={2} />
               </div>
-              <div className="flex items-center gap-2">
-                <Wind className="h-4 w-4 text-sky-700/80" />
-                <span className="text-sky-800 text-sm font-semibold">{weather.wind_speed}km/h</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Gauge className="h-4 w-4 text-sky-700/80" />
-                <span className="text-sky-800 text-sm font-semibold">{weather.pressure}hPa</span>
-              </div>
+              <span className="text-white text-lg font-bold tracking-wide drop-shadow-sm">{weather.city}</span>
             </div>
           </div>
 
-          {/* Large animated weather icon with cloud */}
+          {/* Right: Temperature glass badge */}
           <motion.div
-            animate={{ y: [0, -8, 0] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            className="relative mr-2"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+            className="relative"
+            style={{
+              background: "linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.15) 100%)",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
+              borderRadius: 20,
+              border: "1.5px solid rgba(255,255,255,0.45)",
+              padding: "12px 24px",
+              boxShadow: "0 8px 32px -8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.4)",
+            }}
           >
-            <WeatherIcon className="h-24 w-24 text-yellow-400 drop-shadow-[0_6px_16px_rgba(250,204,21,0.5)]" strokeWidth={1.5} />
-            <motion.div
-              animate={{ x: [0, 10, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -right-6 top-2"
-            >
-              <Cloud className="h-16 w-16 text-white drop-shadow-lg" strokeWidth={1.5} fill="white" />
-            </motion.div>
-            <motion.div
-              animate={{ x: [0, -6, 0] }}
-              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -left-4 bottom-0"
-            >
-              <Cloud className="h-10 w-10 text-white/70 drop-shadow-md" strokeWidth={1.5} fill="white" fillOpacity={0.7} />
-            </motion.div>
+            <div className="flex items-start gap-1">
+              <span className="text-[42px] font-extrabold text-white leading-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.15)]">
+                +{weather.temp}
+              </span>
+              <span className="text-white/80 text-lg font-light mt-1">°C</span>
+            </div>
+            <p className="text-white/70 text-xs font-medium text-center mt-1.5">
+              Feels like {weather.feelsLike}°C
+            </p>
           </motion.div>
         </div>
 
-        {/* Forecast Row - 6 days */}
-        <div className="mt-auto pt-3">
-          <div className="grid grid-cols-6 gap-1.5">
+        {/* === MIDDLE SECTION: Day + Metrics + Hero Illustration === */}
+        <div className="flex items-center justify-between flex-1 my-2">
+          {/* Left: Day name + weather metrics */}
+          <div className="flex flex-col gap-3">
+            <h2 className="text-3xl font-extrabold text-white drop-shadow-sm tracking-tight">{dayName}</h2>
+            <div className="flex flex-col gap-2.5 mt-1">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1 rounded-lg bg-white/15">
+                  <Droplets className="h-4 w-4 text-white/90" strokeWidth={2} />
+                </div>
+                <span className="text-white text-sm font-semibold">{weather.humidity}%</span>
+                <span className="text-white/50 text-xs">humidity</span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <div className="p-1 rounded-lg bg-white/15">
+                  <Wind className="h-4 w-4 text-white/90" strokeWidth={2} />
+                </div>
+                <span className="text-white text-sm font-semibold">{weather.wind_speed} km/h</span>
+                <span className="text-white/50 text-xs">wind</span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <div className="p-1 rounded-lg bg-white/15">
+                  <Gauge className="h-4 w-4 text-white/90" strokeWidth={2} />
+                </div>
+                <span className="text-white text-sm font-semibold">{weather.pressure} hPa</span>
+                <span className="text-white/50 text-xs">pressure</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: LARGE hero weather illustration */}
+          <div className="relative flex items-center justify-center" style={{ width: 200, height: 180 }}>
+            {/* Glow behind icon */}
+            <div className="absolute inset-0 rounded-full" style={{
+              background: "radial-gradient(circle, rgba(255,220,80,0.25) 0%, rgba(255,220,80,0) 70%)",
+              filter: "blur(20px)",
+            }} />
+
+            {/* Main weather icon - 140px */}
+            <motion.div
+              animate={{ y: [0, -12, 0] }}
+              transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+              className="relative z-10"
+            >
+              <WeatherIcon
+                className={`h-36 w-36 ${weatherColor} drop-shadow-[0_8px_24px_rgba(250,204,21,0.4)]`}
+                strokeWidth={1.2}
+              />
+            </motion.div>
+
+            {/* Cloud 1 - large, right */}
+            <motion.div
+              animate={{ x: [0, 14, 0], y: [0, -4, 0] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute -right-4 top-6 z-20"
+            >
+              <Cloud className="h-20 w-20 text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.08)]" strokeWidth={1.2} fill="white" />
+            </motion.div>
+
+            {/* Cloud 2 - medium, left bottom */}
+            <motion.div
+              animate={{ x: [0, -10, 0], y: [0, 3, 0] }}
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute -left-6 bottom-2 z-20"
+            >
+              <Cloud className="h-14 w-14 text-white/80 drop-shadow-md" strokeWidth={1.2} fill="white" fillOpacity={0.85} />
+            </motion.div>
+
+            {/* Cloud 3 - small, top left */}
+            <motion.div
+              animate={{ x: [0, 8, 0] }}
+              transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute left-2 -top-2 z-5"
+            >
+              <Cloud className="h-10 w-10 text-white/50 drop-shadow-sm" strokeWidth={1} fill="white" fillOpacity={0.5} />
+            </motion.div>
+          </div>
+        </div>
+
+        {/* === FORECAST SECTION === */}
+        <div className="mt-auto pt-4">
+          <div className="grid grid-cols-6 gap-2">
             {weather.forecast.map((f, i) => {
               const FIcon = getWeatherInfo(f.code).icon;
               const fColor = getWeatherInfo(f.code).color;
               return (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.08 * i }}
-                  className="bg-white/25 backdrop-blur-sm rounded-2xl p-2 flex flex-col items-center gap-1 border border-white/30 hover:bg-white/40 hover:scale-105 transition-all duration-200 cursor-default"
+                  transition={{ delay: 0.1 * i, duration: 0.4 }}
+                  whileHover={{ scale: 1.08, y: -4 }}
+                  className="flex flex-col items-center gap-1.5 p-2.5 cursor-default transition-all duration-200"
+                  style={{
+                    background: "linear-gradient(135deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.12) 100%)",
+                    backdropFilter: "blur(12px)",
+                    WebkitBackdropFilter: "blur(12px)",
+                    borderRadius: 18,
+                    border: "1px solid rgba(255,255,255,0.35)",
+                    boxShadow: "0 4px 16px -4px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.3)",
+                  }}
                 >
-                  <span className="text-sky-800 text-[10px] font-bold tracking-wider">{f.day}</span>
-                  <FIcon className={`h-6 w-6 ${fColor}`} strokeWidth={1.5} />
-                  <span className="text-sky-900 text-xs font-bold">+{f.tempMax}°C</span>
+                  <span className="text-white/80 text-[10px] font-bold tracking-widest uppercase">{f.day}</span>
+                  <FIcon className={`h-7 w-7 ${fColor} drop-shadow-sm`} strokeWidth={1.5} />
+                  <span className="text-white text-sm font-bold drop-shadow-sm">+{f.tempMax}°C</span>
                   <div className="flex flex-col items-center gap-0.5 mt-0.5">
-                    <span className="text-sky-700/60 text-[7px] flex items-center gap-0.5">
-                      <Droplets className="h-2 w-2" /> {f.humidity}%
+                    <span className="text-white/55 text-[8px] font-medium flex items-center gap-0.5">
+                      <Droplets className="h-2.5 w-2.5" /> {f.humidity}%
                     </span>
-                    <span className="text-sky-700/60 text-[7px] flex items-center gap-0.5">
-                      <Wind className="h-2 w-2" /> {f.wind}km/h
+                    <span className="text-white/55 text-[8px] font-medium flex items-center gap-0.5">
+                      <Wind className="h-2.5 w-2.5" /> {f.wind}km/h
                     </span>
                   </div>
                 </motion.div>
