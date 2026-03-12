@@ -455,7 +455,7 @@ export default function ProductManagement() {
                       animate={{ rotate: [0, 10, -10, 0] }}
                       transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
                     >
-                      <Paintbrush className="h-8 w-8 sm:h-10 sm:w-10 text-green-600" />
+                      <img src={productActivityIcon} alt="Product Activity" className="h-10 w-10 sm:h-12 sm:w-12 object-contain" style={{ mixBlendMode: 'multiply' }} />
                     </motion.div>
                     <div className="flex flex-col">
                       <span>Product Activity</span>
