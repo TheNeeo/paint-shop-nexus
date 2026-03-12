@@ -354,7 +354,7 @@ export function WeatherWidget() {
 
         {/* Forecast Section */}
         <div className="mt-2">
-          <div className="flex gap-3 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+          <div className="flex justify-center gap-2.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
             {weather.forecast.map((f, i) => (
               <motion.div
                 key={i}
