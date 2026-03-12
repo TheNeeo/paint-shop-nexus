@@ -362,9 +362,10 @@ export function WeatherWidget() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.08 * i, duration: 0.35 }}
                 whileHover={{ scale: 1.06, y: -3 }}
-                className="flex-shrink-0 flex flex-col items-center gap-1 p-2.5 cursor-default"
+                className="flex-shrink-0 flex flex-col items-center gap-1 p-2 cursor-default"
                 style={{
-                  width: 110,
+                  width: 90,
+                  minHeight: 110,
                   background: "rgba(255,255,255,0.3)",
                   backdropFilter: "blur(12px)",
                   WebkitBackdropFilter: "blur(12px)",
