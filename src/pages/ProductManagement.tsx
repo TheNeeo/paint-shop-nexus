@@ -38,6 +38,7 @@ import { ProductFooter } from "@/components/product/ProductFooter";
 import { AddProductModal } from "@/components/inventory/AddProductModal";
 import AppLayout from "@/components/layout/AppLayout";
 import dashboardHomeIcon from "@/assets/dashboard-home-icon.png";
+import productActivityIcon from "@/assets/product-activity-icon.png";
 
 // Enhanced mock data with more detailed information
 const mockProducts = [
