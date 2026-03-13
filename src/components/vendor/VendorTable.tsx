@@ -115,20 +115,20 @@ export const VendorTable = forwardRef<{ fetchVendors: () => void }, VendorTableP
   const totalPages = Math.ceil(filteredVendors.length / itemsPerPage);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div className="bg-gradient-to-br from-purple-50/50 via-cyan-50/50 to-teal-50/50 rounded-lg shadow-sm border border-purple-200">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-gray-50">
-              <TableHead className="text-gray-700 font-semibold">S.No</TableHead>
-              <TableHead className="text-gray-700 font-semibold">Name</TableHead>
-              <TableHead className="text-gray-700 font-semibold">Phone No</TableHead>
-              <TableHead className="text-gray-700 font-semibold">GST No</TableHead>
-              <TableHead className="text-gray-700 font-semibold">Address</TableHead>
-              <TableHead className="text-gray-700 font-semibold">Contact Person</TableHead>
-              <TableHead className="text-gray-700 font-semibold">Email</TableHead>
-              <TableHead className="text-gray-700 font-semibold">Status</TableHead>
-              <TableHead className="text-gray-700 font-semibold">Actions</TableHead>
+            <TableRow className="bg-gradient-to-r from-purple-100 via-cyan-100 to-teal-100 border-b border-purple-200">
+              <TableHead className="text-purple-800 font-semibold">S.No</TableHead>
+              <TableHead className="text-purple-800 font-semibold">Name</TableHead>
+              <TableHead className="text-purple-800 font-semibold">Phone No</TableHead>
+              <TableHead className="text-purple-800 font-semibold">GST No</TableHead>
+              <TableHead className="text-purple-800 font-semibold">Address</TableHead>
+              <TableHead className="text-purple-800 font-semibold">Contact Person</TableHead>
+              <TableHead className="text-purple-800 font-semibold">Email</TableHead>
+              <TableHead className="text-purple-800 font-semibold">Status</TableHead>
+              <TableHead className="text-purple-800 font-semibold">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -136,14 +136,14 @@ export const VendorTable = forwardRef<{ fetchVendors: () => void }, VendorTableP
               <TableRow>
                 <TableCell colSpan={8} className="text-center py-8">
                   <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-600"></div>
-                    <span className="ml-2 text-gray-600">Loading vendors...</span>
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
+                    <span className="ml-2 text-purple-600">Loading vendors...</span>
                   </div>
                 </TableCell>
               </TableRow>
             ) : paginatedVendors.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8 text-gray-500">
+                <TableCell colSpan={8} className="text-center py-8 text-purple-500">
                   No vendors found
                 </TableCell>
               </TableRow>
@@ -151,21 +151,21 @@ export const VendorTable = forwardRef<{ fetchVendors: () => void }, VendorTableP
               paginatedVendors.map((vendor, index) => (
                 <TableRow
                   key={vendor.id}
-                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                  className="border-b border-purple-100 hover:bg-purple-50/50 transition-colors bg-white/60"
                 >
-                  <TableCell className="text-gray-900">
+                  <TableCell className="text-purple-900">
                     {(currentPage - 1) * itemsPerPage + index + 1}
                   </TableCell>
-                  <TableCell className="font-medium text-gray-900">
+                  <TableCell className="font-medium text-purple-900">
                     {vendor.name}
                   </TableCell>
-                  <TableCell className="text-gray-700">{vendor.phone || 'N/A'}</TableCell>
-                  <TableCell className="text-gray-700 font-mono text-sm">
+                  <TableCell className="text-purple-700">{vendor.phone || 'N/A'}</TableCell>
+                  <TableCell className="text-purple-700 font-mono text-sm">
                     {vendor.gst_number || 'N/A'}
                   </TableCell>
-                  <TableCell className="text-gray-700">{vendor.address || 'N/A'}</TableCell>
-                  <TableCell className="text-gray-700">{vendor.contact_person || 'N/A'}</TableCell>
-                  <TableCell className="text-gray-700">{vendor.email || 'N/A'}</TableCell>
+                  <TableCell className="text-purple-700">{vendor.address || 'N/A'}</TableCell>
+                  <TableCell className="text-purple-700">{vendor.contact_person || 'N/A'}</TableCell>
+                  <TableCell className="text-purple-700">{vendor.email || 'N/A'}</TableCell>
                   <TableCell>{getStatusBadge(vendor.status)}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
@@ -173,7 +173,7 @@ export const VendorTable = forwardRef<{ fetchVendors: () => void }, VendorTableP
                       variant="ghost"
                       size="sm"
                       onClick={() => handleView(vendor)}
-                      className="h-8 w-8 p-0 hover:bg-orange-50 hover:text-orange-600"
+                      className="h-8 w-8 p-0 hover:bg-cyan-50 hover:text-cyan-600"
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
@@ -181,7 +181,7 @@ export const VendorTable = forwardRef<{ fetchVendors: () => void }, VendorTableP
                       variant="ghost"
                       size="sm"
                       onClick={() => onEditVendor(vendor)}
-                      className="h-8 w-8 p-0 hover:bg-orange-50 hover:text-orange-600"
+                      className="h-8 w-8 p-0 hover:bg-purple-50 hover:text-purple-600"
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -203,8 +203,8 @@ export const VendorTable = forwardRef<{ fetchVendors: () => void }, VendorTableP
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
-        <div className="text-sm text-gray-600">
+      <div className="flex items-center justify-between px-6 py-4 border-t border-purple-200 bg-gradient-to-r from-purple-50/50 via-cyan-50/50 to-teal-50/50">
+        <div className="text-sm text-purple-700">
           Showing {paginatedVendors.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} to{" "}
           {Math.min(currentPage * itemsPerPage, filteredVendors.length)} of {filteredVendors.length} vendors
         </div>
@@ -214,12 +214,12 @@ export const VendorTable = forwardRef<{ fetchVendors: () => void }, VendorTableP
             size="sm"
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            className="border-gray-300 hover:bg-orange-50 hover:border-orange-400"
+            className="border-purple-300 hover:bg-purple-100 hover:border-purple-400 text-purple-700"
           >
             <ChevronLeft className="h-4 w-4" />
             Previous
           </Button>
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-purple-700">
             Page {currentPage} of {totalPages}
           </span>
           <Button
@@ -227,7 +227,7 @@ export const VendorTable = forwardRef<{ fetchVendors: () => void }, VendorTableP
             size="sm"
             onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
-            className="border-gray-300 hover:bg-orange-50 hover:border-orange-400"
+            className="border-purple-300 hover:bg-purple-100 hover:border-purple-400 text-purple-700"
           >
             Next
             <ChevronRight className="h-4 w-4" />

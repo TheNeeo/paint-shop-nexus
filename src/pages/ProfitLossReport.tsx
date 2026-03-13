@@ -1,370 +1,153 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
-import { RefreshCw, Download, Printer, TrendingUp, TrendingDown, DollarSign, Percent } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import { LineChart, Line, AreaChart, Area, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { RefreshCw, Download, TrendingUp, TrendingDown, DollarSign, Percent, BarChart3 } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import dashboardHomeIcon from "@/assets/smart-home-3d-icon-4.png";
+import profitLossIcon from "@/assets/profit-loss-report-icon.png";
 
-// Mock data for demonstration
-const mockProfitLossData = [
-  { date: "2025-01-01", description: "Sales - Paint Products", income: 5090, expense: 0, netAmount: 5090, remarks: "Retail Sales" },
-  { date: "2025-01-01", description: "Purchase - Raw Materials", income: 0, expense: 3000, netAmount: -3000, remarks: "Stock Purchase" },
-  { date: "2025-01-02", description: "Sales - Hardware", income: 7080, expense: 0, netAmount: 7080, remarks: "Wholesale Order" },
-  { date: "2025-01-03", description: "Rent Payment", income: 0, expense: 15000, netAmount: -15000, remarks: "Monthly Rent" },
-  { date: "2025-01-04", description: "Sales - Cement", income: 11800, expense: 0, netAmount: 11800, remarks: "Bulk Order" },
-  { date: "2025-01-05", description: "Utility Bills", income: 0, expense: 2500, netAmount: -2500, remarks: "Electricity & Water" },
-];
-
-const profitVsExpenseData = [
-  { month: "Jan", profit: 45000, expense: 30000 },
-  { month: "Feb", profit: 52000, expense: 33000 },
-  { month: "Mar", profit: 48000, expense: 32000 },
-  { month: "Apr", profit: 61000, expense: 38000 },
-  { month: "May", profit: 55000, expense: 35000 },
-  { month: "Jun", profit: 67000, expense: 40000 },
-];
-
-const monthlyProfitTrend = [
-  { month: "Jan", netProfit: 15000 },
-  { month: "Feb", netProfit: 19000 },
-  { month: "Mar", netProfit: 16000 },
-  { month: "Apr", netProfit: 23000 },
-  { month: "May", netProfit: 20000 },
-  { month: "Jun", netProfit: 27000 },
-];
-
-const profitComposition = [
-  { name: "Sales Revenue", value: 65, color: "hsl(6, 31%, 64%)" },
-  { name: "Service Income", value: 20, color: "hsl(6, 41%, 54%)" },
-  { name: "Other Income", value: 15, color: "hsl(6, 21%, 74%)" },
-];
+const THEME = {
+  primary: '#7a8a3a', primaryDark: '#525e28', primaryLight: '#BBCB64',
+  primaryLighter: '#dde6a8', primaryLightest: '#f0f3de', border: '#BBCB64',
+  gradientFrom: '#dde6a8', gradientMid: '#f0f3de', gradientTo: '#f7f9ee',
+};
 
 const ProfitLossReport = () => {
-  const [dateFrom, setDateFrom] = useState<Date>();
-  const [dateTo, setDateTo] = useState<Date>();
+  const navigate = useNavigate();
 
-  const totalIncome = mockProfitLossData.reduce((sum, item) => sum + item.income, 0);
-  const totalExpense = mockProfitLossData.reduce((sum, item) => sum + item.expense, 0);
-  const grossProfit = totalIncome - totalExpense;
-  const netProfitMargin = totalIncome > 0 ? ((grossProfit / totalIncome) * 100).toFixed(2) : "0.00";
+  const { data: stats } = useQuery({
+    queryKey: ["profit-loss-stats"],
+    queryFn: async () => {
+      const [salesRes, purchasesRes, expensesRes] = await Promise.all([
+        supabase.from("sales").select("total_amount, invoice_date"),
+        supabase.from("purchases").select("total_amount, purchase_date"),
+        supabase.from("expenses").select("amount, date"),
+      ]);
+      const sales = salesRes.data || [];
+      const purchases = purchasesRes.data || [];
+      const expenses = expensesRes.data || [];
+
+      const totalIncome = sales.reduce((s, r) => s + Number(r.total_amount), 0);
+      const totalPurchase = purchases.reduce((s, r) => s + Number(r.total_amount), 0);
+      const totalExpense = expenses.reduce((s, r) => s + Number(r.amount), 0);
+      const totalCost = totalPurchase + totalExpense;
+      const grossProfit = totalIncome - totalCost;
+      const margin = totalIncome > 0 ? ((grossProfit / totalIncome) * 100).toFixed(2) : "0.00";
+
+      // Monthly trend
+      const monthMap: Record<string, { income: number; cost: number }> = {};
+      sales.forEach((s) => { const m = new Date(s.invoice_date).toLocaleString("default", { month: "short" }); if (!monthMap[m]) monthMap[m] = { income: 0, cost: 0 }; monthMap[m].income += Number(s.total_amount); });
+      purchases.forEach((p) => { const m = new Date(p.purchase_date).toLocaleString("default", { month: "short" }); if (!monthMap[m]) monthMap[m] = { income: 0, cost: 0 }; monthMap[m].cost += Number(p.total_amount); });
+      expenses.forEach((e) => { const m = new Date(e.date).toLocaleString("default", { month: "short" }); if (!monthMap[m]) monthMap[m] = { income: 0, cost: 0 }; monthMap[m].cost += Number(e.amount); });
+
+      const trend = Object.entries(monthMap).map(([month, v]) => ({ month, income: v.income, expense: v.cost, profit: v.income - v.cost }));
+
+      // Transaction list
+      const transactions = [
+        ...sales.map((s) => ({ date: s.invoice_date, description: "Sales Revenue", income: Number(s.total_amount), expense: 0, net: Number(s.total_amount) })),
+        ...purchases.map((p) => ({ date: p.purchase_date, description: "Purchase", income: 0, expense: Number(p.total_amount), net: -Number(p.total_amount) })),
+        ...expenses.map((e) => ({ date: e.date, description: "Expense", income: 0, expense: Number(e.amount), net: -Number(e.amount) })),
+      ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+      return { totalIncome, totalCost, grossProfit, margin, trend, transactions };
+    },
+  });
+
+  const { totalIncome = 0, totalCost = 0, grossProfit = 0, margin = "0", trend = [], transactions = [] } = stats || {};
 
   return (
     <AppLayout>
-      <div className="min-h-screen p-6 space-y-6" style={{ backgroundColor: "hsl(6, 31%, 95%)" }}>
-        {/* Header */}
-        <div className="space-y-4">
+      <div className="min-h-screen p-6 space-y-6" style={{ background: `linear-gradient(to bottom right, ${THEME.primaryLightest}, ${THEME.primaryLighter}, #fff)` }}>
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="mb-3">
           <Breadcrumb>
             <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
-              </BreadcrumbItem>
+              <BreadcrumbItem><BreadcrumbLink onClick={() => navigate("/")} className="cursor-pointer flex items-center gap-1.5"><img src={dashboardHomeIcon} alt="Dashboard" className="h-5 w-5 object-contain" style={{ mixBlendMode: "multiply" }} /><span className="text-cyan-600 font-medium">Dashboard</span></BreadcrumbLink></BreadcrumbItem>
               <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink href="#">Reports & Analytics</BreadcrumbLink>
-              </BreadcrumbItem>
+              <BreadcrumbItem><BreadcrumbPage className="flex items-center gap-1.5"><BarChart3 className="h-4 w-4 text-orange-400" /><span className="text-orange-600 font-medium">Reports</span></BreadcrumbPage></BreadcrumbItem>
               <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Profit/Loss Report</BreadcrumbPage>
-              </BreadcrumbItem>
+              <BreadcrumbItem><BreadcrumbPage className="flex items-center gap-1.5"><img src={profitLossIcon} alt="P&L" className="h-5 w-5 object-contain" style={{ mixBlendMode: "multiply" }} /><span className="font-semibold" style={{ color: THEME.primary }}>Profit/Loss Report</span></BreadcrumbPage></BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
+        </motion.div>
 
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold" style={{ color: "hsl(6, 31%, 30%)" }}>Profit / Loss Report</h1>
-              <p className="text-muted-foreground">Analyze overall business profitability.</p>
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm">
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Refresh
-              </Button>
-              <Button variant="outline" size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-              <Button variant="outline" size="sm">
-                <Printer className="h-4 w-4 mr-2" />
-                Print
-              </Button>
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="rounded-3xl p-6 shadow-lg border-2 relative overflow-hidden" style={{ background: `linear-gradient(to right, ${THEME.gradientFrom}, ${THEME.gradientMid}, ${THEME.gradientTo})`, borderColor: THEME.border }}>
+          <div className="relative z-10 flex flex-col sm:flex-row sm:justify-between gap-4">
+            <div className="space-y-2">
+              <h1 className="text-2xl sm:text-4xl font-bold flex items-center gap-3" style={{ color: THEME.primaryDark }}>
+                <img src={profitLossIcon} alt="P&L" className="h-8 w-8 sm:h-10 sm:w-10 object-contain" /> Profit / Loss Report
+              </h1>
+              <p className="text-sm italic" style={{ color: THEME.primary }}>Analyze overall business profitability & trends</p>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Filter Controls */}
-        <Card style={{ borderColor: "hsl(6, 31%, 64%)", backgroundColor: "white" }}>
-          <CardHeader>
-            <CardTitle style={{ color: "hsl(6, 31%, 30%)" }}>Filter Controls</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Date From</label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start text-left font-normal">
-                      {dateFrom ? format(dateFrom, "PPP") : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar mode="single" selected={dateFrom} onSelect={setDateFrom} initialFocus className="pointer-events-auto" />
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Date To</label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start text-left font-normal">
-                      {dateTo ? format(dateTo, "PPP") : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar mode="single" selected={dateTo} onSelect={setDateTo} initialFocus className="pointer-events-auto" />
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Category</label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All Categories" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
-                    <SelectItem value="sales">Sales</SelectItem>
-                    <SelectItem value="purchase">Purchase</SelectItem>
-                    <SelectItem value="expense">Expense</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Customer / Vendor</label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All Parties" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Parties</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="flex gap-2 mt-4">
-              <Button style={{ backgroundColor: "hsl(6, 31%, 64%)", color: "white" }} className="hover:opacity-90">
-                Generate Report
-              </Button>
-              <Button variant="outline">Reset</Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Summary Cards */}
+        {/* Summary */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-rose-400 via-pink-400 to-red-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
-            <div className="relative z-10">
-              <h3 className="text-lg font-semibold text-white/90 mb-1">Total Revenue</h3>
-              <p className="text-2xl font-bold text-white">₹{totalIncome.toLocaleString()}</p>
+          {[
+            { title: "Total Revenue", value: `₹${totalIncome.toLocaleString()}`, icon: TrendingUp, gradient: "from-amber-400 via-yellow-400 to-orange-400" },
+            { title: "Total Costs", value: `₹${totalCost.toLocaleString()}`, icon: TrendingDown, gradient: "from-red-400 via-rose-400 to-pink-400" },
+            { title: "Gross Profit", value: `₹${grossProfit.toLocaleString()}`, icon: DollarSign, gradient: "from-emerald-400 via-green-400 to-teal-400" },
+            { title: "Net Profit Margin", value: `${margin}%`, icon: Percent, gradient: "from-violet-400 via-purple-400 to-indigo-400" },
+          ].map((card) => (
+            <div key={card.title} className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.gradient} p-6 min-h-[140px] shadow-lg`}>
+              <div className="relative z-10"><h3 className="text-lg font-semibold text-white/90 mb-1">{card.title}</h3><p className="text-2xl font-bold text-white">{card.value}</p></div>
+              <div className="absolute right-4 bottom-4 opacity-80"><card.icon className="h-16 w-16 text-white/40" strokeWidth={1.5} /></div>
             </div>
-            <div className="absolute right-4 bottom-4 opacity-80">
-              <TrendingUp className="h-16 w-16 text-white/40" strokeWidth={1.5} />
-            </div>
-          </div>
-
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-400 via-rose-500 to-pink-500 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
-            <div className="relative z-10">
-              <h3 className="text-lg font-semibold text-white/90 mb-1">Total Expenses</h3>
-              <p className="text-2xl font-bold text-white">₹{totalExpense.toLocaleString()}</p>
-            </div>
-            <div className="absolute right-4 bottom-4 opacity-80">
-              <TrendingDown className="h-16 w-16 text-white/40" strokeWidth={1.5} />
-            </div>
-          </div>
-
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-400 via-green-400 to-teal-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
-            <div className="relative z-10">
-              <h3 className="text-lg font-semibold text-white/90 mb-1">Gross Profit</h3>
-              <p className="text-2xl font-bold text-white">₹{grossProfit.toLocaleString()}</p>
-            </div>
-            <div className="absolute right-4 bottom-4 opacity-80">
-              <DollarSign className="h-16 w-16 text-white/40" strokeWidth={1.5} />
-            </div>
-          </div>
-
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-400 via-purple-400 to-indigo-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
-            <div className="relative z-10">
-              <h3 className="text-lg font-semibold text-white/90 mb-1">Net Profit Margin</h3>
-              <p className="text-2xl font-bold text-white">{netProfitMargin}%</p>
-            </div>
-            <div className="absolute right-4 bottom-4 opacity-80">
-              <Percent className="h-16 w-16 text-white/40" strokeWidth={1.5} />
-            </div>
-          </div>
+          ))}
         </div>
 
-        {/* Report Table */}
-        <Card style={{ borderColor: "hsl(6, 31%, 64%)", backgroundColor: "white" }}>
-          <CardHeader>
-            <CardTitle style={{ color: "hsl(6, 31%, 30%)" }}>Profit & Loss Transactions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow style={{ borderColor: "hsl(6, 31%, 70%)" }}>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead className="text-right">Income</TableHead>
-                    <TableHead className="text-right">Expense</TableHead>
-                    <TableHead className="text-right">Net Amount</TableHead>
-                    <TableHead>Remarks</TableHead>
+        {/* Chart */}
+        {trend.length > 0 && (
+          <Card className="border-2" style={{ borderColor: THEME.primaryLight }}>
+            <CardHeader><CardTitle style={{ color: THEME.primaryDark }}>Revenue vs Expenses</CardTitle></CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={trend}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="month" /><YAxis /><Tooltip /><Legend /><Bar dataKey="income" fill="#7a8a3a" name="Revenue (₹)" /><Bar dataKey="expense" fill="#e74c3c" name="Expenses (₹)" /></BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Transactions */}
+        <div className="bg-white rounded-xl border-2 shadow-lg overflow-hidden" style={{ borderColor: THEME.primaryLight }}>
+          <div className="p-4 border-b-2" style={{ background: `linear-gradient(to right, ${THEME.gradientFrom}, ${THEME.gradientMid})`, borderColor: THEME.primaryLight }}>
+            <h2 className="text-lg font-semibold" style={{ color: THEME.primaryDark }}>Profit & Loss Transactions</h2>
+          </div>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow style={{ backgroundColor: THEME.primaryLightest }}>
+                  <TableHead style={{ color: THEME.primaryDark }}>Date</TableHead>
+                  <TableHead style={{ color: THEME.primaryDark }}>Description</TableHead>
+                  <TableHead className="text-right" style={{ color: THEME.primaryDark }}>Income</TableHead>
+                  <TableHead className="text-right" style={{ color: THEME.primaryDark }}>Expense</TableHead>
+                  <TableHead className="text-right" style={{ color: THEME.primaryDark }}>Net Amount</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {transactions.length === 0 ? (
+                  <TableRow><TableCell colSpan={5} className="text-center py-8 text-gray-500">No data found</TableCell></TableRow>
+                ) : transactions.slice(0, 50).map((t, i) => (
+                  <TableRow key={i} className="hover:bg-yellow-50/30">
+                    <TableCell>{t.date}</TableCell>
+                    <TableCell>{t.description}</TableCell>
+                    <TableCell className="text-right">{t.income > 0 ? <span className="text-green-600 font-medium">₹{t.income.toLocaleString()}</span> : "-"}</TableCell>
+                    <TableCell className="text-right">{t.expense > 0 ? <span className="text-red-600 font-medium">₹{t.expense.toLocaleString()}</span> : "-"}</TableCell>
+                    <TableCell className={`text-right font-bold ${t.net >= 0 ? "text-green-700" : "text-red-700"}`}>₹{t.net.toLocaleString()}</TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mockProfitLossData.map((row, idx) => (
-                    <TableRow key={idx} style={{ borderColor: "hsl(6, 31%, 85%)" }}>
-                      <TableCell>{row.date}</TableCell>
-                      <TableCell className="font-medium">{row.description}</TableCell>
-                      <TableCell className="text-right" style={{ color: row.income > 0 ? "hsl(142, 76%, 36%)" : "inherit" }}>
-                        {row.income > 0 ? `₹${row.income.toLocaleString()}` : "-"}
-                      </TableCell>
-                      <TableCell className="text-right" style={{ color: row.expense > 0 ? "hsl(0, 84%, 60%)" : "inherit" }}>
-                        {row.expense > 0 ? `₹${row.expense.toLocaleString()}` : "-"}
-                      </TableCell>
-                      <TableCell className="text-right font-semibold" style={{ color: row.netAmount >= 0 ? "hsl(142, 76%, 36%)" : "hsl(0, 84%, 60%)" }}>
-                        ₹{row.netAmount.toLocaleString()}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">{row.remarks}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-
-            <div className="mt-4">
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious href="#" />
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationLink href="#" isActive>1</PaginationLink>
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationLink href="#">2</PaginationLink>
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationLink href="#">3</PaginationLink>
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationNext href="#" />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Profit vs Expense Area Chart */}
-          <Card style={{ borderColor: "hsl(6, 31%, 64%)", backgroundColor: "white" }}>
-            <CardHeader>
-              <CardTitle style={{ color: "hsl(6, 31%, 30%)" }}>Profit vs Expense</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={profitVsExpenseData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(6, 31%, 85%)" />
-                  <XAxis dataKey="month" stroke="hsl(6, 31%, 40%)" />
-                  <YAxis stroke="hsl(6, 31%, 40%)" />
-                  <Tooltip />
-                  <Legend />
-                  <Area type="monotone" dataKey="profit" stackId="1" stroke="hsl(142, 76%, 36%)" fill="hsl(142, 76%, 80%)" name="Profit (₹)" />
-                  <Area type="monotone" dataKey="expense" stackId="2" stroke="hsl(0, 84%, 60%)" fill="hsl(0, 84%, 85%)" name="Expense (₹)" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* Monthly Profit Trend Line Chart */}
-          <Card style={{ borderColor: "hsl(6, 31%, 64%)", backgroundColor: "white" }}>
-            <CardHeader>
-              <CardTitle style={{ color: "hsl(6, 31%, 30%)" }}>Monthly Profit Trend</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={monthlyProfitTrend}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(6, 31%, 85%)" />
-                  <XAxis dataKey="month" stroke="hsl(6, 31%, 40%)" />
-                  <YAxis stroke="hsl(6, 31%, 40%)" />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="netProfit" stroke="hsl(6, 31%, 64%)" strokeWidth={2} name="Net Profit (₹)" />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </div>
-
-        {/* Profit Composition Pie Chart */}
-        <Card style={{ borderColor: "hsl(6, 31%, 64%)", backgroundColor: "white" }}>
-          <CardHeader>
-            <CardTitle style={{ color: "hsl(6, 31%, 30%)" }}>Profit Composition</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={profitComposition}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {profitComposition.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Footer */}
-        <Card style={{ borderColor: "hsl(6, 31%, 64%)", backgroundColor: "white" }}>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-lg font-semibold" style={{ color: grossProfit >= 0 ? "hsl(142, 76%, 36%)" : "hsl(0, 84%, 60%)" }}>
-                  Net Profit/Loss Summary: ₹{grossProfit.toLocaleString()}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Generated On: {new Date().toLocaleString()}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </AppLayout>
   );

@@ -6,6 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Search, Filter, X } from 'lucide-react';
 import { CustomerHistoryFilters as FilterType } from '@/pages/CustomerHistory';
 
+// Ash Grey theme colors
+const THEME_PRIMARY = "#6B7B65"; // Dark Ash Grey
+const THEME_BORDER = "#B6C2AE"; // Ash Grey border
+const THEME_TEXT = "#4A5746"; // Dark text for Ash Grey
+
 interface CustomerHistoryFiltersProps {
   filters: FilterType;
   setFilters: React.Dispatch<React.SetStateAction<FilterType>>;
@@ -25,26 +30,26 @@ export const CustomerHistoryFilters: React.FC<CustomerHistoryFiltersProps> = ({ 
     <Card 
       className="shadow-lg mb-6"
       style={{
-        background: 'linear-gradient(135deg, rgba(14, 172, 221, 0.05) 0%, rgba(14, 172, 221, 0.1) 100%)',
-        borderColor: '#0EACDD'
+        background: 'linear-gradient(135deg, rgba(182, 194, 174, 0.15) 0%, rgba(182, 194, 174, 0.25) 100%)',
+        borderColor: THEME_BORDER
       }}
     >
       <CardContent className="p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Filter className="h-5 w-5" style={{ color: '#0EACDD' }} />
-          <h3 className="text-lg font-semibold" style={{ color: '#087A9E' }}>Search & Filters</h3>
+          <Filter className="h-5 w-5" style={{ color: THEME_PRIMARY }} />
+          <h3 className="text-lg font-semibold" style={{ color: THEME_TEXT }}>Search & Filters</h3>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Search Input */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" style={{ color: '#0EACDD' }} />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" style={{ color: THEME_PRIMARY }} />
             <Input
               placeholder="Search by Name / Mobile / Email"
               value={filters.searchTerm}
               onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
               className="pl-10 bg-white"
-              style={{ borderColor: '#0EACDD', color: '#087A9E' }}
+              style={{ borderColor: THEME_BORDER, color: THEME_TEXT }}
             />
           </div>
 
@@ -55,10 +60,10 @@ export const CustomerHistoryFilters: React.FC<CustomerHistoryFiltersProps> = ({ 
               setFilters(prev => ({ ...prev, dateRange: value }))
             }
           >
-            <SelectTrigger className="bg-white" style={{ borderColor: '#0EACDD', color: '#087A9E' }}>
+            <SelectTrigger className="bg-white" style={{ borderColor: THEME_BORDER, color: THEME_TEXT }}>
               <SelectValue placeholder="Date Range" />
             </SelectTrigger>
-            <SelectContent className="bg-white" style={{ borderColor: '#0EACDD' }}>
+            <SelectContent className="bg-white" style={{ borderColor: THEME_BORDER }}>
               <SelectItem value="all">All Time</SelectItem>
               <SelectItem value="30days">Last 30 Days</SelectItem>
               <SelectItem value="90days">Last 90 Days</SelectItem>
@@ -73,10 +78,10 @@ export const CustomerHistoryFilters: React.FC<CustomerHistoryFiltersProps> = ({ 
               setFilters(prev => ({ ...prev, customerType: value }))
             }
           >
-            <SelectTrigger className="bg-white" style={{ borderColor: '#0EACDD', color: '#087A9E' }}>
+            <SelectTrigger className="bg-white" style={{ borderColor: THEME_BORDER, color: THEME_TEXT }}>
               <SelectValue placeholder="Customer Type" />
             </SelectTrigger>
-            <SelectContent className="bg-white" style={{ borderColor: '#0EACDD' }}>
+            <SelectContent className="bg-white" style={{ borderColor: THEME_BORDER }}>
               <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="retail">Retail</SelectItem>
               <SelectItem value="wholesale">Wholesale</SelectItem>
@@ -90,10 +95,10 @@ export const CustomerHistoryFilters: React.FC<CustomerHistoryFiltersProps> = ({ 
               setFilters(prev => ({ ...prev, outstandingAmount: value }))
             }
           >
-            <SelectTrigger className="bg-white" style={{ borderColor: '#0EACDD', color: '#087A9E' }}>
+            <SelectTrigger className="bg-white" style={{ borderColor: THEME_BORDER, color: THEME_TEXT }}>
               <SelectValue placeholder="Outstanding Amount" />
             </SelectTrigger>
-            <SelectContent className="bg-white" style={{ borderColor: '#0EACDD' }}>
+            <SelectContent className="bg-white" style={{ borderColor: THEME_BORDER }}>
               <SelectItem value="all">All Amounts</SelectItem>
               <SelectItem value="zero">Zero Outstanding</SelectItem>
               <SelectItem value="low">Low (₹1-₹10k)</SelectItem>
@@ -107,7 +112,7 @@ export const CustomerHistoryFilters: React.FC<CustomerHistoryFiltersProps> = ({ 
             variant="outline"
             onClick={clearFilters}
             className="hover:bg-white/50"
-            style={{ borderColor: '#0EACDD', color: '#0EACDD' }}
+            style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}
           >
             <X className="h-4 w-4 mr-2" />
             Clear Filters

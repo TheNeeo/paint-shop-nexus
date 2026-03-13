@@ -1,10 +1,9 @@
 
 import React, { useState } from "react";
 import { Sidebar } from "./Sidebar";
-import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { FloatingActionButton } from "./FloatingActionButton";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -12,7 +11,6 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   const [collapsed, setCollapsed] = useState(false);
-  const { signOut, user } = useAuth();
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
@@ -39,24 +37,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
       {/* Main content */}
       <main className="flex-1 overflow-auto bg-gray-50">
-        {/* User info and logout button */}
-        <div className="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center">
-          <div className="text-sm text-muted-foreground">
-            Welcome back, <span className="font-medium text-foreground">{user?.email}</span>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={signOut}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign Out
-          </Button>
-        </div>
-        
         <div className="container mx-auto p-6">{children}</div>
       </main>
+      <FloatingActionButton />
     </div>
   );
 }

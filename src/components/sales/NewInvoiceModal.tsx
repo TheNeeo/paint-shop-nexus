@@ -1,10 +1,7 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
+  Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +13,8 @@ import { Plus, Download, Save } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ProductLineForm } from "./ProductLineForm";
 import { NewProductModal } from "./NewProductModal";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface NewInvoiceModalProps {
   isOpen: boolean;
@@ -36,6 +35,7 @@ interface ProductLine {
 export function NewInvoiceModal({ isOpen, onClose }: NewInvoiceModalProps) {
   const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().split('T')[0]);
   const [customerName, setCustomerName] = useState("");
+  const [customerId, setCustomerId] = useState("");
   const [productLines, setProductLines] = useState<ProductLine[]>([]);
   const [discount, setDiscount] = useState(0);
   const [isGstInclusive, setIsGstInclusive] = useState(false);
@@ -44,6 +44,15 @@ export function NewInvoiceModal({ isOpen, onClose }: NewInvoiceModalProps) {
   const [paidAmount, setPaidAmount] = useState(0);
   const [showProductLineForm, setShowProductLineForm] = useState(false);
   const [showNewProductModal, setShowNewProductModal] = useState(false);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      supabase.from('customers').select('id, name').eq('status', 'active').order('name')
+        .then(({ data }) => setCustomers(data || []));
+    }
+  }, [isOpen]);
 
   const addProductLine = (productLine: ProductLine) => {
     setProductLines([...productLines, productLine]);
@@ -56,47 +65,113 @@ export function NewInvoiceModal({ isOpen, onClose }: NewInvoiceModalProps) {
 
   const handleNewProductCreated = (product: any) => {
     console.log("New product created:", product);
-    // You can add logic here to refresh the product list or add the new product to invoice
   };
 
-  const subtotal = productLines.reduce((sum, line) => {
-    const baseAmount = line.quantity * line.rate;
-    return sum + (isGstInclusive ? baseAmount : baseAmount);
-  }, 0);
-
-  const totalGst = productLines.reduce((sum, line) => {
-    const baseAmount = line.quantity * line.rate;
-    return sum + (baseAmount * line.gstPercent / 100);
-  }, 0);
-
+  const subtotal = productLines.reduce((sum, line) => sum + (line.quantity * line.rate), 0);
+  const totalGst = productLines.reduce((sum, line) => sum + (line.quantity * line.rate * line.gstPercent / 100), 0);
   const discountAmount = (subtotal * discount) / 100;
   const grandTotal = isGstInclusive ? subtotal - discountAmount : subtotal + totalGst - discountAmount;
   const pendingAmount = grandTotal - paidAmount;
 
-  const handleSaveInvoice = () => {
-    const invoiceData = {
-      invoiceDate,
-      customerName,
-      productLines,
-      subtotal,
-      totalGst,
-      discount,
-      discountAmount,
-      grandTotal,
-      paidAmount,
-      pendingAmount,
-      paymentMode,
-      isGstInclusive,
-      notes,
-    };
-    
-    console.log("Saving invoice...", invoiceData);
-    onClose();
+  const handleSaveInvoice = async () => {
+    if (!customerName && !customerId) {
+      toast.error("Please select a customer");
+      return;
+    }
+    if (productLines.length === 0) {
+      toast.error("Please add at least one product");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const invoiceNumber = `INV-${Date.now().toString().slice(-8)}`;
+      const paymentStatus = paidAmount >= grandTotal ? 'paid' : paidAmount > 0 ? 'partial' : 'pending';
+
+      const { data: sale, error: saleError } = await supabase
+        .from('sales')
+        .insert([{
+          invoice_number: invoiceNumber,
+          invoice_date: invoiceDate,
+          customer_id: customerId || null,
+          customer_name: customers.find(c => c.id === customerId)?.name || customerName,
+          subtotal,
+          tax_amount: totalGst,
+          discount_amount: discountAmount,
+          total_amount: grandTotal,
+          paid_amount: paidAmount,
+          pending_amount: pendingAmount,
+          payment_mode: paymentMode || null,
+          payment_status: paymentStatus,
+          is_gst_inclusive: isGstInclusive,
+          notes: notes || null,
+          created_by_user_id: user.id,
+        }])
+        .select()
+        .single();
+
+      if (saleError) throw saleError;
+
+      // Insert sale items
+      const saleItems = productLines.map(line => ({
+        sale_id: sale!.id,
+        product_name: line.productName,
+        hsn_code: line.hsnCode,
+        quantity: line.quantity,
+        unit: line.unit,
+        rate: line.rate,
+        gst_percent: line.gstPercent,
+        amount: line.amount,
+      }));
+
+      const { error: itemsError } = await supabase.from('sale_items').insert(saleItems);
+      if (itemsError) throw itemsError;
+
+      // Decrease inventory stock for each product sold
+      for (const line of productLines) {
+        const { data: product } = await supabase
+          .from('products')
+          .select('id, current_stock')
+          .eq('name', line.productName)
+          .maybeSingle();
+
+        if (product) {
+          await supabase.from('products')
+            .update({ current_stock: Math.max(0, Number(product.current_stock) - line.quantity) })
+            .eq('id', product.id);
+        }
+      }
+
+      // Update customer total_sales
+      if (customerId) {
+        const { data: cust } = await supabase.from('customers').select('total_sales').eq('id', customerId).single();
+        if (cust) {
+          await supabase.from('customers').update({ total_sales: Number(cust.total_sales) + grandTotal }).eq('id', customerId);
+        }
+      }
+
+      toast.success(`Invoice ${invoiceNumber} created successfully!`);
+      onClose();
+      resetForm();
+    } catch (err: any) {
+      console.error("Error saving invoice:", err);
+      toast.error(err.message || "Failed to save invoice");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleSaveAndPrint = () => {
-    handleSaveInvoice();
-    console.log("Generating PDF...");
+  const resetForm = () => {
+    setProductLines([]);
+    setCustomerName("");
+    setCustomerId("");
+    setDiscount(0);
+    setPaidAmount(0);
+    setPaymentMode("");
+    setNotes("");
   };
 
   return (
@@ -108,71 +183,47 @@ export function NewInvoiceModal({ isOpen, onClose }: NewInvoiceModalProps) {
           </DialogHeader>
 
           <div className="space-y-6">
-            {/* Invoice Header */}
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <Label className="text-black font-semibold">Invoice Date</Label>
-                <Input
-                  type="date"
-                  value={invoiceDate}
-                  onChange={(e) => setInvoiceDate(e.target.value)}
-                  className="bg-white border-gray-300"
-                />
+                <Input type="date" value={invoiceDate} onChange={(e) => setInvoiceDate(e.target.value)} className="bg-white border-gray-300" />
               </div>
               <div>
                 <Label className="text-black font-semibold">Customer Name</Label>
-                <Select value={customerName} onValueChange={setCustomerName}>
+                <Select value={customerId} onValueChange={(val) => { setCustomerId(val); setCustomerName(''); }}>
                   <SelectTrigger className="bg-white border-gray-300">
-                    <SelectValue placeholder="Select or Add Customer" />
+                    <SelectValue placeholder="Select Customer" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="john-doe">John Doe</SelectItem>
-                    <SelectItem value="jane-smith">Jane Smith</SelectItem>
-                    <SelectItem value="bob-johnson">Bob Johnson</SelectItem>
-                    <SelectItem value="add-new">+ Add New Customer</SelectItem>
+                    {customers.map(c => (
+                      <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
-            {/* Product Lines Section */}
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <Label className="text-black font-semibold text-lg">Product Details</Label>
                 <div className="flex gap-2">
-                  <Button 
-                    onClick={() => setShowNewProductModal(true)} 
-                    size="sm" 
-                    variant="outline"
-                    className="border-green-500 text-green-600 hover:bg-green-50"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    New Product
+                  <Button onClick={() => setShowNewProductModal(true)} size="sm" variant="outline" className="border-green-500 text-green-600 hover:bg-green-50">
+                    <Plus className="h-4 w-4 mr-2" /> New Product
                   </Button>
-                  <Button 
-                    onClick={() => setShowProductLineForm(true)} 
-                    size="sm" 
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Product Line
+                  <Button onClick={() => setShowProductLineForm(true)} size="sm" className="bg-blue-600 hover:bg-blue-700">
+                    <Plus className="h-4 w-4 mr-2" /> Add Product Line
                   </Button>
                 </div>
               </div>
 
-              {/* Show Product Line Form */}
               {showProductLineForm && (
-                <ProductLineForm
-                  onAddProduct={addProductLine}
-                  onCancel={() => setShowProductLineForm(false)}
-                />
+                <ProductLineForm onAddProduct={addProductLine} onCancel={() => setShowProductLineForm(false)} />
               )}
 
-              {/* Product Table Header */}
               {productLines.length > 0 && (
                 <div className="grid grid-cols-12 gap-2 p-3 bg-gray-100 rounded-lg font-semibold text-sm text-gray-700">
-                  <div className="col-span-2">Product Name</div>
-                  <div className="col-span-1">HSN Code</div>
+                  <div className="col-span-3">Product Name</div>
+                  <div className="col-span-1">HSN</div>
                   <div className="col-span-1">Qty</div>
                   <div className="col-span-1">Unit</div>
                   <div className="col-span-2">Rate (₹)</div>
@@ -182,104 +233,52 @@ export function NewInvoiceModal({ isOpen, onClose }: NewInvoiceModalProps) {
                 </div>
               )}
 
-              {/* Product Lines */}
               {productLines.map((line) => (
                 <div key={line.id} className="grid grid-cols-12 gap-2 p-3 border rounded-lg bg-green-50 border-green-200">
-                  <div className="col-span-2 flex items-center">
-                    <span className="text-sm font-medium">{line.productName}</span>
-                  </div>
-                  <div className="col-span-1 flex items-center">
-                    <span className="text-sm">{line.hsnCode}</span>
-                  </div>
-                  <div className="col-span-1 flex items-center">
-                    <span className="text-sm">{line.quantity}</span>
-                  </div>
-                  <div className="col-span-1 flex items-center">
-                    <span className="text-sm">{line.unit}</span>
-                  </div>
-                  <div className="col-span-2 flex items-center">
-                    <span className="text-sm">₹{line.rate.toFixed(2)}</span>
-                  </div>
-                  <div className="col-span-1 flex items-center">
-                    <span className="text-sm">{line.gstPercent}%</span>
-                  </div>
-                  <div className="col-span-2 flex items-center">
-                    <span className="text-sm font-semibold">₹{line.amount.toFixed(2)}</span>
-                  </div>
+                  <div className="col-span-3 flex items-center"><span className="text-sm font-medium">{line.productName}</span></div>
+                  <div className="col-span-1 flex items-center"><span className="text-sm">{line.hsnCode}</span></div>
+                  <div className="col-span-1 flex items-center"><span className="text-sm">{line.quantity}</span></div>
+                  <div className="col-span-1 flex items-center"><span className="text-sm">{line.unit}</span></div>
+                  <div className="col-span-2 flex items-center"><span className="text-sm">₹{line.rate.toFixed(2)}</span></div>
+                  <div className="col-span-1 flex items-center"><span className="text-sm">{line.gstPercent}%</span></div>
+                  <div className="col-span-2 flex items-center"><span className="text-sm font-semibold">₹{line.amount.toFixed(2)}</span></div>
                   <div className="col-span-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => removeProductLine(line.id)}
-                      className="text-red-600 border-red-300 hover:bg-red-50"
-                    >
-                      Remove
-                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => removeProductLine(line.id)} className="text-red-600 border-red-300 hover:bg-red-50">Remove</Button>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Tax Settings and Calculations */}
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-coral-50 border border-coral-200 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-gray-50 border rounded-lg">
                   <div>
                     <Label className="text-black font-semibold">Tax Inclusive/Exclusive</Label>
-                    <p className="text-sm text-gray-600">
-                      {isGstInclusive ? "Prices include GST" : "GST will be added to prices"}
-                    </p>
+                    <p className="text-sm text-gray-600">{isGstInclusive ? "Prices include GST" : "GST added to prices"}</p>
                   </div>
-                  <Switch
-                    checked={isGstInclusive}
-                    onCheckedChange={setIsGstInclusive}
-                  />
+                  <Switch checked={isGstInclusive} onCheckedChange={setIsGstInclusive} />
                 </div>
-                
                 <div>
                   <Label className="text-black font-semibold">Discount (%)</Label>
-                  <Input
-                    type="number"
-                    value={discount}
-                    onChange={(e) => setDiscount(Number(e.target.value))}
-                    className="bg-white border-gray-300"
-                  />
+                  <Input type="number" value={discount} onChange={(e) => setDiscount(Number(e.target.value))} className="bg-white border-gray-300" />
                 </div>
               </div>
-
               <div className="space-y-3 bg-green-50 p-4 rounded-lg border border-green-200">
                 <h3 className="font-semibold text-green-800">Invoice Summary</h3>
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span>Subtotal:</span>
-                    <span>₹{subtotal.toFixed(2)}</span>
-                  </div>
-                  {!isGstInclusive && (
-                    <div className="flex justify-between">
-                      <span>GST:</span>
-                      <span>₹{totalGst.toFixed(2)}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between">
-                    <span>Discount:</span>
-                    <span>-₹{discountAmount.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between font-bold text-lg border-t border-green-300 pt-2">
-                    <span>Grand Total:</span>
-                    <span>₹{grandTotal.toFixed(2)}</span>
-                  </div>
+                  <div className="flex justify-between"><span>Subtotal:</span><span>₹{subtotal.toFixed(2)}</span></div>
+                  {!isGstInclusive && <div className="flex justify-between"><span>GST:</span><span>₹{totalGst.toFixed(2)}</span></div>}
+                  <div className="flex justify-between"><span>Discount:</span><span>-₹{discountAmount.toFixed(2)}</span></div>
+                  <div className="flex justify-between font-bold text-lg border-t border-green-300 pt-2"><span>Grand Total:</span><span>₹{grandTotal.toFixed(2)}</span></div>
                 </div>
               </div>
             </div>
 
-            {/* Payment Information */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label className="text-black font-semibold">Payment Mode</Label>
                 <Select value={paymentMode} onValueChange={setPaymentMode}>
-                  <SelectTrigger className="bg-white border-gray-300">
-                    <SelectValue placeholder="Select Payment Mode" />
-                  </SelectTrigger>
+                  <SelectTrigger className="bg-white border-gray-300"><SelectValue placeholder="Select Payment Mode" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="cash">Cash</SelectItem>
                     <SelectItem value="upi">UPI</SelectItem>
@@ -291,69 +290,32 @@ export function NewInvoiceModal({ isOpen, onClose }: NewInvoiceModalProps) {
               </div>
               <div>
                 <Label className="text-black font-semibold">Paid Amount</Label>
-                <Input
-                  type="number"
-                  value={paidAmount}
-                  onChange={(e) => setPaidAmount(Number(e.target.value))}
-                  className="bg-white border-gray-300"
-                />
+                <Input type="number" value={paidAmount} onChange={(e) => setPaidAmount(Number(e.target.value))} className="bg-white border-gray-300" />
               </div>
             </div>
 
             {pendingAmount > 0 && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
-                    Pending Amount: ₹{pendingAmount.toFixed(2)}
-                  </Badge>
-                </div>
+                <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">Pending: ₹{pendingAmount.toFixed(2)}</Badge>
               </div>
             )}
 
-            {/* Notes */}
             <div>
               <Label className="text-black font-semibold">Notes (Optional)</Label>
-              <Textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Add any additional notes, terms & conditions..."
-                className="bg-white border-gray-300"
-                rows={3}
-              />
+              <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Additional notes..." className="bg-white border-gray-300" rows={3} />
             </div>
 
-            {/* Signature & Stamp Section */}
-            <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
-              <Label className="text-black font-semibold">Signature & Stamp</Label>
-              <div className="mt-2 p-6 border-2 border-dashed border-gray-300 rounded-lg text-center text-gray-500">
-                <p>Signature and company stamp will be automatically added to PDF</p>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
             <div className="flex justify-end gap-4 pt-4 border-t">
-              <Button variant="outline" onClick={onClose} className="border-gray-300 hover:bg-gray-50">
-                Cancel
-              </Button>
-              <Button onClick={handleSaveInvoice} className="bg-blue-600 hover:bg-blue-700">
-                <Save className="h-4 w-4 mr-2" />
-                Save Invoice
-              </Button>
-              <Button onClick={handleSaveAndPrint} className="bg-green-600 hover:bg-green-700">
-                <Download className="h-4 w-4 mr-2" />
-                Save & Download PDF
+              <Button variant="outline" onClick={onClose} className="border-gray-300 hover:bg-gray-50">Cancel</Button>
+              <Button onClick={handleSaveInvoice} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
+                <Save className="h-4 w-4 mr-2" /> {saving ? 'Saving...' : 'Save Invoice'}
               </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* New Product Modal */}
-      <NewProductModal
-        isOpen={showNewProductModal}
-        onClose={() => setShowNewProductModal(false)}
-        onProductCreated={handleNewProductCreated}
-      />
+      <NewProductModal isOpen={showNewProductModal} onClose={() => setShowNewProductModal(false)} onProductCreated={handleNewProductCreated} />
     </>
   );
 }

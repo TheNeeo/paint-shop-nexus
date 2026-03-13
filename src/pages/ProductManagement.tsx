@@ -1,10 +1,17 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -17,11 +24,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   Plus,
   Download,
-  Home,
   Zap,
   Package,
   RefreshCw,
   Paintbrush,
+  Activity,
 } from "lucide-react";
 import { ProductStats } from "@/components/product/ProductStats";
 import { ProductFilters } from "@/components/product/ProductFilters";
@@ -30,6 +37,76 @@ import { BulkActions } from "@/components/product/BulkActions";
 import { ProductFooter } from "@/components/product/ProductFooter";
 import { AddProductModal } from "@/components/inventory/AddProductModal";
 import AppLayout from "@/components/layout/AppLayout";
+import dashboardHomeIcon from "@/assets/dashboard-home-icon.png";
+import productActivityIcon from "@/assets/product-activity-icon.png";
+
+// Enhanced mock data with more detailed information
+const mockProducts = [
+  {
+    id: "1",
+    name: "Premium Paint Brush Set",
+    category: "Tools",
+    unit: "Set",
+    unitPrice: 29.99,
+    stockQuantity: 45,
+    image: "/placeholder.svg",
+    baseCode: "PB001",
+    description: "High-quality brush set for professional painting",
+    dateAdded: "2024-01-15",
+    featured: true,
+    rating: 4.8,
+    totalSales: 150,
+    lastSold: "2024-01-10",
+    supplier: "ArtCraft Inc.",
+    variants: [
+      { id: "1a", name: "Small Brush Set", unitPrice: 19.99, stockQuantity: 25, sku: "PB001-S" },
+      { id: "1b", name: "Medium Brush Set", unitPrice: 24.99, stockQuantity: 15, sku: "PB001-M" },
+      { id: "1c", name: "Large Brush Set", unitPrice: 34.99, stockQuantity: 5, sku: "PB001-L" },
+    ],
+  },
+  {
+    id: "2",
+    name: "Acrylic Paint Collection",
+    category: "Paint",
+    unit: "Bottle",
+    unitPrice: 12.50,
+    stockQuantity: 120,
+    image: "/placeholder.svg",
+    baseCode: "AP002",
+    description: "Vibrant acrylic paint collection with 24 colors",
+    dateAdded: "2024-01-10",
+    featured: false,
+    rating: 4.6,
+    totalSales: 230,
+    lastSold: "2024-01-12",
+    supplier: "ColorMax Ltd.",
+    variants: [
+      { id: "2a", name: "Basic Colors (12pc)", unitPrice: 8.99, stockQuantity: 80, sku: "AP002-B" },
+      { id: "2b", name: "Premium Colors (24pc)", unitPrice: 16.99, stockQuantity: 40, sku: "AP002-P" },
+    ],
+  },
+  {
+    id: "3",
+    name: "Canvas Pack",
+    category: "Canvas",
+    unit: "Pack",
+    unitPrice: 15.75,
+    stockQuantity: 8,
+    image: "/placeholder.svg",
+    baseCode: "CP003",
+    description: "Professional grade canvas pack for artists",
+    dateAdded: "2024-01-08",
+    featured: true,
+    rating: 4.9,
+    totalSales: 89,
+    lastSold: "2024-01-11",
+    supplier: "Canvas Pro",
+    variants: [
+      { id: "3a", name: "Small Canvas (8x10)", unitPrice: 12.99, stockQuantity: 5, sku: "CP003-S" },
+      { id: "3b", name: "Large Canvas (16x20)", unitPrice: 18.99, stockQuantity: 3, sku: "CP003-L" },
+    ],
+  },
+];
 
 const categories = ["All", "Tools", "Paint", "Canvas", "Brushes"];
 const stockStatuses = ["All", "In Stock", "Low Stock", "Out of Stock"];
@@ -41,25 +118,39 @@ const sortOptions = [
   { value: "rating", label: "Rating" },
 ];
 
-const getColorClasses = (colorValue: string) => {
-  const colorMap = {
-    blue: "bg-blue-100 text-blue-800 border-blue-200",
-    red: "bg-red-100 text-red-800 border-red-200",
-    green: "bg-green-100 text-green-800 border-green-200",
-    purple: "bg-purple-100 text-purple-800 border-purple-200",
-    orange: "bg-orange-100 text-orange-800 border-orange-200",
-    pink: "bg-pink-100 text-pink-800 border-pink-200",
-    indigo: "bg-indigo-100 text-indigo-800 border-indigo-200",
-    coral: "bg-orange-100 text-orange-800 border-orange-200",
-  };
-  return colorMap[colorValue] || "bg-slate-100 text-slate-800 border-slate-200";
-};
-
-const getCategoryColor = (category: string, colorValue?: string) => {
-  if (colorValue) {
-    return getColorClasses(colorValue);
+const getCategoryColor = (category: string, categoryColor?: string) => {
+  // Use category color from database if available
+  if (categoryColor) {
+    // Normalize color name (lowercase, trim)
+    const normalizedColor = categoryColor.toLowerCase().trim();
+    
+    const colorMap: Record<string, string> = {
+      blue: "bg-blue-100 text-blue-800 border-blue-200",
+      red: "bg-red-100 text-red-800 border-red-200",
+      green: "bg-green-100 text-green-800 border-green-200",
+      purple: "bg-purple-100 text-purple-800 border-purple-200",
+      orange: "bg-orange-100 text-orange-800 border-orange-200",
+      yellow: "bg-amber-100 text-amber-800 border-amber-200",
+      amber: "bg-amber-100 text-amber-800 border-amber-200",
+      pink: "bg-pink-100 text-pink-800 border-pink-200",
+      cyan: "bg-cyan-100 text-cyan-800 border-cyan-200",
+      teal: "bg-teal-100 text-teal-800 border-teal-200",
+      indigo: "bg-indigo-100 text-indigo-800 border-indigo-200",
+      slate: "bg-slate-100 text-slate-800 border-slate-200",
+      gray: "bg-gray-100 text-gray-800 border-gray-200",
+      rose: "bg-rose-100 text-rose-800 border-rose-200",
+      coral: "bg-coral-100 text-coral-800 border-coral-200",
+      lime: "bg-lime-100 text-lime-800 border-lime-200",
+      emerald: "bg-emerald-100 text-emerald-800 border-emerald-200",
+      sky: "bg-sky-100 text-sky-800 border-sky-200",
+      violet: "bg-violet-100 text-violet-800 border-violet-200",
+      fuchsia: "bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200",
+    };
+    return colorMap[normalizedColor] || `bg-${normalizedColor}-100 text-${normalizedColor}-800 border-${normalizedColor}-200`;
   }
-  const colors = {
+  
+  // Fallback to category name based colors
+  const colors: Record<string, string> = {
     Tools: "bg-blue-100 text-blue-800 border-blue-200",
     Paint: "bg-red-100 text-red-800 border-red-200",
     Canvas: "bg-green-100 text-green-800 border-green-200",
@@ -76,149 +167,81 @@ const getStockStatus = (quantity: number) => {
 
 export default function ProductManagement() {
   const navigate = useNavigate();
-
-  // Fetch products from database with vendor information and category colors
-  // Fetch categories for color mapping
-  const { data: categories = [] } = useQuery({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const { data } = await supabase.from("categories").select("*");
-      return data || [];
-    }
-  });
-
-  // Fetch vendors for vendor name mapping
-  const { data: vendors = [] } = useQuery({
-    queryKey: ["vendors"],
-    queryFn: async () => {
-      const { data } = await supabase.from("vendors").select("*");
-      return data || [];
-    }
-  });
-
-  const categoryColorMap = categories.reduce((acc, cat) => {
-    acc[cat.id] = cat.color;
-    return acc;
-  }, {} as Record<string, string>);
-
-  const vendorMap = vendors.reduce((acc, vendor) => {
-    acc[vendor.id] = vendor.name;
-    return acc;
-  }, {} as Record<string, string>);
-
+  // Fetch products from database with vendors and variants
   const { data: dbProducts = [], isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Fetch main products with categories and vendors
+      const { data: mainProducts, error } = await supabase
         .from("products")
-        .select("*")
-        .is("parent_product_id", null);
-
+        .select(`
+          *,
+          categories (
+            name,
+            color
+          ),
+          vendors:preferred_vendor_id (
+            name
+          )
+        `)
+        .is("parent_product_id", null)
+        .order("created_at", { ascending: false });
+      
       if (error) throw error;
 
-      // Fetch variants for all parent products
-      const { data: allVariants = [] } = await supabase
-        .from("products")
-        .select("*")
-        .not("parent_product_id", "is", null);
+      // Fetch variants for each main product
+      const productsWithVariants = await Promise.all(
+        (mainProducts || []).map(async (product, index) => {
+          const { data: variants } = await supabase
+            .from("products")
+            .select(`
+              *,
+              vendors:preferred_vendor_id (
+                name
+              )
+            `)
+            .eq("parent_product_id", product.id)
+            .order("created_at", { ascending: true });
 
-      const variantsByParent = (allVariants || []).reduce((acc, variant) => {
-        if (!acc[variant.parent_product_id]) {
-          acc[variant.parent_product_id] = [];
-        }
-        acc[variant.parent_product_id].push(variant);
-        return acc;
-      }, {} as Record<string, any[]>);
-
-      // Helper function to calculate remaining warranty
-      const calculateRemainingWarranty = (shelfLifeDetails: any): string => {
-        if (!shelfLifeDetails || !shelfLifeDetails.expiry_date) return "-";
-
-        try {
-          const [year, month] = shelfLifeDetails.expiry_date.split('-');
-          const expiry = new Date(parseInt(year), parseInt(month) - 1, 1);
-          const today = new Date();
-
-          const diffMs = expiry.getTime() - today.getTime();
-          if (diffMs <= 0) return "Expired";
-
-          const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-          const years = Math.floor(diffDays / 365);
-          const months = Math.floor((diffDays % 365) / 30);
-
-          if (years > 0 && months > 0) {
-            return `${years} Yr ${months} Mo Left`;
-          } else if (years > 0) {
-            return `${years} Yr Left`;
-          } else if (months > 0) {
-            return `${months} Months Left`;
-          } else {
-            return `${diffDays} Days Left`;
-          }
-        } catch {
-          return "-";
-        }
-      };
-
-      // Transform database products to match the format expected by the UI
-      return (data || []).map((product, index) => {
-        let shelfLifeDetails = null;
-        let remainingWarranty = "-";
-
-        // Try to parse shelf_life_details from description if it's JSON
-        try {
-          if (product.description && typeof product.description === 'string' && product.description.startsWith('{')) {
-            const parsed = JSON.parse(product.description);
-            shelfLifeDetails = parsed.shelf_life_details;
-            remainingWarranty = calculateRemainingWarranty(shelfLifeDetails);
-          }
-        } catch {
-          // If parsing fails, description is plain text
-        }
-
-        const categoryName = categories.find(c => c.id === product.category_id)?.name || "Uncategorized";
-        const categoryColor = categoryColorMap[product.category_id] || "blue";
-        const vendorName = vendorMap[product.preferred_vendor_id] || "-";
-
-        // Transform variants
-        const variants = (variantsByParent[product.id] || []).map((variant) => {
           return {
-            id: variant.id,
-            name: variant.name,
-            unitPrice: Number(variant.unit_price) || 0,
-            stockQuantity: variant.current_stock || 0,
-            baseCode: variant.hsn_code || "-",
-            hsnCode: variant.hsn_code || "-",
-            totalSales: variant.sale_qty || 0,
-            currentStock: variant.current_stock || 0,
-            sale_price: Number(variant.unit_price) || 0
+            id: product.id,
+            name: product.name,
+            category: product.categories?.name || "Uncategorized",
+            categoryColor: product.categories?.color || "green",
+            unit: product.unit,
+            unitPrice: Number(product.sale_price) || Number(product.unit_price) || 0,
+            stockQuantity: product.current_stock || 0,
+            image: product.image_url || "/placeholder.svg",
+            baseCode: product.hsn_code || `PRD${String(index + 1).padStart(3, '0')}`,
+            description: "",
+            dateAdded: new Date(product.created_at).toISOString().split('T')[0],
+            featured: false,
+            rating: 4.5,
+            totalSales: product.sale_qty || 0,
+            lastSold: "",
+            vendorName: product.vendors?.name || "",
+            expiryDate: product.expiry_date || "",
+            remainingWarranty: product.remaining_warranty || "",
+            variants: (variants || []).map(v => ({
+              id: v.id,
+              name: v.name,
+              unitPrice: Number(v.sale_price) || Number(v.unit_price) || 0,
+              salePrice: Number(v.sale_price) || 0,
+              purchasePrice: Number(v.purchase_price) || 0,
+              stockQuantity: v.current_stock || 0,
+              currentStock: v.current_stock || 0,
+              sku: v.hsn_code || "",
+              hsnCode: v.hsn_code || "",
+              image: v.image_url || "",
+              vendorName: v.vendors?.name || "",
+              expiryDate: v.expiry_date || "",
+              remainingWarranty: v.remaining_warranty || "",
+            }))
           };
-        });
-
-        return {
-          id: product.id,
-          name: product.name,
-          category: categoryName,
-          categoryColor: categoryColor,
-          vendorName: vendorName,
-          unit: product.unit,
-          unitPrice: Number(product.unit_price) || 0,
-          stockQuantity: product.current_stock || 0,
-          image: product.image_url || "/placeholder.svg",
-          baseCode: product.hsn_code || `PRD${String(index + 1).padStart(3, '0')}`,
-          hsnCode: product.hsn_code || "-",
-          description: product.description || "",
-          dateAdded: new Date(product.created_at).toISOString().split('T')[0],
-          featured: false,
-          rating: 4.5,
-          totalSales: product.sale_qty || 0,
-          lastSold: "",
-          supplier: "",
-          shelfLifeDetails: shelfLifeDetails,
-          remainingWarranty: remainingWarranty,
-          variants: variants
-        };
-      });
+        })
+      );
+      
+      return productsWithVariants;
     },
   });
 
@@ -231,13 +254,6 @@ export default function ProductManagement() {
   const [sortBy, setSortBy] = useState("name");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
-  const location = useLocation();
-
-  useEffect(() => {
-    if (location.pathname === "/product/add") {
-      setIsAddProductOpen(true);
-    }
-  }, [location.pathname]);
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
 
@@ -271,13 +287,13 @@ export default function ProductManagement() {
 
   const filteredProducts = useMemo(() => {
     return products.filter(product => {
-      const matchesSearch = (product.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           (product.baseCode || "").toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           product.baseCode.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = categoryFilter === "All" || product.category === categoryFilter;
       const stockStatus = getStockStatus(product.stockQuantity).status;
       const matchesStock = stockFilter === "All" || stockStatus === stockFilter;
       const matchesFeatured = !showFeaturedOnly || product.featured;
-
+      
       return matchesSearch && matchesCategory && matchesStock && matchesFeatured;
     }).sort((a, b) => {
       switch (sortBy) {
@@ -305,7 +321,63 @@ export default function ProductManagement() {
   }, [products]);
 
   const handleBulkAction = (action: string) => {
-    console.log(`Bulk action: ${action} on products:`, Array.from(selectedProducts));
+    const selectedProductsList = filteredProducts.filter(p => selectedProducts.has(p.id));
+    
+    switch (action) {
+      case "export":
+        // Export selected products as CSV
+        const headers = ["Product Name", "Category", "Unit", "Unit Price", "Stock Quantity", "Vendor", "HSN Code"];
+        const csvContent = [
+          headers.join(","),
+          ...selectedProductsList.map(product => [
+            `"${product.name}"`,
+            `"${product.category}"`,
+            `"${product.unit}"`,
+            product.unitPrice,
+            product.stockQuantity,
+            `"${product.vendorName || ''}"`,
+            `"${product.baseCode}"`
+          ].join(","))
+        ].join("\n");
+        
+        const blob = new Blob([csvContent], { type: "text/csv" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `selected_products_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        alert(`✅ Exported ${selectedProductsList.length} product(s) successfully!`);
+        break;
+        
+      case "edit":
+        alert(`📝 Bulk Edit: ${selectedProductsList.length} product(s) selected.\n\nProducts:\n${selectedProductsList.map(p => `• ${p.name}`).join('\n')}\n\nBulk edit feature will open a form to update common fields.`);
+        break;
+        
+      case "duplicate":
+        alert(`📋 Duplicate: ${selectedProductsList.length} product(s) will be duplicated.\n\nProducts:\n${selectedProductsList.map(p => `• ${p.name}`).join('\n')}\n\nDuplicate feature coming soon!`);
+        break;
+        
+      case "feature":
+        alert(`⭐ Mark as Featured: ${selectedProductsList.length} product(s) will be marked as featured.\n\nProducts:\n${selectedProductsList.map(p => `• ${p.name}`).join('\n')}`);
+        break;
+        
+      case "tag":
+        alert(`🏷️ Add Tags: Add tags to ${selectedProductsList.length} product(s).\n\nProducts:\n${selectedProductsList.map(p => `• ${p.name}`).join('\n')}\n\nTag management feature coming soon!`);
+        break;
+        
+      case "archive":
+        alert(`📦 Archive: ${selectedProductsList.length} product(s) will be archived.\n\nProducts:\n${selectedProductsList.map(p => `• ${p.name}`).join('\n')}`);
+        break;
+        
+      case "delete":
+        alert(`🗑️ Delete: ${selectedProductsList.length} product(s) will be permanently deleted.\n\nProducts:\n${selectedProductsList.map(p => `• ${p.name}`).join('\n')}\n\nThis action cannot be undone!`);
+        setSelectedProducts(new Set());
+        break;
+        
+      default:
+        console.log(`Unknown action: ${action}`);
+    }
   };
 
   return (
@@ -321,29 +393,41 @@ export default function ProductManagement() {
             </div>
           ) : (
             <>
-          {/* Breadcrumb Navigation */}
-          <div className="mb-6">
+          {/* Breadcrumb - Outside Header Box */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+            className="mb-3"
+          >
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbLink
-                    onClick={() => navigate("/")}
-                    className="cursor-pointer hover:text-green-700 transition-colors"
+                  <BreadcrumbLink 
+                    onClick={() => navigate("/")} 
+                    className="cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-1.5"
                   >
-                    <Home className="h-4 w-4 text-green-600" />
+                    <img src={dashboardHomeIcon} alt="Dashboard" className="h-5 w-5 object-contain bg-transparent" style={{ mixBlendMode: 'multiply' }} />
+                    <span className="text-cyan-600 font-medium">Dashboard</span>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage className="text-green-700 font-medium">Product Management</BreadcrumbPage>
+                  <BreadcrumbPage className="flex items-center gap-1.5">
+                    <Package className="h-4 w-4 text-orange-400" />
+                    <span className="text-orange-600 font-medium">Product Management</span>
+                  </BreadcrumbPage>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage className="text-green-800 font-semibold">Product Activity</BreadcrumbPage>
+                  <BreadcrumbPage className="flex items-center gap-1.5">
+                    <Activity className="h-4 w-4 text-green-400" />
+                    <span className="text-green-700 font-semibold">Product Activity</span>
+                  </BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
-          </div>
+          </motion.div>
 
           {/* Enhanced Animated Header */}
           <motion.div
@@ -357,7 +441,7 @@ export default function ProductManagement() {
               <div className="absolute top-0 left-0 w-40 h-40 bg-green-400 rounded-full blur-3xl animate-pulse"></div>
               <div className="absolute bottom-0 right-0 w-40 h-40 bg-teal-400 rounded-full blur-3xl animate-pulse delay-1000"></div>
             </div>
-
+            
             <div className="relative z-10 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
               <div className="space-y-3">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
@@ -371,9 +455,19 @@ export default function ProductManagement() {
                       animate={{ rotate: [0, 10, -10, 0] }}
                       transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
                     >
-                      <Paintbrush className="h-8 w-8 sm:h-10 sm:w-10 text-green-600" />
+                      <img src={productActivityIcon} alt="Product Activity" className="h-10 w-10 sm:h-12 sm:w-12 object-contain" style={{ mixBlendMode: 'multiply' }} />
                     </motion.div>
-                    Product Activity
+                    <div className="flex flex-col">
+                      <span>Product Activity</span>
+                      <motion.span 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.5, duration: 0.5 }}
+                        className="text-sm font-normal text-green-700 italic ml-[3.5ch]"
+                      >
+                        Advanced Product & Variant Control
+                      </motion.span>
+                    </div>
                   </motion.h1>
                   <motion.div
                     initial={{ scale: 0 }}
@@ -396,6 +490,7 @@ export default function ProductManagement() {
                 <Button 
                   variant="outline" 
                   size="sm" 
+                  onClick={() => window.location.reload()}
                   className="w-full sm:w-auto bg-white hover:bg-green-50 border-2 border-green-300 text-green-700 hover:border-green-400 transition-all duration-300 shadow-sm hover:shadow-md group"
                 >
                   <RefreshCw className="h-4 w-4 mr-2 group-hover:rotate-180 transition-transform duration-500" />
@@ -404,29 +499,42 @@ export default function ProductManagement() {
                 <Button 
                   variant="outline" 
                   size="sm" 
+                  onClick={() => {
+                    const csvContent = filteredProducts.map(p => 
+                      `${p.name},${p.category},${p.unit},${p.unitPrice},${p.stockQuantity}`
+                    ).join('\n');
+                    const blob = new Blob([`Name,Category,Unit,Price,Stock\n${csvContent}`], { type: 'text/csv' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'products_export.csv';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  }}
                   className="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700 border-blue-600 transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105"
                 >
                   <Download className="h-4 w-4 mr-2" />
                   Export
                 </Button>
               
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Button
-                    onClick={() => setIsAddProductOpen(true)}
-                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl w-full sm:w-auto border-2 border-green-400 transition-all duration-300 relative overflow-hidden group"
-                  >
-                    <span className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
-                    <Plus className="h-4 w-4 mr-2 relative z-10" />
-                    <span className="relative z-10">Add New Product</span>
-                  </Button>
-                </motion.div>
-
-                <AddProductModal
-                  isOpen={isAddProductOpen}
-                  onClose={() => setIsAddProductOpen(false)}
+                <Dialog open={isAddProductOpen} onOpenChange={setIsAddProductOpen}>
+                  <DialogTrigger asChild>
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl w-full sm:w-auto border-2 border-green-400 transition-all duration-300 relative overflow-hidden group">
+                        <span className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
+                        <Plus className="h-4 w-4 mr-2 relative z-10" />
+                        <span className="relative z-10">Add New Product</span>
+                      </Button>
+                    </motion.div>
+                  </DialogTrigger>
+                </Dialog>
+                
+                <AddProductModal 
+                  isOpen={isAddProductOpen} 
+                  onClose={() => setIsAddProductOpen(false)} 
                 />
               </motion.div>
             </div>
@@ -457,7 +565,7 @@ export default function ProductManagement() {
               setShowFeaturedOnly={setShowFeaturedOnly}
               viewMode={viewMode}
               setViewMode={setViewMode}
-              categories={["All", ...categories.map(c => c.name)]}
+              categories={categories}
               stockStatuses={stockStatuses}
               sortOptions={sortOptions}
             />

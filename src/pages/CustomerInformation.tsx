@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { motion } from 'framer-motion';
-import { useLocation } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import { CustomerSummaryCards } from '@/components/customer/CustomerSummaryCards';
 import { CustomerTable } from '@/components/customer/CustomerTable';
@@ -54,42 +54,35 @@ const CustomerInformation: React.FC = () => {
     customerType: 'all',
     balanceStatus: 'all'
   });
-  const location = useLocation();
+
+  const [customers, setCustomers] = useState<Customer[]>([]);
+
+  const fetchCustomers = async () => {
+    const { data, error } = await supabase
+      .from('customers')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (!error && data) {
+      setCustomers(data.map(c => ({
+        id: c.id,
+        name: c.name,
+        mobile: c.mobile,
+        email: c.email || undefined,
+        gstNo: c.gst_no || undefined,
+        address: c.address || '',
+        customerType: (c.customer_type as 'retail' | 'wholesale') || 'retail',
+        totalSales: Number(c.total_sales) || 0,
+        outstandingBalance: Number(c.outstanding_balance) || 0,
+        status: (c.status as 'active' | 'inactive') || 'active',
+        createdAt: new Date(c.created_at),
+      })));
+    }
+  };
 
   useEffect(() => {
-    if (location.pathname === '/customers/new') {
-      setIsModalOpen(true);
-    }
-  }, [location.pathname]);
-
-  // Mock data - replace with actual data fetching
-  const [customers, setCustomers] = useState<Customer[]>([
-    {
-      id: '1',
-      name: 'Rajesh Kumar',
-      mobile: '+91 98765 43210',
-      email: 'rajesh@example.com',
-      gstNo: '07AABCU9603R1ZX',
-      address: '123 MG Road, Delhi - 110001',
-      customerType: 'wholesale',
-      totalSales: 125000,
-      outstandingBalance: 15000,
-      status: 'active',
-      createdAt: new Date('2024-01-15')
-    },
-    {
-      id: '2',
-      name: 'Priya Sharma',
-      mobile: '+91 87654 32109',
-      email: 'priya@example.com',
-      address: '456 Park Street, Mumbai - 400001',
-      customerType: 'retail',
-      totalSales: 45000,
-      outstandingBalance: 0,
-      status: 'active',
-      createdAt: new Date('2024-02-20')
-    }
-  ]);
+    fetchCustomers();
+  }, []);
 
   const handleAddCustomer = () => {
     setEditingCustomer(null);
@@ -101,25 +94,36 @@ const CustomerInformation: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleDeleteCustomer = (customerId: string) => {
-    setCustomers(prev => prev.filter(c => c.id !== customerId));
+  const handleDeleteCustomer = async (customerId: string) => {
+    if (!confirm('Are you sure you want to delete this customer?')) return;
+    await supabase.from('customers').delete().eq('id', customerId);
+    fetchCustomers();
   };
 
-  const handleSaveCustomer = (customerData: Omit<Customer, 'id' | 'createdAt'>) => {
+  const handleSaveCustomer = async (customerData: Omit<Customer, 'id' | 'createdAt'>) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const dbData = {
+      name: customerData.name,
+      mobile: customerData.mobile,
+      email: customerData.email || null,
+      gst_no: customerData.gstNo || null,
+      address: customerData.address,
+      customer_type: customerData.customerType,
+      total_sales: customerData.totalSales,
+      outstanding_balance: customerData.outstandingBalance,
+      status: customerData.status,
+      created_by_user_id: user.id,
+    };
+
     if (editingCustomer) {
-      setCustomers(prev => prev.map(c => 
-        c.id === editingCustomer.id 
-          ? { ...customerData, id: c.id, createdAt: c.createdAt }
-          : c
-      ));
+      await supabase.from('customers').update(dbData).eq('id', editingCustomer.id);
     } else {
-      const newCustomer: Customer = {
-        ...customerData,
-        id: Date.now().toString(),
-        createdAt: new Date()
-      };
-      setCustomers(prev => [...prev, newCustomer]);
+      await supabase.from('customers').insert([dbData]);
     }
+
+    fetchCustomers();
     setIsModalOpen(false);
   };
 

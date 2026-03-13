@@ -81,7 +81,7 @@ export const menuData = [
         id: "new-sales-entry",
         title: "New Sales Entry",
         icon: Plus,
-        path: "/sales/new",
+        action: "add-sale",
         iconColor: "text-blue-400",
       },
       {
@@ -182,7 +182,7 @@ export const menuData = [
         id: "add-new-customer",
         title: "Add New Customer",
         icon: Plus,
-        path: "/customers/new",
+        action: "add-customer",
         iconColor: "text-green-400",
       },
       {
@@ -203,7 +203,7 @@ export const menuData = [
         id: "add-new-vendor",
         title: "Add New Vendor",
         icon: UserPlus,
-        path: "/vendors/new",
+        action: "add-vendor",
         iconColor: "text-emerald-400",
       },
       {
@@ -275,7 +275,7 @@ export const menuData = [
         id: "add-new-expense",
         title: "Add New Expense",
         icon: Plus,
-        path: "/expenses/new",
+        action: "add-expense",
         iconColor: "text-blue-400",
       },
       {

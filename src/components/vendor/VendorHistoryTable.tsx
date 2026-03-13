@@ -60,7 +60,7 @@ export const VendorHistoryTable: React.FC<VendorHistoryTableProps> = ({
   const getRowBackground = (vendor: VendorHistoryData) => {
     if (vendor.outstanding > 10000) return "bg-red-50 hover:bg-red-100";
     if (vendor.outstanding === 0) return "bg-green-50 hover:bg-green-100";
-    return "hover:bg-blue-50";
+    return "hover:bg-[#f0fafa]";
   };
 
   const getStatusBadge = (status: string) => {
@@ -76,53 +76,42 @@ export const VendorHistoryTable: React.FC<VendorHistoryTableProps> = ({
   };
 
   const getPaymentStatusBadge = (status: string) => {
-    const statusColors = {
+    const statusColors: Record<string, string> = {
       "Paid": "bg-green-100 text-green-800",
-      "Pending": "bg-coral-100 text-coral-800",
+      "Pending": "bg-amber-100 text-amber-800",
       "Overdue": "bg-red-100 text-red-800",
     };
     
     return (
-      <Badge className={statusColors[status as keyof typeof statusColors] || "bg-gray-100 text-gray-800"}>
+      <Badge className={statusColors[status] || "bg-gray-100 text-gray-800"}>
         {status}
       </Badge>
     );
   };
 
-  const handleView = (vendorId: string) => {
-    console.log('Viewing vendor:', vendorId);
-  };
-
-  const handleEdit = (vendorId: string) => {
-    console.log('Editing vendor:', vendorId);
-  };
-
-  const handleDelete = (vendorId: string) => {
-    console.log('Deleting vendor:', vendorId);
-  };
-
-  const handleViewPO = (poNumber: string) => {
-    console.log('Viewing PO:', poNumber);
-  };
+  const handleView = (vendorId: string) => console.log('Viewing vendor:', vendorId);
+  const handleEdit = (vendorId: string) => console.log('Editing vendor:', vendorId);
+  const handleDelete = (vendorId: string) => console.log('Deleting vendor:', vendorId);
+  const handleViewPO = (poNumber: string) => console.log('Viewing PO:', poNumber);
 
   return (
     <div className="space-y-4">
-      <Card className="border-blue-200 bg-white shadow-sm">
+      <Card className="bg-white shadow-sm" style={{ borderColor: '#9ECAD6' }}>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-blue-50 hover:bg-blue-100">
-                  <TableHead className="text-blue-900 font-semibold">S.No</TableHead>
-                  <TableHead className="text-blue-900 font-semibold">Vendor Name</TableHead>
-                  <TableHead className="text-blue-900 font-semibold">Mobile Number</TableHead>
-                  <TableHead className="text-blue-900 font-semibold">GST No.</TableHead>
-                  <TableHead className="text-blue-900 font-semibold">Total POs</TableHead>
-                  <TableHead className="text-blue-900 font-semibold">Total Amount</TableHead>
-                  <TableHead className="text-blue-900 font-semibold">Last Purchase</TableHead>
-                  <TableHead className="text-blue-900 font-semibold">Outstanding</TableHead>
-                  <TableHead className="text-blue-900 font-semibold">Status</TableHead>
-                  <TableHead className="text-blue-900 font-semibold">Actions</TableHead>
+                <TableRow style={{ backgroundColor: '#e8f5f5' }}>
+                  <TableHead className="font-semibold" style={{ color: '#2a7a8a' }}>S.No</TableHead>
+                  <TableHead className="font-semibold" style={{ color: '#2a7a8a' }}>Vendor Name</TableHead>
+                  <TableHead className="font-semibold" style={{ color: '#2a7a8a' }}>Mobile Number</TableHead>
+                  <TableHead className="font-semibold" style={{ color: '#2a7a8a' }}>GST No.</TableHead>
+                  <TableHead className="font-semibold" style={{ color: '#2a7a8a' }}>Total POs</TableHead>
+                  <TableHead className="font-semibold" style={{ color: '#2a7a8a' }}>Total Amount</TableHead>
+                  <TableHead className="font-semibold" style={{ color: '#2a7a8a' }}>Last Purchase</TableHead>
+                  <TableHead className="font-semibold" style={{ color: '#2a7a8a' }}>Outstanding</TableHead>
+                  <TableHead className="font-semibold" style={{ color: '#2a7a8a' }}>Status</TableHead>
+                  <TableHead className="font-semibold" style={{ color: '#2a7a8a' }}>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -164,28 +153,13 @@ export const VendorHistoryTable: React.FC<VendorHistoryTableProps> = ({
                       <TableCell>{getStatusBadge(vendor.status)}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleView(vendor.id)}
-                            className="text-blue-600 hover:text-blue-700 hover:bg-blue-100"
-                          >
+                          <Button variant="ghost" size="sm" onClick={() => handleView(vendor.id)} style={{ color: '#3d8f9e' }}>
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEdit(vendor.id)}
-                            className="text-blue-600 hover:text-blue-700 hover:bg-blue-100"
-                          >
+                          <Button variant="ghost" size="sm" onClick={() => handleEdit(vendor.id)} style={{ color: '#3d8f9e' }}>
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(vendor.id)}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-100"
-                          >
+                          <Button variant="ghost" size="sm" onClick={() => handleDelete(vendor.id)} className="text-red-600 hover:text-red-700 hover:bg-red-100">
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -195,19 +169,20 @@ export const VendorHistoryTable: React.FC<VendorHistoryTableProps> = ({
                     {/* Expanded Row Content */}
                     {expandedRows.has(vendor.id) && (
                       <TableRow>
-                        <TableCell colSpan={10} className="bg-blue-25 border-t-0">
-                          <div className="p-4 bg-blue-25 rounded-lg">
-                            <h4 className="font-semibold text-blue-900 mb-3">Purchase Order History</h4>
+                        <TableCell colSpan={10} className="border-t-0">
+                          <div className="p-4 rounded-lg" style={{ backgroundColor: '#f0fafa' }}>
+                            <h4 className="font-semibold mb-3" style={{ color: '#2a7a8a' }}>Purchase Order History</h4>
                             <div className="grid gap-2">
                               {vendor.purchaseOrders.map((po, poIndex) => (
                                 <div
                                   key={poIndex}
-                                  className="flex items-center justify-between p-3 bg-white rounded-md border border-blue-200"
+                                  className="flex items-center justify-between p-3 bg-white rounded-md"
+                                  style={{ borderColor: '#9ECAD6', borderWidth: 1 }}
                                 >
                                   <div className="grid grid-cols-4 gap-4 flex-1">
                                     <div>
                                       <span className="text-sm text-gray-600">PO Number:</span>
-                                      <div className="font-medium text-blue-700">{po.poNumber}</div>
+                                      <div className="font-medium" style={{ color: '#3d8f9e' }}>{po.poNumber}</div>
                                     </div>
                                     <div>
                                       <span className="text-sm text-gray-600">Date:</span>
@@ -226,7 +201,7 @@ export const VendorHistoryTable: React.FC<VendorHistoryTableProps> = ({
                                     variant="outline"
                                     size="sm"
                                     onClick={() => handleViewPO(po.poNumber)}
-                                    className="border-blue-300 text-blue-700 hover:bg-blue-100"
+                                    style={{ borderColor: '#9ECAD6', color: '#3d8f9e' }}
                                   >
                                     <FileText className="h-4 w-4 mr-1" />
                                     View PO
@@ -248,7 +223,7 @@ export const VendorHistoryTable: React.FC<VendorHistoryTableProps> = ({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <Card className="border-blue-200 bg-white">
+        <Card className="bg-white" style={{ borderColor: '#9ECAD6' }}>
           <CardContent className="flex items-center justify-between p-4">
             <div className="text-sm text-gray-600">
               Showing {((currentPage - 1) * itemsPerPage) + 1} to{" "}
@@ -260,7 +235,7 @@ export const VendorHistoryTable: React.FC<VendorHistoryTableProps> = ({
                 variant="outline"
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
-                className="border-blue-300 text-blue-700 hover:bg-blue-100 disabled:opacity-50"
+                style={{ borderColor: '#9ECAD6', color: '#3d8f9e' }}
               >
                 Previous
               </Button>
@@ -271,7 +246,7 @@ export const VendorHistoryTable: React.FC<VendorHistoryTableProps> = ({
                 variant="outline"
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
-                className="border-blue-300 text-blue-700 hover:bg-blue-100 disabled:opacity-50"
+                style={{ borderColor: '#9ECAD6', color: '#3d8f9e' }}
               >
                 Next
               </Button>

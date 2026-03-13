@@ -10,15 +10,57 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "14.4"
   }
   public: {
     Tables: {
+      cash_receipts: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by_user_id: string
+          id: string
+          notes: string | null
+          payer_name: string
+          payment_mode: string
+          reason: string | null
+          receipt_date: string
+          receipt_no: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          created_by_user_id: string
+          id?: string
+          notes?: string | null
+          payer_name: string
+          payment_mode?: string
+          reason?: string | null
+          receipt_date?: string
+          receipt_no: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by_user_id?: string
+          id?: string
+          notes?: string | null
+          payer_name?: string
+          payment_mode?: string
+          reason?: string | null
+          receipt_date?: string
+          receipt_no?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           color: string | null
           created_at: string
-          created_by_user_id: string | null
+          created_by_user_id: string
           description: string | null
           id: string
           name: string
@@ -27,7 +69,7 @@ export type Database = {
         Insert: {
           color?: string | null
           created_at?: string
-          created_by_user_id?: string | null
+          created_by_user_id: string
           description?: string | null
           id?: string
           name: string
@@ -36,10 +78,97 @@ export type Database = {
         Update: {
           color?: string | null
           created_at?: string
-          created_by_user_id?: string | null
+          created_by_user_id?: string
           description?: string | null
           id?: string
           name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      customers: {
+        Row: {
+          address: string | null
+          created_at: string
+          created_by_user_id: string
+          customer_type: string | null
+          email: string | null
+          gst_no: string | null
+          id: string
+          mobile: string
+          name: string
+          outstanding_balance: number | null
+          status: string | null
+          total_sales: number | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          created_by_user_id: string
+          customer_type?: string | null
+          email?: string | null
+          gst_no?: string | null
+          id?: string
+          mobile: string
+          name: string
+          outstanding_balance?: number | null
+          status?: string | null
+          total_sales?: number | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          created_by_user_id?: string
+          customer_type?: string | null
+          email?: string | null
+          gst_no?: string | null
+          id?: string
+          mobile?: string
+          name?: string
+          outstanding_balance?: number | null
+          status?: string | null
+          total_sales?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      expenses: {
+        Row: {
+          amount: number | null
+          created_at: string
+          created_by_user_id: string
+          date: string
+          description: string | null
+          id: string
+          payment_mode: string | null
+          ref_no: string | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          created_by_user_id: string
+          date?: string
+          description?: string | null
+          id?: string
+          payment_mode?: string | null
+          ref_no?: string | null
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          created_by_user_id?: string
+          date?: string
+          description?: string | null
+          id?: string
+          payment_mode?: string | null
+          ref_no?: string | null
+          type?: string
           updated_at?: string
         }
         Relationships: []
@@ -48,75 +177,84 @@ export type Database = {
         Row: {
           category_id: string | null
           created_at: string
-          created_by_user_id: string | null
-          current_stock: number
+          created_by_user_id: string
+          current_stock: number | null
+          description: string | null
           expiry_date: string | null
           hsn_code: string | null
           id: string
           image_url: string | null
-          is_variant: boolean
+          is_variant: boolean | null
           manufacture_date: string | null
+          mrp: number | null
           name: string
           parent_product_id: string | null
           preferred_vendor_id: string | null
           purchase_price: number | null
-          purchase_qty: number
+          purchase_qty: number | null
           remaining_warranty: string | null
           sale_price: number | null
-          sale_qty: number
-          threshold_qty: number
-          unit: string
-          unit_price: number
+          sale_qty: number | null
+          status: string | null
+          threshold_qty: number | null
+          unit: string | null
+          unit_price: number | null
           updated_at: string
           warranty_years: number | null
         }
         Insert: {
           category_id?: string | null
           created_at?: string
-          created_by_user_id?: string | null
-          current_stock?: number
+          created_by_user_id: string
+          current_stock?: number | null
+          description?: string | null
           expiry_date?: string | null
           hsn_code?: string | null
           id?: string
           image_url?: string | null
-          is_variant?: boolean
+          is_variant?: boolean | null
           manufacture_date?: string | null
+          mrp?: number | null
           name: string
           parent_product_id?: string | null
           preferred_vendor_id?: string | null
           purchase_price?: number | null
-          purchase_qty?: number
+          purchase_qty?: number | null
           remaining_warranty?: string | null
           sale_price?: number | null
-          sale_qty?: number
-          threshold_qty?: number
-          unit?: string
-          unit_price?: number
+          sale_qty?: number | null
+          status?: string | null
+          threshold_qty?: number | null
+          unit?: string | null
+          unit_price?: number | null
           updated_at?: string
           warranty_years?: number | null
         }
         Update: {
           category_id?: string | null
           created_at?: string
-          created_by_user_id?: string | null
-          current_stock?: number
+          created_by_user_id?: string
+          current_stock?: number | null
+          description?: string | null
           expiry_date?: string | null
           hsn_code?: string | null
           id?: string
           image_url?: string | null
-          is_variant?: boolean
+          is_variant?: boolean | null
           manufacture_date?: string | null
+          mrp?: number | null
           name?: string
           parent_product_id?: string | null
           preferred_vendor_id?: string | null
           purchase_price?: number | null
-          purchase_qty?: number
+          purchase_qty?: number | null
           remaining_warranty?: string | null
           sale_price?: number | null
-          sale_qty?: number
-          threshold_qty?: number
-          unit?: string
-          unit_price?: number
+          sale_qty?: number | null
+          status?: string | null
+          threshold_qty?: number | null
+          unit?: string | null
+          unit_price?: number | null
           updated_at?: string
           warranty_years?: number | null
         }
@@ -146,7 +284,7 @@ export type Database = {
       }
       profiles: {
         Row: {
-          company_name: string | null
+          avatar_url: string | null
           created_at: string
           email: string | null
           full_name: string | null
@@ -155,7 +293,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          company_name?: string | null
+          avatar_url?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
@@ -164,7 +302,7 @@ export type Database = {
           user_id: string
         }
         Update: {
-          company_name?: string | null
+          avatar_url?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
@@ -177,41 +315,51 @@ export type Database = {
       purchase_items: {
         Row: {
           created_at: string
-          created_by_user_id: string | null
+          created_by_user_id: string
           discount_rate: number | null
           id: string
+          product_id: string | null
           product_name: string
           purchase_id: string
-          quantity: number
+          quantity: number | null
           tax_rate: number | null
-          total_amount: number
-          unit_price: number
+          total_amount: number | null
+          unit_price: number | null
         }
         Insert: {
           created_at?: string
-          created_by_user_id?: string | null
+          created_by_user_id: string
           discount_rate?: number | null
           id?: string
+          product_id?: string | null
           product_name: string
           purchase_id: string
-          quantity: number
+          quantity?: number | null
           tax_rate?: number | null
-          total_amount: number
-          unit_price: number
+          total_amount?: number | null
+          unit_price?: number | null
         }
         Update: {
           created_at?: string
-          created_by_user_id?: string | null
+          created_by_user_id?: string
           discount_rate?: number | null
           id?: string
+          product_id?: string | null
           product_name?: string
           purchase_id?: string
-          quantity?: number
+          quantity?: number | null
           tax_rate?: number | null
-          total_amount?: number
-          unit_price?: number
+          total_amount?: number | null
+          unit_price?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "purchase_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "purchase_items_purchase_id_fkey"
             columns: ["purchase_id"]
@@ -223,58 +371,61 @@ export type Database = {
       }
       purchases: {
         Row: {
-          balance_amount: number
+          balance_amount: number | null
           created_at: string
-          discount_amount: number
+          created_by_user_id: string
+          discount_amount: number | null
           id: string
           invoice_file_url: string | null
           invoice_number: string
           notes: string | null
-          paid_amount: number
+          paid_amount: number | null
           payment_method: string | null
           purchase_date: string
-          status: string
-          subtotal: number
-          tax_amount: number
-          total_amount: number
+          status: string | null
+          subtotal: number | null
+          tax_amount: number | null
+          total_amount: number | null
           updated_at: string
-          vendor_id: string
+          vendor_id: string | null
         }
         Insert: {
-          balance_amount?: number
+          balance_amount?: number | null
           created_at?: string
-          discount_amount?: number
+          created_by_user_id: string
+          discount_amount?: number | null
           id?: string
           invoice_file_url?: string | null
           invoice_number: string
           notes?: string | null
-          paid_amount?: number
+          paid_amount?: number | null
           payment_method?: string | null
           purchase_date?: string
-          status?: string
-          subtotal?: number
-          tax_amount?: number
-          total_amount?: number
+          status?: string | null
+          subtotal?: number | null
+          tax_amount?: number | null
+          total_amount?: number | null
           updated_at?: string
-          vendor_id: string
+          vendor_id?: string | null
         }
         Update: {
-          balance_amount?: number
+          balance_amount?: number | null
           created_at?: string
-          discount_amount?: number
+          created_by_user_id?: string
+          discount_amount?: number | null
           id?: string
           invoice_file_url?: string | null
           invoice_number?: string
           notes?: string | null
-          paid_amount?: number
+          paid_amount?: number | null
           payment_method?: string | null
           purchase_date?: string
-          status?: string
-          subtotal?: number
-          tax_amount?: number
-          total_amount?: number
+          status?: string | null
+          subtotal?: number | null
+          tax_amount?: number | null
+          total_amount?: number | null
           updated_at?: string
-          vendor_id?: string
+          vendor_id?: string | null
         }
         Relationships: [
           {
@@ -286,39 +437,164 @@ export type Database = {
           },
         ]
       }
-      stock_adjustments: {
+      sale_items: {
+        Row: {
+          amount: number | null
+          created_at: string
+          gst_percent: number | null
+          hsn_code: string | null
+          id: string
+          product_id: string | null
+          product_name: string
+          quantity: number | null
+          rate: number | null
+          sale_id: string
+          unit: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          gst_percent?: number | null
+          hsn_code?: string | null
+          id?: string
+          product_id?: string | null
+          product_name: string
+          quantity?: number | null
+          rate?: number | null
+          sale_id: string
+          unit?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          gst_percent?: number | null
+          hsn_code?: string | null
+          id?: string
+          product_id?: string | null
+          product_name?: string
+          quantity?: number | null
+          rate?: number | null
+          sale_id?: string
+          unit?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sale_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sale_items_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "sales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales: {
         Row: {
           created_at: string
-          created_by_user_id: string | null
+          created_by_user_id: string
+          customer_id: string | null
+          customer_name: string | null
+          discount_amount: number | null
           id: string
-          new_stock: number
+          invoice_date: string
+          invoice_number: string
+          is_gst_inclusive: boolean | null
           notes: string | null
-          previous_stock: number
-          product_id: string
-          quantity_change: number
-          reason_code: string
+          paid_amount: number | null
+          payment_mode: string | null
+          payment_status: string | null
+          pending_amount: number | null
+          subtotal: number | null
+          tax_amount: number | null
+          total_amount: number | null
+          updated_at: string
         }
         Insert: {
           created_at?: string
-          created_by_user_id?: string | null
+          created_by_user_id: string
+          customer_id?: string | null
+          customer_name?: string | null
+          discount_amount?: number | null
           id?: string
-          new_stock: number
+          invoice_date?: string
+          invoice_number: string
+          is_gst_inclusive?: boolean | null
           notes?: string | null
-          previous_stock: number
-          product_id: string
-          quantity_change: number
-          reason_code: string
+          paid_amount?: number | null
+          payment_mode?: string | null
+          payment_status?: string | null
+          pending_amount?: number | null
+          subtotal?: number | null
+          tax_amount?: number | null
+          total_amount?: number | null
+          updated_at?: string
         }
         Update: {
           created_at?: string
-          created_by_user_id?: string | null
+          created_by_user_id?: string
+          customer_id?: string | null
+          customer_name?: string | null
+          discount_amount?: number | null
           id?: string
-          new_stock?: number
+          invoice_date?: string
+          invoice_number?: string
+          is_gst_inclusive?: boolean | null
           notes?: string | null
-          previous_stock?: number
+          paid_amount?: number | null
+          payment_mode?: string | null
+          payment_status?: string | null
+          pending_amount?: number | null
+          subtotal?: number | null
+          tax_amount?: number | null
+          total_amount?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stock_adjustments: {
+        Row: {
+          adjustment_type: string
+          created_at: string
+          created_by_user_id: string
+          id: string
+          product_id: string
+          quantity: number
+          reason: string | null
+          reference_id: string | null
+        }
+        Insert: {
+          adjustment_type: string
+          created_at?: string
+          created_by_user_id: string
+          id?: string
+          product_id: string
+          quantity: number
+          reason?: string | null
+          reference_id?: string | null
+        }
+        Update: {
+          adjustment_type?: string
+          created_at?: string
+          created_by_user_id?: string
+          id?: string
           product_id?: string
-          quantity_change?: number
-          reason_code?: string
+          quantity?: number
+          reason?: string | null
+          reference_id?: string | null
         }
         Relationships: [
           {
@@ -333,21 +609,21 @@ export type Database = {
       user_roles: {
         Row: {
           created_at: string
-          created_by: string | null
+          created_by_user_id: string | null
           id: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Insert: {
           created_at?: string
-          created_by?: string | null
+          created_by_user_id?: string | null
           id?: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Update: {
           created_at?: string
-          created_by?: string | null
+          created_by_user_id?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
@@ -359,36 +635,39 @@ export type Database = {
           address: string | null
           contact_person: string | null
           created_at: string
-          created_by_user_id: string | null
+          created_by_user_id: string
           email: string | null
           gst_number: string | null
           id: string
           name: string
           phone: string | null
+          status: string | null
           updated_at: string
         }
         Insert: {
           address?: string | null
           contact_person?: string | null
           created_at?: string
-          created_by_user_id?: string | null
+          created_by_user_id: string
           email?: string | null
           gst_number?: string | null
           id?: string
           name: string
           phone?: string | null
+          status?: string | null
           updated_at?: string
         }
         Update: {
           address?: string | null
           contact_person?: string | null
           created_at?: string
-          created_by_user_id?: string | null
+          created_by_user_id?: string
           email?: string | null
           gst_number?: string | null
           id?: string
           name?: string
           phone?: string | null
+          status?: string | null
           updated_at?: string
         }
         Relationships: []

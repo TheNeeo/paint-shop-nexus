@@ -25,10 +25,10 @@ export const VendorHistoryFilters: React.FC<VendorHistoryFiltersProps> = ({
   };
 
   return (
-    <Card className="border-blue-200 bg-white shadow-sm">
+    <Card className="bg-white shadow-sm" style={{ borderColor: '#9ECAD6' }}>
       <CardHeader className="pb-4">
         <CardTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-          <Filter className="h-5 w-5 text-blue-600" />
+          <Filter className="h-5 w-5" style={{ color: '#3d8f9e' }} />
           Search & Filters
         </CardTitle>
       </CardHeader>
@@ -41,7 +41,8 @@ export const VendorHistoryFilters: React.FC<VendorHistoryFiltersProps> = ({
               placeholder="Search by Name, Mobile, GST No..."
               value={filters.search}
               onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-              className="pl-10 border-blue-200 focus:ring-blue-500 focus:border-blue-500"
+              className="pl-10"
+              style={{ borderColor: '#9ECAD6' }}
             />
           </div>
 
@@ -50,10 +51,10 @@ export const VendorHistoryFilters: React.FC<VendorHistoryFiltersProps> = ({
             value={filters.dateRange}
             onValueChange={(value) => setFilters(prev => ({ ...prev, dateRange: value }))}
           >
-            <SelectTrigger className="border-blue-200 focus:ring-blue-500 focus:border-blue-500">
+            <SelectTrigger style={{ borderColor: '#9ECAD6' }}>
               <SelectValue placeholder="Date Range" />
             </SelectTrigger>
-            <SelectContent className="bg-white border-blue-200">
+            <SelectContent className="bg-white" style={{ borderColor: '#9ECAD6' }}>
               <SelectItem value="last-7-days">Last 7 days</SelectItem>
               <SelectItem value="last-30-days">Last 30 days</SelectItem>
               <SelectItem value="last-3-months">Last 3 months</SelectItem>
@@ -67,10 +68,10 @@ export const VendorHistoryFilters: React.FC<VendorHistoryFiltersProps> = ({
             value={filters.category}
             onValueChange={(value) => setFilters(prev => ({ ...prev, category: value }))}
           >
-            <SelectTrigger className="border-blue-200 focus:ring-blue-500 focus:border-blue-500">
+            <SelectTrigger style={{ borderColor: '#9ECAD6' }}>
               <SelectValue placeholder="Vendor Category" />
             </SelectTrigger>
-            <SelectContent className="bg-white border-blue-200">
+            <SelectContent className="bg-white" style={{ borderColor: '#9ECAD6' }}>
               <SelectItem value="paints">Paints</SelectItem>
               <SelectItem value="accessories">Accessories</SelectItem>
               <SelectItem value="tools">Tools</SelectItem>
@@ -84,10 +85,10 @@ export const VendorHistoryFilters: React.FC<VendorHistoryFiltersProps> = ({
             value={filters.outstanding}
             onValueChange={(value) => setFilters(prev => ({ ...prev, outstanding: value }))}
           >
-            <SelectTrigger className="border-blue-200 focus:ring-blue-500 focus:border-blue-500">
+            <SelectTrigger style={{ borderColor: '#9ECAD6' }}>
               <SelectValue placeholder="Outstanding Balance" />
             </SelectTrigger>
-            <SelectContent className="bg-white border-blue-200">
+            <SelectContent className="bg-white" style={{ borderColor: '#9ECAD6' }}>
               <SelectItem value="no-outstanding">No Outstanding</SelectItem>
               <SelectItem value="has-outstanding">Has Outstanding</SelectItem>
               <SelectItem value="high-outstanding">High Outstanding (&gt;₹10K)</SelectItem>
@@ -101,7 +102,7 @@ export const VendorHistoryFilters: React.FC<VendorHistoryFiltersProps> = ({
           <Button
             variant="outline"
             onClick={clearFilters}
-            className="border-blue-300 text-blue-700 hover:bg-blue-100"
+            style={{ borderColor: '#9ECAD6', color: '#3d8f9e' }}
           >
             <X className="h-4 w-4 mr-2" />
             Clear Filters
