@@ -144,7 +144,7 @@ export function ProductPreview({ product }: ProductPreviewProps) {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-500">Unit Price</p>
-                      <p className="font-semibold">${variant.unitPrice.toFixed(2)}</p>
+                      <p className="font-semibold">₹{variant.unitPrice.toFixed(2)}</p>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-500">Stock Quantity</p>
