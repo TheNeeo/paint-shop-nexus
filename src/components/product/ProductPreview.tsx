@@ -167,7 +167,7 @@ export function ProductPreview({ product }: ProductPreviewProps) {
           <div>
             <p className="text-sm text-gray-600">Total Stock Value</p>
             <p className="text-xl font-bold text-blue-600">
-              ${(product.unitPrice * product.stockQuantity).toFixed(2)}
+              ₹{(product.unitPrice * product.stockQuantity).toFixed(2)}
             </p>
           </div>
           <div>
