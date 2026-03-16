@@ -78,7 +78,7 @@ export function ProductPreview({ product }: ProductPreviewProps) {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-500">Unit Price</p>
-              <p className="text-lg font-semibold">${product.unitPrice.toFixed(2)}</p>
+              <p className="text-lg font-semibold">₹{product.unitPrice.toFixed(2)}</p>
             </div>
             <div>
               <p className="text-sm font-medium text-gray-500">Unit</p>
@@ -144,7 +144,7 @@ export function ProductPreview({ product }: ProductPreviewProps) {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-500">Unit Price</p>
-                      <p className="font-semibold">${variant.unitPrice.toFixed(2)}</p>
+                      <p className="font-semibold">₹{variant.unitPrice.toFixed(2)}</p>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-500">Stock Quantity</p>
@@ -167,13 +167,13 @@ export function ProductPreview({ product }: ProductPreviewProps) {
           <div>
             <p className="text-sm text-gray-600">Total Stock Value</p>
             <p className="text-xl font-bold text-blue-600">
-              ${(product.unitPrice * product.stockQuantity).toFixed(2)}
+              ₹{(product.unitPrice * product.stockQuantity).toFixed(2)}
             </p>
           </div>
           <div>
             <p className="text-sm text-gray-600">Variants Stock Value</p>
             <p className="text-xl font-bold text-blue-600">
-              ${product.variants?.reduce((total, variant) => 
+              ₹{product.variants?.reduce((total, variant) => 
                 total + (variant.unitPrice * variant.stockQuantity), 0
               ).toFixed(2) || '0.00'}
             </p>
