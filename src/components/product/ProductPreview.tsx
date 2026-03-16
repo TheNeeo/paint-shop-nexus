@@ -173,7 +173,7 @@ export function ProductPreview({ product }: ProductPreviewProps) {
           <div>
             <p className="text-sm text-gray-600">Variants Stock Value</p>
             <p className="text-xl font-bold text-blue-600">
-              ${product.variants?.reduce((total, variant) => 
+              ₹{product.variants?.reduce((total, variant) => 
                 total + (variant.unitPrice * variant.stockQuantity), 0
               ).toFixed(2) || '0.00'}
             </p>

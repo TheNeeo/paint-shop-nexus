@@ -89,7 +89,7 @@ export function ProductFooter({
                 <div>
                   <span className="text-xs text-gray-600 block">Stock Value</span>
                   <Badge className="bg-blue-600 text-white border-none text-lg font-bold px-3 py-1 mt-1">
-                    $<AnimatedCounter target={totalValue} duration={2000} />
+                    ₹<AnimatedCounter target={totalValue} duration={2000} />
                   </Badge>
                 </div>
               </motion.div>
