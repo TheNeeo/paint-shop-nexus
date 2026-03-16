@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useCallback } from "react";
 import { MapPin, Droplets, Wind, Gauge, RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
@@ -353,8 +352,8 @@ export function WeatherWidget() {
         </div>
 
         {/* Forecast Section */}
-        <div className="mt-2">
-          <div className="flex justify-center gap-2.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+        <div className="mt-4 flex justify-center">
+          <div className="inline-flex gap-1.5" style={{ justifyContent: "center" }}>
             {weather.forecast.map((f, i) => (
               <motion.div
                 key={i}
