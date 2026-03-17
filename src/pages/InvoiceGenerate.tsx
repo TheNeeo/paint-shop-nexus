@@ -50,6 +50,12 @@ import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import invoiceGenerateIcon from "@/assets/invoice-generate-icon.png";
 import dashboardHomeIcon from "@/assets/dashboard-home-icon.png";
+import { InvoiceViewer } from "@/components/sales/InvoiceViewer";
+import {
+  Dialog,
+  DialogContent,
+} from "@/components/ui/dialog";
+import { ProfessionalInvoiceTemplate } from "@/components/sales/ProfessionalInvoiceTemplate";
 
 // Champagne Brown theme colors
 const THEME_PRIMARY = "#5D3A1A";
@@ -78,6 +84,7 @@ export default function InvoiceGenerate() {
   const [paidAmount, setPaidAmount] = useState<number>(0);
   const [notes, setNotes] = useState<string>("");
   const [terms, setTerms] = useState<string>("");
+  const [showPreview, setShowPreview] = useState<boolean>(false);
 
   // Fetch products
   const { data: products = [] } = useQuery({
@@ -730,8 +737,15 @@ export default function InvoiceGenerate() {
 
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-3 justify-end pt-4 border-t" style={{ borderColor: THEME_BORDER }}>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
+                  onClick={() => setShowPreview(true)}
+                  style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}
+                >
+                  👁️ Preview Invoice
+                </Button>
+                <Button
+                  variant="outline"
                   onClick={handleSaveDraft}
                   style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}
                 >
@@ -746,14 +760,14 @@ export default function InvoiceGenerate() {
                   <FileDown className="h-4 w-4 mr-2" />
                   Generate PDF
                 </Button>
-                <Button 
+                <Button
                   variant="outline"
                   style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}
                 >
                   <Printer className="h-4 w-4 mr-2" />
                   Print Invoice
                 </Button>
-                <Button 
+                <Button
                   variant="outline"
                   style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}
                 >
@@ -828,8 +842,8 @@ export default function InvoiceGenerate() {
 
           {/* Footer */}
           <div className="flex justify-between items-center text-sm pt-4 border-t" style={{ borderColor: THEME_BORDER, color: THEME_SECONDARY }}>
-            <a 
-              href="/sales" 
+            <a
+              href="/sales"
               className="hover:underline"
               style={{ color: THEME_PRIMARY }}
             >
@@ -838,6 +852,65 @@ export default function InvoiceGenerate() {
             <span>Last updated: {new Date().toLocaleString()}</span>
           </div>
         </div>
+
+        {/* Invoice Preview Dialog */}
+        <Dialog open={showPreview} onOpenChange={setShowPreview}>
+          <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto p-0 bg-white">
+            <ProfessionalInvoiceTemplate
+              invoiceNumber="INV-2025-001"
+              date={new Date().toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" })}
+              vendorName="Asian Paints Ltd"
+              vendorContact="9876543210"
+              vendorEmail="rajesh@asianpaints.com"
+              vendorGST="27AABCA1234B1Z5"
+              vendorAddress="Mumbai, MH"
+              invoiceStatus="Received"
+              paymentMethod="Bank Transfer"
+              items={invoiceItems.length > 0 ? invoiceItems.map((item) => ({
+                product: item.productName,
+                qty: item.quantity,
+                unitPrice: item.rate,
+                taxPercent: gstRate,
+                discountPercent: discount,
+                total: item.amount,
+              })) : [
+                {
+                  product: "Premium Emulsion Paint",
+                  qty: 50,
+                  unitPrice: 450,
+                  taxPercent: 18,
+                  discountPercent: 5,
+                  total: 21375,
+                },
+                {
+                  product: "Weather Coat Exterior",
+                  qty: 20,
+                  unitPrice: 1200,
+                  taxPercent: 18,
+                  discountPercent: 10,
+                  total: 25920,
+                },
+                {
+                  product: "Wood Primer",
+                  qty: 10,
+                  unitPrice: 800,
+                  taxPercent: 18,
+                  discountPercent: 0,
+                  total: 9440,
+                },
+              ]}
+              subtotal={subtotal}
+              taxAmount={gstAmount}
+              discount={discountAmount}
+              totalAmount={grandTotal}
+              paidAmount={paidAmount}
+              balanceDue={balanceDue}
+              onClose={() => setShowPreview(false)}
+              onDownloadPDF={handleGeneratePDF}
+              onPrint={() => window.print()}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
     </AppLayout>
   );
