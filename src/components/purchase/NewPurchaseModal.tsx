@@ -463,7 +463,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             {/* Basic Information */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <FormField
