@@ -45,8 +45,8 @@ import purchaseInvoiceIcon from '@/assets/purchase-invoice-icon.png';
 // Blue theme colors
 const THEME_PRIMARY = '#1e40af';
 const THEME_SECONDARY = '#3b82f6';
-const THEME_BG = 'rgba(59, 130, 246, 0.1)';
-const THEME_BORDER = 'rgba(59, 130, 246, 0.3)';
+const THEME_BG = '#f0f4ff';
+const THEME_BORDER = '#bfdbfe';
 
 // Validation schema
 const purchaseSchema = z.object({
