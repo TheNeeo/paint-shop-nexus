@@ -785,7 +785,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
             </div>
 
             {/* Bottom Section with Bill Upload and Totals */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Bill Upload */}
               <div>
                 <h3 className="text-lg font-semibold mb-4" style={{ color: THEME_PRIMARY }}>Attach Bill Image (Optional)</h3>
