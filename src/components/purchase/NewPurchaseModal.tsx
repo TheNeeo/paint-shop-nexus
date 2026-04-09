@@ -45,8 +45,8 @@ import purchaseInvoiceIcon from '@/assets/purchase-invoice-icon.png';
 // Blue theme colors
 const THEME_PRIMARY = '#1e40af';
 const THEME_SECONDARY = '#3b82f6';
-const THEME_BG = 'rgba(59, 130, 246, 0.1)';
-const THEME_BORDER = 'rgba(59, 130, 246, 0.3)';
+const THEME_BG = '#f0f4ff';
+const THEME_BORDER = '#bfdbfe';
 
 // Validation schema
 const purchaseSchema = z.object({
@@ -449,9 +449,9 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="max-w-7xl max-h-[90vh] overflow-y-auto z-[100]"
+        className="max-w-7xl max-h-[95vh] overflow-y-auto z-[100]"
         style={{ 
-          background: `linear-gradient(135deg, hsl(var(--background)) 0%, hsl(222, 47%, 11%) 100%)`,
+          background: '#eef2ff',
           borderColor: THEME_SECONDARY 
         }}
       >
@@ -463,7 +463,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             {/* Basic Information */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <FormField
@@ -551,8 +551,8 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
 
             {/* Items Section */}
             <div>
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold flex items-center gap-2" style={{ color: THEME_PRIMARY }}>
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-sm font-semibold flex items-center gap-2" style={{ color: THEME_PRIMARY }}>
                   <Package className="w-5 h-5" />
                   Purchase Items
                 </h3>
@@ -578,7 +578,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
               <div className="overflow-x-auto rounded-lg border" style={{ borderColor: THEME_BORDER }}>
                 <Table>
                   <TableHeader>
-                    <TableRow style={{ background: `linear-gradient(90deg, ${THEME_BG} 0%, rgba(30, 64, 175, 0.15) 100%)` }}>
+                    <TableRow style={{ background: '#dbeafe' }}>
                       <TableHead style={{ color: THEME_PRIMARY }} className="font-semibold">Product *</TableHead>
                       <TableHead style={{ color: THEME_PRIMARY }} className="font-semibold">Variant</TableHead>
                       <TableHead style={{ color: THEME_PRIMARY }} className="font-semibold">Category</TableHead>
@@ -785,16 +785,16 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
             </div>
 
             {/* Bottom Section with Bill Upload and Totals */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Bill Upload */}
               <div>
-                <h3 className="text-lg font-semibold mb-4" style={{ color: THEME_PRIMARY }}>Attach Bill Image (Optional)</h3>
+                <h3 className="text-sm font-semibold mb-2" style={{ color: THEME_PRIMARY }}>Attach Bill Image (Optional)</h3>
                 {!billImagePreview ? (
                   <div 
-                    className="border-2 border-dashed rounded-lg p-6 text-center"
+                    className="border-2 border-dashed rounded-lg p-4 text-center"
                     style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
                   >
-                    <Upload className="mx-auto h-12 w-12" style={{ color: THEME_SECONDARY }} />
+                    <Upload className="mx-auto h-8 w-8" style={{ color: THEME_SECONDARY }} />
                     <p className="mt-2 text-sm" style={{ color: THEME_PRIMARY }}>
                       Drag and drop your bill image here, or click to browse
                     </p>
@@ -839,7 +839,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                   </div>
                 )}
 
-                <div className="mt-4">
+                <div className="mt-3">
                   <FormField
                     control={form.control}
                     name="notes"
@@ -862,12 +862,12 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
 
               {/* Purchase Summary */}
               <div>
-                <h3 className="text-lg font-semibold mb-4" style={{ color: THEME_PRIMARY }}>Purchase Summary</h3>
+                <h3 className="text-sm font-semibold mb-2" style={{ color: THEME_PRIMARY }}>Purchase Summary</h3>
                 <div 
-                  className="p-4 rounded-lg space-y-3 border"
+                  className="p-3 rounded-lg space-y-2 border"
                   style={{ 
-                    background: `linear-gradient(90deg, ${THEME_BG} 0%, rgba(30, 64, 175, 0.15) 100%)`,
-                    borderColor: THEME_SECONDARY 
+                    background: '#dbeafe',
+                    borderColor: '#bfdbfe' 
                   }}
                 >
                   <div className="flex justify-between">
