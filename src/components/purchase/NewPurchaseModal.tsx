@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -33,7 +33,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Plus, Trash2, Upload, X, FileImage } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Plus, Trash2, Upload, X, FileImage, Package, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Vendor } from '@/types/purchase';
 import { useForm } from 'react-hook-form';
@@ -58,14 +59,37 @@ const purchaseSchema = z.object({
 
 type PurchaseFormData = z.infer<typeof purchaseSchema>;
 
+interface ProductData {
+  id: string;
+  name: string;
+  category_id: string | null;
+  category_name?: string;
+  unit: string | null;
+  purchase_price: number | null;
+  hsn_code: string | null;
+  is_variant: boolean | null;
+  parent_product_id: string | null;
+  manufacture_date: string | null;
+  expiry_date: string | null;
+  current_stock: number | null;
+}
+
 interface PurchaseItem {
+  product_id: string;
   product_name: string;
-  quantity: number;
+  variant_id: string;
+  variant_name: string;
+  category: string;
   unit: string;
+  batch_no: string;
+  mfg_date: string;
+  exp_date: string;
+  quantity: number;
   unit_price: number;
   tax_rate: number;
   discount_rate: number;
   total_amount: number;
+  has_expiry: boolean;
 }
 
 interface NewPurchaseModalProps {
@@ -74,15 +98,33 @@ interface NewPurchaseModalProps {
   onPurchaseCreated: () => void;
 }
 
+const emptyItem = (): PurchaseItem => ({
+  product_id: '',
+  product_name: '',
+  variant_id: '',
+  variant_name: '',
+  category: '',
+  unit: 'PCS',
+  batch_no: '',
+  mfg_date: '',
+  exp_date: '',
+  quantity: 1,
+  unit_price: 0,
+  tax_rate: 18,
+  discount_rate: 0,
+  total_amount: 0,
+  has_expiry: false,
+});
+
 export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
   isOpen,
   onClose,
   onPurchaseCreated
 }) => {
   const [vendors, setVendors] = useState<Vendor[]>([]);
-  const [items, setItems] = useState<PurchaseItem[]>([
-    { product_name: '', quantity: 1, unit: 'PCS', unit_price: 0, tax_rate: 18, discount_rate: 0, total_amount: 0 }
-  ]);
+  const [allProducts, setAllProducts] = useState<ProductData[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const [items, setItems] = useState<PurchaseItem[]>([emptyItem()]);
   const [discountAmount, setDiscountAmount] = useState(0);
   const [paidAmount, setPaidAmount] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -101,9 +143,19 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
     },
   });
 
+  // Separate parent products and variants
+  const parentProducts = useMemo(() => 
+    allProducts.filter(p => !p.is_variant), [allProducts]
+  );
+
+  const getVariantsForProduct = (parentId: string) => 
+    allProducts.filter(p => p.is_variant && p.parent_product_id === parentId);
+
   useEffect(() => {
     if (isOpen) {
       fetchVendors();
+      fetchProducts();
+      fetchCategories();
       generateBillNumber();
     }
   }, [isOpen]);
@@ -114,11 +166,36 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
         .from('vendors')
         .select('*')
         .order('name');
-      
       if (error) throw error;
       setVendors(data || []);
     } catch (error) {
       console.error('Error fetching vendors:', error);
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('id, name, category_id, unit, purchase_price, hsn_code, is_variant, parent_product_id, manufacture_date, expiry_date, current_stock')
+        .order('name');
+      if (error) throw error;
+      setAllProducts(data || []);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('id, name')
+        .order('name');
+      if (error) throw error;
+      setCategories(data || []);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
     }
   };
 
@@ -130,34 +207,76 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
     form.setValue('billNumber', `BILL-${year}${month}-${random}`);
   };
 
+  const getCategoryName = (categoryId: string | null) => {
+    if (!categoryId) return '';
+    const cat = categories.find(c => c.id === categoryId);
+    return cat?.name || '';
+  };
+
   const addItem = () => {
-    setItems([...items, { 
-      product_name: '', 
-      quantity: 1, 
-      unit: 'PCS',
-      unit_price: 0, 
-      tax_rate: 18, 
-      discount_rate: 0, 
-      total_amount: 0 
-    }]);
+    setItems([...items, emptyItem()]);
   };
 
   const removeItem = (index: number) => {
     setItems(items.filter((_, i) => i !== index));
   };
 
-  const updateItem = (index: number, field: keyof PurchaseItem, value: string | number) => {
-    const updatedItems = [...items];
-    updatedItems[index] = { ...updatedItems[index], [field]: value };
-    
-    // Calculate total amount for the item
-    const item = updatedItems[index];
+  const calculateItemTotal = (item: PurchaseItem) => {
     const subtotal = item.quantity * item.unit_price;
     const discountAmt = (subtotal * item.discount_rate) / 100;
     const afterDiscount = subtotal - discountAmt;
     const taxAmount = (afterDiscount * item.tax_rate) / 100;
-    item.total_amount = afterDiscount + taxAmount;
+    return afterDiscount + taxAmount;
+  };
+
+  const handleProductSelect = (index: number, productId: string) => {
+    const product = allProducts.find(p => p.id === productId);
+    if (!product) return;
+
+    const updatedItems = [...items];
+    const hasExpiry = !!(product.manufacture_date || product.expiry_date);
     
+    updatedItems[index] = {
+      ...updatedItems[index],
+      product_id: productId,
+      product_name: product.name,
+      variant_id: '',
+      variant_name: '',
+      category: getCategoryName(product.category_id),
+      unit: product.unit || 'PCS',
+      unit_price: product.purchase_price || 0,
+      tax_rate: 18,
+      mfg_date: product.manufacture_date || '',
+      exp_date: product.expiry_date || '',
+      has_expiry: hasExpiry,
+    };
+    updatedItems[index].total_amount = calculateItemTotal(updatedItems[index]);
+    setItems(updatedItems);
+    setItemsError('');
+  };
+
+  const handleVariantSelect = (index: number, variantId: string) => {
+    const variant = allProducts.find(p => p.id === variantId);
+    if (!variant) return;
+
+    const updatedItems = [...items];
+    updatedItems[index] = {
+      ...updatedItems[index],
+      variant_id: variantId,
+      variant_name: variant.name,
+      unit_price: variant.purchase_price || updatedItems[index].unit_price,
+      mfg_date: variant.manufacture_date || updatedItems[index].mfg_date,
+      exp_date: variant.expiry_date || updatedItems[index].exp_date,
+      has_expiry: !!(variant.manufacture_date || variant.expiry_date) || updatedItems[index].has_expiry,
+    };
+    updatedItems[index].total_amount = calculateItemTotal(updatedItems[index]);
+    setItems(updatedItems);
+  };
+
+  const updateItem = (index: number, field: keyof PurchaseItem, value: string | number | boolean) => {
+    const updatedItems = [...items];
+    (updatedItems[index] as any)[field] = value;
+    updatedItems[index].total_amount = calculateItemTotal(updatedItems[index]);
     setItems(updatedItems);
     setItemsError('');
   };
@@ -202,10 +321,10 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
 
   const validateItems = () => {
     const hasValidItems = items.some(item => 
-      item.product_name.trim() !== '' && item.quantity > 0 && item.unit_price > 0
+      item.product_id !== '' && item.quantity > 0 && item.unit_price > 0
     );
     if (!hasValidItems) {
-      setItemsError('At least one item with product name, quantity, and price is required');
+      setItemsError('At least one item with product, quantity, and rate is required');
       return false;
     }
     return true;
@@ -218,7 +337,6 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
     try {
       const totals = calculateTotals();
       
-      // Get current user
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       if (!currentUser) {
         throw new Error("User not authenticated");
@@ -247,10 +365,12 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
 
       if (purchaseError) throw purchaseError;
 
-      // Create purchase items with created_by_user_id
-      const purchaseItems = items.filter(item => item.product_name.trim() !== '').map(item => ({
+      // Create purchase items
+      const validItems = items.filter(item => item.product_id !== '');
+      const purchaseItems = validItems.map(item => ({
         purchase_id: purchase!.id,
-        product_name: item.product_name,
+        product_name: item.variant_name || item.product_name,
+        product_id: item.variant_id || item.product_id || null,
         quantity: item.quantity,
         unit_price: item.unit_price,
         tax_rate: item.tax_rate,
@@ -259,11 +379,50 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
         created_by_user_id: currentUser.id
       }));
 
-      const { error: itemsError } = await supabase
+      const { error: itemsErr } = await supabase
         .from('purchase_items')
         .insert(purchaseItems);
 
-      if (itemsError) throw itemsError;
+      if (itemsErr) throw itemsErr;
+
+      // Update stock for each item
+      for (const item of validItems) {
+        const targetProductId = item.variant_id || item.product_id;
+        if (!targetProductId) continue;
+
+        const product = allProducts.find(p => p.id === targetProductId);
+        const currentStock = product?.current_stock || 0;
+        const newStock = currentStock + item.quantity;
+
+        await supabase
+          .from('products')
+          .update({ current_stock: newStock })
+          .eq('id', targetProductId);
+
+        // If variant, also update parent stock
+        if (item.variant_id && item.product_id) {
+          const parentProduct = allProducts.find(p => p.id === item.product_id);
+          if (parentProduct) {
+            const parentStock = (parentProduct.current_stock || 0) + item.quantity;
+            await supabase
+              .from('products')
+              .update({ current_stock: parentStock })
+              .eq('id', item.product_id);
+          }
+        }
+
+        // Log stock adjustment
+        await supabase
+          .from('stock_adjustments')
+          .insert({
+            product_id: targetProductId,
+            quantity: item.quantity,
+            adjustment_type: 'purchase',
+            reason: `Purchase: ${data.billNumber}`,
+            reference_id: purchase!.id,
+            created_by_user_id: currentUser.id
+          });
+      }
 
       onPurchaseCreated();
       resetForm();
@@ -277,7 +436,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
 
   const resetForm = () => {
     form.reset();
-    setItems([{ product_name: '', quantity: 1, unit: 'PCS', unit_price: 0, tax_rate: 18, discount_rate: 0, total_amount: 0 }]);
+    setItems([emptyItem()]);
     setDiscountAmount(0);
     setPaidAmount(0);
     setBillImage(null);
@@ -290,7 +449,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="max-w-6xl max-h-[90vh] overflow-y-auto z-[100]"
+        className="max-w-7xl max-h-[90vh] overflow-y-auto z-[100]"
         style={{ 
           background: `linear-gradient(135deg, hsl(var(--background)) 0%, hsl(222, 47%, 11%) 100%)`,
           borderColor: THEME_SECONDARY 
@@ -298,7 +457,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3" style={{ color: THEME_PRIMARY }}>
-            <img src={purchaseInvoiceIcon} alt="Purchase" className="w-8 h-8" />
+            <img src={purchaseInvoiceIcon} alt="Purchase" className="w-8 h-8 animate-bounce" />
             Add Purchase Entry
           </DialogTitle>
         </DialogHeader>
@@ -393,7 +552,10 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
             {/* Items Section */}
             <div>
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold" style={{ color: THEME_PRIMARY }}>Purchase Items</h3>
+                <h3 className="text-lg font-semibold flex items-center gap-2" style={{ color: THEME_PRIMARY }}>
+                  <Package className="w-5 h-5" />
+                  Purchase Items
+                </h3>
                 <Button 
                   type="button"
                   onClick={addItem} 
@@ -407,104 +569,219 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
               </div>
 
               {itemsError && (
-                <p className="text-sm text-red-500 mb-2">{itemsError}</p>
+                <div className="flex items-center gap-2 text-sm text-red-500 mb-2">
+                  <AlertCircle className="w-4 h-4" />
+                  {itemsError}
+                </div>
               )}
 
-              <Table>
-                <TableHeader>
-                  <TableRow style={{ background: `linear-gradient(90deg, ${THEME_BG} 0%, rgba(30, 64, 175, 0.15) 100%)` }}>
-                    <TableHead style={{ color: THEME_PRIMARY }}>Product Name</TableHead>
-                    <TableHead style={{ color: THEME_PRIMARY }}>Unit</TableHead>
-                    <TableHead style={{ color: THEME_PRIMARY }}>Qty</TableHead>
-                    <TableHead style={{ color: THEME_PRIMARY }}>Rate</TableHead>
-                    <TableHead style={{ color: THEME_PRIMARY }}>GST %</TableHead>
-                    <TableHead style={{ color: THEME_PRIMARY }}>Disc %</TableHead>
-                    <TableHead style={{ color: THEME_PRIMARY }}>Total</TableHead>
-                    <TableHead></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {items.map((item, index) => (
-                    <TableRow key={index}>
-                      <TableCell>
-                        <Input
-                          value={item.product_name}
-                          onChange={(e) => updateItem(index, 'product_name', e.target.value)}
-                          placeholder="Product name"
-                          style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Select 
-                          value={item.unit} 
-                          onValueChange={(value) => updateItem(index, 'unit', value)}
-                        >
-                          <SelectTrigger className="w-20" style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="PCS">PCS</SelectItem>
-                            <SelectItem value="KG">KG</SelectItem>
-                            <SelectItem value="LTR">LTR</SelectItem>
-                            <SelectItem value="MTR">MTR</SelectItem>
-                            <SelectItem value="BOX">BOX</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          value={item.quantity}
-                          onChange={(e) => updateItem(index, 'quantity', parseInt(e.target.value) || 0)}
-                          className="w-20"
-                          style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          value={item.unit_price}
-                          onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
-                          className="w-24"
-                          style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          value={item.tax_rate}
-                          onChange={(e) => updateItem(index, 'tax_rate', parseFloat(e.target.value) || 0)}
-                          className="w-20"
-                          style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          value={item.discount_rate}
-                          onChange={(e) => updateItem(index, 'discount_rate', parseFloat(e.target.value) || 0)}
-                          className="w-20"
-                          style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium" style={{ color: THEME_PRIMARY }}>₹{item.total_amount.toFixed(2)}</TableCell>
-                      <TableCell>
-                        {items.length > 1 && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeItem(index)}
-                            className="text-red-600 hover:bg-red-100"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        )}
-                      </TableCell>
+              <div className="overflow-x-auto rounded-lg border" style={{ borderColor: THEME_BORDER }}>
+                <Table>
+                  <TableHeader>
+                    <TableRow style={{ background: `linear-gradient(90deg, ${THEME_BG} 0%, rgba(30, 64, 175, 0.15) 100%)` }}>
+                      <TableHead style={{ color: THEME_PRIMARY }} className="font-semibold">Product *</TableHead>
+                      <TableHead style={{ color: THEME_PRIMARY }} className="font-semibold">Variant</TableHead>
+                      <TableHead style={{ color: THEME_PRIMARY }} className="font-semibold">Category</TableHead>
+                      <TableHead style={{ color: THEME_PRIMARY }} className="font-semibold">Unit</TableHead>
+                      <TableHead style={{ color: THEME_PRIMARY }} className="font-semibold">Batch No</TableHead>
+                      <TableHead style={{ color: THEME_PRIMARY }} className="font-semibold">MFG Date</TableHead>
+                      <TableHead style={{ color: THEME_PRIMARY }} className="font-semibold">EXP Date</TableHead>
+                      <TableHead style={{ color: THEME_PRIMARY }} className="font-semibold">Qty *</TableHead>
+                      <TableHead style={{ color: THEME_PRIMARY }} className="font-semibold">Rate *</TableHead>
+                      <TableHead style={{ color: THEME_PRIMARY }} className="font-semibold">GST %</TableHead>
+                      <TableHead style={{ color: THEME_PRIMARY }} className="font-semibold">Disc %</TableHead>
+                      <TableHead style={{ color: THEME_PRIMARY }} className="font-semibold">Total</TableHead>
+                      <TableHead></TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {items.map((item, index) => {
+                      const variants = item.product_id ? getVariantsForProduct(item.product_id) : [];
+                      const showExpiryFields = item.has_expiry;
+
+                      return (
+                        <TableRow key={index} className="hover:bg-blue-50/50">
+                          {/* Product Dropdown */}
+                          <TableCell className="min-w-[160px]">
+                            <Select 
+                              value={item.product_id} 
+                              onValueChange={(val) => handleProductSelect(index, val)}
+                            >
+                              <SelectTrigger className="w-full text-xs" style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}>
+                                <SelectValue placeholder="Select Product" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {parentProducts.map(product => (
+                                  <SelectItem key={product.id} value={product.id}>
+                                    {product.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </TableCell>
+
+                          {/* Variant Dropdown */}
+                          <TableCell className="min-w-[140px]">
+                            {variants.length > 0 ? (
+                              <Select 
+                                value={item.variant_id} 
+                                onValueChange={(val) => handleVariantSelect(index, val)}
+                              >
+                                <SelectTrigger className="w-full text-xs" style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}>
+                                  <SelectValue placeholder="Select Variant" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {variants.map(v => (
+                                    <SelectItem key={v.id} value={v.id}>
+                                      {v.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            ) : (
+                              <span className="text-xs text-muted-foreground italic">No variants</span>
+                            )}
+                          </TableCell>
+
+                          {/* Category (Auto) */}
+                          <TableCell>
+                            {item.category ? (
+                              <Badge variant="outline" className="text-xs border-blue-300 text-blue-700 whitespace-nowrap">
+                                {item.category}
+                              </Badge>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">—</span>
+                            )}
+                          </TableCell>
+
+                          {/* Unit (Auto) */}
+                          <TableCell>
+                            <span className="text-xs font-medium" style={{ color: THEME_PRIMARY }}>
+                              {item.unit || '—'}
+                            </span>
+                          </TableCell>
+
+                          {/* Batch No */}
+                          <TableCell className="min-w-[100px]">
+                            {showExpiryFields ? (
+                              <Input
+                                value={item.batch_no}
+                                onChange={(e) => updateItem(index, 'batch_no', e.target.value)}
+                                placeholder="Batch"
+                                className="w-full text-xs"
+                                style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                              />
+                            ) : (
+                              <span className="text-xs text-muted-foreground">—</span>
+                            )}
+                          </TableCell>
+
+                          {/* MFG Date */}
+                          <TableCell className="min-w-[120px]">
+                            {showExpiryFields ? (
+                              <Input
+                                type="date"
+                                value={item.mfg_date}
+                                onChange={(e) => updateItem(index, 'mfg_date', e.target.value)}
+                                className="w-full text-xs"
+                                style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                              />
+                            ) : (
+                              <span className="text-xs text-muted-foreground">—</span>
+                            )}
+                          </TableCell>
+
+                          {/* EXP Date */}
+                          <TableCell className="min-w-[120px]">
+                            {showExpiryFields ? (
+                              <Input
+                                type="date"
+                                value={item.exp_date}
+                                onChange={(e) => updateItem(index, 'exp_date', e.target.value)}
+                                className="w-full text-xs"
+                                style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                              />
+                            ) : (
+                              <span className="text-xs text-muted-foreground">—</span>
+                            )}
+                          </TableCell>
+
+                          {/* Qty */}
+                          <TableCell>
+                            <Input
+                              type="number"
+                              value={item.quantity}
+                              onChange={(e) => updateItem(index, 'quantity', parseInt(e.target.value) || 0)}
+                              className="w-16 text-xs"
+                              min="0"
+                              style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                            />
+                          </TableCell>
+
+                          {/* Rate */}
+                          <TableCell>
+                            <Input
+                              type="number"
+                              value={item.unit_price}
+                              onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                              className="w-20 text-xs"
+                              min="0"
+                              step="0.01"
+                              style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                            />
+                          </TableCell>
+
+                          {/* GST % (Auto but editable) */}
+                          <TableCell>
+                            <Input
+                              type="number"
+                              value={item.tax_rate}
+                              onChange={(e) => updateItem(index, 'tax_rate', parseFloat(e.target.value) || 0)}
+                              className="w-16 text-xs"
+                              min="0"
+                              style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                            />
+                          </TableCell>
+
+                          {/* Discount % */}
+                          <TableCell>
+                            <Input
+                              type="number"
+                              value={item.discount_rate}
+                              onChange={(e) => updateItem(index, 'discount_rate', parseFloat(e.target.value) || 0)}
+                              className="w-16 text-xs"
+                              min="0"
+                              style={{ borderColor: THEME_SECONDARY, backgroundColor: THEME_BG }}
+                            />
+                          </TableCell>
+
+                          {/* Total (Auto) */}
+                          <TableCell>
+                            <span className="font-semibold text-xs whitespace-nowrap" style={{ color: THEME_PRIMARY }}>
+                              ₹{item.total_amount.toFixed(2)}
+                            </span>
+                          </TableCell>
+
+                          {/* Delete */}
+                          <TableCell>
+                            {items.length > 1 && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeItem(index)}
+                                className="text-red-600 hover:bg-red-100 h-7 w-7 p-0"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
 
             {/* Bottom Section with Bill Upload and Totals */}
