@@ -864,10 +864,10 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
               <div>
                 <h3 className="text-sm font-semibold mb-2" style={{ color: THEME_PRIMARY }}>Purchase Summary</h3>
                 <div 
-                  className="p-4 rounded-lg space-y-3 border"
+                  className="p-3 rounded-lg space-y-2 border"
                   style={{ 
-                    background: `linear-gradient(90deg, ${THEME_BG} 0%, rgba(30, 64, 175, 0.15) 100%)`,
-                    borderColor: THEME_SECONDARY 
+                    background: '#dbeafe',
+                    borderColor: '#bfdbfe' 
                   }}
                 >
                   <div className="flex justify-between">
