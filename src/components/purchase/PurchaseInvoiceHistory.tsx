@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -7,86 +7,86 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Search, Filter, Download, Eye, Edit, Trash2, FileDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
-interface InvoiceHistory {
-  id: string;
-  invoiceNo: string;
-  supplierName: string;
-  date: string;
-  totalAmount: number;
-  paymentStatus: 'Paid' | 'Partial' | 'Pending';
-}
-
-const mockInvoices: InvoiceHistory[] = [
-  {
-    id: '1',
-    invoiceNo: 'PI-2024-001',
-    supplierName: 'ABC Suppliers',
-    date: '2024-01-15',
-    totalAmount: 25000,
-    paymentStatus: 'Paid'
-  },
-  {
-    id: '2',
-    invoiceNo: 'PI-2024-002',
-    supplierName: 'XYZ Industries',
-    date: '2024-01-16',
-    totalAmount: 18500,
-    paymentStatus: 'Partial'
-  },
-  {
-    id: '3',
-    invoiceNo: 'PI-2024-003',
-    supplierName: 'DEF Traders',
-    date: '2024-01-17',
-    totalAmount: 12000,
-    paymentStatus: 'Pending'
-  }
-];
+import { supabase } from '@/integrations/supabase/client';
+import { Purchase } from '@/types/purchase';
+import { PurchaseInvoiceModal } from './PurchaseInvoiceModal';
+import { format } from 'date-fns';
 
 export const PurchaseInvoiceHistory = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [dateRange, setDateRange] = useState('all');
+  const [purchases, setPurchases] = useState<Purchase[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    fetchPurchases();
+  }, []);
+
+  const fetchPurchases = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('purchases')
+        .select('*, vendors(name)')
+        .order('purchase_date', { ascending: false });
+
+      if (error) throw error;
+
+      const mapped: Purchase[] = (data || []).map((p: any) => ({
+        id: p.id,
+        invoice_number: p.invoice_number,
+        vendor_id: p.vendor_id || '',
+        vendor_name: p.vendors?.name || 'Unknown Vendor',
+        purchase_date: p.purchase_date,
+        total_amount: p.total_amount || 0,
+        paid_amount: p.paid_amount || 0,
+        balance_amount: p.balance_amount || 0,
+        subtotal: p.subtotal || 0,
+        tax_amount: p.tax_amount || 0,
+        discount_amount: p.discount_amount || 0,
+        status: p.status || 'pending',
+        payment_method: p.payment_method,
+        notes: p.notes,
+        invoice_file_url: p.invoice_file_url,
+        created_at: p.created_at,
+      }));
+      setPurchases(mapped);
+    } catch (error) {
+      console.error('Error fetching purchases:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusBadge = (status: string) => {
-    const colors = {
-      'Paid': 'bg-green-100 text-green-800 border-green-200',
-      'Partial': 'bg-pink-100 text-pink-800 border-pink-200',
-      'Pending': 'bg-red-100 text-red-800 border-red-200'
+    const colors: Record<string, string> = {
+      'received': 'bg-green-100 text-green-800 border-green-200',
+      'pending': 'bg-orange-100 text-orange-800 border-orange-200',
+      'returned': 'bg-red-100 text-red-800 border-red-200',
     };
-    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800 border-gray-200';
+    return colors[status] || 'bg-gray-100 text-gray-800 border-gray-200';
   };
 
-  const handleView = (invoice: InvoiceHistory) => {
-    toast({
-      title: "View Invoice",
-      description: `Opening invoice ${invoice.invoiceNo}`,
-    });
+  const handleView = (purchase: Purchase) => {
+    setSelectedPurchase(purchase);
+    setIsModalOpen(true);
   };
 
-  const handleEdit = (invoice: InvoiceHistory) => {
-    toast({
-      title: "Edit Invoice",
-      description: `Editing invoice ${invoice.invoiceNo}`,
-    });
-  };
+  const filteredPurchases = purchases.filter(p => {
+    const matchesSearch = searchTerm === '' ||
+      p.invoice_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.vendor_name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
-  const handleDelete = (invoice: InvoiceHistory) => {
-    toast({
-      title: "Delete Invoice",
-      description: `Invoice ${invoice.invoiceNo} has been deleted`,
-      variant: "destructive"
-    });
-  };
-
-  const handleDownload = (invoice: InvoiceHistory) => {
-    toast({
-      title: "Download PDF",
-      description: `Downloading ${invoice.invoiceNo}.pdf`,
-    });
-  };
+  const totalAmount = filteredPurchases.reduce((s, p) => s + p.total_amount, 0);
+  const paidAmount = filteredPurchases.reduce((s, p) => s + p.paid_amount, 0);
+  const balanceDue = filteredPurchases.reduce((s, p) => s + p.balance_amount, 0);
 
   return (
     <div className="space-y-6">
@@ -107,7 +107,7 @@ export const PurchaseInvoiceHistory = () => {
               />
             </div>
             <Select value={dateRange} onValueChange={setDateRange}>
-              <SelectTrigger className="border-pink-300 focus:border-pink-500 focus:ring-pink-500">
+              <SelectTrigger className="border-pink-300">
                 <SelectValue placeholder="Date Range" />
               </SelectTrigger>
               <SelectContent>
@@ -115,18 +115,17 @@ export const PurchaseInvoiceHistory = () => {
                 <SelectItem value="today">Today</SelectItem>
                 <SelectItem value="week">This Week</SelectItem>
                 <SelectItem value="month">This Month</SelectItem>
-                <SelectItem value="quarter">This Quarter</SelectItem>
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="border-pink-300 focus:border-pink-500 focus:ring-pink-500">
+              <SelectTrigger className="border-pink-300">
                 <SelectValue placeholder="Payment Status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="paid">Paid</SelectItem>
-                <SelectItem value="partial">Partial</SelectItem>
+                <SelectItem value="received">Received</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="returned">Returned</SelectItem>
               </SelectContent>
             </Select>
             <Button variant="outline" className="border-pink-300 text-pink-700 hover:bg-pink-100">
@@ -147,87 +146,57 @@ export const PurchaseInvoiceHistory = () => {
           </Button>
         </CardHeader>
         <CardContent className="pt-6">
-          <div className="overflow-x-auto">
-            <table className="w-full bg-white rounded-lg">
-              <thead>
-                <tr className="border-b border-pink-200 bg-pink-100">
-                  <th className="text-left p-4 font-medium text-pink-800">Invoice No.</th>
-                  <th className="text-left p-4 font-medium text-pink-800">Supplier Name</th>
-                  <th className="text-left p-4 font-medium text-pink-800">Date</th>
-                  <th className="text-left p-4 font-medium text-pink-800">Total Amount</th>
-                  <th className="text-left p-4 font-medium text-pink-800">Payment Status</th>
-                  <th className="text-left p-4 font-medium text-pink-800">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {mockInvoices.map((invoice) => (
-                  <tr key={invoice.id} className="border-b border-pink-100 hover:bg-pink-50">
-                    <td className="p-4 font-medium text-pink-700">{invoice.invoiceNo}</td>
-                    <td className="p-4 text-pink-600">{invoice.supplierName}</td>
-                    <td className="p-4 text-pink-600">{new Date(invoice.date).toLocaleDateString()}</td>
-                    <td className="p-4 font-medium text-pink-700">₹{invoice.totalAmount.toLocaleString()}</td>
-                    <td className="p-4">
-                      <Badge className={getStatusBadge(invoice.paymentStatus)}>
-                        {invoice.paymentStatus}
-                      </Badge>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleView(invoice)}
-                          className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEdit(invoice)}
-                          className="text-green-600 hover:text-green-800 hover:bg-green-50"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDownload(invoice)}
-                          className="text-purple-600 hover:text-purple-800 hover:bg-purple-50"
-                        >
-                          <Download className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(invoice)}
-                          className="text-red-600 hover:text-red-800 hover:bg-red-50"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </td>
+          {loading ? (
+            <div className="text-center py-8 text-pink-600">Loading invoices...</div>
+          ) : filteredPurchases.length === 0 ? (
+            <div className="text-center py-8 text-pink-600">No purchase invoices found.</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full bg-white rounded-lg">
+                <thead>
+                  <tr className="border-b border-pink-200 bg-pink-100">
+                    <th className="text-left p-4 font-medium text-pink-800">Invoice No.</th>
+                    <th className="text-left p-4 font-medium text-pink-800">Vendor Name</th>
+                    <th className="text-left p-4 font-medium text-pink-800">Date</th>
+                    <th className="text-left p-4 font-medium text-pink-800">Total Amount</th>
+                    <th className="text-left p-4 font-medium text-pink-800">Status</th>
+                    <th className="text-left p-4 font-medium text-pink-800">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          
-          {/* Pagination */}
+                </thead>
+                <tbody>
+                  {filteredPurchases.map((purchase) => (
+                    <tr key={purchase.id} className="border-b border-pink-100 hover:bg-pink-50">
+                      <td className="p-4 font-medium text-pink-700">{purchase.invoice_number}</td>
+                      <td className="p-4 text-pink-600">{purchase.vendor_name}</td>
+                      <td className="p-4 text-pink-600">{format(new Date(purchase.purchase_date), 'dd/MM/yyyy')}</td>
+                      <td className="p-4 font-medium text-pink-700">₹{purchase.total_amount.toLocaleString('en-IN')}</td>
+                      <td className="p-4">
+                        <Badge className={getStatusBadge(purchase.status)}>
+                          {purchase.status.charAt(0).toUpperCase() + purchase.status.slice(1)}
+                        </Badge>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex gap-2">
+                          <Button variant="ghost" size="sm" onClick={() => handleView(purchase)}
+                            className="text-blue-600 hover:text-blue-800 hover:bg-blue-50">
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm"
+                            className="text-red-600 hover:text-red-800 hover:bg-red-50">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
           <div className="flex items-center justify-between mt-6">
             <div className="text-sm text-pink-600">
-              Showing 1 to 3 of 3 results
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" disabled className="border-pink-300 text-pink-400">
-                Previous
-              </Button>
-              <Button variant="outline" size="sm" className="bg-pink-100 text-pink-700 border-pink-300">
-                1
-              </Button>
-              <Button variant="outline" size="sm" disabled className="border-pink-300 text-pink-400">
-                Next
-              </Button>
+              Showing {filteredPurchases.length} results
             </div>
           </div>
         </CardContent>
@@ -236,38 +205,37 @@ export const PurchaseInvoiceHistory = () => {
       {/* Summary Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="bg-pink-50 border-pink-200">
-          <CardContent className="p-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-pink-600">3</div>
-              <div className="text-sm text-pink-500">Total Invoices</div>
-            </div>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-pink-600">{filteredPurchases.length}</div>
+            <div className="text-sm text-pink-500">Total Invoices</div>
           </CardContent>
         </Card>
         <Card className="bg-pink-50 border-pink-200">
-          <CardContent className="p-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">₹55,500</div>
-              <div className="text-sm text-pink-500">Total Amount</div>
-            </div>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-green-600">₹{totalAmount.toLocaleString('en-IN')}</div>
+            <div className="text-sm text-pink-500">Total Amount</div>
           </CardContent>
         </Card>
         <Card className="bg-pink-50 border-pink-200">
-          <CardContent className="p-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-pink-600">₹30,500</div>
-              <div className="text-sm text-pink-500">Paid Amount</div>
-            </div>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-pink-600">₹{paidAmount.toLocaleString('en-IN')}</div>
+            <div className="text-sm text-pink-500">Paid Amount</div>
           </CardContent>
         </Card>
         <Card className="bg-pink-50 border-pink-200">
-          <CardContent className="p-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-red-600">₹25,000</div>
-              <div className="text-sm text-pink-500">Balance Due</div>
-            </div>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-red-600">₹{balanceDue.toLocaleString('en-IN')}</div>
+            <div className="text-sm text-pink-500">Balance Due</div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Invoice Modal */}
+      <PurchaseInvoiceModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        purchase={selectedPurchase}
+      />
     </div>
   );
 };
