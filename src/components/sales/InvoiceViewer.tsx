@@ -57,7 +57,7 @@ export function InvoiceViewer({ isOpen, onClose, invoice }: InvoiceViewerProps) 
   };
 
   const handlePrint = () => window.print();
-  const handleDownload = () => alert('PDF download coming soon');
+  const handleDownload = () => { window.print(); };
 
   if (!invoice) return null;
 
