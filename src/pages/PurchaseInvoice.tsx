@@ -24,8 +24,15 @@ const PurchaseInvoice = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('create');
 
-  const handleExportCSV = () => {
-    console.log("Exporting CSV...");
+  const handleExportCSV = async () => {
+    try {
+      const { data, error } = await supabase.from('purchases').select('invoice_number, purchase_date, total_amount, paid_amount, balance_amount, status').order('purchase_date', { ascending: false });
+      if (error) throw error;
+      if (!data || data.length === 0) { toast.error("No invoice data to export"); return; }
+      const formatted = data.map(p => ({ Invoice: p.invoice_number, Date: p.purchase_date, Total: p.total_amount, Paid: p.paid_amount, Balance: p.balance_amount, Status: p.status }));
+      exportToCSV(formatted, 'purchase_invoices_export');
+      toast.success("Purchase invoices exported successfully!");
+    } catch (err) { toast.error("Failed to export purchase invoices"); }
   };
 
   return (
