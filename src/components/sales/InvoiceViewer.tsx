@@ -81,8 +81,20 @@ export function InvoiceViewer({ isOpen, onClose, invoice }: InvoiceViewerProps) 
           <div className="text-center py-12 text-gray-500">Loading invoice details...</div>
         ) : (
           <div className="relative bg-white rounded-2xl">
+            {/* Print styles */}
+            <style>{`
+              @media print {
+                body * { visibility: hidden !important; }
+                .invoice-print-area, .invoice-print-area * { visibility: visible !important; }
+                .invoice-print-area { position: absolute; left: 0; top: 0; width: 100%; }
+                .invoice-company-name { -webkit-text-fill-color: #1a237e !important; color: #1a237e !important; background: none !important; }
+                .invoice-badge { background: #5c6bc0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                .invoice-total-badge { background: #5c6bc0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                .invoice-header-bg { background: #e8eaf6 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+              }
+            `}</style>
             {/* Header with gradient */}
-            <div className="relative overflow-hidden rounded-t-2xl px-6 pt-6 pb-5"
+            <div className="invoice-header-bg relative overflow-hidden rounded-t-2xl px-6 pt-6 pb-5"
               style={{ background: 'linear-gradient(135deg, #e8eaf6 0%, #c5cae9 30%, #bbdefb 60%, #e1f5fe 100%)' }}>
               {/* Decorative dots */}
               <div className="absolute top-3 left-1/2 flex gap-1.5 opacity-30">
@@ -96,7 +108,7 @@ export function InvoiceViewer({ isOpen, onClose, invoice }: InvoiceViewerProps) 
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-2xl">🎨</span>
                     <div>
-                      <h2 className="text-xl font-bold" style={{ background: 'linear-gradient(90deg, #1a237e, #1565c0, #00897b, #e65100)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                      <h2 className="invoice-company-name text-xl font-bold" style={{ background: 'linear-gradient(90deg, #1a237e, #1565c0, #00897b, #e65100)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                         NEO COLOR FACTORY
                       </h2>
                       <p className="text-xs text-gray-500 -mt-0.5">Premium Paints & Coatings</p>
@@ -105,7 +117,7 @@ export function InvoiceViewer({ isOpen, onClose, invoice }: InvoiceViewerProps) 
                 </div>
 
                 <div className="text-right">
-                  <div className="inline-block px-4 py-1.5 rounded-full text-white font-bold text-sm"
+                  <div className="invoice-badge inline-block px-4 py-1.5 rounded-full text-white font-bold text-sm"
                     style={{ background: 'linear-gradient(135deg, #5c6bc0, #42a5f5, #7e57c2)' }}>
                     SALE INVOICE
                   </div>
