@@ -20,6 +20,9 @@ import { InventoryTable } from "@/components/inventory/InventoryTable";
 import { AddProductModal } from "@/components/inventory/AddProductModal";
 import { EditProductModal } from "@/components/inventory/EditProductModal";
 import { StockAdjustmentModal } from "@/components/inventory/StockAdjustmentModal";
+import { supabase } from "@/integrations/supabase/client";
+import { exportToCSV } from "@/lib/exportUtils";
+import { toast } from "sonner";
 import dashboardHomeIcon from "@/assets/dashboard-home-icon.png";
 import inventoryIcon from "@/assets/inventory-icon.png";
 

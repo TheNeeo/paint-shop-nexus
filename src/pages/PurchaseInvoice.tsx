@@ -17,6 +17,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Download, ShoppingCart, FileText, History, Plus } from 'lucide-react';
+import { supabase } from "@/integrations/supabase/client";
+import { exportToCSV } from "@/lib/exportUtils";
+import { toast } from "sonner";
 import dashboardHomeIcon from '@/assets/dashboard-home-icon.png';
 import purchaseInvoiceIcon from '@/assets/purchase-invoice-page-icon.png';
 
