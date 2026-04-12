@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { exportToCSV } from "@/lib/exportUtils";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
@@ -41,8 +44,15 @@ export default function CashReceipt() {
     setIsNewReceiptModalOpen(true);
   };
 
-  const handleExportCSV = () => {
-    console.log("Exporting CSV...");
+  const handleExportCSV = async () => {
+    try {
+      const { data, error } = await supabase.from('cash_receipts').select('receipt_no, receipt_date, payer_name, amount, payment_mode, reason, notes').order('receipt_date', { ascending: false });
+      if (error) throw error;
+      if (!data || data.length === 0) { toast.error("No receipt data to export"); return; }
+      const formatted = data.map(r => ({ 'Receipt No': r.receipt_no, Date: r.receipt_date, Payer: r.payer_name, Amount: r.amount, 'Payment Mode': r.payment_mode, Reason: r.reason || '', Notes: r.notes || '' }));
+      exportToCSV(formatted, 'cash_receipts_export');
+      toast.success("Cash receipts exported successfully!");
+    } catch (err) { toast.error("Failed to export cash receipts"); }
   };
 
   return (

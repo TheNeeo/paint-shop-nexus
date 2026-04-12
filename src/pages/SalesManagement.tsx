@@ -16,6 +16,9 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Download, Activity, ShoppingCart } from "lucide-react";
 import { SalesFilters } from "@/components/sales/SalesFilters";
 import { SalesTable } from "@/components/sales/SalesTable";
+import { supabase } from "@/integrations/supabase/client";
+import { exportToCSV } from "@/lib/exportUtils";
+import { toast } from "sonner";
 import { NewInvoiceModal } from "@/components/sales/NewInvoiceModal";
 import { InvoiceViewer } from "@/components/sales/InvoiceViewer";
 import { SalesSummary } from "@/components/sales/SalesSummary";
@@ -41,9 +44,15 @@ export default function SalesManagement() {
     setIsInvoiceViewerOpen(true);
   };
 
-  const handleExportCSV = () => {
-    // Export functionality
-    console.log("Exporting CSV...");
+  const handleExportCSV = async () => {
+    try {
+      const { data, error } = await supabase.from('sales').select('invoice_number, invoice_date, customer_name, total_amount, paid_amount, pending_amount, payment_mode, payment_status').order('invoice_date', { ascending: false });
+      if (error) throw error;
+      if (!data || data.length === 0) { toast.error("No sales data to export"); return; }
+      const formatted = data.map(s => ({ Invoice: s.invoice_number, Date: s.invoice_date, Customer: s.customer_name || 'Walk-in', Total: s.total_amount, Paid: s.paid_amount, Pending: s.pending_amount, 'Payment Mode': s.payment_mode || 'N/A', Status: s.payment_status }));
+      exportToCSV(formatted, 'sales_export');
+      toast.success("Sales data exported successfully!");
+    } catch (err) { toast.error("Failed to export sales data"); }
   };
 
   return (

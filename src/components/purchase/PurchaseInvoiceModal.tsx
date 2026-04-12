@@ -54,7 +54,7 @@ export const PurchaseInvoiceModal: React.FC<PurchaseInvoiceModalProps> = ({
   };
 
   const handlePrint = () => window.print();
-  const handleDownload = () => alert('Download functionality would be implemented here');
+  const handleDownload = () => { window.print(); };
 
   if (!purchase) return null;
 

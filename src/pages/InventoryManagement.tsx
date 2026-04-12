@@ -20,6 +20,9 @@ import { InventoryTable } from "@/components/inventory/InventoryTable";
 import { AddProductModal } from "@/components/inventory/AddProductModal";
 import { EditProductModal } from "@/components/inventory/EditProductModal";
 import { StockAdjustmentModal } from "@/components/inventory/StockAdjustmentModal";
+import { supabase } from "@/integrations/supabase/client";
+import { exportToCSV } from "@/lib/exportUtils";
+import { toast } from "sonner";
 import dashboardHomeIcon from "@/assets/dashboard-home-icon.png";
 import inventoryIcon from "@/assets/inventory-icon.png";
 
@@ -43,8 +46,15 @@ export default function InventoryManagement() {
     setIsAdjustmentModalOpen(true);
   };
 
-  const handleExportCSV = () => {
-    console.log("Exporting CSV...");
+  const handleExportCSV = async () => {
+    try {
+      const { data, error } = await supabase.from('products').select('name, unit, current_stock, purchase_price, sale_price, mrp, threshold_qty, status').order('name');
+      if (error) throw error;
+      if (!data || data.length === 0) { toast.error("No inventory data to export"); return; }
+      const formatted = data.map(p => ({ Product: p.name, Unit: p.unit, Stock: p.current_stock, 'Purchase Price': p.purchase_price, 'Sale Price': p.sale_price, MRP: p.mrp, 'Threshold Qty': p.threshold_qty, Status: p.status }));
+      exportToCSV(formatted, 'inventory_export');
+      toast.success("Inventory data exported successfully!");
+    } catch (err) { toast.error("Failed to export inventory data"); }
   };
 
   return (

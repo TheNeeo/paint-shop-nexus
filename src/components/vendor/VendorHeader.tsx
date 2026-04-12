@@ -3,6 +3,9 @@ import { motion } from "framer-motion";
 import { Plus, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { exportToCSV } from "@/lib/exportUtils";
+import { toast } from "sonner";
 import vendorIcon from "@/assets/vendor-icon.png";
 
 // Theme colors for Vendor Information
@@ -16,8 +19,15 @@ interface VendorHeaderProps {
 }
 
 export function VendorHeader({ onAddVendor }: VendorHeaderProps) {
-  const handleExportCSV = () => {
-    console.log("Exporting CSV...");
+  const handleExportCSV = async () => {
+    try {
+      const { data, error } = await supabase.from('vendors').select('name, phone, email, gst_number, address, contact_person, status').order('name');
+      if (error) throw error;
+      if (!data || data.length === 0) { toast.error("No vendor data to export"); return; }
+      const formatted = data.map(v => ({ Name: v.name, Phone: v.phone || '', Email: v.email || '', GST: v.gst_number || '', Address: v.address || '', 'Contact Person': v.contact_person || '', Status: v.status }));
+      exportToCSV(formatted, 'vendors_export');
+      toast.success("Vendor data exported successfully!");
+    } catch (err) { toast.error("Failed to export vendor data"); }
   };
 
   return (
