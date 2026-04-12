@@ -261,7 +261,7 @@ export function InvoiceViewer({ isOpen, onClose, invoice }: InvoiceViewerProps) 
                     </div>
 
                     {/* Total Amount badge */}
-                    <div className="rounded-full px-4 py-2 flex items-center justify-between text-white font-bold"
+                    <div className="invoice-total-badge rounded-full px-4 py-2 flex items-center justify-between text-white font-bold"
                       style={{ background: 'linear-gradient(135deg, #5c6bc0, #42a5f5, #7e57c2)' }}>
                       <span className="text-xs">Total Amount</span>
                       <span>₹{totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
