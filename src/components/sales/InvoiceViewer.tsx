@@ -80,7 +80,7 @@ export function InvoiceViewer({ isOpen, onClose, invoice }: InvoiceViewerProps) 
         {loading ? (
           <div className="text-center py-12 text-gray-500">Loading invoice details...</div>
         ) : (
-          <div className="relative bg-white rounded-2xl">
+          <div className="invoice-print-area relative bg-white rounded-2xl">
             {/* Print styles */}
             <style>{`
               @media print {
