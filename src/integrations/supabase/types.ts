@@ -510,6 +510,7 @@ export type Database = {
           payment_mode: string | null
           payment_status: string | null
           pending_amount: number | null
+          status: string
           subtotal: number | null
           tax_amount: number | null
           total_amount: number | null
@@ -530,6 +531,7 @@ export type Database = {
           payment_mode?: string | null
           payment_status?: string | null
           pending_amount?: number | null
+          status?: string
           subtotal?: number | null
           tax_amount?: number | null
           total_amount?: number | null
@@ -550,6 +552,7 @@ export type Database = {
           payment_mode?: string | null
           payment_status?: string | null
           pending_amount?: number | null
+          status?: string
           subtotal?: number | null
           tax_amount?: number | null
           total_amount?: number | null

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import {
@@ -30,6 +30,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   FileText,
   DollarSign,
@@ -46,8 +47,9 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+import { toast as sonnerToast } from "sonner";
 import invoiceGenerateIcon from "@/assets/invoice-generate-icon.png";
 import dashboardHomeIcon from "@/assets/dashboard-home-icon.png";
 
@@ -71,6 +73,7 @@ interface InvoiceItem {
 export default function InvoiceGenerate() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [selectedCustomer, setSelectedCustomer] = useState<string>("");
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
   const [discount, setDiscount] = useState<number>(0);
@@ -78,6 +81,8 @@ export default function InvoiceGenerate() {
   const [paidAmount, setPaidAmount] = useState<number>(0);
   const [notes, setNotes] = useState<string>("");
   const [terms, setTerms] = useState<string>("");
+  const [saving, setSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState("history");
 
   // Fetch products
   const { data: products = [] } = useQuery({
@@ -100,6 +105,34 @@ export default function InvoiceGenerate() {
         .from("categories")
         .select("*")
         .order("name");
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Fetch invoice history (final)
+  const { data: invoiceHistory = [] } = useQuery({
+    queryKey: ["invoice-history"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("sales")
+        .select("*")
+        .eq("status", "final")
+        .order("invoice_date", { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Fetch invoice drafts
+  const { data: invoiceDrafts = [] } = useQuery({
+    queryKey: ["invoice-drafts"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("sales")
+        .select("*")
+        .eq("status", "draft")
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data || [];
     },
@@ -146,18 +179,119 @@ export default function InvoiceGenerate() {
     );
   };
 
-  const handleSaveDraft = () => {
-    toast({
-      title: "Draft Saved",
-      description: "Invoice draft has been saved successfully.",
-    });
+  const resetForm = () => {
+    setInvoiceItems([]);
+    setSelectedCustomer("");
+    setDiscount(0);
+    setGstRate(18);
+    setPaidAmount(0);
+    setNotes("");
+    setTerms("");
   };
+
+  const saveInvoice = async (status: 'draft' | 'final') => {
+    if (invoiceItems.length === 0) {
+      sonnerToast.error("कम से कम एक product add करें");
+      return;
+    }
+    setSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const invoiceNumber = `INV-${Date.now().toString().slice(-8)}`;
+      const paymentStatus = paidAmount >= grandTotal ? 'paid' : paidAmount > 0 ? 'partial' : 'pending';
+
+      const { data: sale, error: saleError } = await supabase
+        .from('sales')
+        .insert([{
+          invoice_number: invoiceNumber,
+          invoice_date: new Date().toISOString().split('T')[0],
+          customer_name: selectedCustomer || 'Walk-in',
+          subtotal,
+          tax_amount: gstAmount,
+          discount_amount: discountAmount,
+          total_amount: grandTotal,
+          paid_amount: paidAmount,
+          pending_amount: balanceDue,
+          payment_mode: null,
+          payment_status: paymentStatus,
+          is_gst_inclusive: false,
+          notes: notes || null,
+          created_by_user_id: user.id,
+          status,
+        }])
+        .select()
+        .single();
+
+      if (saleError) throw saleError;
+
+      // Insert sale items
+      if (invoiceItems.length > 0) {
+        const saleItems = invoiceItems.map(item => ({
+          sale_id: sale!.id,
+          product_name: item.productName,
+          hsn_code: item.hsnCode,
+          quantity: item.quantity,
+          unit: item.unit,
+          rate: item.rate,
+          gst_percent: 0,
+          amount: item.amount,
+        }));
+        const { error: itemsError } = await supabase.from('sale_items').insert(saleItems);
+        if (itemsError) throw itemsError;
+      }
+
+      queryClient.invalidateQueries({ queryKey: ["invoice-history"] });
+      queryClient.invalidateQueries({ queryKey: ["invoice-drafts"] });
+
+      if (status === 'draft') {
+        sonnerToast.success(`Draft ${invoiceNumber} save हो गया!`);
+        setActiveTab("drafts");
+      } else {
+        sonnerToast.success(`Invoice ${invoiceNumber} save हो गया!`);
+        setActiveTab("history");
+      }
+      resetForm();
+    } catch (err: any) {
+      console.error("Error saving invoice:", err);
+      sonnerToast.error(err.message || "Invoice save करने में error आया");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSaveDraft = () => saveInvoice('draft');
+  const handleSaveInvoice = () => saveInvoice('final');
 
   const handleGeneratePDF = () => {
     toast({
       title: "PDF Generated",
       description: "Invoice PDF is ready for download.",
     });
+  };
+
+  const handleDeleteDraft = async (id: string) => {
+    try {
+      await supabase.from('sale_items').delete().eq('sale_id', id);
+      await supabase.from('sales').delete().eq('id', id);
+      queryClient.invalidateQueries({ queryKey: ["invoice-drafts"] });
+      sonnerToast.success("Draft delete हो गया!");
+    } catch {
+      sonnerToast.error("Draft delete करने में error आया");
+    }
+  };
+
+  const handleFinalizeDraft = async (id: string) => {
+    try {
+      await supabase.from('sales').update({ status: 'final' }).eq('id', id);
+      queryClient.invalidateQueries({ queryKey: ["invoice-history"] });
+      queryClient.invalidateQueries({ queryKey: ["invoice-drafts"] });
+      sonnerToast.success("Draft finalize हो गया! Invoice History में move किया।");
+      setActiveTab("history");
+    } catch {
+      sonnerToast.error("Draft finalize करने में error आया");
+    }
   };
 
   return (
@@ -733,10 +867,11 @@ export default function InvoiceGenerate() {
                 <Button 
                   variant="outline" 
                   onClick={handleSaveDraft}
+                  disabled={saving}
                   style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}
                 >
                   <Save className="h-4 w-4 mr-2" />
-                  Save Draft
+                  {saving ? 'Saving...' : 'Save Draft'}
                 </Button>
                 <Button
                   variant="outline"
@@ -748,82 +883,159 @@ export default function InvoiceGenerate() {
                 </Button>
                 <Button 
                   variant="outline"
+                  onClick={() => window.print()}
                   style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}
                 >
                   <Printer className="h-4 w-4 mr-2" />
                   Print Invoice
                 </Button>
-                <Button 
-                  variant="outline"
-                  style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}
-                >
-                  <Mail className="h-4 w-4 mr-2" />
-                  Send via Email
-                </Button>
                 <Button
-                  style={{ backgroundColor: THEME_PRIMARY, color: "#fff" }}
-                  className="hover:opacity-90"
+                  onClick={handleSaveInvoice}
+                  disabled={saving}
+                  style={{ backgroundColor: '#16a34a', color: "#fff" }}
+                  className="hover:opacity-90 shadow-md"
                 >
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Send via WhatsApp
+                  <FileText className="h-4 w-4 mr-2" />
+                  {saving ? 'Saving...' : 'Save Invoice'}
                 </Button>
               </div>
             </CardContent>
           </Card>
 
-          {/* Invoice History Table */}
+          {/* Invoice History & Drafts Tabs */}
           <Card style={{ borderColor: THEME_BORDER, borderWidth: "2px" }}>
-            <CardHeader style={{ backgroundColor: `${THEME_BG}60` }}>
-              <CardTitle style={{ color: THEME_PRIMARY }}>Invoice History</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <Table>
-                <TableHeader style={{ backgroundColor: `${THEME_BG}40` }}>
-                  <TableRow>
-                    <TableHead style={{ color: THEME_PRIMARY }}>Invoice No.</TableHead>
-                    <TableHead style={{ color: THEME_PRIMARY }}>Customer Name</TableHead>
-                    <TableHead style={{ color: THEME_PRIMARY }}>Date</TableHead>
-                    <TableHead style={{ color: THEME_PRIMARY }}>Amount</TableHead>
-                    <TableHead style={{ color: THEME_PRIMARY }}>Status</TableHead>
-                    <TableHead style={{ color: THEME_PRIMARY }}>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell className="font-medium" style={{ color: THEME_PRIMARY }}>INV-2024-150</TableCell>
-                    <TableCell style={{ color: THEME_SECONDARY }}>John Doe</TableCell>
-                    <TableCell style={{ color: THEME_SECONDARY }}>2025-01-10</TableCell>
-                    <TableCell style={{ color: THEME_PRIMARY }}>₹12,500</TableCell>
-                    <TableCell>
-                      <Badge className="bg-green-100 text-green-700">Paid</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm" style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}>View</Button>
-                        <Button variant="outline" size="sm" style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}>Edit</Button>
-                        <Button variant="outline" size="sm" style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}>PDF</Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium" style={{ color: THEME_PRIMARY }}>INV-2024-149</TableCell>
-                    <TableCell style={{ color: THEME_SECONDARY }}>Jane Smith</TableCell>
-                    <TableCell style={{ color: THEME_SECONDARY }}>2025-01-09</TableCell>
-                    <TableCell style={{ color: THEME_PRIMARY }}>₹8,750</TableCell>
-                    <TableCell>
-                      <Badge className="bg-yellow-100 text-yellow-700">Unpaid</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm" style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}>View</Button>
-                        <Button variant="outline" size="sm" style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}>Edit</Button>
-                        <Button variant="outline" size="sm" style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}>PDF</Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </CardContent>
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <CardHeader style={{ backgroundColor: `${THEME_BG}60` }} className="pb-0">
+                <TabsList className="w-fit" style={{ backgroundColor: `${THEME_BG}` }}>
+                  <TabsTrigger 
+                    value="history" 
+                    className="data-[state=active]:text-white px-6 py-2"
+                    style={{ 
+                      ...(activeTab === 'history' ? { backgroundColor: THEME_PRIMARY } : { color: THEME_PRIMARY })
+                    }}
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Invoice History ({invoiceHistory.length})
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="drafts" 
+                    className="data-[state=active]:text-white px-6 py-2"
+                    style={{ 
+                      ...(activeTab === 'drafts' ? { backgroundColor: '#d97706' } : { color: '#d97706' })
+                    }}
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    Invoice Drafts ({invoiceDrafts.length})
+                  </TabsTrigger>
+                </TabsList>
+              </CardHeader>
+
+              <CardContent className="pt-4">
+                {/* Invoice History Tab */}
+                <TabsContent value="history" className="mt-0">
+                  <Table>
+                    <TableHeader style={{ backgroundColor: `${THEME_BG}40` }}>
+                      <TableRow>
+                        <TableHead style={{ color: THEME_PRIMARY }}>Invoice No.</TableHead>
+                        <TableHead style={{ color: THEME_PRIMARY }}>Customer Name</TableHead>
+                        <TableHead style={{ color: THEME_PRIMARY }}>Date</TableHead>
+                        <TableHead style={{ color: THEME_PRIMARY }}>Amount</TableHead>
+                        <TableHead style={{ color: THEME_PRIMARY }}>Status</TableHead>
+                        <TableHead style={{ color: THEME_PRIMARY }}>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {invoiceHistory.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={6} className="text-center py-8" style={{ color: THEME_SECONDARY }}>
+                            कोई invoice history नहीं है। पहला invoice बनाएं!
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        invoiceHistory.map((inv: any) => (
+                          <TableRow key={inv.id}>
+                            <TableCell className="font-medium" style={{ color: THEME_PRIMARY }}>{inv.invoice_number}</TableCell>
+                            <TableCell style={{ color: THEME_SECONDARY }}>{inv.customer_name || 'Walk-in'}</TableCell>
+                            <TableCell style={{ color: THEME_SECONDARY }}>{inv.invoice_date}</TableCell>
+                            <TableCell style={{ color: THEME_PRIMARY }}>₹{Number(inv.total_amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</TableCell>
+                            <TableCell>
+                              <Badge className={
+                                inv.payment_status === 'paid' ? 'bg-green-100 text-green-700' :
+                                inv.payment_status === 'partial' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-red-100 text-red-700'
+                              }>
+                                {inv.payment_status === 'paid' ? 'Paid' : inv.payment_status === 'partial' ? 'Partial' : 'Pending'}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-2">
+                                <Button variant="outline" size="sm" style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}>View</Button>
+                                <Button variant="outline" size="sm" onClick={() => window.print()} style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}>PDF</Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </TabsContent>
+
+                {/* Invoice Drafts Tab */}
+                <TabsContent value="drafts" className="mt-0">
+                  <Table>
+                    <TableHeader style={{ backgroundColor: '#fef3c740' }}>
+                      <TableRow>
+                        <TableHead style={{ color: '#92400e' }}>Invoice No.</TableHead>
+                        <TableHead style={{ color: '#92400e' }}>Customer Name</TableHead>
+                        <TableHead style={{ color: '#92400e' }}>Date</TableHead>
+                        <TableHead style={{ color: '#92400e' }}>Amount</TableHead>
+                        <TableHead style={{ color: '#92400e' }}>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {invoiceDrafts.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={5} className="text-center py-8" style={{ color: '#92400e' }}>
+                            कोई draft invoice नहीं है।
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        invoiceDrafts.map((draft: any) => (
+                          <TableRow key={draft.id} className="bg-amber-50/30">
+                            <TableCell className="font-medium" style={{ color: '#92400e' }}>{draft.invoice_number}</TableCell>
+                            <TableCell style={{ color: '#b45309' }}>{draft.customer_name || 'Walk-in'}</TableCell>
+                            <TableCell style={{ color: '#b45309' }}>{draft.invoice_date}</TableCell>
+                            <TableCell style={{ color: '#92400e' }}>₹{Number(draft.total_amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</TableCell>
+                            <TableCell>
+                              <div className="flex gap-2">
+                                <Button 
+                                  size="sm" 
+                                  onClick={() => handleFinalizeDraft(draft.id)}
+                                  style={{ backgroundColor: '#16a34a', color: '#fff' }}
+                                  className="hover:opacity-90"
+                                >
+                                  <FileText className="h-3 w-3 mr-1" />
+                                  Finalize
+                                </Button>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  onClick={() => handleDeleteDraft(draft.id)}
+                                  className="text-red-600 border-red-300 hover:bg-red-50"
+                                >
+                                  <Trash2 className="h-3 w-3 mr-1" />
+                                  Delete
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </TabsContent>
+              </CardContent>
+            </Tabs>
           </Card>
 
           {/* Footer */}
