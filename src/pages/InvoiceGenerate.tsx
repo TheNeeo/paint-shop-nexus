@@ -47,8 +47,9 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+import { toast as sonnerToast } from "sonner";
 import invoiceGenerateIcon from "@/assets/invoice-generate-icon.png";
 import dashboardHomeIcon from "@/assets/dashboard-home-icon.png";
 
