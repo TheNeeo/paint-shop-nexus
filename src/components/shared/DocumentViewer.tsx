@@ -21,7 +21,7 @@ interface DocumentItem {
   unit?: string;
 }
 
-interface DocumentData {
+export interface DocumentData {
   documentType: DocumentType;
   documentNumber: string;
   date: string;
