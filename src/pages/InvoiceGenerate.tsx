@@ -110,6 +110,34 @@ export default function InvoiceGenerate() {
     },
   });
 
+  // Fetch invoice history (final)
+  const { data: invoiceHistory = [] } = useQuery({
+    queryKey: ["invoice-history"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("sales")
+        .select("*")
+        .eq("status", "final")
+        .order("invoice_date", { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Fetch invoice drafts
+  const { data: invoiceDrafts = [] } = useQuery({
+    queryKey: ["invoice-drafts"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("sales")
+        .select("*")
+        .eq("status", "draft")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
   // Calculate totals
   const subtotal = invoiceItems.reduce((sum, item) => sum + item.amount, 0);
   const discountAmount = (subtotal * discount) / 100;
@@ -151,18 +179,119 @@ export default function InvoiceGenerate() {
     );
   };
 
-  const handleSaveDraft = () => {
-    toast({
-      title: "Draft Saved",
-      description: "Invoice draft has been saved successfully.",
-    });
+  const resetForm = () => {
+    setInvoiceItems([]);
+    setSelectedCustomer("");
+    setDiscount(0);
+    setGstRate(18);
+    setPaidAmount(0);
+    setNotes("");
+    setTerms("");
   };
+
+  const saveInvoice = async (status: 'draft' | 'final') => {
+    if (invoiceItems.length === 0) {
+      sonnerToast.error("कम से कम एक product add करें");
+      return;
+    }
+    setSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const invoiceNumber = `INV-${Date.now().toString().slice(-8)}`;
+      const paymentStatus = paidAmount >= grandTotal ? 'paid' : paidAmount > 0 ? 'partial' : 'pending';
+
+      const { data: sale, error: saleError } = await supabase
+        .from('sales')
+        .insert([{
+          invoice_number: invoiceNumber,
+          invoice_date: new Date().toISOString().split('T')[0],
+          customer_name: selectedCustomer || 'Walk-in',
+          subtotal,
+          tax_amount: gstAmount,
+          discount_amount: discountAmount,
+          total_amount: grandTotal,
+          paid_amount: paidAmount,
+          pending_amount: balanceDue,
+          payment_mode: null,
+          payment_status: paymentStatus,
+          is_gst_inclusive: false,
+          notes: notes || null,
+          created_by_user_id: user.id,
+          status,
+        }])
+        .select()
+        .single();
+
+      if (saleError) throw saleError;
+
+      // Insert sale items
+      if (invoiceItems.length > 0) {
+        const saleItems = invoiceItems.map(item => ({
+          sale_id: sale!.id,
+          product_name: item.productName,
+          hsn_code: item.hsnCode,
+          quantity: item.quantity,
+          unit: item.unit,
+          rate: item.rate,
+          gst_percent: 0,
+          amount: item.amount,
+        }));
+        const { error: itemsError } = await supabase.from('sale_items').insert(saleItems);
+        if (itemsError) throw itemsError;
+      }
+
+      queryClient.invalidateQueries({ queryKey: ["invoice-history"] });
+      queryClient.invalidateQueries({ queryKey: ["invoice-drafts"] });
+
+      if (status === 'draft') {
+        sonnerToast.success(`Draft ${invoiceNumber} save हो गया!`);
+        setActiveTab("drafts");
+      } else {
+        sonnerToast.success(`Invoice ${invoiceNumber} save हो गया!`);
+        setActiveTab("history");
+      }
+      resetForm();
+    } catch (err: any) {
+      console.error("Error saving invoice:", err);
+      sonnerToast.error(err.message || "Invoice save करने में error आया");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSaveDraft = () => saveInvoice('draft');
+  const handleSaveInvoice = () => saveInvoice('final');
 
   const handleGeneratePDF = () => {
     toast({
       title: "PDF Generated",
       description: "Invoice PDF is ready for download.",
     });
+  };
+
+  const handleDeleteDraft = async (id: string) => {
+    try {
+      await supabase.from('sale_items').delete().eq('sale_id', id);
+      await supabase.from('sales').delete().eq('id', id);
+      queryClient.invalidateQueries({ queryKey: ["invoice-drafts"] });
+      sonnerToast.success("Draft delete हो गया!");
+    } catch {
+      sonnerToast.error("Draft delete करने में error आया");
+    }
+  };
+
+  const handleFinalizeDraft = async (id: string) => {
+    try {
+      await supabase.from('sales').update({ status: 'final' }).eq('id', id);
+      queryClient.invalidateQueries({ queryKey: ["invoice-history"] });
+      queryClient.invalidateQueries({ queryKey: ["invoice-drafts"] });
+      sonnerToast.success("Draft finalize हो गया! Invoice History में move किया।");
+      setActiveTab("history");
+    } catch {
+      sonnerToast.error("Draft finalize करने में error आया");
+    }
   };
 
   return (
