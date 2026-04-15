@@ -73,6 +73,7 @@ interface InvoiceItem {
 export default function InvoiceGenerate() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [selectedCustomer, setSelectedCustomer] = useState<string>("");
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
   const [discount, setDiscount] = useState<number>(0);
@@ -80,6 +81,8 @@ export default function InvoiceGenerate() {
   const [paidAmount, setPaidAmount] = useState<number>(0);
   const [notes, setNotes] = useState<string>("");
   const [terms, setTerms] = useState<string>("");
+  const [saving, setSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState("history");
 
   // Fetch products
   const { data: products = [] } = useQuery({
