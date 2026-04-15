@@ -20,6 +20,7 @@ import { CashReceiptSummary } from "@/components/cash-receipt/CashReceiptSummary
 import { CashReceiptFilters } from "@/components/cash-receipt/CashReceiptFilters";
 import { CashReceiptTable } from "@/components/cash-receipt/CashReceiptTable";
 import { AddEditReceiptModal } from "@/components/cash-receipt/AddEditReceiptModal";
+import { DocumentViewer, DocumentData } from "@/components/shared/DocumentViewer";
 import dashboardHomeIcon from "@/assets/dashboard-home-icon.png";
 import cashReceiptIcon from "@/assets/cash-receipt-icon.png";
 
@@ -27,6 +28,8 @@ export default function CashReceipt() {
   const navigate = useNavigate();
   const [isNewReceiptModalOpen, setIsNewReceiptModalOpen] = useState(false);
   const [editingReceipt, setEditingReceipt] = useState(null);
+  const [viewingReceipt, setViewingReceipt] = useState<DocumentData | null>(null);
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [filters, setFilters] = useState({
     dateRange: null,
     payerName: "",
@@ -42,6 +45,35 @@ export default function CashReceipt() {
   const handleEditReceipt = (receipt: any) => {
     setEditingReceipt(receipt);
     setIsNewReceiptModalOpen(true);
+  };
+
+  const handleViewReceipt = (receipt: any) => {
+    const amount = Number(receipt.amount) || 0;
+    const docData: DocumentData = {
+      documentType: "receipt",
+      documentNumber: receipt.receipt_no,
+      date: receipt.receipt_date,
+      partyName: receipt.payer_name,
+      paymentStatus: amount > 0 ? "paid" : "pending",
+      paymentMode: (receipt.payment_mode || "cash").replace("_", " ").replace(/\b\w/g, (c: string) => c.toUpperCase()),
+      items: [{
+        name: receipt.reason || "Cash Payment",
+        qty: 1,
+        rate: amount,
+        discount: 0,
+        total: amount,
+      }],
+      subtotal: amount,
+      taxAmount: 0,
+      discountAmount: 0,
+      totalAmount: amount,
+      paidAmount: amount,
+      balanceDue: 0,
+      reason: receipt.reason || undefined,
+      notes: receipt.notes || undefined,
+    };
+    setViewingReceipt(docData);
+    setIsViewerOpen(true);
   };
 
   const handleExportCSV = async () => {
@@ -206,6 +238,7 @@ export default function CashReceipt() {
           <CashReceiptTable 
             filters={filters} 
             onEditReceipt={handleEditReceipt}
+            onViewReceipt={handleViewReceipt}
           />
 
           {/* Add/Edit Receipt Modal */}
@@ -213,6 +246,13 @@ export default function CashReceipt() {
             isOpen={isNewReceiptModalOpen}
             onClose={() => setIsNewReceiptModalOpen(false)}
             receipt={editingReceipt}
+          />
+
+          {/* Document Viewer */}
+          <DocumentViewer
+            isOpen={isViewerOpen}
+            onClose={() => setIsViewerOpen(false)}
+            data={viewingReceipt}
           />
         </div>
       </div>
