@@ -11,9 +11,10 @@ import { toast } from "sonner";
 interface CashReceiptTableProps {
   filters: any;
   onEditReceipt: (receipt: any) => void;
+  onViewReceipt?: (receipt: any) => void;
 }
 
-export function CashReceiptTable({ filters, onEditReceipt }: CashReceiptTableProps) {
+export function CashReceiptTable({ filters, onEditReceipt, onViewReceipt }: CashReceiptTableProps) {
   const queryClient = useQueryClient();
 
   const { data: receipts = [], isLoading } = useQuery({
@@ -83,6 +84,11 @@ export function CashReceiptTable({ filters, onEditReceipt }: CashReceiptTablePro
                   <TableCell>{receipt.reason}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
+                      {onViewReceipt && (
+                        <Button variant="ghost" size="sm" onClick={() => onViewReceipt(receipt)} className="h-8 w-8 p-0 hover:bg-blue-100">
+                          <Eye className="h-4 w-4 text-blue-600" />
+                        </Button>
+                      )}
                       <Button variant="ghost" size="sm" onClick={() => onEditReceipt(receipt)} className="h-8 w-8 p-0 hover:bg-green-100">
                         <Edit className="h-4 w-4" style={{ color: "#7DBE3C" }} />
                       </Button>
