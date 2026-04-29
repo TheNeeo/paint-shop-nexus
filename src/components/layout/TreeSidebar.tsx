@@ -5,7 +5,8 @@ import { TreeNode } from "./TreeNode";
 import { menuData } from "./menuData";
 import { TreeSidebarProps } from "./types";
 import { useLocation } from "react-router-dom";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, Settings as SettingsIcon, ChevronUp } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import {
   Dialog,
@@ -22,6 +23,7 @@ import { Zap, Send, Twitter, MessageCircle, Globe } from "lucide-react";
 
 export function TreeSidebar({ collapsed }: TreeSidebarProps) {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const [isAddVendorOpen, setIsAddVendorOpen] = useState(false);
   const [isAddCustomerOpen, setIsAddCustomerOpen] = useState(false);
@@ -135,20 +137,67 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
             </div>
           ) : (
             <div className="p-3">
-              <div className="flex items-center gap-3 p-2 rounded-xl bg-slate-800/60 border border-slate-700/40">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white text-sm font-bold shadow-lg shrink-0 ring-2 ring-cyan-400/30">
-                  {userInitial}
+              <div className={cn(
+                "rounded-xl bg-slate-800/40 border border-slate-700/40 overflow-hidden transition-all duration-300",
+                profileMenuOpen && "border-cyan-500/30 shadow-lg shadow-cyan-500/5"
+              )}>
+                {/* Expandable menu items */}
+                <div className={cn(
+                  "grid transition-all duration-300 ease-out",
+                  profileMenuOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                )}>
+                  <div className="overflow-hidden">
+                    <div className="p-2 space-y-0.5 border-b border-slate-700/40">
+                      <Link
+                        to="/customers"
+                        onClick={() => setProfileMenuOpen(false)}
+                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-slate-300 hover:bg-slate-700/50 hover:text-white text-xs transition-all"
+                      >
+                        <User className="h-3.5 w-3.5 text-cyan-400" />
+                        My Profile
+                      </Link>
+                      <Link
+                        to="/settings/app"
+                        onClick={() => setProfileMenuOpen(false)}
+                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-slate-300 hover:bg-slate-700/50 hover:text-white text-xs transition-all"
+                      >
+                        <SettingsIcon className="h-3.5 w-3.5 text-purple-400" />
+                        Settings
+                      </Link>
+                      <button
+                        onClick={() => { setProfileMenuOpen(false); signOut(); }}
+                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 text-xs transition-all"
+                      >
+                        <LogOut className="h-3.5 w-3.5" />
+                        Sign Out
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-slate-200 text-xs font-medium truncate">{userEmail}</p>
-                  <p className="text-slate-500 text-[10px]">Logged in</p>
-                </div>
+
+                {/* Profile trigger row */}
                 <button
-                  onClick={signOut}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 shrink-0"
-                  title="Sign Out"
+                  onClick={() => setProfileMenuOpen((v) => !v)}
+                  className="w-full flex items-center gap-2 p-2.5 hover:bg-slate-700/30 transition-colors"
                 >
-                  <LogOut className="h-4 w-4" />
+                  <div className="relative shrink-0">
+                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-sm font-bold shadow-md">
+                      {userInitial}
+                    </div>
+                    <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-400 ring-2 ring-slate-900 animate-pulse" />
+                  </div>
+                  <div className="flex-1 min-w-0 text-left">
+                    <p className="text-white text-xs font-semibold truncate">{userEmail}</p>
+                    <p className="text-slate-400 text-[10px]">
+                      <span className="text-green-400">●</span> Active
+                    </p>
+                  </div>
+                  <ChevronUp
+                    className={cn(
+                      "h-3.5 w-3.5 text-slate-400 transition-transform duration-300 shrink-0",
+                      profileMenuOpen ? "rotate-0" : "rotate-180"
+                    )}
+                  />
                 </button>
               </div>
             </div>
