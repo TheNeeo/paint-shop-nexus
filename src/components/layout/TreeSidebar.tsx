@@ -5,7 +5,8 @@ import { TreeNode } from "./TreeNode";
 import { menuData } from "./menuData";
 import { TreeSidebarProps } from "./types";
 import { useLocation } from "react-router-dom";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, Settings as SettingsIcon, ChevronUp } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import {
   Dialog,
