@@ -52,6 +52,7 @@ import { motion } from "framer-motion";
 import { toast as sonnerToast } from "sonner";
 import invoiceGenerateIcon from "@/assets/invoice-generate-icon.png";
 import dashboardHomeIcon from "@/assets/dashboard-home-icon.png";
+import { InvoiceViewer } from "@/components/sales/InvoiceViewer";
 
 // Champagne Brown theme colors
 const THEME_PRIMARY = "#5D3A1A";
