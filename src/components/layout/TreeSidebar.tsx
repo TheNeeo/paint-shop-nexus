@@ -176,7 +176,7 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
                         Settings
                       </Link>
                       <button
-                        onClick={() => { setProfileMenuOpen(false); signOut(); }}
+                        onClick={() => { setProfileMenuOpen(false); setIsSignOutConfirmOpen(true); }}
                         className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 text-xs transition-all"
                       >
                         <LogOut className="h-3.5 w-3.5" />
