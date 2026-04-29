@@ -232,6 +232,35 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
       <AddEditCustomerModal isOpen={isAddCustomerOpen} onClose={() => setIsAddCustomerOpen(false)} customer={null} onSave={() => {}} />
       <NewInvoiceModal isOpen={isNewSaleOpen} onClose={() => setIsNewSaleOpen(false)} />
       <AddEditExpenseModal open={isAddExpenseOpen} onOpenChange={setIsAddExpenseOpen} />
+
+      {/* Sign Out Confirmation */}
+      <AlertDialog open={isSignOutConfirmOpen} onOpenChange={setIsSignOutConfirmOpen}>
+        <AlertDialogContent className="bg-white border-2 border-red-100 z-[100]">
+          <AlertDialogHeader>
+            <div className="mx-auto w-14 h-14 rounded-full bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center shadow-lg shadow-red-500/30 mb-2">
+              <LogOut className="h-7 w-7 text-white" />
+            </div>
+            <AlertDialogTitle className="text-center text-xl font-bold text-slate-800">
+              Sign Out Confirmation
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-slate-600">
+              Are you sure you want to sign out? You will need to log in again to access your account.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="sm:justify-center gap-2">
+            <AlertDialogCancel className="min-w-[110px] border-slate-300 hover:bg-slate-100">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={signOut}
+              className="min-w-[110px] bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white shadow-md"
+            >
+              <LogOut className="h-4 w-4 mr-1.5" />
+              Sign Out
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
