@@ -84,6 +84,35 @@ export default function InvoiceGenerate() {
   const [terms, setTerms] = useState<string>("");
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("history");
+  const [viewerInvoice, setViewerInvoice] = useState<any>(null);
+  const [viewerOpen, setViewerOpen] = useState(false);
+
+  const buildPreviewInvoice = () => ({
+    invoice_number: `PREVIEW-${Date.now().toString().slice(-6)}`,
+    invoice_date: new Date().toISOString().split('T')[0],
+    created_at: new Date().toISOString(),
+    customer_name: selectedCustomer || 'Walk-in Customer',
+    subtotal,
+    tax_amount: gstAmount,
+    discount_amount: discountAmount,
+    total_amount: grandTotal,
+    paid_amount: paidAmount,
+    pending_amount: balanceDue,
+    payment_status: paidAmount >= grandTotal && grandTotal > 0 ? 'paid' : paidAmount > 0 ? 'partial' : 'pending',
+    payment_mode: 'N/A',
+    sale_items: invoiceItems.map(i => ({
+      product_name: i.productName,
+      quantity: i.quantity,
+      rate: i.rate,
+      gst_percent: gstRate,
+      amount: i.amount,
+    })),
+  });
+
+  const openPreview = (inv: any) => {
+    setViewerInvoice(inv);
+    setViewerOpen(true);
+  };
 
   // Fetch products
   const { data: products = [] } = useQuery({
