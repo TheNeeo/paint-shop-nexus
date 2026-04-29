@@ -1082,6 +1082,11 @@ export default function InvoiceGenerate() {
           </div>
         </div>
       </div>
+      <InvoiceViewer
+        isOpen={viewerOpen}
+        onClose={() => setViewerOpen(false)}
+        invoice={viewerInvoice}
+      />
     </AppLayout>
   );
 }
