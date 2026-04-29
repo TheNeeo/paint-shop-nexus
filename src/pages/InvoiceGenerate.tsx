@@ -914,7 +914,7 @@ export default function InvoiceGenerate() {
                 </Button>
                 <Button 
                   variant="outline"
-                  onClick={() => window.print()}
+                  onClick={handleGeneratePDF}
                   style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}
                 >
                   <Printer className="h-4 w-4 mr-2" />
