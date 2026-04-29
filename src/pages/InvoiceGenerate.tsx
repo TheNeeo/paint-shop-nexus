@@ -52,6 +52,7 @@ import { motion } from "framer-motion";
 import { toast as sonnerToast } from "sonner";
 import invoiceGenerateIcon from "@/assets/invoice-generate-icon.png";
 import dashboardHomeIcon from "@/assets/dashboard-home-icon.png";
+import { InvoiceViewer } from "@/components/sales/InvoiceViewer";
 
 // Champagne Brown theme colors
 const THEME_PRIMARY = "#5D3A1A";
@@ -83,6 +84,35 @@ export default function InvoiceGenerate() {
   const [terms, setTerms] = useState<string>("");
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("history");
+  const [viewerInvoice, setViewerInvoice] = useState<any>(null);
+  const [viewerOpen, setViewerOpen] = useState(false);
+
+  const buildPreviewInvoice = () => ({
+    invoice_number: `PREVIEW-${Date.now().toString().slice(-6)}`,
+    invoice_date: new Date().toISOString().split('T')[0],
+    created_at: new Date().toISOString(),
+    customer_name: selectedCustomer || 'Walk-in Customer',
+    subtotal,
+    tax_amount: gstAmount,
+    discount_amount: discountAmount,
+    total_amount: grandTotal,
+    paid_amount: paidAmount,
+    pending_amount: balanceDue,
+    payment_status: paidAmount >= grandTotal && grandTotal > 0 ? 'paid' : paidAmount > 0 ? 'partial' : 'pending',
+    payment_mode: 'N/A',
+    sale_items: invoiceItems.map(i => ({
+      product_name: i.productName,
+      quantity: i.quantity,
+      rate: i.rate,
+      gst_percent: gstRate,
+      amount: i.amount,
+    })),
+  });
+
+  const openPreview = (inv: any) => {
+    setViewerInvoice(inv);
+    setViewerOpen(true);
+  };
 
   // Fetch products
   const { data: products = [] } = useQuery({
@@ -265,10 +295,11 @@ export default function InvoiceGenerate() {
   const handleSaveInvoice = () => saveInvoice('final');
 
   const handleGeneratePDF = () => {
-    toast({
-      title: "PDF Generated",
-      description: "Invoice PDF is ready for download.",
-    });
+    if (invoiceItems.length === 0) {
+      sonnerToast.error("कम से कम एक product add करें preview के लिए");
+      return;
+    }
+    openPreview(buildPreviewInvoice());
   };
 
   const handleDeleteDraft = async (id: string) => {
@@ -883,7 +914,7 @@ export default function InvoiceGenerate() {
                 </Button>
                 <Button 
                   variant="outline"
-                  onClick={() => window.print()}
+                  onClick={handleGeneratePDF}
                   style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}
                 >
                   <Printer className="h-4 w-4 mr-2" />
@@ -969,8 +1000,8 @@ export default function InvoiceGenerate() {
                             </TableCell>
                             <TableCell>
                               <div className="flex gap-2">
-                                <Button variant="outline" size="sm" style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}>View</Button>
-                                <Button variant="outline" size="sm" onClick={() => window.print()} style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}>PDF</Button>
+                                <Button variant="outline" size="sm" onClick={() => openPreview(inv)} style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}>View</Button>
+                                <Button variant="outline" size="sm" onClick={() => openPreview(inv)} style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}>PDF</Button>
                               </div>
                             </TableCell>
                           </TableRow>
@@ -1051,6 +1082,11 @@ export default function InvoiceGenerate() {
           </div>
         </div>
       </div>
+      <InvoiceViewer
+        isOpen={viewerOpen}
+        onClose={() => setViewerOpen(false)}
+        invoice={viewerInvoice}
+      />
     </AppLayout>
   );
 }
