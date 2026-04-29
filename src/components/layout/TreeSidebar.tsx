@@ -18,6 +18,7 @@ import { AddEditVendorModal } from "@/components/vendor/AddEditVendorModal";
 import { AddEditCustomerModal } from "@/components/customer/AddEditCustomerModal";
 import { NewInvoiceModal } from "@/components/sales/NewInvoiceModal";
 import { AddEditExpenseModal } from "@/components/expense/AddEditExpenseModal";
+import { Zap, Send, Twitter, MessageCircle, Globe } from "lucide-react";
 
 export function TreeSidebar({ collapsed }: TreeSidebarProps) {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
@@ -51,37 +52,37 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
   return (
     <>
       <div className={cn(
-        "h-full bg-gradient-to-b from-slate-800 via-slate-900 to-slate-800 border-r border-slate-700/50 transition-all duration-300 flex flex-col",
+        "h-full bg-gradient-to-b from-[#0b1220] via-[#0f172a] to-[#0b1220] border-r border-slate-800/80 transition-all duration-300 flex flex-col shadow-2xl",
         collapsed ? "w-16" : "w-64"
       )}>
-        {/* Header */}
-        <div className="p-4 border-b border-slate-700/50 bg-gradient-to-r from-slate-800 to-slate-700">
-          <div className={cn("flex items-center", collapsed ? "justify-center" : "space-x-2")}>
-            {!collapsed ? (
-              <div className="text-center">
-                <div className="text-cyan-400 font-bold text-xl mb-1">Well-Come</div>
-                <div className="flex flex-col">
-                  <span className="text-slate-200 font-bold text-lg">NEO</span>
-                  <div className="font-bold text-sm">
-                    <span className="text-red-400">C</span>
-                    <span className="text-orange-400">O</span>
-                    <span className="text-green-400">L</span>
-                    <span className="text-blue-400">O</span>
-                    <span className="text-purple-400">R</span>
-                  </div>
-                  <span className="text-slate-200 font-bold text-xs">FACTORY</span>
+        {/* Brand Header */}
+        <div className={cn(
+          "border-b border-slate-800/80 bg-slate-900/40 backdrop-blur",
+          collapsed ? "p-3" : "p-4"
+        )}>
+          <div className={cn("flex items-center", collapsed ? "justify-center" : "gap-3")}>
+            <div className="relative h-10 w-10 rounded-xl bg-gradient-to-br from-cyan-400/20 to-blue-500/20 ring-1 ring-cyan-400/40 flex items-center justify-center shadow-lg shadow-cyan-500/10 shrink-0">
+              <Zap className="h-5 w-5 text-cyan-400" strokeWidth={2.5} />
+            </div>
+            {!collapsed && (
+              <div className="leading-tight">
+                <div className="text-[10px] uppercase tracking-[0.18em] text-cyan-400/80 font-semibold">Welcome</div>
+                <div className="font-bold text-base">
+                  <span className="text-slate-100">NEO </span>
+                  <span className="text-red-400">C</span>
+                  <span className="text-orange-400">O</span>
+                  <span className="text-green-400">L</span>
+                  <span className="text-blue-400">O</span>
+                  <span className="text-purple-400">R</span>
                 </div>
-              </div>
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-cyan-400 flex items-center justify-center">
-                <span className="text-white font-bold text-xs">N</span>
+                <div className="text-[10px] tracking-widest text-slate-400 font-medium">FACTORY</div>
               </div>
             )}
           </div>
         </div>
 
         {/* Tree Menu */}
-        <div className="flex-1 py-4 overflow-y-auto scrollbar-thin scrollbar-thumb-primary relative">
+        <div className="flex-1 py-3 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 space-y-0.5 relative">
           {menuData.map((item) => (
             <TreeNode
               key={item.id}
@@ -95,16 +96,38 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
           ))}
         </div>
 
+        {/* Social / Quick Icons row */}
+        {!collapsed && (
+          <div className="px-4 py-3 border-t border-slate-800/80 flex items-center justify-center gap-2">
+            {[
+              { Icon: Send, color: "text-sky-400", bg: "hover:bg-sky-500/10 ring-sky-500/30" },
+              { Icon: Twitter, color: "text-blue-400", bg: "hover:bg-blue-500/10 ring-blue-500/30" },
+              { Icon: MessageCircle, color: "text-indigo-400", bg: "hover:bg-indigo-500/10 ring-indigo-500/30" },
+              { Icon: Globe, color: "text-orange-400", bg: "hover:bg-orange-500/10 ring-orange-500/30" },
+            ].map(({ Icon, color, bg }, i) => (
+              <button
+                key={i}
+                className={cn(
+                  "h-8 w-8 rounded-full flex items-center justify-center ring-1 ring-slate-700/60 bg-slate-800/40 transition-all duration-200 hover:scale-110",
+                  bg
+                )}
+              >
+                <Icon className={cn("h-4 w-4", color)} />
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* User Profile Section */}
-        <div className="border-t border-slate-700/50 bg-slate-900/80 backdrop-blur-sm">
+        <div className="border-t border-slate-800/80 bg-slate-900/60 backdrop-blur-sm">
           {collapsed ? (
             <div className="p-3 flex flex-col items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white text-xs font-bold shadow-lg">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white text-xs font-bold shadow-lg ring-2 ring-cyan-400/30">
                 {userInitial}
               </div>
               <button
                 onClick={signOut}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-400 hover:bg-slate-700/50 transition-all duration-200"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
                 title="Sign Out"
               >
                 <LogOut className="h-4 w-4" />
@@ -113,7 +136,7 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
           ) : (
             <div className="p-3">
               <div className="flex items-center gap-3 p-2 rounded-xl bg-slate-800/60 border border-slate-700/40">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white text-sm font-bold shadow-lg shrink-0">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white text-sm font-bold shadow-lg shrink-0 ring-2 ring-cyan-400/30">
                   {userInitial}
                 </div>
                 <div className="flex-1 min-w-0">
