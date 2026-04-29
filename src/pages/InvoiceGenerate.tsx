@@ -1000,8 +1000,8 @@ export default function InvoiceGenerate() {
                             </TableCell>
                             <TableCell>
                               <div className="flex gap-2">
-                                <Button variant="outline" size="sm" style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}>View</Button>
-                                <Button variant="outline" size="sm" onClick={() => window.print()} style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}>PDF</Button>
+                                <Button variant="outline" size="sm" onClick={() => openPreview(inv)} style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}>View</Button>
+                                <Button variant="outline" size="sm" onClick={() => openPreview(inv)} style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}>PDF</Button>
                               </div>
                             </TableCell>
                           </TableRow>
