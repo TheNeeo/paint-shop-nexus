@@ -23,6 +23,7 @@ import { Zap, Send, Twitter, MessageCircle, Globe } from "lucide-react";
 
 export function TreeSidebar({ collapsed }: TreeSidebarProps) {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const [isAddVendorOpen, setIsAddVendorOpen] = useState(false);
   const [isAddCustomerOpen, setIsAddCustomerOpen] = useState(false);
