@@ -18,6 +18,7 @@ import { AddEditVendorModal } from "@/components/vendor/AddEditVendorModal";
 import { AddEditCustomerModal } from "@/components/customer/AddEditCustomerModal";
 import { NewInvoiceModal } from "@/components/sales/NewInvoiceModal";
 import { AddEditExpenseModal } from "@/components/expense/AddEditExpenseModal";
+import { Zap, Send, Twitter, MessageCircle, Globe } from "lucide-react";
 
 export function TreeSidebar({ collapsed }: TreeSidebarProps) {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
