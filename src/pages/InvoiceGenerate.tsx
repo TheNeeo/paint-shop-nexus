@@ -295,10 +295,11 @@ export default function InvoiceGenerate() {
   const handleSaveInvoice = () => saveInvoice('final');
 
   const handleGeneratePDF = () => {
-    toast({
-      title: "PDF Generated",
-      description: "Invoice PDF is ready for download.",
-    });
+    if (invoiceItems.length === 0) {
+      sonnerToast.error("कम से कम एक product add करें preview के लिए");
+      return;
+    }
+    openPreview(buildPreviewInvoice());
   };
 
   const handleDeleteDraft = async (id: string) => {
