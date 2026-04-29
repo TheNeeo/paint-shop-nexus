@@ -39,6 +39,7 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
   const [isAddCustomerOpen, setIsAddCustomerOpen] = useState(false);
   const [isNewSaleOpen, setIsNewSaleOpen] = useState(false);
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
+  const [isSignOutConfirmOpen, setIsSignOutConfirmOpen] = useState(false);
   const location = useLocation();
   const { signOut, user } = useAuth();
 
