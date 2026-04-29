@@ -139,7 +139,7 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
                 {userInitial}
               </div>
               <button
-                onClick={signOut}
+                onClick={() => setIsSignOutConfirmOpen(true)}
                 className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
                 title="Sign Out"
               >
