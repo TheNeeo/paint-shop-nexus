@@ -2,11 +2,13 @@ import React from "react";
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Download, Printer, CheckCircle, CreditCard, Building2, ClipboardList, Package, Phone, Mail, MapPin, FileText, Heart } from "lucide-react";
 import { format } from "date-fns";
 import { QRCodeSVG } from "qrcode.react";
+import { printElementBySelector } from "@/lib/printUtils";
 
 export type DocumentType = "invoice" | "receipt" | "sales_slip";
 
@@ -129,12 +131,13 @@ export function DocumentViewer({ isOpen, onClose, data, loading }: DocumentViewe
     status: data.paymentStatus,
   });
 
-  const handlePrint = () => window.print();
-  const handleDownload = () => window.print();
+  const handlePrint = () => printElementBySelector({ selector: ".doc-print-area", title: `${config.label} ${data.documentNumber}` });
+  const handleDownload = () => printElementBySelector({ selector: ".doc-print-area", title: `${config.label} ${data.documentNumber}` });
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-[900px] max-h-[95vh] overflow-y-auto p-0 border-0 rounded-2xl">
+        <DialogTitle className="sr-only">Document Preview</DialogTitle>
         {loading ? (
           <div className="text-center py-12 text-gray-500">Loading...</div>
         ) : (

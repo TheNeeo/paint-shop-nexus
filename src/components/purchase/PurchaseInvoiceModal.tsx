@@ -3,11 +3,13 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import { Download, Printer, FileText, Phone, Mail, Globe, CheckCircle, CreditCard } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Purchase, PurchaseItem, Vendor } from '@/types/purchase';
 import { format } from 'date-fns';
+import { printElementBySelector } from '@/lib/printUtils';
 
 interface PurchaseInvoiceModalProps {
   isOpen: boolean;
@@ -53,8 +55,8 @@ export const PurchaseInvoiceModal: React.FC<PurchaseInvoiceModalProps> = ({
     }
   };
 
-  const handlePrint = () => window.print();
-  const handleDownload = () => { window.print(); };
+  const handlePrint = () => printElementBySelector({ selector: '.purchase-invoice-print-area', title: `Purchase Invoice ${purchase?.invoice_number || ''}` });
+  const handleDownload = () => printElementBySelector({ selector: '.purchase-invoice-print-area', title: `Purchase Invoice ${purchase?.invoice_number || ''}` });
 
   if (!purchase) return null;
 
@@ -64,10 +66,11 @@ export const PurchaseInvoiceModal: React.FC<PurchaseInvoiceModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto p-0 border-0 rounded-3xl">
+        <DialogTitle className="sr-only">Purchase Invoice Preview</DialogTitle>
         {loading ? (
           <div className="text-center py-12">Loading invoice details...</div>
         ) : (
-          <div className="relative">
+          <div className="purchase-invoice-print-area relative">
             {/* Colorful Header with gradient */}
             <div className="relative overflow-hidden rounded-t-3xl px-8 pt-8 pb-10"
               style={{ background: 'linear-gradient(135deg, #e8eaf6 0%, #c5cae9 30%, #bbdefb 60%, #e1f5fe 100%)' }}>
@@ -265,7 +268,7 @@ export const PurchaseInvoiceModal: React.FC<PurchaseInvoiceModalProps> = ({
               </div>
 
               {/* Action Buttons */}
-              <div className="flex justify-center gap-4 pb-2">
+              <div className="flex justify-center gap-4 pb-2 no-print">
                 <Button 
                   onClick={handleDownload}
                   className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full px-6"

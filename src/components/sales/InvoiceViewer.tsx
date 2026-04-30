@@ -3,11 +3,13 @@ import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Download, Printer, FileText, Phone, Mail, MapPin, CheckCircle, CreditCard, Building2, ClipboardList, Package, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { printElementBySelector } from "@/lib/printUtils";
 
 interface InvoiceViewerProps {
   isOpen: boolean;
@@ -56,8 +58,8 @@ export function InvoiceViewer({ isOpen, onClose, invoice }: InvoiceViewerProps) 
     }
   };
 
-  const handlePrint = () => window.print();
-  const handleDownload = () => { window.print(); };
+  const handlePrint = () => printElementBySelector({ selector: ".invoice-print-area", title: `Sale Invoice ${invoice.invoice_number}` });
+  const handleDownload = () => printElementBySelector({ selector: ".invoice-print-area", title: `Sale Invoice ${invoice.invoice_number}` });
 
   if (!invoice) return null;
 
@@ -77,6 +79,7 @@ export function InvoiceViewer({ isOpen, onClose, invoice }: InvoiceViewerProps) 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-[900px] max-h-[95vh] overflow-y-auto p-0 border-0 rounded-2xl">
+        <DialogTitle className="sr-only">Sale Invoice Preview</DialogTitle>
         {loading ? (
           <div className="text-center py-12 text-gray-500">Loading invoice details...</div>
         ) : (
