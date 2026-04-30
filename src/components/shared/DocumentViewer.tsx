@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Printer, CheckCircle, CreditCard, Building2, ClipboardList, Package, Phone, Mail, MapPin, FileText, Heart } from "lucide-react";
 import { format } from "date-fns";
 import { QRCodeSVG } from "qrcode.react";
+import { printElementBySelector } from "@/lib/printUtils";
 
 export type DocumentType = "invoice" | "receipt" | "sales_slip";
 
@@ -129,8 +130,8 @@ export function DocumentViewer({ isOpen, onClose, data, loading }: DocumentViewe
     status: data.paymentStatus,
   });
 
-  const handlePrint = () => window.print();
-  const handleDownload = () => window.print();
+  const handlePrint = () => printElementBySelector({ selector: ".doc-print-area", title: `${config.label} ${data.documentNumber}` });
+  const handleDownload = () => printElementBySelector({ selector: ".doc-print-area", title: `${config.label} ${data.documentNumber}` });
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
