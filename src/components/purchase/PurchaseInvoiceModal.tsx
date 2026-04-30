@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import { Download, Printer, FileText, Phone, Mail, Globe, CheckCircle, CreditCard } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -65,6 +66,7 @@ export const PurchaseInvoiceModal: React.FC<PurchaseInvoiceModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto p-0 border-0 rounded-3xl">
+        <DialogTitle className="sr-only">Purchase Invoice Preview</DialogTitle>
         {loading ? (
           <div className="text-center py-12">Loading invoice details...</div>
         ) : (
