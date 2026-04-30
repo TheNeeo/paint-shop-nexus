@@ -2,6 +2,7 @@ import React from "react";
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Download, Printer, CheckCircle, CreditCard, Building2, ClipboardList, Package, Phone, Mail, MapPin, FileText, Heart } from "lucide-react";
@@ -136,6 +137,7 @@ export function DocumentViewer({ isOpen, onClose, data, loading }: DocumentViewe
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-[900px] max-h-[95vh] overflow-y-auto p-0 border-0 rounded-2xl">
+        <DialogTitle className="sr-only">Document Preview</DialogTitle>
         {loading ? (
           <div className="text-center py-12 text-gray-500">Loading...</div>
         ) : (
