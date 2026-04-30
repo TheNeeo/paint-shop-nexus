@@ -16,6 +16,50 @@ const waitForImages = async (doc: Document) => {
   );
 };
 
+const collectDocumentStyles = async () => {
+  const nodes = Array.from(document.querySelectorAll<HTMLLinkElement | HTMLStyleElement>("link[rel='stylesheet'], style"));
+
+  const styles = await Promise.all(
+    nodes.map(async (node) => {
+      if (node.tagName.toLowerCase() !== "link") {
+        return `<style>${(node.textContent || "").replace(/<\/style/gi, "<\\/style")}</style>`;
+      }
+
+      const link = node as HTMLLinkElement;
+      try {
+        const response = await fetch(link.href, { credentials: "same-origin" });
+        if (!response.ok) throw new Error(`Unable to load stylesheet: ${link.href}`);
+        const css = (await response.text()).replace(/<\/style/gi, "<\\/style");
+        return `<style>${css}</style>`;
+      } catch {
+        return `<link rel="stylesheet" href="${link.href}">`;
+      }
+    })
+  );
+
+  return styles.join("\n");
+};
+
+const waitForStylesheets = async (doc: Document) => {
+  const links = Array.from(doc.querySelectorAll<HTMLLinkElement>("link[rel='stylesheet']"));
+  await Promise.all(
+    links.map((link) => {
+      if (link.sheet) return Promise.resolve();
+      return new Promise<void>((resolve) => {
+        const timer = window.setTimeout(resolve, 2500);
+        link.onload = () => {
+          window.clearTimeout(timer);
+          resolve();
+        };
+        link.onerror = () => {
+          window.clearTimeout(timer);
+          resolve();
+        };
+      });
+    })
+  );
+};
+
 export const printElementBySelector = async ({ selector, title = "Document" }: PrintElementOptions) => {
   const source = document.querySelector<HTMLElement>(selector);
 
@@ -30,11 +74,13 @@ export const printElementBySelector = async ({ selector, title = "Document" }: P
   const frame = document.createElement("iframe");
   frame.setAttribute("aria-hidden", "true");
   frame.style.position = "fixed";
-  frame.style.right = "0";
-  frame.style.bottom = "0";
-  frame.style.width = "0";
-  frame.style.height = "0";
+  frame.style.left = "-10000px";
+  frame.style.top = "0";
+  frame.style.width = "210mm";
+  frame.style.height = "297mm";
   frame.style.border = "0";
+  frame.style.opacity = "0";
+  frame.style.pointerEvents = "none";
   document.body.appendChild(frame);
 
   const printWindow = frame.contentWindow;
@@ -45,16 +91,7 @@ export const printElementBySelector = async ({ selector, title = "Document" }: P
     return false;
   }
 
-  const styles = Array.from(document.querySelectorAll<HTMLLinkElement | HTMLStyleElement>("link[rel='stylesheet'], style"))
-    .map((node) => {
-      if (node.tagName.toLowerCase() === "link") {
-        const link = node as HTMLLinkElement;
-        return `<link rel="stylesheet" href="${link.href}">`;
-      }
-      return `<style>${node.textContent || ""}</style>`;
-    })
-    .join("\n");
-
+  const styles = await collectDocumentStyles();
   const safeTitle = title.replace(/[<>]/g, "");
 
   printDocument.open();
@@ -100,7 +137,8 @@ export const printElementBySelector = async ({ selector, title = "Document" }: P
     </html>`);
   printDocument.close();
 
-  await new Promise((resolve) => setTimeout(resolve, 300));
+  await waitForStylesheets(printDocument);
+  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   await waitForImages(printDocument);
   await printDocument.fonts?.ready.catch(() => undefined);
 
