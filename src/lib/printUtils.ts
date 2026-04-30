@@ -66,16 +66,31 @@ export const printElementBySelector = async ({ selector, title = "Document" }: P
         <title>${safeTitle}</title>
         ${styles}
         <style>
-          @page { size: A4 landscape; margin: 8mm; }
+          @page { size: A4 portrait; margin: 6mm; }
           * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           html, body { margin: 0 !important; padding: 0 !important; background: #ffffff !important; }
-          body { width: 100%; min-height: 100%; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-          .lovable-print-root { width: 100%; max-width: 277mm; margin: 0 auto; background: #ffffff; }
+          body { width: 100%; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+          .lovable-print-root {
+            width: 198mm;
+            margin: 0 auto;
+            background: #ffffff;
+            transform-origin: top left;
+          }
+          /* Fit-to-one-page: scale down if content overflows A4 portrait usable height (~285mm) */
+          .lovable-print-root { zoom: 0.82; }
+          @supports (-webkit-hyphens:none) {
+            /* Safari fallback using transform */
+            .lovable-print-root { zoom: normal; }
+          }
           .lovable-print-root .no-print, .lovable-print-root [data-no-print='true'] { display: none !important; visibility: hidden !important; }
+          .lovable-print-root, .lovable-print-root * {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+          .lovable-print-root img { max-width: 100%; height: auto; }
           @media print {
             body * { visibility: visible !important; }
             .lovable-print-root, .lovable-print-root * { visibility: visible !important; }
-            .lovable-print-root { page-break-inside: avoid; break-inside: avoid; }
           }
         </style>
       </head>
