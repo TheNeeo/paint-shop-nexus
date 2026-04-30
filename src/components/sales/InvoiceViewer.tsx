@@ -292,7 +292,7 @@ export function InvoiceViewer({ isOpen, onClose, invoice }: InvoiceViewerProps) 
                   </div>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-2 no-print">
                   <Button
                     onClick={handleDownload}
                     size="sm"
