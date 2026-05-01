@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Download, RefreshCw, DollarSign, FileText, TrendingUp, BarChart, BarChart3, Search, Filter, X, Eye } from "lucide-react";
+import { Download, RefreshCw, DollarSign, FileText, TrendingUp, BarChart, BarChart3, Search, Filter, X, Eye, Hash, Calendar, Tag, AlignLeft, IndianRupee, CreditCard, Receipt } from "lucide-react";
+import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -129,13 +130,13 @@ const ExpenseReport = () => {
               <Table>
                 <TableHeader>
                   <TableRow style={{ backgroundColor: THEME.primaryLightest }}>
-                    <TableHead style={{ color: THEME.primaryDark }}>S.No</TableHead>
-                    <TableHead style={{ color: THEME.primaryDark }}>Date</TableHead>
-                    <TableHead style={{ color: THEME.primaryDark }}>Type</TableHead>
-                    <TableHead style={{ color: THEME.primaryDark }}>Description</TableHead>
-                    <TableHead className="text-right" style={{ color: THEME.primaryDark }}>Amount</TableHead>
-                    <TableHead style={{ color: THEME.primaryDark }}>Payment Mode</TableHead>
-                    <TableHead style={{ color: THEME.primaryDark }}>Ref No.</TableHead>
+                    <TableHeaderCell icon={Hash} label="S.No" textColor={THEME.primaryDark} iconColor="#64748b" />
+                    <TableHeaderCell icon={Calendar} label="Date" textColor={THEME.primaryDark} iconColor="#0ea5e9" />
+                    <TableHeaderCell icon={Tag} label="Type" textColor={THEME.primaryDark} iconColor="#8b5cf6" />
+                    <TableHeaderCell icon={AlignLeft} label="Description" textColor={THEME.primaryDark} iconColor="#ec4899" />
+                    <TableHeaderCell icon={IndianRupee} label="Amount" textColor={THEME.primaryDark} iconColor="#f59e0b" align="right" className="text-right" />
+                    <TableHeaderCell icon={CreditCard} label="Payment Mode" textColor={THEME.primaryDark} iconColor="#0d9488" />
+                    <TableHeaderCell icon={Receipt} label="Ref No." textColor={THEME.primaryDark} iconColor="#1e40af" />
                   </TableRow>
                 </TableHeader>
                 <TableBody>

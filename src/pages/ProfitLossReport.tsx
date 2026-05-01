@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { RefreshCw, Download, TrendingUp, TrendingDown, DollarSign, Percent, BarChart3 } from "lucide-react";
+import { RefreshCw, Download, TrendingUp, TrendingDown, DollarSign, Percent, BarChart3, Calendar, FileText, IndianRupee } from "lucide-react";
+import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -125,11 +126,11 @@ const ProfitLossReport = () => {
             <Table>
               <TableHeader>
                 <TableRow style={{ backgroundColor: THEME.primaryLightest }}>
-                  <TableHead style={{ color: THEME.primaryDark }}>Date</TableHead>
-                  <TableHead style={{ color: THEME.primaryDark }}>Description</TableHead>
-                  <TableHead className="text-right" style={{ color: THEME.primaryDark }}>Income</TableHead>
-                  <TableHead className="text-right" style={{ color: THEME.primaryDark }}>Expense</TableHead>
-                  <TableHead className="text-right" style={{ color: THEME.primaryDark }}>Net Amount</TableHead>
+                  <TableHeaderCell icon={Calendar} label="Date" textColor={THEME.primaryDark} iconColor="#0ea5e9" />
+                  <TableHeaderCell icon={FileText} label="Description" textColor={THEME.primaryDark} iconColor="#ec4899" />
+                  <TableHeaderCell icon={TrendingUp} label="Income" textColor={THEME.primaryDark} iconColor="#10b981" align="right" className="text-right" />
+                  <TableHeaderCell icon={TrendingDown} label="Expense" textColor={THEME.primaryDark} iconColor="#ef4444" align="right" className="text-right" />
+                  <TableHeaderCell icon={IndianRupee} label="Net Amount" textColor={THEME.primaryDark} iconColor="#f59e0b" align="right" className="text-right" />
                 </TableRow>
               </TableHeader>
               <TableBody>

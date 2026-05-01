@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Download, Printer, TrendingUp, TrendingDown, DollarSign, Wallet, Plus, BookOpen, RefreshCw, BarChart3, Search, Filter } from "lucide-react";
+import { Download, Printer, TrendingUp, TrendingDown, DollarSign, Wallet, Plus, BookOpen, RefreshCw, BarChart3, Search, Filter, Clock, Tag, AlignLeft, IndianRupee, CreditCard, Calculator } from "lucide-react";
+import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -370,13 +371,13 @@ const DayBook = () => {
                   <TableHeader>
                     <TableRow style={{ backgroundColor: THEME.primaryLightest, borderBottomColor: THEME.border }}>
                       <TableHead className="text-center w-12"><div className="w-4"></div></TableHead>
-                      <TableHead className="font-semibold w-20" style={{ color: THEME.primaryDark }}>Time</TableHead>
-                      <TableHead className="font-semibold w-32" style={{ color: THEME.primaryDark }}>Type</TableHead>
-                      <TableHead className="font-semibold min-w-[200px]" style={{ color: THEME.primaryDark }}>Description</TableHead>
-                      <TableHead className="font-semibold text-right w-28" style={{ color: THEME.primaryDark }}>Debit</TableHead>
-                      <TableHead className="font-semibold text-right w-28" style={{ color: THEME.primaryDark }}>Credit</TableHead>
-                      <TableHead className="font-semibold w-40" style={{ color: THEME.primaryDark }}>Payment Mode</TableHead>
-                      <TableHead className="font-semibold text-right w-28" style={{ color: THEME.primaryDark }}>Balance</TableHead>
+                      <TableHeaderCell icon={Clock} label="Time" textColor={THEME.primaryDark} iconColor="#0ea5e9" className="w-20" />
+                      <TableHeaderCell icon={Tag} label="Type" textColor={THEME.primaryDark} iconColor="#8b5cf6" className="w-32" />
+                      <TableHeaderCell icon={AlignLeft} label="Description" textColor={THEME.primaryDark} iconColor="#ec4899" className="min-w-[200px]" />
+                      <TableHeaderCell icon={TrendingDown} label="Debit" textColor={THEME.primaryDark} iconColor="#ef4444" align="right" className="text-right w-28" />
+                      <TableHeaderCell icon={TrendingUp} label="Credit" textColor={THEME.primaryDark} iconColor="#10b981" align="right" className="text-right w-28" />
+                      <TableHeaderCell icon={CreditCard} label="Payment Mode" textColor={THEME.primaryDark} iconColor="#0d9488" className="w-40" />
+                      <TableHeaderCell icon={Calculator} label="Balance" textColor={THEME.primaryDark} iconColor="#f59e0b" align="right" className="text-right w-28" />
                     </TableRow>
                   </TableHeader>
                   <TableBody>

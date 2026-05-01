@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Download, Printer, RefreshCw, Plus, DollarSign, FileText, TrendingUp, Target, BarChart3, Search, Filter, Calendar as CalendarIcon, CreditCard, X, Eye, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Download, Printer, RefreshCw, Plus, DollarSign, FileText, TrendingUp, Target, BarChart3, Search, Filter, Calendar as CalendarIcon, CreditCard, X, Eye, Edit, Trash2, ChevronLeft, ChevronRight, Hash, Tag, IndianRupee, AlignLeft, Receipt, Settings } from "lucide-react";
+import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -361,14 +362,14 @@ const ExpenseActivity = () => {
                 <Table>
                   <TableHeader>
                     <TableRow style={{ backgroundColor: THEME.primaryLightest, borderBottomColor: THEME.border }}>
-                      <TableHead className="font-semibold" style={{ color: THEME.primaryDark }}>S.No</TableHead>
-                      <TableHead className="font-semibold" style={{ color: THEME.primaryDark }}>Date</TableHead>
-                      <TableHead className="font-semibold" style={{ color: THEME.primaryDark }}>Expense Type</TableHead>
-                      <TableHead className="font-semibold" style={{ color: THEME.primaryDark }}>Amount</TableHead>
-                      <TableHead className="font-semibold" style={{ color: THEME.primaryDark }}>Payment Mode</TableHead>
-                      <TableHead className="font-semibold" style={{ color: THEME.primaryDark }}>Description</TableHead>
-                      <TableHead className="font-semibold" style={{ color: THEME.primaryDark }}>Ref/Bill No</TableHead>
-                      <TableHead className="font-semibold" style={{ color: THEME.primaryDark }}>Actions</TableHead>
+                      <TableHeaderCell icon={Hash} label="S.No" textColor={THEME.primaryDark} iconColor="#64748b" />
+                      <TableHeaderCell icon={CalendarIcon} label="Date" textColor={THEME.primaryDark} iconColor="#0ea5e9" />
+                      <TableHeaderCell icon={Tag} label="Expense Type" textColor={THEME.primaryDark} iconColor="#8b5cf6" />
+                      <TableHeaderCell icon={IndianRupee} label="Amount" textColor={THEME.primaryDark} iconColor="#f59e0b" />
+                      <TableHeaderCell icon={CreditCard} label="Payment Mode" textColor={THEME.primaryDark} iconColor="#0d9488" />
+                      <TableHeaderCell icon={AlignLeft} label="Description" textColor={THEME.primaryDark} iconColor="#ec4899" />
+                      <TableHeaderCell icon={Receipt} label="Ref/Bill No" textColor={THEME.primaryDark} iconColor="#1e40af" />
+                      <TableHeaderCell icon={Settings} label="Actions" textColor={THEME.primaryDark} iconColor="#64748b" />
                     </TableRow>
                   </TableHeader>
                   <TableBody>

@@ -12,7 +12,8 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RefreshCw, Download, Printer, Calendar as CalendarIcon, TrendingUp, ShoppingCart, DollarSign, BarChart3 } from "lucide-react";
+import { RefreshCw, Download, Printer, Calendar as CalendarIcon, TrendingUp, ShoppingCart, DollarSign, BarChart3, IndianRupee, Percent, Calculator } from "lucide-react";
+import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
@@ -333,12 +334,12 @@ const PeriodicReport = () => {
                   <Table>
                     <TableHeader>
                       <TableRow style={{ borderColor: THEME.primaryLighter }}>
-                        <TableHead style={{ color: THEME.primaryDark }}>Period</TableHead>
-                        <TableHead className="text-right" style={{ color: THEME.primaryDark }}>Total Sales</TableHead>
-                        <TableHead className="text-right" style={{ color: THEME.primaryDark }}>Total Purchase</TableHead>
-                        <TableHead className="text-right" style={{ color: THEME.primaryDark }}>GST</TableHead>
-                        <TableHead className="text-right" style={{ color: THEME.primaryDark }}>Net Profit</TableHead>
-                        <TableHead className="text-right" style={{ color: THEME.primaryDark }}>Avg. Order Value</TableHead>
+                        <TableHeaderCell icon={CalendarIcon} label="Period" textColor={THEME.primaryDark} iconColor="#0ea5e9" />
+                        <TableHeaderCell icon={TrendingUp} label="Total Sales" textColor={THEME.primaryDark} iconColor="#10b981" align="right" className="text-right" />
+                        <TableHeaderCell icon={ShoppingCart} label="Total Purchase" textColor={THEME.primaryDark} iconColor="#1e40af" align="right" className="text-right" />
+                        <TableHeaderCell icon={Percent} label="GST" textColor={THEME.primaryDark} iconColor="#8b5cf6" align="right" className="text-right" />
+                        <TableHeaderCell icon={IndianRupee} label="Net Profit" textColor={THEME.primaryDark} iconColor="#f59e0b" align="right" className="text-right" />
+                        <TableHeaderCell icon={Calculator} label="Avg. Order Value" textColor={THEME.primaryDark} iconColor="#ec4899" align="right" className="text-right" />
                       </TableRow>
                     </TableHeader>
                     <TableBody>
