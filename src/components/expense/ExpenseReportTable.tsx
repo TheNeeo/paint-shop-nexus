@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Eye, Edit, Trash2, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Eye, Edit, Trash2, Search, ChevronLeft, ChevronRight, Hash, Calendar, FileText, Tag, AlignLeft, IndianRupee, CreditCard, User, Receipt, Settings } from "lucide-react";
+import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
 
 interface ExpenseReportTableProps {
   onViewExpense: (expense: any) => void;
@@ -132,16 +133,16 @@ export const ExpenseReportTable = ({ onViewExpense }: ExpenseReportTableProps) =
         <Table>
           <TableHeader>
             <TableRow className="bg-turquoise-50 hover:bg-turquoise-50">
-              <TableHead className="text-turquoise-700 font-semibold">S.No</TableHead>
-              <TableHead className="text-turquoise-700 font-semibold">Date</TableHead>
-              <TableHead className="text-turquoise-700 font-semibold">Expense Title</TableHead>
-              <TableHead className="text-turquoise-700 font-semibold">Category</TableHead>
-              <TableHead className="text-turquoise-700 font-semibold">Description</TableHead>
-              <TableHead className="text-turquoise-700 font-semibold">Amount</TableHead>
-              <TableHead className="text-turquoise-700 font-semibold">Payment Mode</TableHead>
-              <TableHead className="text-turquoise-700 font-semibold">Paid To</TableHead>
-              <TableHead className="text-turquoise-700 font-semibold">Reference No.</TableHead>
-              <TableHead className="text-turquoise-700 font-semibold text-center">Actions</TableHead>
+              <TableHeaderCell icon={Hash} label="S.No" className="text-turquoise-700" iconColor="#64748b" />
+              <TableHeaderCell icon={Calendar} label="Date" className="text-turquoise-700" iconColor="#0ea5e9" />
+              <TableHeaderCell icon={FileText} label="Expense Title" className="text-turquoise-700" iconColor="#ec4899" />
+              <TableHeaderCell icon={Tag} label="Category" className="text-turquoise-700" iconColor="#8b5cf6" />
+              <TableHeaderCell icon={AlignLeft} label="Description" className="text-turquoise-700" iconColor="#0d9488" />
+              <TableHeaderCell icon={IndianRupee} label="Amount" className="text-turquoise-700" iconColor="#f59e0b" />
+              <TableHeaderCell icon={CreditCard} label="Payment Mode" className="text-turquoise-700" iconColor="#10b981" />
+              <TableHeaderCell icon={User} label="Paid To" className="text-turquoise-700" iconColor="#1e40af" />
+              <TableHeaderCell icon={Receipt} label="Reference No." className="text-turquoise-700" iconColor="#f97316" />
+              <TableHeaderCell icon={Settings} label="Actions" className="text-turquoise-700" iconColor="#64748b" align="center" />
             </TableRow>
           </TableHeader>
           <TableBody>

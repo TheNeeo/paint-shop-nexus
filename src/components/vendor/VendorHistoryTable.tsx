@@ -10,7 +10,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Eye, Edit, Trash2, ChevronDown, ChevronUp, FileText } from "lucide-react";
+import { Eye, Edit, Trash2, ChevronDown, ChevronUp, FileText, Hash, User, Phone, ShoppingBag, IndianRupee, Calendar, AlertTriangle, CheckCircle, Settings } from "lucide-react";
+import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
 import type { VendorHistoryData, FilterType } from "@/pages/VendorHistory";
 
 interface VendorHistoryTableProps {
@@ -102,16 +103,16 @@ export const VendorHistoryTable: React.FC<VendorHistoryTableProps> = ({
             <Table>
               <TableHeader>
                 <TableRow style={{ backgroundColor: '#e8f5f5' }}>
-                  <TableHead className="font-semibold" style={{ color: '#2a7a8a' }}>S.No</TableHead>
-                  <TableHead className="font-semibold" style={{ color: '#2a7a8a' }}>Vendor Name</TableHead>
-                  <TableHead className="font-semibold" style={{ color: '#2a7a8a' }}>Mobile Number</TableHead>
-                  <TableHead className="font-semibold" style={{ color: '#2a7a8a' }}>GST No.</TableHead>
-                  <TableHead className="font-semibold" style={{ color: '#2a7a8a' }}>Total POs</TableHead>
-                  <TableHead className="font-semibold" style={{ color: '#2a7a8a' }}>Total Amount</TableHead>
-                  <TableHead className="font-semibold" style={{ color: '#2a7a8a' }}>Last Purchase</TableHead>
-                  <TableHead className="font-semibold" style={{ color: '#2a7a8a' }}>Outstanding</TableHead>
-                  <TableHead className="font-semibold" style={{ color: '#2a7a8a' }}>Status</TableHead>
-                  <TableHead className="font-semibold" style={{ color: '#2a7a8a' }}>Actions</TableHead>
+                  <TableHeaderCell icon={Hash} label="S.No" textColor="#2a7a8a" iconColor="#64748b" />
+                  <TableHeaderCell icon={User} label="Vendor Name" textColor="#2a7a8a" iconColor="#1e40af" />
+                  <TableHeaderCell icon={Phone} label="Mobile Number" textColor="#2a7a8a" iconColor="#10b981" />
+                  <TableHeaderCell icon={FileText} label="GST No." textColor="#2a7a8a" iconColor="#ec4899" />
+                  <TableHeaderCell icon={ShoppingBag} label="Total POs" textColor="#2a7a8a" iconColor="#8b5cf6" />
+                  <TableHeaderCell icon={IndianRupee} label="Total Amount" textColor="#2a7a8a" iconColor="#f59e0b" />
+                  <TableHeaderCell icon={Calendar} label="Last Purchase" textColor="#2a7a8a" iconColor="#0ea5e9" />
+                  <TableHeaderCell icon={AlertTriangle} label="Outstanding" textColor="#2a7a8a" iconColor="#ef4444" />
+                  <TableHeaderCell icon={CheckCircle} label="Status" textColor="#2a7a8a" iconColor="#22c55e" />
+                  <TableHeaderCell icon={Settings} label="Actions" textColor="#2a7a8a" iconColor="#64748b" />
                 </TableRow>
               </TableHeader>
               <TableBody>

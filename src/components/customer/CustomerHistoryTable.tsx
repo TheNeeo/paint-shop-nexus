@@ -10,7 +10,8 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Eye, Edit, Trash2, ChevronDown, ChevronRight, FileText, AlertCircle } from 'lucide-react';
+import { Eye, Edit, Trash2, ChevronDown, ChevronRight, FileText, AlertCircle, Hash, User, Phone, Mail, ShoppingBag, IndianRupee, Calendar, AlertTriangle, Settings } from 'lucide-react';
+import { TableHeaderCell } from '@/components/shared/TableHeaderCell';
 import { CustomerHistoryData } from '@/pages/CustomerHistory';
 
 // Ash Grey theme colors
@@ -87,15 +88,15 @@ export const CustomerHistoryTable: React.FC<CustomerHistoryTableProps> = ({
             <TableHeader>
               <TableRow style={{ background: `linear-gradient(135deg, rgba(182, 194, 174, 0.2) 0%, rgba(182, 194, 174, 0.15) 100%)` }}>
                 <TableHead className="font-semibold w-12" style={{ color: THEME_TEXT }}></TableHead>
-                <TableHead className="font-semibold" style={{ color: THEME_TEXT }}>S.No</TableHead>
-                <TableHead className="font-semibold" style={{ color: THEME_TEXT }}>Customer Name</TableHead>
-                <TableHead className="font-semibold" style={{ color: THEME_TEXT }}>Mobile Number</TableHead>
-                <TableHead className="font-semibold" style={{ color: THEME_TEXT }}>Email</TableHead>
-                <TableHead className="font-semibold" style={{ color: THEME_TEXT }}>Total Invoices</TableHead>
-                <TableHead className="font-semibold" style={{ color: THEME_TEXT }}>Total Purchase Value</TableHead>
-                <TableHead className="font-semibold" style={{ color: THEME_TEXT }}>Last Purchase Date</TableHead>
-                <TableHead className="font-semibold" style={{ color: THEME_TEXT }}>Outstanding Balance</TableHead>
-                <TableHead className="font-semibold text-center" style={{ color: THEME_TEXT }}>Actions</TableHead>
+                <TableHeaderCell icon={Hash} label="S.No" textColor={THEME_TEXT} iconColor="#64748b" />
+                <TableHeaderCell icon={User} label="Customer Name" textColor={THEME_TEXT} iconColor="#1e40af" />
+                <TableHeaderCell icon={Phone} label="Mobile Number" textColor={THEME_TEXT} iconColor="#10b981" />
+                <TableHeaderCell icon={Mail} label="Email" textColor={THEME_TEXT} iconColor="#0ea5e9" />
+                <TableHeaderCell icon={ShoppingBag} label="Total Invoices" textColor={THEME_TEXT} iconColor="#8b5cf6" />
+                <TableHeaderCell icon={IndianRupee} label="Total Purchase Value" textColor={THEME_TEXT} iconColor="#f59e0b" />
+                <TableHeaderCell icon={Calendar} label="Last Purchase Date" textColor={THEME_TEXT} iconColor="#ec4899" />
+                <TableHeaderCell icon={AlertTriangle} label="Outstanding Balance" textColor={THEME_TEXT} iconColor="#ef4444" />
+                <TableHeaderCell icon={Settings} label="Actions" textColor={THEME_TEXT} iconColor="#64748b" align="center" className="text-center" />
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -221,11 +222,11 @@ export const CustomerHistoryTable: React.FC<CustomerHistoryTableProps> = ({
                                 <Table>
                                   <TableHeader>
                                     <TableRow style={{ background: `rgba(182, 194, 174, 0.15)` }}>
-                                      <TableHead className="font-medium" style={{ color: THEME_TEXT }}>Invoice No</TableHead>
-                                      <TableHead className="font-medium" style={{ color: THEME_TEXT }}>Date</TableHead>
-                                      <TableHead className="font-medium" style={{ color: THEME_TEXT }}>Amount</TableHead>
-                                      <TableHead className="font-medium" style={{ color: THEME_TEXT }}>Payment Status</TableHead>
-                                      <TableHead className="font-medium" style={{ color: THEME_TEXT }}>Action</TableHead>
+                                      <TableHeaderCell icon={FileText} label="Invoice No" textColor={THEME_TEXT} iconColor="#8b5cf6" />
+                                      <TableHeaderCell icon={Calendar} label="Date" textColor={THEME_TEXT} iconColor="#0ea5e9" />
+                                      <TableHeaderCell icon={IndianRupee} label="Amount" textColor={THEME_TEXT} iconColor="#f59e0b" />
+                                      <TableHeaderCell icon={AlertCircle} label="Payment Status" textColor={THEME_TEXT} iconColor="#ef4444" />
+                                      <TableHeaderCell icon={Settings} label="Action" textColor={THEME_TEXT} iconColor="#64748b" />
                                     </TableRow>
                                   </TableHeader>
                                   <TableBody>

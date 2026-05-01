@@ -4,7 +4,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Plus, ChevronDown, ChevronRight } from 'lucide-react';
+import { Eye, Plus, ChevronDown, ChevronRight, Hash, Package, FileText, Ruler, Boxes, AlertTriangle, ShoppingCart, IndianRupee, Calculator, Truck, Settings } from 'lucide-react';
+import { TableHeaderCell } from '@/components/shared/TableHeaderCell';
 import {
   Table,
   TableBody,
@@ -114,17 +115,17 @@ export function ReorderTable({
                 />
               </TableHead>
               <TableHead className="w-12"></TableHead>
-              <TableHead className="text-pink-800 font-semibold">S.No</TableHead>
-              <TableHead className="text-pink-800 font-semibold">Product Name</TableHead>
-              <TableHead className="text-pink-800 font-semibold">HSN Code</TableHead>
-              <TableHead className="text-pink-800 font-semibold">Unit</TableHead>
-              <TableHead className="text-pink-800 font-semibold">Current Stock</TableHead>
-              <TableHead className="text-pink-800 font-semibold">Min Threshold</TableHead>
-              <TableHead className="text-pink-800 font-semibold">Suggested Qty</TableHead>
-              <TableHead className="text-pink-800 font-semibold">Purchase Rate</TableHead>
-              <TableHead className="text-pink-800 font-semibold">Total Cost</TableHead>
-              <TableHead className="text-pink-800 font-semibold">Supplier</TableHead>
-              <TableHead className="text-pink-800 font-semibold text-center">Actions</TableHead>
+              <TableHeaderCell icon={Hash} label="S.No" textColor="#9d174d" iconColor="#64748b" />
+              <TableHeaderCell icon={Package} label="Product Name" textColor="#9d174d" iconColor="#f97316" />
+              <TableHeaderCell icon={FileText} label="HSN Code" textColor="#9d174d" iconColor="#ec4899" />
+              <TableHeaderCell icon={Ruler} label="Unit" textColor="#9d174d" iconColor="#0d9488" />
+              <TableHeaderCell icon={Boxes} label="Current Stock" textColor="#9d174d" iconColor="#0ea5e9" />
+              <TableHeaderCell icon={AlertTriangle} label="Min Threshold" textColor="#9d174d" iconColor="#ef4444" />
+              <TableHeaderCell icon={ShoppingCart} label="Suggested Qty" textColor="#9d174d" iconColor="#1e40af" />
+              <TableHeaderCell icon={IndianRupee} label="Purchase Rate" textColor="#9d174d" iconColor="#f59e0b" />
+              <TableHeaderCell icon={Calculator} label="Total Cost" textColor="#9d174d" iconColor="#8b5cf6" />
+              <TableHeaderCell icon={Truck} label="Supplier" textColor="#9d174d" iconColor="#10b981" />
+              <TableHeaderCell icon={Settings} label="Actions" textColor="#9d174d" iconColor="#64748b" align="center" className="text-center" />
             </TableRow>
           </TableHeader>
           <TableBody>

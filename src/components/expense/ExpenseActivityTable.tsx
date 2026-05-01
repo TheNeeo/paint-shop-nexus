@@ -3,7 +3,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Eye, Edit, Trash2, ChevronLeft, ChevronRight, Hash, Calendar, Tag, IndianRupee, CreditCard, FileText, Receipt, Settings } from "lucide-react";
+import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
 
 interface Expense {
   id: number;
@@ -110,14 +111,14 @@ export const ExpenseActivityTable = ({ onEditExpense }: ExpenseActivityTableProp
           <Table>
             <TableHeader>
               <TableRow className="bg-green-50">
-                <TableHead className="text-green-700 font-semibold">S.No</TableHead>
-                <TableHead className="text-green-700 font-semibold">Date</TableHead>
-                <TableHead className="text-green-700 font-semibold">Expense Type</TableHead>
-                <TableHead className="text-green-700 font-semibold">Amount</TableHead>
-                <TableHead className="text-green-700 font-semibold">Payment Mode</TableHead>
-                <TableHead className="text-green-700 font-semibold">Description</TableHead>
-                <TableHead className="text-green-700 font-semibold">Ref/Bill No</TableHead>
-                <TableHead className="text-green-700 font-semibold">Actions</TableHead>
+                <TableHeaderCell icon={Hash} label="S.No" className="text-green-700" iconColor="#64748b" />
+                <TableHeaderCell icon={Calendar} label="Date" className="text-green-700" iconColor="#0ea5e9" />
+                <TableHeaderCell icon={Tag} label="Expense Type" className="text-green-700" iconColor="#8b5cf6" />
+                <TableHeaderCell icon={IndianRupee} label="Amount" className="text-green-700" iconColor="#f59e0b" />
+                <TableHeaderCell icon={CreditCard} label="Payment Mode" className="text-green-700" iconColor="#0d9488" />
+                <TableHeaderCell icon={FileText} label="Description" className="text-green-700" iconColor="#ec4899" />
+                <TableHeaderCell icon={Receipt} label="Ref/Bill No" className="text-green-700" iconColor="#1e40af" />
+                <TableHeaderCell icon={Settings} label="Actions" className="text-green-700" iconColor="#64748b" />
               </TableRow>
             </TableHeader>
             <TableBody>

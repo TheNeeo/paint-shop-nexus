@@ -6,7 +6,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ChevronDown, ChevronRight, Edit, Trash, Eye, Download } from "lucide-react";
+import { ChevronDown, ChevronRight, Edit, Trash, Eye, Download, Calendar, Hash, User, IndianRupee, Wallet, CreditCard, Inbox, Settings } from "lucide-react";
+import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -102,14 +103,14 @@ export function SalesTable({ filters, onViewInvoice }: SalesTableProps) {
           <TableRow style={{ backgroundColor: '#fdf2f8' }}>
             <TableHead className="w-12 font-semibold" style={{ color: '#831843' }}><Checkbox /></TableHead>
             <TableHead className="w-8 font-semibold" style={{ color: '#831843' }}></TableHead>
-            <TableHead className="font-semibold" style={{ color: '#831843' }}>Date</TableHead>
-            <TableHead className="font-semibold" style={{ color: '#831843' }}>Invoice #</TableHead>
-            <TableHead className="font-semibold" style={{ color: '#831843' }}>Customer</TableHead>
-            <TableHead className="font-semibold" style={{ color: '#831843' }}>Total Amount</TableHead>
-            <TableHead className="font-semibold" style={{ color: '#831843' }}>Paid Amount</TableHead>
-            <TableHead className="font-semibold" style={{ color: '#831843' }}>Payment Mode</TableHead>
-            <TableHead className="font-semibold" style={{ color: '#831843' }}>Status</TableHead>
-            <TableHead className="font-semibold" style={{ color: '#831843' }}>Actions</TableHead>
+            <TableHeaderCell icon={Calendar} label="Date" textColor="#831843" iconColor="#0ea5e9" />
+            <TableHeaderCell icon={Hash} label="Invoice #" textColor="#831843" iconColor="#ec4899" />
+            <TableHeaderCell icon={User} label="Customer" textColor="#831843" iconColor="#1e40af" />
+            <TableHeaderCell icon={IndianRupee} label="Total Amount" textColor="#831843" iconColor="#f59e0b" />
+            <TableHeaderCell icon={Wallet} label="Paid Amount" textColor="#831843" iconColor="#10b981" />
+            <TableHeaderCell icon={CreditCard} label="Payment Mode" textColor="#831843" iconColor="#0d9488" />
+            <TableHeaderCell icon={Inbox} label="Status" textColor="#831843" iconColor="#ef4444" />
+            <TableHeaderCell icon={Settings} label="Actions" textColor="#831843" iconColor="#64748b" />
           </TableRow>
         </TableHeader>
         <TableBody>

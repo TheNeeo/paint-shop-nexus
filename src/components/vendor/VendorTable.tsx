@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Eye, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Eye, Edit, Trash2, ChevronLeft, ChevronRight, Hash, User, Phone, FileText, MapPin, UserCheck, Mail, CheckCircle, Settings } from "lucide-react";
+import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -116,15 +117,15 @@ export function VendorTable({
         <Table>
           <TableHeader>
             <TableRow className="bg-gradient-to-r from-purple-100 via-cyan-100 to-teal-100 border-b border-purple-200">
-              <TableHead className="text-purple-800 font-semibold">S.No</TableHead>
-              <TableHead className="text-purple-800 font-semibold">Name</TableHead>
-              <TableHead className="text-purple-800 font-semibold">Phone No</TableHead>
-              <TableHead className="text-purple-800 font-semibold">GST No</TableHead>
-              <TableHead className="text-purple-800 font-semibold">Address</TableHead>
-              <TableHead className="text-purple-800 font-semibold">Contact Person</TableHead>
-              <TableHead className="text-purple-800 font-semibold">Email</TableHead>
-              <TableHead className="text-purple-800 font-semibold">Status</TableHead>
-              <TableHead className="text-purple-800 font-semibold">Actions</TableHead>
+              <TableHeaderCell icon={Hash} label="S.No" textColor="#6b21a8" iconColor="#64748b" />
+              <TableHeaderCell icon={User} label="Name" textColor="#6b21a8" iconColor="#1e40af" />
+              <TableHeaderCell icon={Phone} label="Phone No" textColor="#6b21a8" iconColor="#10b981" />
+              <TableHeaderCell icon={FileText} label="GST No" textColor="#6b21a8" iconColor="#ec4899" />
+              <TableHeaderCell icon={MapPin} label="Address" textColor="#6b21a8" iconColor="#f59e0b" />
+              <TableHeaderCell icon={UserCheck} label="Contact Person" textColor="#6b21a8" iconColor="#0d9488" />
+              <TableHeaderCell icon={Mail} label="Email" textColor="#6b21a8" iconColor="#0ea5e9" />
+              <TableHeaderCell icon={CheckCircle} label="Status" textColor="#6b21a8" iconColor="#22c55e" />
+              <TableHeaderCell icon={Settings} label="Actions" textColor="#6b21a8" iconColor="#64748b" />
             </TableRow>
           </TableHeader>
           <TableBody>
