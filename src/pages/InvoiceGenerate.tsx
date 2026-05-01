@@ -44,7 +44,18 @@ import {
   Mail,
   MessageSquare,
   ShoppingCart,
+  Hash,
+  Package,
+  Tag,
+  Ruler,
+  Calculator,
+  IndianRupee,
+  User,
+  Calendar,
+  Inbox,
+  Settings,
 } from "lucide-react";
+import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -683,14 +694,14 @@ export default function InvoiceGenerate() {
                   <Table>
                     <TableHeader style={{ backgroundColor: `${THEME_BG}60` }}>
                       <TableRow>
-                        <TableHead className="w-12" style={{ color: THEME_PRIMARY }}>S.No</TableHead>
-                        <TableHead style={{ color: THEME_PRIMARY }}>Product Name</TableHead>
-                        <TableHead style={{ color: THEME_PRIMARY }}>Category</TableHead>
-                        <TableHead style={{ color: THEME_PRIMARY }}>HSN Code</TableHead>
-                        <TableHead style={{ color: THEME_PRIMARY }}>Unit</TableHead>
-                        <TableHead className="w-24" style={{ color: THEME_PRIMARY }}>Qty</TableHead>
-                        <TableHead className="w-32" style={{ color: THEME_PRIMARY }}>Rate</TableHead>
-                        <TableHead className="w-32" style={{ color: THEME_PRIMARY }}>Amount</TableHead>
+                        <TableHeaderCell icon={Hash} label="S.No" textColor={THEME_PRIMARY} iconColor="#64748b" className="w-12" />
+                        <TableHeaderCell icon={Package} label="Product Name" textColor={THEME_PRIMARY} iconColor="#f97316" />
+                        <TableHeaderCell icon={Tag} label="Category" textColor={THEME_PRIMARY} iconColor="#8b5cf6" />
+                        <TableHeaderCell icon={FileText} label="HSN Code" textColor={THEME_PRIMARY} iconColor="#ec4899" />
+                        <TableHeaderCell icon={Ruler} label="Unit" textColor={THEME_PRIMARY} iconColor="#0d9488" />
+                        <TableHeaderCell icon={Calculator} label="Qty" textColor={THEME_PRIMARY} iconColor="#0ea5e9" className="w-24" />
+                        <TableHeaderCell icon={IndianRupee} label="Rate" textColor={THEME_PRIMARY} iconColor="#f59e0b" className="w-32" />
+                        <TableHeaderCell icon={IndianRupee} label="Amount" textColor={THEME_PRIMARY} iconColor="#10b981" className="w-32" />
                         <TableHead className="w-12"></TableHead>
                       </TableRow>
                     </TableHeader>
@@ -967,12 +978,12 @@ export default function InvoiceGenerate() {
                   <Table>
                     <TableHeader style={{ backgroundColor: `${THEME_BG}40` }}>
                       <TableRow>
-                        <TableHead style={{ color: THEME_PRIMARY }}>Invoice No.</TableHead>
-                        <TableHead style={{ color: THEME_PRIMARY }}>Customer Name</TableHead>
-                        <TableHead style={{ color: THEME_PRIMARY }}>Date</TableHead>
-                        <TableHead style={{ color: THEME_PRIMARY }}>Amount</TableHead>
-                        <TableHead style={{ color: THEME_PRIMARY }}>Status</TableHead>
-                        <TableHead style={{ color: THEME_PRIMARY }}>Actions</TableHead>
+                        <TableHeaderCell icon={FileText} label="Invoice No." textColor={THEME_PRIMARY} iconColor="#ec4899" />
+                        <TableHeaderCell icon={User} label="Customer Name" textColor={THEME_PRIMARY} iconColor="#1e40af" />
+                        <TableHeaderCell icon={Calendar} label="Date" textColor={THEME_PRIMARY} iconColor="#0ea5e9" />
+                        <TableHeaderCell icon={IndianRupee} label="Amount" textColor={THEME_PRIMARY} iconColor="#f59e0b" />
+                        <TableHeaderCell icon={Inbox} label="Status" textColor={THEME_PRIMARY} iconColor="#22c55e" />
+                        <TableHeaderCell icon={Settings} label="Actions" textColor={THEME_PRIMARY} iconColor="#64748b" />
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1016,11 +1027,11 @@ export default function InvoiceGenerate() {
                   <Table>
                     <TableHeader style={{ backgroundColor: '#fef3c740' }}>
                       <TableRow>
-                        <TableHead style={{ color: '#92400e' }}>Invoice No.</TableHead>
-                        <TableHead style={{ color: '#92400e' }}>Customer Name</TableHead>
-                        <TableHead style={{ color: '#92400e' }}>Date</TableHead>
-                        <TableHead style={{ color: '#92400e' }}>Amount</TableHead>
-                        <TableHead style={{ color: '#92400e' }}>Actions</TableHead>
+                        <TableHeaderCell icon={FileText} label="Invoice No." textColor="#92400e" iconColor="#ec4899" />
+                        <TableHeaderCell icon={User} label="Customer Name" textColor="#92400e" iconColor="#1e40af" />
+                        <TableHeaderCell icon={Calendar} label="Date" textColor="#92400e" iconColor="#0ea5e9" />
+                        <TableHeaderCell icon={IndianRupee} label="Amount" textColor="#92400e" iconColor="#f59e0b" />
+                        <TableHeaderCell icon={Settings} label="Actions" textColor="#92400e" iconColor="#64748b" />
                       </TableRow>
                     </TableHeader>
                     <TableBody>
