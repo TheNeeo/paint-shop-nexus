@@ -57,7 +57,7 @@ import {
   Search, 
   Filter,
   Boxes,
-  ArrowLeft
+  ArrowLeft,
   Package as PkgIcon,
   Tag as TagIcon,
   FileText as FileTextIcon,
