@@ -38,8 +38,16 @@ import {
   Download, 
   ArrowLeft,
   Boxes,
-  Clock
+  Clock,
+  Calendar as CalIcon,
+  Package as PkgIcon,
+  ArrowUpDown as ArrowIcon,
+  Tag as TagIcon,
+  FileText as FileIcon,
+  StickyNote as NoteIcon,
+  User as UserIcon,
 } from "lucide-react";
+import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
 import dashboardHomeIcon from "@/assets/dashboard-home-icon.png";
 import inventoryMovementIcon from "@/assets/inventory-movement-icon.png";
 
@@ -374,13 +382,13 @@ export default function InventoryMovementHistory() {
                 <Table>
                   <TableHeader>
                     <TableRow style={{ backgroundColor: `${ELECTRIC_AQUA}20` }}>
-                      <TableHead style={{ color: ELECTRIC_AQUA_DARKER }}>Date & Time</TableHead>
-                      <TableHead style={{ color: ELECTRIC_AQUA_DARKER }}>Product Name</TableHead>
-                      <TableHead style={{ color: ELECTRIC_AQUA_DARKER }}>Quantity In/Out</TableHead>
-                      <TableHead style={{ color: ELECTRIC_AQUA_DARKER }}>Type</TableHead>
-                      <TableHead style={{ color: ELECTRIC_AQUA_DARKER }}>Reason</TableHead>
-                      <TableHead style={{ color: ELECTRIC_AQUA_DARKER }}>Notes</TableHead>
-                      <TableHead style={{ color: ELECTRIC_AQUA_DARKER }}>User/Admin</TableHead>
+                      <TableHeaderCell icon={CalIcon} label="Date & Time" textColor={ELECTRIC_AQUA_DARKER} iconColor="#0ea5e9" />
+                      <TableHeaderCell icon={PkgIcon} label="Product Name" textColor={ELECTRIC_AQUA_DARKER} iconColor="#f97316" />
+                      <TableHeaderCell icon={ArrowIcon} label="Quantity In/Out" textColor={ELECTRIC_AQUA_DARKER} iconColor="#10b981" />
+                      <TableHeaderCell icon={TagIcon} label="Type" textColor={ELECTRIC_AQUA_DARKER} iconColor="#8b5cf6" />
+                      <TableHeaderCell icon={FileIcon} label="Reason" textColor={ELECTRIC_AQUA_DARKER} iconColor="#ec4899" />
+                      <TableHeaderCell icon={NoteIcon} label="Notes" textColor={ELECTRIC_AQUA_DARKER} iconColor="#f59e0b" />
+                      <TableHeaderCell icon={UserIcon} label="User/Admin" textColor={ELECTRIC_AQUA_DARKER} iconColor="#1e40af" />
                     </TableRow>
                   </TableHeader>
                   <TableBody>

@@ -26,8 +26,18 @@ import {
   FileImage, 
   Download,
   ChevronDown,
-  ChevronRight 
+  ChevronRight,
+  FileText,
+  User,
+  Calendar,
+  CreditCard,
+  IndianRupee,
+  Percent,
+  Inbox,
+  Paperclip,
+  Settings,
 } from 'lucide-react';
+import { TableHeaderCell } from '@/components/shared/TableHeaderCell';
 import { supabase } from '@/integrations/supabase/client';
 import { Purchase } from '@/types/purchase';
 import { format } from 'date-fns';
@@ -202,15 +212,15 @@ export const PurchaseTable: React.FC<PurchaseTableProps> = ({
               />
             </TableHead>
             <TableHead className="w-12"></TableHead>
-            <TableHead style={{ color: THEME_PRIMARY }}>📄 Bill No.</TableHead>
-            <TableHead style={{ color: THEME_PRIMARY }}>👤 Vendor Name</TableHead>
-            <TableHead style={{ color: THEME_PRIMARY }}>📅 Date</TableHead>
-            <TableHead style={{ color: THEME_PRIMARY }}>💳 Payment Mode</TableHead>
-            <TableHead style={{ color: THEME_PRIMARY }}>💰 Total Amount</TableHead>
-            <TableHead style={{ color: THEME_PRIMARY }}>📊 GST %</TableHead>
-            <TableHead style={{ color: THEME_PRIMARY }}>📥 Status</TableHead>
-            <TableHead style={{ color: THEME_PRIMARY }}>📎 Bill</TableHead>
-            <TableHead className="text-right" style={{ color: THEME_PRIMARY }}>⚙️ Actions</TableHead>
+            <TableHeaderCell icon={FileText} label="Bill No." textColor={THEME_PRIMARY} iconColor="#ec4899" />
+            <TableHeaderCell icon={User} label="Vendor Name" textColor={THEME_PRIMARY} iconColor="#1e40af" />
+            <TableHeaderCell icon={Calendar} label="Date" textColor={THEME_PRIMARY} iconColor="#0ea5e9" />
+            <TableHeaderCell icon={CreditCard} label="Payment Mode" textColor={THEME_PRIMARY} iconColor="#0d9488" />
+            <TableHeaderCell icon={IndianRupee} label="Total Amount" textColor={THEME_PRIMARY} iconColor="#f59e0b" />
+            <TableHeaderCell icon={Percent} label="GST %" textColor={THEME_PRIMARY} iconColor="#10b981" />
+            <TableHeaderCell icon={Inbox} label="Status" textColor={THEME_PRIMARY} iconColor="#ef4444" />
+            <TableHeaderCell icon={Paperclip} label="Bill" textColor={THEME_PRIMARY} iconColor="#8b5cf6" />
+            <TableHeaderCell icon={Settings} label="Actions" textColor={THEME_PRIMARY} iconColor="#64748b" align="right" className="text-right" />
           </TableRow>
         </TableHeader>
         <TableBody>

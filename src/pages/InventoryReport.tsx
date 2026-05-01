@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Package, TrendingUp, AlertCircle, Star, RefreshCw, Download, Search, BarChart3 } from "lucide-react";
+import { Package, TrendingUp, AlertCircle, Star, RefreshCw, Download, Search, BarChart3, Tag, Boxes, Ruler, IndianRupee, Calculator, CheckCircle } from "lucide-react";
+import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
@@ -107,13 +108,13 @@ export default function InventoryReport() {
             <Table>
               <TableHeader>
                 <TableRow style={{ backgroundColor: THEME.primaryLightest }}>
-                  <TableHead style={{ color: THEME.primaryDark }}>Product</TableHead>
-                  <TableHead style={{ color: THEME.primaryDark }}>Category</TableHead>
-                  <TableHead className="text-right" style={{ color: THEME.primaryDark }}>Current Stock</TableHead>
-                  <TableHead style={{ color: THEME.primaryDark }}>Unit</TableHead>
-                  <TableHead className="text-right" style={{ color: THEME.primaryDark }}>Unit Price</TableHead>
-                  <TableHead className="text-right" style={{ color: THEME.primaryDark }}>Stock Value</TableHead>
-                  <TableHead style={{ color: THEME.primaryDark }}>Status</TableHead>
+                  <TableHeaderCell icon={Package} label="Product" textColor={THEME.primaryDark} iconColor="#f97316" />
+                  <TableHeaderCell icon={Tag} label="Category" textColor={THEME.primaryDark} iconColor="#8b5cf6" />
+                  <TableHeaderCell icon={Boxes} label="Current Stock" textColor={THEME.primaryDark} iconColor="#0ea5e9" align="right" className="text-right" />
+                  <TableHeaderCell icon={Ruler} label="Unit" textColor={THEME.primaryDark} iconColor="#0d9488" />
+                  <TableHeaderCell icon={IndianRupee} label="Unit Price" textColor={THEME.primaryDark} iconColor="#f59e0b" align="right" className="text-right" />
+                  <TableHeaderCell icon={Calculator} label="Stock Value" textColor={THEME.primaryDark} iconColor="#ec4899" align="right" className="text-right" />
+                  <TableHeaderCell icon={CheckCircle} label="Status" textColor={THEME.primaryDark} iconColor="#22c55e" />
                 </TableRow>
               </TableHeader>
               <TableBody>

@@ -11,7 +11,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ChevronDown, ChevronRight, Star, Package } from "lucide-react";
+import { ChevronDown, ChevronRight, Star, Package, Hash, Tag, Truck, IndianRupee, Boxes, ShoppingBag, Calendar, Settings } from "lucide-react";
+import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
 import { ProductRowActions } from "./ProductRowActions";
 import { ProductVariantRows } from "./ProductVariantRows";
 
@@ -58,15 +59,15 @@ export function ProductTable({
               />
             </TableHead>
             <TableHead className="text-white font-bold text-sm w-12"></TableHead>
-            <TableHead className="text-white font-bold text-sm w-12">#</TableHead>
-            <TableHead className="text-white font-bold text-sm">Product Name</TableHead>
-            <TableHead className="text-white font-bold text-sm">Category</TableHead>
-            <TableHead className="text-white font-bold text-sm">Vendor Name</TableHead>
-            <TableHead className="text-white font-bold text-sm">Unit Price</TableHead>
-            <TableHead className="text-white font-bold text-sm">Stock</TableHead>
-            <TableHead className="text-white font-bold text-sm">Sales</TableHead>
-            <TableHead className="text-white font-bold text-sm">Warranty/Expiry</TableHead>
-            <TableHead className="text-white font-bold text-sm w-40">Actions</TableHead>
+            <TableHeaderCell icon={Hash} label="#" className="text-white w-12" iconColor="#fde68a" />
+            <TableHeaderCell icon={Package} label="Product Name" className="text-white" iconColor="#fdba74" />
+            <TableHeaderCell icon={Tag} label="Category" className="text-white" iconColor="#fbcfe8" />
+            <TableHeaderCell icon={Truck} label="Vendor Name" className="text-white" iconColor="#a5f3fc" />
+            <TableHeaderCell icon={IndianRupee} label="Unit Price" className="text-white" iconColor="#fde68a" />
+            <TableHeaderCell icon={Boxes} label="Stock" className="text-white" iconColor="#bef264" />
+            <TableHeaderCell icon={ShoppingBag} label="Sales" className="text-white" iconColor="#bbf7d0" />
+            <TableHeaderCell icon={Calendar} label="Warranty/Expiry" className="text-white" iconColor="#fecaca" />
+            <TableHeaderCell icon={Settings} label="Actions" className="text-white w-40" iconColor="#e2e8f0" />
           </TableRow>
         </TableHeader>
         <TableBody>

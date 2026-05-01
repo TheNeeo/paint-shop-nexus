@@ -57,8 +57,17 @@ import {
   Search, 
   Filter,
   Boxes,
-  ArrowLeft
+  ArrowLeft,
+  Package as PkgIcon,
+  Tag as TagIcon,
+  FileText as FileTextIcon,
+  Boxes as BoxesIcon,
+  Ruler as RulerIcon,
+  IndianRupee as IndianRupeeIcon,
+  CheckCircle as CheckCircleIcon,
+  Settings as SettingsIcon,
 } from "lucide-react";
+import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -660,14 +669,14 @@ export default function UpdateStock() {
                   <Table>
                     <TableHeader>
                       <TableRow style={{ backgroundColor: `${PALE_OAK}15` }}>
-                        <TableHead style={{ color: PALE_OAK_DARKER }}>Product Name</TableHead>
-                        <TableHead style={{ color: PALE_OAK_DARKER }}>Category</TableHead>
-                        <TableHead style={{ color: PALE_OAK_DARKER }}>HSN Code</TableHead>
-                        <TableHead className="text-right" style={{ color: PALE_OAK_DARKER }}>Current Stock</TableHead>
-                        <TableHead style={{ color: PALE_OAK_DARKER }}>Unit</TableHead>
-                        <TableHead className="text-right" style={{ color: PALE_OAK_DARKER }}>Unit Price</TableHead>
-                        <TableHead style={{ color: PALE_OAK_DARKER }}>Status</TableHead>
-                        <TableHead style={{ color: PALE_OAK_DARKER }}>Actions</TableHead>
+                        <TableHeaderCell icon={PkgIcon} label="Product Name" textColor={PALE_OAK_DARKER} iconColor="#f97316" />
+                        <TableHeaderCell icon={TagIcon} label="Category" textColor={PALE_OAK_DARKER} iconColor="#8b5cf6" />
+                        <TableHeaderCell icon={FileTextIcon} label="HSN Code" textColor={PALE_OAK_DARKER} iconColor="#ec4899" />
+                        <TableHeaderCell icon={BoxesIcon} label="Current Stock" textColor={PALE_OAK_DARKER} iconColor="#0ea5e9" align="right" className="text-right" />
+                        <TableHeaderCell icon={RulerIcon} label="Unit" textColor={PALE_OAK_DARKER} iconColor="#0d9488" />
+                        <TableHeaderCell icon={IndianRupeeIcon} label="Unit Price" textColor={PALE_OAK_DARKER} iconColor="#f59e0b" align="right" className="text-right" />
+                        <TableHeaderCell icon={CheckCircleIcon} label="Status" textColor={PALE_OAK_DARKER} iconColor="#22c55e" />
+                        <TableHeaderCell icon={SettingsIcon} label="Actions" textColor={PALE_OAK_DARKER} iconColor="#64748b" />
                       </TableRow>
                     </TableHeader>
                     <TableBody>

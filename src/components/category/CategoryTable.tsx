@@ -9,7 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Package } from "lucide-react";
+import { Package, Tag, FileText, Palette, Boxes, CheckCircle, Calendar, Settings } from "lucide-react";
+import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
 import { CategoryRow } from "./CategoryRow";
 import { ProductRows } from "./ProductRows";
 
@@ -38,13 +39,13 @@ export function CategoryTable({ categories, onEdit, onDelete }: CategoryTablePro
         <TableHeader>
           <TableRow className="bg-gradient-to-r from-purple-600 via-purple-500 to-indigo-500 hover:from-purple-700 hover:via-purple-600 hover:to-indigo-600 border-b-2 border-purple-800">
             <TableHead className="text-white font-bold text-sm w-12"></TableHead>
-            <TableHead className="text-white font-bold text-sm">Category</TableHead>
-            <TableHead className="text-white font-bold text-sm">Description</TableHead>
-            <TableHead className="text-white font-bold text-sm">Color</TableHead>
-            <TableHead className="text-white font-bold text-sm">Products</TableHead>
-            <TableHead className="text-white font-bold text-sm">Status</TableHead>
-            <TableHead className="text-white font-bold text-sm">Created</TableHead>
-            <TableHead className="text-white font-bold text-sm w-32">Actions</TableHead>
+            <TableHeaderCell icon={Tag} label="Category" className="text-white" iconColor="#fbcfe8" />
+            <TableHeaderCell icon={FileText} label="Description" className="text-white" iconColor="#a5f3fc" />
+            <TableHeaderCell icon={Palette} label="Color" className="text-white" iconColor="#fdba74" />
+            <TableHeaderCell icon={Boxes} label="Products" className="text-white" iconColor="#bef264" />
+            <TableHeaderCell icon={CheckCircle} label="Status" className="text-white" iconColor="#bbf7d0" />
+            <TableHeaderCell icon={Calendar} label="Created" className="text-white" iconColor="#fde68a" />
+            <TableHeaderCell icon={Settings} label="Actions" className="text-white w-32" iconColor="#e2e8f0" />
           </TableRow>
         </TableHeader>
         <TableBody>

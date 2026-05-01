@@ -19,8 +19,20 @@ import {
   ChevronDown, 
   ChevronRight,
   Image as ImageIcon,
-  Settings2
+  Settings2,
+  Hash,
+  Package,
+  FileText,
+  Ruler,
+  ShoppingCart,
+  ShoppingBag,
+  Boxes,
+  AlertTriangle,
+  IndianRupee,
+  CheckCircle,
+  Settings
 } from "lucide-react";
+import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
 import { cn } from "@/lib/utils";
 
 interface InventoryTableProps {
@@ -147,18 +159,18 @@ export function InventoryTable({
       <Table>
         <TableHeader>
           <TableRow style={{ backgroundColor: '#fef9c3' }}>
-            <TableHead className="w-12">S.No</TableHead>
-            <TableHead>Product Details</TableHead>
-            <TableHead className="w-20">Image</TableHead>
-            <TableHead>HSN Code</TableHead>
-            <TableHead>Unit</TableHead>
-            <TableHead>Purchase Qty</TableHead>
-            <TableHead>Sale Qty</TableHead>
-            <TableHead>Current Stock</TableHead>
-            <TableHead>Threshold</TableHead>
-            <TableHead>Total Value</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="w-32">Actions</TableHead>
+            <TableHeaderCell icon={Hash} label="S.No" iconColor="#64748b" className="w-12" />
+            <TableHeaderCell icon={Package} label="Product Details" iconColor="#f97316" />
+            <TableHeaderCell icon={ImageIcon} label="Image" iconColor="#8b5cf6" className="w-20" />
+            <TableHeaderCell icon={FileText} label="HSN Code" iconColor="#ec4899" />
+            <TableHeaderCell icon={Ruler} label="Unit" iconColor="#0d9488" />
+            <TableHeaderCell icon={ShoppingCart} label="Purchase Qty" iconColor="#1e40af" />
+            <TableHeaderCell icon={ShoppingBag} label="Sale Qty" iconColor="#10b981" />
+            <TableHeaderCell icon={Boxes} label="Current Stock" iconColor="#0ea5e9" />
+            <TableHeaderCell icon={AlertTriangle} label="Threshold" iconColor="#ef4444" />
+            <TableHeaderCell icon={IndianRupee} label="Total Value" iconColor="#f59e0b" />
+            <TableHeaderCell icon={CheckCircle} label="Status" iconColor="#22c55e" />
+            <TableHeaderCell icon={Settings} label="Actions" iconColor="#64748b" className="w-32" />
           </TableRow>
         </TableHeader>
         <TableBody>

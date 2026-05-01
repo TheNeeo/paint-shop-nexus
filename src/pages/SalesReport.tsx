@@ -10,7 +10,8 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { RefreshCw, Download, TrendingUp, DollarSign, FileText, BarChart3, Calendar } from "lucide-react";
+import { RefreshCw, Download, TrendingUp, DollarSign, FileText, BarChart3, Calendar, Hash, User, IndianRupee, Percent, CreditCard, Inbox } from "lucide-react";
+import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
 import { format } from "date-fns";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { useQuery } from "@tanstack/react-query";
@@ -128,14 +129,14 @@ const SalesReport = () => {
             <Table>
               <TableHeader>
                 <TableRow style={{ backgroundColor: THEME.primaryLightest }}>
-                  <TableHead style={{ color: THEME.primaryDark }}>Date</TableHead>
-                  <TableHead style={{ color: THEME.primaryDark }}>Invoice No</TableHead>
-                  <TableHead style={{ color: THEME.primaryDark }}>Customer</TableHead>
-                  <TableHead className="text-right" style={{ color: THEME.primaryDark }}>Subtotal</TableHead>
-                  <TableHead className="text-right" style={{ color: THEME.primaryDark }}>GST</TableHead>
-                  <TableHead className="text-right" style={{ color: THEME.primaryDark }}>Total</TableHead>
-                  <TableHead style={{ color: THEME.primaryDark }}>Payment</TableHead>
-                  <TableHead style={{ color: THEME.primaryDark }}>Status</TableHead>
+                  <TableHeaderCell icon={Calendar} label="Date" textColor={THEME.primaryDark} iconColor="#0ea5e9" />
+                  <TableHeaderCell icon={Hash} label="Invoice No" textColor={THEME.primaryDark} iconColor="#ec4899" />
+                  <TableHeaderCell icon={User} label="Customer" textColor={THEME.primaryDark} iconColor="#1e40af" />
+                  <TableHeaderCell icon={IndianRupee} label="Subtotal" textColor={THEME.primaryDark} iconColor="#f59e0b" align="right" className="text-right" />
+                  <TableHeaderCell icon={Percent} label="GST" textColor={THEME.primaryDark} iconColor="#10b981" align="right" className="text-right" />
+                  <TableHeaderCell icon={IndianRupee} label="Total" textColor={THEME.primaryDark} iconColor="#f59e0b" align="right" className="text-right" />
+                  <TableHeaderCell icon={CreditCard} label="Payment" textColor={THEME.primaryDark} iconColor="#0d9488" />
+                  <TableHeaderCell icon={Inbox} label="Status" textColor={THEME.primaryDark} iconColor="#22c55e" />
                 </TableRow>
               </TableHeader>
               <TableBody>

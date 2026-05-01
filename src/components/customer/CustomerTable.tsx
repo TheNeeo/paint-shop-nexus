@@ -10,7 +10,8 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Eye, Edit, Trash2, AlertCircle } from 'lucide-react';
+import { Eye, Edit, Trash2, AlertCircle, Hash, User, Phone, FileText, MapPin, Tag, IndianRupee, AlertTriangle, CheckCircle, Settings } from 'lucide-react';
+import { TableHeaderCell } from '@/components/shared/TableHeaderCell';
 import { Customer } from '@/pages/CustomerInformation';
 
 interface CustomerTableProps {
@@ -64,16 +65,16 @@ export const CustomerTable: React.FC<CustomerTableProps> = ({
                 className="hover:bg-transparent"
                 style={{ background: 'linear-gradient(135deg, #35CA7B 0%, #2DB86A 100%)' }}
               >
-                <TableHead className="text-white font-semibold">S.No</TableHead>
-                <TableHead className="text-white font-semibold">Name</TableHead>
-                <TableHead className="text-white font-semibold">Mobile No</TableHead>
-                <TableHead className="text-white font-semibold">GST No</TableHead>
-                <TableHead className="text-white font-semibold">Address</TableHead>
-                <TableHead className="text-white font-semibold">Type</TableHead>
-                <TableHead className="text-white font-semibold">Total Sales</TableHead>
-                <TableHead className="text-white font-semibold">Outstanding</TableHead>
-                <TableHead className="text-white font-semibold">Status</TableHead>
-                <TableHead className="text-white font-semibold text-center">Actions</TableHead>
+                <TableHeaderCell icon={Hash} label="S.No" className="text-white" iconColor="#fde68a" />
+                <TableHeaderCell icon={User} label="Name" className="text-white" iconColor="#fde68a" />
+                <TableHeaderCell icon={Phone} label="Mobile No" className="text-white" iconColor="#bef264" />
+                <TableHeaderCell icon={FileText} label="GST No" className="text-white" iconColor="#fbcfe8" />
+                <TableHeaderCell icon={MapPin} label="Address" className="text-white" iconColor="#fdba74" />
+                <TableHeaderCell icon={Tag} label="Type" className="text-white" iconColor="#a5f3fc" />
+                <TableHeaderCell icon={IndianRupee} label="Total Sales" className="text-white" iconColor="#fde68a" />
+                <TableHeaderCell icon={AlertTriangle} label="Outstanding" className="text-white" iconColor="#fecaca" />
+                <TableHeaderCell icon={CheckCircle} label="Status" className="text-white" iconColor="#bbf7d0" />
+                <TableHeaderCell icon={Settings} label="Actions" className="text-white text-center" iconColor="#e2e8f0" align="center" />
               </TableRow>
             </TableHeader>
             <TableBody>

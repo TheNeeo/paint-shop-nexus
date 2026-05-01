@@ -2,7 +2,8 @@ import React from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Edit, Printer, Trash2 } from "lucide-react";
+import { Eye, Edit, Printer, Trash2, Hash, Receipt, Calendar, User, IndianRupee, CreditCard, FileText, Settings } from "lucide-react";
+import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
 import { Card, CardContent } from "@/components/ui/card";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -58,14 +59,14 @@ export function CashReceiptTable({ filters, onEditReceipt, onViewReceipt }: Cash
           <Table>
             <TableHeader>
               <TableRow style={{ backgroundColor: "rgba(125, 190, 60, 0.1)" }}>
-                <TableHead style={{ color: "#16583f", fontWeight: "600" }}>S.No</TableHead>
-                <TableHead style={{ color: "#16583f", fontWeight: "600" }}>Receipt No</TableHead>
-                <TableHead style={{ color: "#16583f", fontWeight: "600" }}>Date</TableHead>
-                <TableHead style={{ color: "#16583f", fontWeight: "600" }}>Payer Name</TableHead>
-                <TableHead style={{ color: "#16583f", fontWeight: "600" }}>Amount</TableHead>
-                <TableHead style={{ color: "#16583f", fontWeight: "600" }}>Payment Mode</TableHead>
-                <TableHead style={{ color: "#16583f", fontWeight: "600" }}>Reason</TableHead>
-                <TableHead style={{ color: "#16583f", fontWeight: "600" }}>Actions</TableHead>
+                <TableHeaderCell icon={Hash} label="S.No" textColor="#16583f" iconColor="#64748b" />
+                <TableHeaderCell icon={Receipt} label="Receipt No" textColor="#16583f" iconColor="#ec4899" />
+                <TableHeaderCell icon={Calendar} label="Date" textColor="#16583f" iconColor="#0ea5e9" />
+                <TableHeaderCell icon={User} label="Payer Name" textColor="#16583f" iconColor="#1e40af" />
+                <TableHeaderCell icon={IndianRupee} label="Amount" textColor="#16583f" iconColor="#f59e0b" />
+                <TableHeaderCell icon={CreditCard} label="Payment Mode" textColor="#16583f" iconColor="#0d9488" />
+                <TableHeaderCell icon={FileText} label="Reason" textColor="#16583f" iconColor="#8b5cf6" />
+                <TableHeaderCell icon={Settings} label="Actions" textColor="#16583f" iconColor="#64748b" />
               </TableRow>
             </TableHeader>
             <TableBody>
