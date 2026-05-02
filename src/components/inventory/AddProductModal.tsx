@@ -616,12 +616,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main Product Details - Takes 2 columns */}
             <div className="lg:col-span-2 space-y-6 p-6 rounded-xl bg-gradient-to-br from-blue-50/50 to-cyan-50/30 dark:from-blue-950/20 dark:to-cyan-950/10 border border-blue-100/50 dark:border-blue-900/30 animate-fade-in">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-blue-500/10">
-                  <Package className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                </div>
-                <h3 className="text-lg font-semibold text-foreground">Main Product Details</h3>
-              </div>
+              <FormSectionHeader icon={Package} title="Main Product Details" color="blue" />
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
