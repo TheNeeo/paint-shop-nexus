@@ -842,12 +842,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
 
           {/* Pricing & Quantity Section */}
           <div className="space-y-6 p-6 rounded-xl bg-gradient-to-br from-emerald-50/50 to-green-50/30 dark:from-emerald-950/20 dark:to-green-950/10 border border-emerald-100/50 dark:border-emerald-900/30 animate-fade-in" style={{animationDelay: '0.1s'}}>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-emerald-500/10">
-                <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-              </div>
-              <h3 className="text-lg font-semibold text-foreground">Pricing & Quantity Details</h3>
-            </div>
+            <FormSectionHeader icon={DollarSign} title="Pricing & Quantity Details" color="emerald" />
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
