@@ -8,6 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Customer } from '@/pages/CustomerInformation';
 import addNewCustomerIcon from '@/assets/add-new-customer-icon.png';
+import { User, Phone, Mail, FileText, MapPin, Tag, IndianRupee, ToggleRight, UserCircle } from 'lucide-react';
+import { FormSectionHeader } from '@/components/shared/FormSectionHeader';
+import { FormFieldLabel } from '@/components/shared/FormFieldLabel';
 
 interface AddEditCustomerModalProps {
   isOpen: boolean;
