@@ -20,12 +20,14 @@ import {
 } from "@/components/ui/select";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, Plus, X, Package, DollarSign, TrendingUp, FileText, Hash, FolderTree, Box, Activity, IndianRupee, ShoppingCart, AlertTriangle, Building2, Package2, Calendar, Clock } from "lucide-react";
+import { Upload, Plus, X, Package, DollarSign, TrendingUp, FileText, Hash, FolderTree, Box, Activity, IndianRupee, ShoppingCart, AlertTriangle, Building2, Package2, Calendar, Clock, ImageIcon } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { CategoryForm } from "@/components/category/CategoryForm";
 import { AddEditVendorModal } from "@/components/vendor/AddEditVendorModal";
 import bucketIcon from "@/assets/bucket-icon.png";
+import { FormSectionHeader } from "@/components/shared/FormSectionHeader";
+import { FormFieldLabel } from "@/components/shared/FormFieldLabel";
 
 interface AddProductModalProps {
   isOpen: boolean;
@@ -614,12 +616,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main Product Details - Takes 2 columns */}
             <div className="lg:col-span-2 space-y-6 p-6 rounded-xl bg-gradient-to-br from-blue-50/50 to-cyan-50/30 dark:from-blue-950/20 dark:to-cyan-950/10 border border-blue-100/50 dark:border-blue-900/30 animate-fade-in">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-blue-500/10">
-                  <Package className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                </div>
-                <h3 className="text-lg font-semibold text-foreground">Main Product Details</h3>
-              </div>
+              <FormSectionHeader icon={Package} title="Main Product Details" color="blue" />
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
@@ -771,12 +768,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
 
             {/* Product Image - Takes 1 column */}
             <div className="space-y-4 p-6 rounded-xl bg-gradient-to-br from-purple-50/50 to-pink-50/30 dark:from-purple-950/20 dark:to-pink-950/10 border border-purple-100/50 dark:border-purple-900/30 animate-fade-in">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-purple-500/10">
-                  <Upload className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                </div>
-                <h3 className="text-lg font-semibold text-foreground">📸 Product Image</h3>
-              </div>
+              <FormSectionHeader icon={ImageIcon} title="Product Image" color="purple" />
               
               <div
                 className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
@@ -850,12 +842,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
 
           {/* Pricing & Quantity Section */}
           <div className="space-y-6 p-6 rounded-xl bg-gradient-to-br from-emerald-50/50 to-green-50/30 dark:from-emerald-950/20 dark:to-green-950/10 border border-emerald-100/50 dark:border-emerald-900/30 animate-fade-in" style={{animationDelay: '0.1s'}}>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-emerald-500/10">
-                <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-              </div>
-              <h3 className="text-lg font-semibold text-foreground">Pricing & Quantity Details</h3>
-            </div>
+            <FormSectionHeader icon={DollarSign} title="Pricing & Quantity Details" color="emerald" />
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
@@ -1000,12 +987,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
 
           {/* Stock Management Section */}
           <div className="space-y-6 p-6 rounded-xl bg-gradient-to-br from-orange-50/50 to-amber-50/30 dark:from-orange-950/20 dark:to-amber-950/10 border border-orange-100/50 dark:border-orange-900/30 animate-fade-in" style={{animationDelay: '0.2s'}}>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-orange-500/10">
-                <TrendingUp className="w-5 h-5 text-orange-600 dark:text-orange-400" />
-              </div>
-              <h3 className="text-lg font-semibold text-foreground">Stock Management</h3>
-            </div>
+            <FormSectionHeader icon={AlertTriangle} title="Stock Management" color="orange" />
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
@@ -1120,12 +1102,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
 
           {/* Product Shelf Life Details Section */}
           <div className="space-y-6 p-6 rounded-xl bg-gradient-to-br from-rose-50/50 to-pink-50/30 dark:from-rose-950/20 dark:to-pink-950/10 border border-rose-100/50 dark:border-rose-900/30 animate-fade-in" style={{animationDelay: '0.3s'}}>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-rose-500/10">
-                <Calendar className="w-5 h-5 text-rose-600 dark:text-rose-400" />
-              </div>
-              <h3 className="text-lg font-semibold text-foreground">📋 Product Shelf Life Details</h3>
-            </div>
+            <FormSectionHeader icon={Calendar} title="Product Shelf Life Details" color="rose" />
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
@@ -1200,12 +1177,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
           {!formData.is_variant && (
             <div className="space-y-6 p-6 rounded-xl bg-gradient-to-br from-indigo-50/50 to-blue-50/30 dark:from-indigo-950/20 dark:to-blue-950/10 border border-indigo-100/50 dark:border-indigo-900/30 animate-fade-in" style={{animationDelay: '0.4s'}}>
               <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-indigo-500/10">
-                    <Package className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-foreground">Product Variants</h3>
-                </div>
+                <FormSectionHeader icon={Package} title="Product Variants" color="indigo" className="mb-0" />
                 <Button
                   type="button"
                   onClick={addVariant}

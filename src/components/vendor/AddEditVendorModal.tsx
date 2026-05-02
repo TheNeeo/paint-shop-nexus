@@ -24,6 +24,9 @@ import { motion } from "framer-motion";
 import { z } from "zod";
 import { validateInput, vendorCustomerSchemas } from "@/lib/validation";
 import addNewVendorIcon from "@/assets/add-new-vendor-icon.png";
+import { Building2, Phone, Mail, FileText, MapPin, User, ToggleRight, UserCircle, Settings } from "lucide-react";
+import { FormSectionHeader } from "@/components/shared/FormSectionHeader";
+import { FormFieldLabel } from "@/components/shared/FormFieldLabel";
 interface AddEditVendorModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -188,108 +191,101 @@ export function AddEditVendorModal({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Vendor Name */}
-            <div className="space-y-2">
-              <Label htmlFor="name" className="text-purple-700 font-medium">
-                Vendor Name *
-              </Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => handleInputChange("name", e.target.value)}
-                placeholder="Enter vendor name"
-                className="border-purple-200 focus:border-cyan-500 focus:ring-cyan-100 bg-white/80"
-                required
-              />
-            </div>
+          {/* Section: Basic Details */}
+          <div>
+            <FormSectionHeader icon={UserCircle} title="Basic Details" color="purple" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <FormFieldLabel icon={Building2} label="Vendor Name" htmlFor="name" required color="purple" />
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
+                  placeholder="Enter vendor name"
+                  className="border-purple-200 focus:border-cyan-500 focus:ring-cyan-100 bg-white/80"
+                  required
+                />
+              </div>
 
-            {/* Phone Number */}
-            <div className="space-y-2">
-              <Label htmlFor="phone" className="text-purple-700 font-medium">
-                Phone Number *
-              </Label>
-              <Input
-                id="phone"
-                value={formData.phone}
-                onChange={(e) => handleInputChange("phone", e.target.value)}
-                placeholder="Enter phone number"
-                className="border-purple-200 focus:border-cyan-500 focus:ring-cyan-100 bg-white/80"
-                required
-              />
-            </div>
+              <div className="space-y-1">
+                <FormFieldLabel icon={Phone} label="Phone Number" htmlFor="phone" required color="purple" />
+                <Input
+                  id="phone"
+                  value={formData.phone}
+                  onChange={(e) => handleInputChange("phone", e.target.value)}
+                  placeholder="Enter phone number"
+                  className="border-purple-200 focus:border-cyan-500 focus:ring-cyan-100 bg-white/80"
+                  required
+                />
+              </div>
 
-            {/* Email */}
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-purple-700 font-medium">
-                Email (Optional)
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-                placeholder="Enter email address"
-                className="border-purple-200 focus:border-cyan-500 focus:ring-cyan-100 bg-white/80"
-              />
-            </div>
+              <div className="space-y-1">
+                <FormFieldLabel icon={Mail} label="Email (Optional)" htmlFor="email" color="purple" />
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  placeholder="Enter email address"
+                  className="border-purple-200 focus:border-cyan-500 focus:ring-cyan-100 bg-white/80"
+                />
+              </div>
 
-            {/* GST Number */}
-            <div className="space-y-2">
-              <Label htmlFor="gst_number" className="text-purple-700 font-medium">
-                GST No (Optional)
-              </Label>
-              <Input
-                id="gst_number"
-                value={formData.gst_number}
-                onChange={(e) => handleInputChange("gst_number", e.target.value)}
-                placeholder="Enter GST number"
-                className="border-purple-200 focus:border-cyan-500 focus:ring-cyan-100 bg-white/80"
-              />
-            </div>
+              <div className="space-y-1">
+                <FormFieldLabel icon={FileText} label="GST No (Optional)" htmlFor="gst_number" color="purple" />
+                <Input
+                  id="gst_number"
+                  value={formData.gst_number}
+                  onChange={(e) => handleInputChange("gst_number", e.target.value)}
+                  placeholder="Enter GST number"
+                  className="border-purple-200 focus:border-cyan-500 focus:ring-cyan-100 bg-white/80"
+                />
+              </div>
 
-            {/* Contact Person */}
-            <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="contact_person" className="text-purple-700 font-medium">
-                Contact Person (Optional)
-              </Label>
-              <Input
-                id="contact_person"
-                value={formData.contact_person}
-                onChange={(e) => handleInputChange("contact_person", e.target.value)}
-                placeholder="Enter contact person name"
-                className="border-purple-200 focus:border-cyan-500 focus:ring-cyan-100 bg-white/80"
+              <div className="space-y-1 md:col-span-2">
+                <FormFieldLabel icon={User} label="Contact Person (Optional)" htmlFor="contact_person" color="purple" />
+                <Input
+                  id="contact_person"
+                  value={formData.contact_person}
+                  onChange={(e) => handleInputChange("contact_person", e.target.value)}
+                  placeholder="Enter contact person name"
+                  className="border-purple-200 focus:border-cyan-500 focus:ring-cyan-100 bg-white/80"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Section: Address */}
+          <div>
+            <FormSectionHeader icon={MapPin} title="Address Details" color="cyan" />
+            <div className="space-y-1">
+              <FormFieldLabel icon={MapPin} label="Address" htmlFor="address" color="cyan" />
+              <Textarea
+                id="address"
+                value={formData.address}
+                onChange={(e) => handleInputChange("address", e.target.value)}
+                placeholder="Enter complete address"
+                className="border-purple-200 focus:border-cyan-500 focus:ring-cyan-100 bg-white/80 min-h-[100px]"
               />
             </div>
           </div>
 
-          {/* Address */}
-          <div className="space-y-2">
-            <Label htmlFor="address" className="text-purple-700 font-medium">
-              Address
-            </Label>
-            <Textarea
-              id="address"
-              value={formData.address}
-              onChange={(e) => handleInputChange("address", e.target.value)}
-              placeholder="Enter complete address"
-              className="border-purple-200 focus:border-cyan-500 focus:ring-cyan-100 bg-white/80 min-h-[100px]"
-            />
-          </div>
-
-          {/* Status Toggle */}
-          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-100/50 to-cyan-100/50 rounded-lg border border-purple-200">
-            <div>
-              <Label className="text-purple-700 font-medium">Vendor Status</Label>
-              <p className="text-sm text-purple-600/80">
-                Enable to mark vendor as active
-              </p>
+          {/* Section: Settings */}
+          <div>
+            <FormSectionHeader icon={Settings} title="Vendor Settings" color="teal" />
+            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-100/50 to-cyan-100/50 rounded-lg border border-purple-200">
+              <div>
+                <FormFieldLabel icon={ToggleRight} label="Vendor Status" color="teal" className="mb-0" />
+                <p className="text-sm text-purple-600/80 mt-1">
+                  Enable to mark vendor as active
+                </p>
+              </div>
+              <Switch
+                checked={formData.status}
+                onCheckedChange={(checked) => handleInputChange("status", checked)}
+                className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-500 data-[state=checked]:to-cyan-500"
+              />
             </div>
-            <Switch
-              checked={formData.status}
-              onCheckedChange={(checked) => handleInputChange("status", checked)}
-              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-500 data-[state=checked]:to-cyan-500"
-            />
           </div>
 
           {/* Action Buttons */}

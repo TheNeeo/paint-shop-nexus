@@ -8,6 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Customer } from '@/pages/CustomerInformation';
 import addNewCustomerIcon from '@/assets/add-new-customer-icon.png';
+import { User, Phone, Mail, FileText, MapPin, Tag, IndianRupee, ToggleRight, UserCircle } from 'lucide-react';
+import { FormSectionHeader } from '@/components/shared/FormSectionHeader';
+import { FormFieldLabel } from '@/components/shared/FormFieldLabel';
 
 interface AddEditCustomerModalProps {
   isOpen: boolean;
@@ -132,130 +135,136 @@ export const AddEditCustomerModal: React.FC<AddEditCustomerModalProps> = ({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Customer Name */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="name" style={{ color: '#1D7A4A' }}>Customer Name *</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
-                className={`mt-1 bg-white border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500 ${
-                  errors.name ? 'border-red-400' : ''
-                }`}
-                placeholder="Enter customer name"
-              />
-              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
-            </div>
-
-            {/* Mobile Number */}
-            <div>
-              <Label htmlFor="mobile" style={{ color: '#1D7A4A' }}>Mobile Number *</Label>
-              <Input
-                id="mobile"
-                value={formData.mobile}
-                onChange={(e) => handleInputChange('mobile', e.target.value)}
-                className={`mt-1 bg-white border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500 ${
-                  errors.mobile ? 'border-red-400' : ''
-                }`}
-                placeholder="+91 98765 43210"
-              />
-              {errors.mobile && <p className="text-red-500 text-sm mt-1">{errors.mobile}</p>}
-            </div>
-          </div>
-
-          {/* Email and GST */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="email" style={{ color: '#1D7A4A' }}>Email (Optional)</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                className={`mt-1 bg-white border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500 ${
-                  errors.email ? 'border-red-400' : ''
-                }`}
-                placeholder="customer@example.com"
-              />
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-            </div>
-
-            <div>
-              <Label htmlFor="gstNo" style={{ color: '#1D7A4A' }}>GST Number (Optional)</Label>
-              <Input
-                id="gstNo"
-                value={formData.gstNo}
-                onChange={(e) => handleInputChange('gstNo', e.target.value)}
-                className="mt-1 bg-white border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500"
-                placeholder="07AABCU9603R1ZX"
-              />
-            </div>
-          </div>
-
-          {/* Address */}
+          {/* Section: Basic Details */}
           <div>
-            <Label htmlFor="address" style={{ color: '#1D7A4A' }}>Address *</Label>
-            <Textarea
-              id="address"
-              value={formData.address}
-              onChange={(e) => handleInputChange('address', e.target.value)}
-              className={`mt-1 bg-white border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500 ${
-                errors.address ? 'border-red-400' : ''
-              }`}
-              placeholder="Enter complete address"
-              rows={3}
-            />
-            {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
+            <FormSectionHeader icon={UserCircle} title="Basic Details" color="emerald" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <FormFieldLabel icon={User} label="Customer Name" htmlFor="name" required color="emerald" />
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  className={`bg-white border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500 ${
+                    errors.name ? 'border-red-400' : ''
+                  }`}
+                  placeholder="Enter customer name"
+                />
+                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+              </div>
+
+              <div>
+                <FormFieldLabel icon={Phone} label="Mobile Number" htmlFor="mobile" required color="emerald" />
+                <Input
+                  id="mobile"
+                  value={formData.mobile}
+                  onChange={(e) => handleInputChange('mobile', e.target.value)}
+                  className={`bg-white border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500 ${
+                    errors.mobile ? 'border-red-400' : ''
+                  }`}
+                  placeholder="+91 98765 43210"
+                />
+                {errors.mobile && <p className="text-red-500 text-sm mt-1">{errors.mobile}</p>}
+              </div>
+            </div>
           </div>
 
-          {/* Customer Type and Opening Balance */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label style={{ color: '#1D7A4A' }}>Customer Type</Label>
-              <Select 
-                value={formData.customerType} 
-                onValueChange={(value: 'retail' | 'wholesale') => handleInputChange('customerType', value)}
-              >
-                <SelectTrigger className="mt-1 bg-white border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="retail">Retail</SelectItem>
-                  <SelectItem value="wholesale">Wholesale</SelectItem>
-                </SelectContent>
-              </Select>
+          {/* Section: Contact & Tax */}
+          <div>
+            <FormSectionHeader icon={FileText} title="Contact & Tax Info" color="cyan" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <FormFieldLabel icon={Mail} label="Email (Optional)" htmlFor="email" color="cyan" />
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  className={`bg-white border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500 ${
+                    errors.email ? 'border-red-400' : ''
+                  }`}
+                  placeholder="customer@example.com"
+                />
+                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+              </div>
+
+              <div>
+                <FormFieldLabel icon={FileText} label="GST Number (Optional)" htmlFor="gstNo" color="cyan" />
+                <Input
+                  id="gstNo"
+                  value={formData.gstNo}
+                  onChange={(e) => handleInputChange('gstNo', e.target.value)}
+                  className="bg-white border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500"
+                  placeholder="07AABCU9603R1ZX"
+                />
+              </div>
             </div>
 
-            <div>
-              <Label htmlFor="outstandingBalance" style={{ color: '#1D7A4A' }}>Opening Balance</Label>
-              <Input
-                id="outstandingBalance"
-                type="number"
-                value={formData.outstandingBalance}
-                onChange={(e) => handleInputChange('outstandingBalance', Number(e.target.value))}
-                className="mt-1 bg-white border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500"
-                placeholder="0"
-                min="0"
-                step="0.01"
+            <div className="mt-4">
+              <FormFieldLabel icon={MapPin} label="Address" htmlFor="address" required color="cyan" />
+              <Textarea
+                id="address"
+                value={formData.address}
+                onChange={(e) => handleInputChange('address', e.target.value)}
+                className={`bg-white border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500 ${
+                  errors.address ? 'border-red-400' : ''
+                }`}
+                placeholder="Enter complete address"
+                rows={3}
               />
+              {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
             </div>
           </div>
 
-          {/* Status Toggle */}
-          <div className="flex items-center space-x-3">
-            <Label htmlFor="status" style={{ color: '#1D7A4A' }}>Active Status</Label>
-            <Switch
-              id="status"
-              checked={formData.status === 'active'}
-              onCheckedChange={(checked) => handleInputChange('status', checked ? 'active' : 'inactive')}
-              className="data-[state=checked]:bg-emerald-500"
-            />
-            <span className={`text-sm font-medium ${
-              formData.status === 'active' ? '' : 'text-gray-500'
-            }`} style={formData.status === 'active' ? { color: '#35CA7B' } : {}}>
-              {formData.status === 'active' ? 'Active' : 'Inactive'}
-            </span>
+          {/* Section: Account Settings */}
+          <div>
+            <FormSectionHeader icon={Tag} title="Account Settings" color="purple" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <FormFieldLabel icon={Tag} label="Customer Type" color="purple" />
+                <Select
+                  value={formData.customerType}
+                  onValueChange={(value: 'retail' | 'wholesale') => handleInputChange('customerType', value)}
+                >
+                  <SelectTrigger className="bg-white border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="retail">Retail</SelectItem>
+                    <SelectItem value="wholesale">Wholesale</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <FormFieldLabel icon={IndianRupee} label="Opening Balance" htmlFor="outstandingBalance" color="purple" />
+                <Input
+                  id="outstandingBalance"
+                  type="number"
+                  value={formData.outstandingBalance}
+                  onChange={(e) => handleInputChange('outstandingBalance', Number(e.target.value))}
+                  className="bg-white border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500"
+                  placeholder="0"
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3 mt-4">
+              <FormFieldLabel icon={ToggleRight} label="Active Status" htmlFor="status" color="purple" className="mb-0" />
+              <Switch
+                id="status"
+                checked={formData.status === 'active'}
+                onCheckedChange={(checked) => handleInputChange('status', checked ? 'active' : 'inactive')}
+                className="data-[state=checked]:bg-emerald-500"
+              />
+              <span className={`text-sm font-medium ${
+                formData.status === 'active' ? '' : 'text-gray-500'
+              }`} style={formData.status === 'active' ? { color: '#35CA7B' } : {}}>
+                {formData.status === 'active' ? 'Active' : 'Inactive'}
+              </span>
+            </div>
           </div>
 
           {/* Action Buttons */}
