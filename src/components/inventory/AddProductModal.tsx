@@ -1102,12 +1102,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
 
           {/* Product Shelf Life Details Section */}
           <div className="space-y-6 p-6 rounded-xl bg-gradient-to-br from-rose-50/50 to-pink-50/30 dark:from-rose-950/20 dark:to-pink-950/10 border border-rose-100/50 dark:border-rose-900/30 animate-fade-in" style={{animationDelay: '0.3s'}}>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-rose-500/10">
-                <Calendar className="w-5 h-5 text-rose-600 dark:text-rose-400" />
-              </div>
-              <h3 className="text-lg font-semibold text-foreground">📋 Product Shelf Life Details</h3>
-            </div>
+            <FormSectionHeader icon={Calendar} title="Product Shelf Life Details" color="rose" />
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
