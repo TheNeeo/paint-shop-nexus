@@ -987,12 +987,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
 
           {/* Stock Management Section */}
           <div className="space-y-6 p-6 rounded-xl bg-gradient-to-br from-orange-50/50 to-amber-50/30 dark:from-orange-950/20 dark:to-amber-950/10 border border-orange-100/50 dark:border-orange-900/30 animate-fade-in" style={{animationDelay: '0.2s'}}>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-orange-500/10">
-                <TrendingUp className="w-5 h-5 text-orange-600 dark:text-orange-400" />
-              </div>
-              <h3 className="text-lg font-semibold text-foreground">Stock Management</h3>
-            </div>
+            <FormSectionHeader icon={AlertTriangle} title="Stock Management" color="orange" />
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
