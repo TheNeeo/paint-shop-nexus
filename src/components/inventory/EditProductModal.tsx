@@ -18,8 +18,10 @@ import {
 } from "@/components/ui/select";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload } from "lucide-react";
+import { Upload, Package, Tag, Hash, Ruler, ShoppingCart, TrendingDown, Box, AlertTriangle, IndianRupee, ImageIcon, DollarSign } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { FormSectionHeader } from "@/components/shared/FormSectionHeader";
+import { FormFieldLabel } from "@/components/shared/FormFieldLabel";
 
 interface EditProductModalProps {
   isOpen: boolean;
@@ -118,143 +120,159 @@ export function EditProductModal({ isOpen, onClose, product }: EditProductModalP
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="name" className="text-cyan-700">Product Name *</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                required
-                placeholder="Enter product name"
-                className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
-              />
-            </div>
+          {/* Section: Main Product Details */}
+          <div>
+            <FormSectionHeader icon={Package} title="Main Product Details" color="cyan" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <FormFieldLabel icon={Package} label="Product Name" htmlFor="name" required color="cyan" />
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  required
+                  placeholder="Enter product name"
+                  className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="category" className="text-cyan-700">Category *</Label>
-              <Select 
-                value={formData.category_id} 
-                onValueChange={(value) => setFormData({...formData, category_id: value})}
-              >
-                <SelectTrigger className="border-cyan-200 focus:border-cyan-500 bg-white">
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent className="bg-white">
-                  {categories?.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+              <div className="space-y-1">
+                <FormFieldLabel icon={Tag} label="Category" htmlFor="category" required color="cyan" />
+                <Select 
+                  value={formData.category_id} 
+                  onValueChange={(value) => setFormData({...formData, category_id: value})}
+                >
+                  <SelectTrigger className="border-cyan-200 focus:border-cyan-500 bg-white">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    {categories?.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="hsn_code" className="text-cyan-700">HSN Code</Label>
-              <Input
-                id="hsn_code"
-                value={formData.hsn_code}
-                onChange={(e) => setFormData({...formData, hsn_code: e.target.value})}
-                placeholder="Enter HSN code"
-                className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
-              />
-            </div>
+              <div className="space-y-1">
+                <FormFieldLabel icon={Hash} label="HSN Code" htmlFor="hsn_code" color="cyan" />
+                <Input
+                  id="hsn_code"
+                  value={formData.hsn_code}
+                  onChange={(e) => setFormData({...formData, hsn_code: e.target.value})}
+                  placeholder="Enter HSN code"
+                  className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="unit" className="text-cyan-700">Unit *</Label>
-              <Select 
-                value={formData.unit} 
-                onValueChange={(value) => setFormData({...formData, unit: value})}
-              >
-                <SelectTrigger className="border-cyan-200 focus:border-cyan-500 bg-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-white">
-                  {UNITS.map((unit) => (
-                    <SelectItem key={unit} value={unit}>
-                      {unit}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="purchase_qty" className="text-cyan-700">Purchase Qty</Label>
-              <Input
-                id="purchase_qty"
-                type="number"
-                value={formData.purchase_qty}
-                onChange={(e) => setFormData({...formData, purchase_qty: parseInt(e.target.value) || 0})}
-                placeholder="Enter purchase quantity"
-                className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="sale_qty" className="text-cyan-700">Sale Qty</Label>
-              <Input
-                id="sale_qty"
-                type="number"
-                value={formData.sale_qty}
-                onChange={(e) => setFormData({...formData, sale_qty: parseInt(e.target.value) || 0})}
-                placeholder="Enter sale quantity"
-                className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="current_stock" className="text-cyan-700">Current Stock</Label>
-              <Input
-                id="current_stock"
-                type="number"
-                value={formData.current_stock}
-                onChange={(e) => setFormData({...formData, current_stock: parseInt(e.target.value) || 0})}
-                placeholder="Enter current stock"
-                className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="threshold_qty" className="text-cyan-700">Threshold Qty</Label>
-              <Input
-                id="threshold_qty"
-                type="number"
-                value={formData.threshold_qty}
-                onChange={(e) => setFormData({...formData, threshold_qty: parseInt(e.target.value) || 0})}
-                placeholder="Enter threshold quantity"
-                className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="unit_price" className="text-cyan-700">Unit Price</Label>
-              <Input
-                id="unit_price"
-                type="number"
-                step="0.01"
-                value={formData.unit_price}
-                onChange={(e) => setFormData({...formData, unit_price: parseFloat(e.target.value) || 0})}
-                placeholder="Enter unit price"
-                className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
-              />
+              <div className="space-y-1">
+                <FormFieldLabel icon={Ruler} label="Unit" htmlFor="unit" required color="cyan" />
+                <Select 
+                  value={formData.unit} 
+                  onValueChange={(value) => setFormData({...formData, unit: value})}
+                >
+                  <SelectTrigger className="border-cyan-200 focus:border-cyan-500 bg-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    {UNITS.map((unit) => (
+                      <SelectItem key={unit} value={unit}>
+                        {unit}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="image_url" className="text-cyan-700">Image URL</Label>
-            <div className="flex gap-2">
-              <Input
-                id="image_url"
-                value={formData.image_url}
-                onChange={(e) => setFormData({...formData, image_url: e.target.value})}
-                placeholder="Enter image URL"
-                className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
-              />
-              <Button type="button" variant="outline" className="border-cyan-200 text-cyan-700 hover:bg-cyan-50">
-                <Upload className="h-4 w-4" />
-              </Button>
+          {/* Section: Stock Management */}
+          <div>
+            <FormSectionHeader icon={Box} title="Stock Management" color="orange" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <FormFieldLabel icon={ShoppingCart} label="Purchase Qty" htmlFor="purchase_qty" color="orange" />
+                <Input
+                  id="purchase_qty"
+                  type="number"
+                  value={formData.purchase_qty}
+                  onChange={(e) => setFormData({...formData, purchase_qty: parseInt(e.target.value) || 0})}
+                  placeholder="Enter purchase quantity"
+                  className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <FormFieldLabel icon={TrendingDown} label="Sale Qty" htmlFor="sale_qty" color="orange" />
+                <Input
+                  id="sale_qty"
+                  type="number"
+                  value={formData.sale_qty}
+                  onChange={(e) => setFormData({...formData, sale_qty: parseInt(e.target.value) || 0})}
+                  placeholder="Enter sale quantity"
+                  className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <FormFieldLabel icon={Box} label="Current Stock" htmlFor="current_stock" color="orange" />
+                <Input
+                  id="current_stock"
+                  type="number"
+                  value={formData.current_stock}
+                  onChange={(e) => setFormData({...formData, current_stock: parseInt(e.target.value) || 0})}
+                  placeholder="Enter current stock"
+                  className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <FormFieldLabel icon={AlertTriangle} label="Threshold Qty" htmlFor="threshold_qty" color="orange" />
+                <Input
+                  id="threshold_qty"
+                  type="number"
+                  value={formData.threshold_qty}
+                  onChange={(e) => setFormData({...formData, threshold_qty: parseInt(e.target.value) || 0})}
+                  placeholder="Enter threshold quantity"
+                  className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Section: Pricing */}
+          <div>
+            <FormSectionHeader icon={DollarSign} title="Pricing & Image" color="green" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <FormFieldLabel icon={IndianRupee} label="Unit Price" htmlFor="unit_price" color="green" />
+                <Input
+                  id="unit_price"
+                  type="number"
+                  step="0.01"
+                  value={formData.unit_price}
+                  onChange={(e) => setFormData({...formData, unit_price: parseFloat(e.target.value) || 0})}
+                  placeholder="Enter unit price"
+                  className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <FormFieldLabel icon={ImageIcon} label="Image URL" htmlFor="image_url" color="green" />
+                <div className="flex gap-2">
+                  <Input
+                    id="image_url"
+                    value={formData.image_url}
+                    onChange={(e) => setFormData({...formData, image_url: e.target.value})}
+                    placeholder="Enter image URL"
+                    className="border-cyan-200 focus:border-cyan-500 focus:ring-cyan-200 bg-white"
+                  />
+                  <Button type="button" variant="outline" className="border-cyan-200 text-cyan-700 hover:bg-cyan-50">
+                    <Upload className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
 
