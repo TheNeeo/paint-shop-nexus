@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRoles } from "@/hooks/useUserRoles";
 import { toast } from "sonner";
 
 interface VendorTableProps {
@@ -29,6 +30,7 @@ export function VendorTable({
   onEditVendor,
 }: VendorTableProps) {
   const { user } = useAuth();
+  const { isAdmin } = useUserRoles();
   const [currentPage, setCurrentPage] = useState(1);
   const [vendors, setVendors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,7 +60,7 @@ export function VendorTable({
   };
 
   const handleView = (vendor: any) => {
-    console.log("Viewing vendor:", vendor);
+    // View handler - opens detail panel (no-op placeholder)
   };
 
   const handleDelete = async (vendor: any) => {
@@ -182,14 +184,16 @@ export function VendorTable({
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(vendor)}
-                      className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    {isAdmin && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(vendor)}
+                        className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>
