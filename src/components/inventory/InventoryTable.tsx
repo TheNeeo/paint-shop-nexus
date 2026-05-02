@@ -33,6 +33,7 @@ import {
   Settings
 } from "lucide-react";
 import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
+import { useUserRoles } from "@/hooks/useUserRoles";
 import { cn } from "@/lib/utils";
 
 interface InventoryTableProps {
@@ -70,6 +71,7 @@ export function InventoryTable({
   onEditProduct,
   onAdjustStock
 }: InventoryTableProps) {
+  const { isAdminOrManager } = useUserRoles();
   const [expandedProducts, setExpandedProducts] = useState<Set<string>>(new Set());
 
   const { data: products, isLoading } = useQuery({
@@ -259,9 +261,11 @@ export function InventoryTable({
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      {isAdminOrManager && (
+                        <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
