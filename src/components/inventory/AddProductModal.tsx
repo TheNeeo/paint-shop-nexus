@@ -768,12 +768,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
 
             {/* Product Image - Takes 1 column */}
             <div className="space-y-4 p-6 rounded-xl bg-gradient-to-br from-purple-50/50 to-pink-50/30 dark:from-purple-950/20 dark:to-pink-950/10 border border-purple-100/50 dark:border-purple-900/30 animate-fade-in">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-purple-500/10">
-                  <Upload className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                </div>
-                <h3 className="text-lg font-semibold text-foreground">📸 Product Image</h3>
-              </div>
+              <FormSectionHeader icon={ImageIcon} title="Product Image" color="purple" />
               
               <div
                 className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
