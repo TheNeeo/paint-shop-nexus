@@ -340,9 +340,11 @@ export function InventoryTable({
                           >
                             <Edit className="h-3 w-3" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
+                          {isAdminOrManager && (
+                            <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
