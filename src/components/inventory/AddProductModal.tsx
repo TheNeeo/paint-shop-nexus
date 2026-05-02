@@ -1177,12 +1177,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
           {!formData.is_variant && (
             <div className="space-y-6 p-6 rounded-xl bg-gradient-to-br from-indigo-50/50 to-blue-50/30 dark:from-indigo-950/20 dark:to-blue-950/10 border border-indigo-100/50 dark:border-indigo-900/30 animate-fade-in" style={{animationDelay: '0.4s'}}>
               <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-indigo-500/10">
-                    <Package className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-foreground">Product Variants</h3>
-                </div>
+                <FormSectionHeader icon={Package} title="Product Variants" color="indigo" className="mb-0" />
                 <Button
                   type="button"
                   onClick={addVariant}
