@@ -21,6 +21,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { z } from "zod";
+import { validateInput, vendorCustomerSchemas } from "@/lib/validation";
 import addNewVendorIcon from "@/assets/add-new-vendor-icon.png";
 interface AddEditVendorModalProps {
   isOpen: boolean;
@@ -78,6 +80,32 @@ export function AddEditVendorModal({
 
     setLoading(true);
     try {
+      // Client-side validation before reaching the database
+      const validation = validateInput(
+        z.object({
+          name: vendorCustomerSchemas.name,
+          contact_person: vendorCustomerSchemas.contactPerson,
+          email: vendorCustomerSchemas.email,
+          phone: vendorCustomerSchemas.phone,
+          address: vendorCustomerSchemas.address,
+          gst_number: vendorCustomerSchemas.gstNumber,
+        }),
+        {
+          name: formData.name,
+          contact_person: formData.contact_person,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+          gst_number: formData.gst_number,
+        }
+      );
+
+      if (!validation.success) {
+        toast.error(validation.error || "Please check the form fields");
+        setLoading(false);
+        return;
+      }
+
       const vendorData = {
         name: formData.name,
         phone: formData.phone,
