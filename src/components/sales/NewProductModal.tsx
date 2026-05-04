@@ -11,7 +11,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Trash2, Upload, Package, DollarSign, AlertTriangle } from "lucide-react";
+import { Plus, Trash2, Upload, Package, DollarSign, AlertTriangle, Hash, Tag, Layers, IndianRupee, ImageIcon, FileText, ToggleRight } from "lucide-react";
+import { FormSectionHeader } from "@/components/shared/FormSectionHeader";
+import { FormFieldLabel } from "@/components/shared/FormFieldLabel";
 
 interface NewProductModalProps {
   isOpen: boolean;
