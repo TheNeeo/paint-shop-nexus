@@ -21,8 +21,9 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { X, TrendingUp, TrendingDown, AlertTriangle, Package, FileText, Hash } from "lucide-react";
+import { X, TrendingUp, TrendingDown, AlertTriangle, Package, FileText, Hash, ArrowUpDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { FormFieldLabel } from "@/components/shared/FormFieldLabel";
 
 interface StockAdjustmentModalProps {
   isOpen: boolean;
