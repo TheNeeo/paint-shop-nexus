@@ -181,33 +181,38 @@ export function NewInvoiceModal({ isOpen, onClose }: NewInvoiceModalProps) {
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto bg-white">
           <DialogHeader>
-            <DialogTitle className="text-black text-xl">Create New Invoice</DialogTitle>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <Receipt className="h-5 w-5 text-blue-600" /> Create New Invoice
+            </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <Label className="text-black font-semibold">Invoice Date</Label>
-                <Input type="date" value={invoiceDate} onChange={(e) => setInvoiceDate(e.target.value)} className="bg-white border-gray-300" />
-              </div>
-              <div>
-                <Label className="text-black font-semibold">Customer Name</Label>
-                <Select value={customerId} onValueChange={(val) => { setCustomerId(val); setCustomerName(''); }}>
-                  <SelectTrigger className="bg-white border-gray-300">
-                    <SelectValue placeholder="Select Customer" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {customers.map(c => (
-                      <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            <div>
+              <FormSectionHeader icon={FileText} title="Invoice Details" color="blue" />
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <FormFieldLabel icon={Calendar} label="Invoice Date" required color="blue" />
+                  <Input type="date" value={invoiceDate} onChange={(e) => setInvoiceDate(e.target.value)} className="bg-white border-gray-300" />
+                </div>
+                <div>
+                  <FormFieldLabel icon={User} label="Customer Name" required color="emerald" />
+                  <Select value={customerId} onValueChange={(val) => { setCustomerId(val); setCustomerName(''); }}>
+                    <SelectTrigger className="bg-white border-gray-300">
+                      <SelectValue placeholder="Select Customer" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {customers.map(c => (
+                        <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
 
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <Label className="text-black font-semibold text-lg">Product Details</Label>
+                <FormSectionHeader icon={Package} title="Product Details" color="emerald" />
                 <div className="flex gap-2">
                   <Button onClick={() => setShowNewProductModal(true)} size="sm" variant="outline" className="border-green-500 text-green-600 hover:bg-green-50">
                     <Plus className="h-4 w-4 mr-2" /> New Product
@@ -251,48 +256,54 @@ export function NewInvoiceModal({ isOpen, onClose }: NewInvoiceModalProps) {
               ))}
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-gray-50 border rounded-lg">
-                  <div>
-                    <Label className="text-black font-semibold">Tax Inclusive/Exclusive</Label>
-                    <p className="text-sm text-gray-600">{isGstInclusive ? "Prices include GST" : "GST added to prices"}</p>
+            <div>
+              <FormSectionHeader icon={Receipt} title="Tax & Discount" color="amber" />
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-gray-50 border rounded-lg">
+                    <div>
+                      <FormFieldLabel icon={ToggleLeft} label="Tax Inclusive/Exclusive" color="amber" />
+                      <p className="text-sm text-gray-600">{isGstInclusive ? "Prices include GST" : "GST added to prices"}</p>
+                    </div>
+                    <Switch checked={isGstInclusive} onCheckedChange={setIsGstInclusive} />
                   </div>
-                  <Switch checked={isGstInclusive} onCheckedChange={setIsGstInclusive} />
+                  <div>
+                    <FormFieldLabel icon={Percent} label="Discount (%)" color="orange" />
+                    <Input type="number" value={discount} onChange={(e) => setDiscount(Number(e.target.value))} className="bg-white border-gray-300" />
+                  </div>
                 </div>
-                <div>
-                  <Label className="text-black font-semibold">Discount (%)</Label>
-                  <Input type="number" value={discount} onChange={(e) => setDiscount(Number(e.target.value))} className="bg-white border-gray-300" />
-                </div>
-              </div>
-              <div className="space-y-3 bg-green-50 p-4 rounded-lg border border-green-200">
-                <h3 className="font-semibold text-green-800">Invoice Summary</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between"><span>Subtotal:</span><span>₹{subtotal.toFixed(2)}</span></div>
-                  {!isGstInclusive && <div className="flex justify-between"><span>GST:</span><span>₹{totalGst.toFixed(2)}</span></div>}
-                  <div className="flex justify-between"><span>Discount:</span><span>-₹{discountAmount.toFixed(2)}</span></div>
-                  <div className="flex justify-between font-bold text-lg border-t border-green-300 pt-2"><span>Grand Total:</span><span>₹{grandTotal.toFixed(2)}</span></div>
+                <div className="space-y-3 bg-green-50 p-4 rounded-lg border border-green-200">
+                  <h3 className="font-semibold text-green-800">Invoice Summary</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between"><span>Subtotal:</span><span>₹{subtotal.toFixed(2)}</span></div>
+                    {!isGstInclusive && <div className="flex justify-between"><span>GST:</span><span>₹{totalGst.toFixed(2)}</span></div>}
+                    <div className="flex justify-between"><span>Discount:</span><span>-₹{discountAmount.toFixed(2)}</span></div>
+                    <div className="flex justify-between font-bold text-lg border-t border-green-300 pt-2"><span>Grand Total:</span><span>₹{grandTotal.toFixed(2)}</span></div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-black font-semibold">Payment Mode</Label>
-                <Select value={paymentMode} onValueChange={setPaymentMode}>
-                  <SelectTrigger className="bg-white border-gray-300"><SelectValue placeholder="Select Payment Mode" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cash">Cash</SelectItem>
-                    <SelectItem value="upi">UPI</SelectItem>
-                    <SelectItem value="bank-transfer">Bank Transfer</SelectItem>
-                    <SelectItem value="cheque">Cheque</SelectItem>
-                    <SelectItem value="credit-card">Credit Card</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-black font-semibold">Paid Amount</Label>
-                <Input type="number" value={paidAmount} onChange={(e) => setPaidAmount(Number(e.target.value))} className="bg-white border-gray-300" />
+            <div>
+              <FormSectionHeader icon={Wallet} title="Payment Information" color="purple" />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <FormFieldLabel icon={CreditCard} label="Payment Mode" color="purple" />
+                  <Select value={paymentMode} onValueChange={setPaymentMode}>
+                    <SelectTrigger className="bg-white border-gray-300"><SelectValue placeholder="Select Payment Mode" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cash">Cash</SelectItem>
+                      <SelectItem value="upi">UPI</SelectItem>
+                      <SelectItem value="bank-transfer">Bank Transfer</SelectItem>
+                      <SelectItem value="cheque">Cheque</SelectItem>
+                      <SelectItem value="credit-card">Credit Card</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <FormFieldLabel icon={IndianRupee} label="Paid Amount" color="emerald" />
+                  <Input type="number" value={paidAmount} onChange={(e) => setPaidAmount(Number(e.target.value))} className="bg-white border-gray-300" />
+                </div>
               </div>
             </div>
 
@@ -303,7 +314,7 @@ export function NewInvoiceModal({ isOpen, onClose }: NewInvoiceModalProps) {
             )}
 
             <div>
-              <Label className="text-black font-semibold">Notes (Optional)</Label>
+              <FormFieldLabel icon={FileText} label="Notes (Optional)" color="slate" />
               <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Additional notes..." className="bg-white border-gray-300" rows={3} />
             </div>
 
