@@ -389,7 +389,7 @@ export function NewProductModal({ isOpen, onClose, onProductCreated }: NewProduc
 
           {/* Description */}
           <div className="bg-white p-6 rounded-xl border-2 border-green-200 shadow-sm">
-            <h3 className="text-lg font-semibold text-green-800 mb-4">Description</h3>
+            <FormSectionHeader icon={FileText} title="Description" color="emerald" />
             <Textarea
               placeholder="Enter detailed product description..."
               rows={4}
