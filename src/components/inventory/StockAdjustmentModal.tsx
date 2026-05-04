@@ -21,8 +21,9 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { X, TrendingUp, TrendingDown, AlertTriangle, Package, FileText, Hash } from "lucide-react";
+import { X, TrendingUp, TrendingDown, AlertTriangle, Package, FileText, Hash, ArrowUpDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { FormFieldLabel } from "@/components/shared/FormFieldLabel";
 
 interface StockAdjustmentModalProps {
   isOpen: boolean;
@@ -205,7 +206,7 @@ export function StockAdjustmentModal({ isOpen, onClose, product }: StockAdjustme
         <form onSubmit={handleSubmit} className="space-y-5 pt-2">
           {/* Adjustment Type Toggle */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Adjustment Type *</Label>
+            <FormFieldLabel icon={ArrowUpDown} label="Adjustment Type" required color="amber" />
             <div className="grid grid-cols-2 gap-3">
               <Button
                 type="button"
@@ -238,7 +239,7 @@ export function StockAdjustmentModal({ isOpen, onClose, product }: StockAdjustme
 
           {/* Quantity Input */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Quantity *</Label>
+            <FormFieldLabel icon={Hash} label="Quantity" required color="emerald" />
             <Input
               type="number"
               min="1"
@@ -272,10 +273,7 @@ export function StockAdjustmentModal({ isOpen, onClose, product }: StockAdjustme
 
           {/* Reason Code Selection */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium flex items-center gap-2">
-              <FileText className="w-4 h-4" style={{ color: '#a16207' }} />
-              Reason for Adjustment *
-            </Label>
+            <FormFieldLabel icon={FileText} label="Reason for Adjustment" required color="amber" />
             <Select value={reasonCode} onValueChange={setReasonCode}>
               <SelectTrigger className="h-12" style={{ borderColor: '#EADE71' }}>
                 <SelectValue placeholder="Select a reason" />
@@ -295,7 +293,7 @@ export function StockAdjustmentModal({ isOpen, onClose, product }: StockAdjustme
 
           {/* Notes */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Additional Notes (Optional)</Label>
+            <FormFieldLabel icon={FileText} label="Additional Notes (Optional)" color="slate" />
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}

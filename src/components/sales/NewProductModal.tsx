@@ -11,7 +11,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Trash2, Upload, Package, DollarSign, AlertTriangle } from "lucide-react";
+import { Plus, Trash2, Upload, Package, DollarSign, AlertTriangle, Hash, Tag, Layers, IndianRupee, ImageIcon, FileText, ToggleRight } from "lucide-react";
+import { FormSectionHeader } from "@/components/shared/FormSectionHeader";
+import { FormFieldLabel } from "@/components/shared/FormFieldLabel";
 
 interface NewProductModalProps {
   isOpen: boolean;
@@ -131,14 +133,11 @@ export function NewProductModal({ isOpen, onClose, onProductCreated }: NewProduc
             {/* Left Column - Main Product Details */}
             <div className="lg:col-span-2 space-y-6">
               <div className="bg-white p-6 rounded-xl border-2 border-green-200 shadow-sm">
-                <h3 className="text-lg font-semibold text-green-800 mb-4 flex items-center gap-2">
-                  <Package className="h-5 w-5" />
-                  Main Product Details
-                </h3>
+                <FormSectionHeader icon={Package} title="Main Product Details" color="emerald" />
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-green-700 font-semibold">Product Name *</Label>
+                    <FormFieldLabel icon={Tag} label="Product Name" required color="emerald" />
                     <Input
                       placeholder="Enter product name"
                       value={productData.name}
@@ -149,7 +148,7 @@ export function NewProductModal({ isOpen, onClose, onProductCreated }: NewProduc
                   </div>
 
                   <div>
-                    <Label className="text-green-700 font-semibold">HSN Code *</Label>
+                    <FormFieldLabel icon={Hash} label="HSN Code" required color="blue" />
                     <Input
                       placeholder="e.g., HSN12345"
                       value={productData.hsnCode}
@@ -160,7 +159,7 @@ export function NewProductModal({ isOpen, onClose, onProductCreated }: NewProduc
                   </div>
 
                   <div>
-                    <Label className="text-green-700 font-semibold">Category *</Label>
+                    <FormFieldLabel icon={Layers} label="Category" required color="purple" />
                     <Select 
                       value={productData.category} 
                       onValueChange={(value) => setProductData({...productData, category: value})}
@@ -178,7 +177,7 @@ export function NewProductModal({ isOpen, onClose, onProductCreated }: NewProduc
                   </div>
 
                   <div>
-                    <Label className="text-green-700 font-semibold">Unit *</Label>
+                    <FormFieldLabel icon={Tag} label="Unit" required color="cyan" />
                     <Select 
                       value={productData.unit} 
                       onValueChange={(value) => setProductData({...productData, unit: value})}
@@ -198,7 +197,7 @@ export function NewProductModal({ isOpen, onClose, onProductCreated }: NewProduc
                   </div>
 
                   <div>
-                    <Label className="text-green-700 font-semibold">Stock Quantity *</Label>
+                    <FormFieldLabel icon={Hash} label="Stock Quantity" required color="orange" />
                     <Input
                       type="number"
                       placeholder="Available quantity"
@@ -210,7 +209,7 @@ export function NewProductModal({ isOpen, onClose, onProductCreated }: NewProduc
                   </div>
 
                   <div>
-                    <Label className="text-green-700 font-semibold">Status</Label>
+                    <FormFieldLabel icon={ToggleRight} label="Status" color="indigo" />
                     <Select 
                       value={productData.status} 
                       onValueChange={(value) => setProductData({...productData, status: value})}
@@ -229,14 +228,11 @@ export function NewProductModal({ isOpen, onClose, onProductCreated }: NewProduc
 
               {/* Pricing Section */}
               <div className="bg-gradient-to-r from-blue-50 to-green-50 p-6 rounded-xl border-2 border-blue-200 shadow-sm">
-                <h3 className="text-lg font-semibold text-blue-800 mb-4 flex items-center gap-2">
-                  <DollarSign className="h-5 w-5" />
-                  Pricing Details
-                </h3>
+                <FormSectionHeader icon={DollarSign} title="Pricing Details" color="blue" />
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <Label className="text-blue-700 font-semibold">Purchase Rate *</Label>
+                    <FormFieldLabel icon={IndianRupee} label="Purchase Rate" required color="blue" />
                     <Input
                       type="number"
                       step="0.01"
@@ -248,7 +244,7 @@ export function NewProductModal({ isOpen, onClose, onProductCreated }: NewProduc
                   </div>
 
                   <div>
-                    <Label className="text-blue-700 font-semibold">Sale Rate *</Label>
+                    <FormFieldLabel icon={IndianRupee} label="Sale Rate" required color="emerald" />
                     <Input
                       type="number"
                       step="0.01"
@@ -261,7 +257,7 @@ export function NewProductModal({ isOpen, onClose, onProductCreated }: NewProduc
                   </div>
 
                   <div>
-                    <Label className="text-blue-700 font-semibold">MRP</Label>
+                    <FormFieldLabel icon={IndianRupee} label="MRP" color="amber" />
                     <Input
                       type="number"
                       step="0.01"
@@ -276,13 +272,10 @@ export function NewProductModal({ isOpen, onClose, onProductCreated }: NewProduc
 
               {/* Stock Management */}
               <div className="bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-xl border-2 border-orange-200 shadow-sm">
-                <h3 className="text-lg font-semibold text-orange-800 mb-4 flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5" />
-                  Stock Management
-                </h3>
+                <FormSectionHeader icon={AlertTriangle} title="Stock Management" color="orange" />
                 
                 <div>
-                  <Label className="text-orange-700 font-semibold">Threshold Quantity</Label>
+                  <FormFieldLabel icon={AlertTriangle} label="Threshold Quantity" color="orange" />
                   <Input
                     type="number"
                     placeholder="Low stock alert quantity"
@@ -297,26 +290,16 @@ export function NewProductModal({ isOpen, onClose, onProductCreated }: NewProduc
             {/* Right Column - Product Image */}
             <div className="lg:col-span-1">
               <div className="bg-white p-6 rounded-xl border-2 border-green-200 shadow-sm h-fit sticky top-4">
-                <h3 className="text-lg font-semibold text-green-800 mb-4">Product Image</h3>
+                <FormSectionHeader icon={ImageIcon} title="Product Image" color="pink" />
                 
                 <div className="space-y-4">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                    id="image-upload"
-                  />
-                  <Label
+                  <Input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" id="image-upload" />
+                  <label
                     htmlFor="image-upload"
                     className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-green-300 rounded-xl cursor-pointer hover:border-green-400 bg-green-50/50"
                   >
                     {imagePreview ? (
-                      <img
-                        src={imagePreview}
-                        alt="Preview"
-                        className="w-full h-full object-cover rounded-xl"
-                      />
+                      <img src={imagePreview} alt="Preview" className="w-full h-full object-cover rounded-xl" />
                     ) : (
                       <div className="flex flex-col items-center space-y-3">
                         <Upload className="h-12 w-12 text-green-400" />
@@ -326,7 +309,7 @@ export function NewProductModal({ isOpen, onClose, onProductCreated }: NewProduc
                         </div>
                       </div>
                     )}
-                  </Label>
+                  </label>
                 </div>
               </div>
             </div>
@@ -335,7 +318,7 @@ export function NewProductModal({ isOpen, onClose, onProductCreated }: NewProduc
           {/* Product Variants */}
           <div className="bg-white p-6 rounded-xl border-2 border-purple-200 shadow-sm">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-purple-800">Product Variants</h3>
+              <FormSectionHeader icon={Layers} title="Product Variants" color="purple" />
               <Button 
                 type="button" 
                 onClick={addVariant} 
@@ -406,7 +389,7 @@ export function NewProductModal({ isOpen, onClose, onProductCreated }: NewProduc
 
           {/* Description */}
           <div className="bg-white p-6 rounded-xl border-2 border-green-200 shadow-sm">
-            <h3 className="text-lg font-semibold text-green-800 mb-4">Description</h3>
+            <FormSectionHeader icon={FileText} title="Description" color="emerald" />
             <Textarea
               placeholder="Enter detailed product description..."
               rows={4}

@@ -6,7 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { CalendarIcon, Save, X } from "lucide-react";
+import { CalendarIcon, Save, X, Clock, Tag, FileText, IndianRupee, CreditCard, Hash, User, Package, Layers, MessageSquare, Info } from "lucide-react";
+import { FormSectionHeader } from "@/components/shared/FormSectionHeader";
+import { FormFieldLabel } from "@/components/shared/FormFieldLabel";
 
 interface AddNewTransactionModalProps {
   open: boolean;
@@ -72,32 +74,18 @@ const AddNewTransactionModal: React.FC<AddNewTransactionModalProps> = ({
           {/* Basic Information */}
           <Card className="border-coral-200/30">
             <CardContent className="p-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+              <FormSectionHeader icon={Info} title="Basic Information" color="rose" />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="date" className="text-gray-700 font-medium">Date</Label>
-                  <Input
-                    id="date"
-                    type="date"
-                    value={formData.date}
-                    onChange={(e) => handleChange('date', e.target.value)}
-                    className="border-coral-200 focus:border-coral-400"
-                    required
-                  />
+                  <FormFieldLabel icon={CalendarIcon} label="Date" htmlFor="date" required color="blue" />
+                  <Input id="date" type="date" value={formData.date} onChange={(e) => handleChange('date', e.target.value)} className="border-coral-200 focus:border-coral-400" required />
                 </div>
                 <div>
-                  <Label htmlFor="time" className="text-gray-700 font-medium">Time</Label>
-                  <Input
-                    id="time"
-                    type="time"
-                    value={formData.time}
-                    onChange={(e) => handleChange('time', e.target.value)}
-                    className="border-coral-200 focus:border-coral-400"
-                    required
-                  />
+                  <FormFieldLabel icon={Clock} label="Time" htmlFor="time" required color="cyan" />
+                  <Input id="time" type="time" value={formData.time} onChange={(e) => handleChange('time', e.target.value)} className="border-coral-200 focus:border-coral-400" required />
                 </div>
                 <div>
-                  <Label htmlFor="type" className="text-gray-700 font-medium">Transaction Type</Label>
+                  <FormFieldLabel icon={Tag} label="Transaction Type" htmlFor="type" required color="purple" />
                   <Select value={formData.type} onValueChange={(value) => handleChange('type', value)}>
                     <SelectTrigger className="border-coral-200 focus:border-coral-400">
                       <SelectValue placeholder="Select type" />
@@ -118,35 +106,18 @@ const AddNewTransactionModal: React.FC<AddNewTransactionModalProps> = ({
           {/* Transaction Details */}
           <Card className="border-coral-200/30">
             <CardContent className="p-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Transaction Details</h3>
+              <FormSectionHeader icon={FileText} title="Transaction Details" color="emerald" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
-                  <Label htmlFor="description" className="text-gray-700 font-medium">Description</Label>
-                  <Input
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => handleChange('description', e.target.value)}
-                    className="border-coral-200 focus:border-coral-400"
-                    placeholder="Transaction description"
-                    required
-                  />
+                  <FormFieldLabel icon={FileText} label="Description" htmlFor="description" required color="emerald" />
+                  <Input id="description" value={formData.description} onChange={(e) => handleChange('description', e.target.value)} className="border-coral-200 focus:border-coral-400" placeholder="Transaction description" required />
                 </div>
                 <div>
-                  <Label htmlFor="amount" className="text-gray-700 font-medium">Amount (₹)</Label>
-                  <Input
-                    id="amount"
-                    type="number"
-                    value={formData.amount}
-                    onChange={(e) => handleChange('amount', e.target.value)}
-                    className="border-coral-200 focus:border-coral-400"
-                    placeholder="0.00"
-                    step="0.01"
-                    min="0"
-                    required
-                  />
+                  <FormFieldLabel icon={IndianRupee} label="Amount (₹)" htmlFor="amount" required color="amber" />
+                  <Input id="amount" type="number" value={formData.amount} onChange={(e) => handleChange('amount', e.target.value)} className="border-coral-200 focus:border-coral-400" placeholder="0.00" step="0.01" min="0" required />
                 </div>
                 <div>
-                  <Label htmlFor="paymentMode" className="text-gray-700 font-medium">Payment Mode</Label>
+                  <FormFieldLabel icon={CreditCard} label="Payment Mode" htmlFor="paymentMode" color="purple" />
                   <Select value={formData.paymentMode} onValueChange={(value) => handleChange('paymentMode', value)}>
                     <SelectTrigger className="border-coral-200 focus:border-coral-400">
                       <SelectValue placeholder="Select payment mode" />
@@ -166,57 +137,27 @@ const AddNewTransactionModal: React.FC<AddNewTransactionModalProps> = ({
           {/* Additional Information */}
           <Card className="border-coral-200/30">
             <CardContent className="p-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Additional Information</h3>
+              <FormSectionHeader icon={Layers} title="Additional Information" color="indigo" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="invoiceNo" className="text-gray-700 font-medium">Invoice/Bill Number</Label>
-                  <Input
-                    id="invoiceNo"
-                    value={formData.invoiceNo}
-                    onChange={(e) => handleChange('invoiceNo', e.target.value)}
-                    className="border-coral-200 focus:border-coral-400"
-                    placeholder="INV-001"
-                  />
+                  <FormFieldLabel icon={Hash} label="Invoice/Bill Number" htmlFor="invoiceNo" color="indigo" />
+                  <Input id="invoiceNo" value={formData.invoiceNo} onChange={(e) => handleChange('invoiceNo', e.target.value)} className="border-coral-200 focus:border-coral-400" placeholder="INV-001" />
                 </div>
                 <div>
-                  <Label htmlFor="customerName" className="text-gray-700 font-medium">Customer/Vendor Name</Label>
-                  <Input
-                    id="customerName"
-                    value={formData.customerName}
-                    onChange={(e) => handleChange('customerName', e.target.value)}
-                    className="border-coral-200 focus:border-coral-400"
-                    placeholder="Enter name"
-                  />
+                  <FormFieldLabel icon={User} label="Customer/Vendor Name" htmlFor="customerName" color="blue" />
+                  <Input id="customerName" value={formData.customerName} onChange={(e) => handleChange('customerName', e.target.value)} className="border-coral-200 focus:border-coral-400" placeholder="Enter name" />
                 </div>
                 <div>
-                  <Label htmlFor="productName" className="text-gray-700 font-medium">Product/Service</Label>
-                  <Input
-                    id="productName"
-                    value={formData.productName}
-                    onChange={(e) => handleChange('productName', e.target.value)}
-                    className="border-coral-200 focus:border-coral-400"
-                    placeholder="Product or service name"
-                  />
+                  <FormFieldLabel icon={Package} label="Product/Service" htmlFor="productName" color="emerald" />
+                  <Input id="productName" value={formData.productName} onChange={(e) => handleChange('productName', e.target.value)} className="border-coral-200 focus:border-coral-400" placeholder="Product or service name" />
                 </div>
                 <div>
-                  <Label htmlFor="unit" className="text-gray-700 font-medium">Unit/Quantity</Label>
-                  <Input
-                    id="unit"
-                    value={formData.unit}
-                    onChange={(e) => handleChange('unit', e.target.value)}
-                    className="border-coral-200 focus:border-coral-400"
-                    placeholder="e.g., 10L, 5 pieces"
-                  />
+                  <FormFieldLabel icon={Tag} label="Unit/Quantity" htmlFor="unit" color="cyan" />
+                  <Input id="unit" value={formData.unit} onChange={(e) => handleChange('unit', e.target.value)} className="border-coral-200 focus:border-coral-400" placeholder="e.g., 10L, 5 pieces" />
                 </div>
                 <div className="md:col-span-2">
-                  <Label htmlFor="notes" className="text-gray-700 font-medium">Notes</Label>
-                  <Textarea
-                    id="notes"
-                    value={formData.notes}
-                    onChange={(e) => handleChange('notes', e.target.value)}
-                    className="border-coral-200 focus:border-coral-400 min-h-[80px]"
-                    placeholder="Add any additional notes or remarks..."
-                  />
+                  <FormFieldLabel icon={MessageSquare} label="Notes" htmlFor="notes" color="slate" />
+                  <Textarea id="notes" value={formData.notes} onChange={(e) => handleChange('notes', e.target.value)} className="border-coral-200 focus:border-coral-400 min-h-[80px]" placeholder="Add any additional notes or remarks..." />
                 </div>
               </div>
             </CardContent>

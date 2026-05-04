@@ -9,10 +9,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Save, Printer } from "lucide-react";
+import { CalendarIcon, Save, Printer, User, IndianRupee, CreditCard, FileText, MessageSquare, Receipt } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { FormSectionHeader } from "@/components/shared/FormSectionHeader";
+import { FormFieldLabel } from "@/components/shared/FormFieldLabel";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -114,10 +116,11 @@ export function AddEditReceiptModal({ isOpen, onClose, receipt }: AddEditReceipt
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormSectionHeader icon={Receipt} title="Receipt Information" color="emerald" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField control={form.control} name="receiptDate" render={({ field }) => (
                 <FormItem className="space-y-2">
-                  <FormLabel style={{ color: THEME_PRIMARY }}>Receipt Date *</FormLabel>
+                  <FormFieldLabel icon={CalendarIcon} label="Receipt Date" required color="emerald" />
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -134,21 +137,21 @@ export function AddEditReceiptModal({ isOpen, onClose, receipt }: AddEditReceipt
               )} />
               <FormField control={form.control} name="payerName" render={({ field }) => (
                 <FormItem className="space-y-2">
-                  <FormLabel style={{ color: THEME_PRIMARY }}>Payer Name *</FormLabel>
+                  <FormFieldLabel icon={User} label="Payer Name" required color="blue" />
                   <FormControl><Input {...field} placeholder="Enter payer name" style={{ borderColor: THEME_SECONDARY }} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
               <FormField control={form.control} name="amount" render={({ field }) => (
                 <FormItem className="space-y-2">
-                  <FormLabel style={{ color: THEME_PRIMARY }}>Amount *</FormLabel>
+                  <FormFieldLabel icon={IndianRupee} label="Amount" required color="amber" />
                   <FormControl><Input {...field} type="number" placeholder="Enter amount" style={{ borderColor: THEME_SECONDARY }} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
               <FormField control={form.control} name="paymentMode" render={({ field }) => (
                 <FormItem className="space-y-2">
-                  <FormLabel style={{ color: THEME_PRIMARY }}>Payment Mode *</FormLabel>
+                  <FormFieldLabel icon={CreditCard} label="Payment Mode" required color="purple" />
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl><SelectTrigger style={{ borderColor: THEME_SECONDARY }}><SelectValue placeholder="Select payment mode" /></SelectTrigger></FormControl>
                     <SelectContent>
@@ -164,14 +167,14 @@ export function AddEditReceiptModal({ isOpen, onClose, receipt }: AddEditReceipt
             </div>
             <FormField control={form.control} name="reason" render={({ field }) => (
               <FormItem className="space-y-2">
-                <FormLabel style={{ color: THEME_PRIMARY }}>Reason for Payment *</FormLabel>
+                <FormFieldLabel icon={FileText} label="Reason for Payment" required color="orange" />
                 <FormControl><Input {...field} placeholder="Enter reason" style={{ borderColor: THEME_SECONDARY }} /></FormControl>
                 <FormMessage />
               </FormItem>
             )} />
             <FormField control={form.control} name="notes" render={({ field }) => (
               <FormItem className="space-y-2">
-                <FormLabel style={{ color: THEME_PRIMARY }}>Notes / Remarks</FormLabel>
+                <FormFieldLabel icon={MessageSquare} label="Notes / Remarks" color="slate" />
                 <FormControl><Textarea {...field} placeholder="Additional notes..." rows={3} style={{ borderColor: THEME_SECONDARY }} /></FormControl>
                 <FormMessage />
               </FormItem>
