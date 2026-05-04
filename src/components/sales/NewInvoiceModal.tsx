@@ -9,12 +9,14 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Download, Save } from "lucide-react";
+import { Plus, Download, Save, FileText, Calendar, User, Package, Receipt, Wallet, CreditCard, IndianRupee, Percent, ToggleLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ProductLineForm } from "./ProductLineForm";
 import { NewProductModal } from "./NewProductModal";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { FormSectionHeader } from "@/components/shared/FormSectionHeader";
+import { FormFieldLabel } from "@/components/shared/FormFieldLabel";
 
 interface NewInvoiceModalProps {
   isOpen: boolean;
