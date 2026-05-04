@@ -6,7 +6,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Save, X, Palette } from "lucide-react";
+import { Save, X, Palette, Tag, FileText, ToggleRight } from "lucide-react";
+import { FormSectionHeader } from "@/components/shared/FormSectionHeader";
+import { FormFieldLabel } from "@/components/shared/FormFieldLabel";
 
 // Extended color options with hex codes and names
 const colorOptions = [
