@@ -186,12 +186,11 @@ export function CategoryForm({ category, onSubmit, onClose }: CategoryFormProps)
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 pt-4">
+      <FormSectionHeader icon={Tag} title="Category Information" color="purple" />
       <div className="grid grid-cols-1 gap-6">
         {/* Category Name */}
         <div className="space-y-2">
-          <Label htmlFor="name" className="text-sm font-medium text-purple-800">
-            Category Name *
-          </Label>
+          <FormFieldLabel icon={Tag} label="Category Name" htmlFor="name" required color="purple" />
           <Input
             id="name"
             type="text"
@@ -207,9 +206,7 @@ export function CategoryForm({ category, onSubmit, onClose }: CategoryFormProps)
 
         {/* Description */}
         <div className="space-y-2">
-          <Label htmlFor="description" className="text-sm font-medium text-purple-800">
-            Description *
-          </Label>
+          <FormFieldLabel icon={FileText} label="Description" htmlFor="description" required color="indigo" />
           <Textarea
             id="description"
             value={formData.description}
@@ -225,9 +222,7 @@ export function CategoryForm({ category, onSubmit, onClose }: CategoryFormProps)
 
         {/* Color Selection with Color Wheel */}
         <div className="space-y-3">
-          <Label className="text-sm font-medium text-purple-800">
-            Category Color
-          </Label>
+          <FormFieldLabel icon={Palette} label="Category Color" color="pink" />
           
           <div className="flex items-center gap-4">
             {/* Color Preview and Picker */}
