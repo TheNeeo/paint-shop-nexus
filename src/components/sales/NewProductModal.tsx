@@ -314,50 +314,11 @@ export function NewProductModal({ isOpen, onClose, onProductCreated }: NewProduc
               </div>
             </div>
           </div>
-            </div>
-
-            {/* Right Column - Product Image */}
-            <div className="lg:col-span-1">
-              <div className="bg-white p-6 rounded-xl border-2 border-green-200 shadow-sm h-fit sticky top-4">
-                <h3 className="text-lg font-semibold text-green-800 mb-4">Product Image</h3>
-                
-                <div className="space-y-4">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                    id="image-upload"
-                  />
-                  <Label
-                    htmlFor="image-upload"
-                    className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-green-300 rounded-xl cursor-pointer hover:border-green-400 bg-green-50/50"
-                  >
-                    {imagePreview ? (
-                      <img
-                        src={imagePreview}
-                        alt="Preview"
-                        className="w-full h-full object-cover rounded-xl"
-                      />
-                    ) : (
-                      <div className="flex flex-col items-center space-y-3">
-                        <Upload className="h-12 w-12 text-green-400" />
-                        <div className="text-center">
-                          <span className="text-sm text-green-600 font-medium block">Upload Product Image</span>
-                          <span className="text-sm text-blue-600 font-medium">Browse Image</span>
-                        </div>
-                      </div>
-                    )}
-                  </Label>
-                </div>
-              </div>
-            </div>
-          </div>
 
           {/* Product Variants */}
           <div className="bg-white p-6 rounded-xl border-2 border-purple-200 shadow-sm">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-purple-800">Product Variants</h3>
+              <FormSectionHeader icon={Layers} title="Product Variants" color="purple" />
               <Button 
                 type="button" 
                 onClick={addVariant} 
