@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { FormSectionHeader } from "@/components/shared/FormSectionHeader";
 import { FormFieldLabel } from "@/components/shared/FormFieldLabel";
+import { nextInvoiceNumber } from "@/hooks/useAppSettings";
 
 interface NewInvoiceModalProps {
   isOpen: boolean;
