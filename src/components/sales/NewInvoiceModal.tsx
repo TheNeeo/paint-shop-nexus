@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { FormSectionHeader } from "@/components/shared/FormSectionHeader";
 import { FormFieldLabel } from "@/components/shared/FormFieldLabel";
+import { nextInvoiceNumber } from "@/hooks/useAppSettings";
 
 interface NewInvoiceModalProps {
   isOpen: boolean;
@@ -90,7 +91,7 @@ export function NewInvoiceModal({ isOpen, onClose }: NewInvoiceModalProps) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const invoiceNumber = `INV-${Date.now().toString().slice(-8)}`;
+      const invoiceNumber = nextInvoiceNumber();
       const paymentStatus = paidAmount >= grandTotal ? 'paid' : paidAmount > 0 ? 'partial' : 'pending';
 
       const { data: sale, error: saleError } = await supabase
