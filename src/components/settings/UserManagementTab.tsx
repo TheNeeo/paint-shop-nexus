@@ -4,22 +4,47 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Users, UserPlus, X } from "lucide-react";
+import { Users, UserPlus, X, ShieldCheck } from "lucide-react";
 import { useUserRoles, AppRole } from "@/hooks/useUserRoles";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function UserManagementTab() {
-  const { isAdmin, allUsersWithRoles, usersLoading, addRole, removeRole } = useUserRoles();
+  const { isAdmin, allUsersWithRoles, usersLoading, addRole, removeRole, rolesLoading } = useUserRoles();
   const [selectedUserId, setSelectedUserId] = useState<string>("");
   const [selectedRole, setSelectedRole] = useState<AppRole>("staff");
+  const [claiming, setClaiming] = useState(false);
+  const qc = useQueryClient();
+
+  const handleClaimAdmin = async () => {
+    setClaiming(true);
+    const { data, error } = await supabase.rpc("claim_first_admin");
+    setClaiming(false);
+    if (error) { toast.error(error.message); return; }
+    if (data) {
+      toast.success("You are now the administrator");
+      qc.invalidateQueries({ queryKey: ["user-roles"] });
+      qc.invalidateQueries({ queryKey: ["all-users-roles"] });
+    } else {
+      toast.error("An admin already exists. Ask them to grant you a role.");
+    }
+  };
 
   if (!isAdmin) {
     return (
-      <Alert>
-        <AlertDescription>
-          You need administrator privileges to manage users.
-        </AlertDescription>
-      </Alert>
+      <div className="space-y-4">
+        <Alert>
+          <AlertDescription>
+            You need administrator privileges to manage users. If this is a fresh setup and no admin exists yet, claim the admin role below.
+          </AlertDescription>
+        </Alert>
+        <Button onClick={handleClaimAdmin} disabled={claiming || rolesLoading}>
+          <ShieldCheck className="h-4 w-4 mr-2" />
+          {claiming ? "Claiming..." : "Claim Admin Role (first user only)"}
+        </Button>
+      </div>
     );
   }
 
