@@ -240,7 +240,7 @@ export default function InvoiceGenerate() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const invoiceNumber = `INV-${Date.now().toString().slice(-8)}`;
+      const invoiceNumber = nextInvoiceNumber();
       const paymentStatus = paidAmount >= grandTotal ? 'paid' : paidAmount > 0 ? 'partial' : 'pending';
 
       const { data: sale, error: saleError } = await supabase
