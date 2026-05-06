@@ -680,6 +680,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_first_admin: { Args: never; Returns: boolean }
       has_admin_or_manager_role: {
         Args: { _user_id: string }
         Returns: boolean
