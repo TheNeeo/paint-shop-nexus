@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
+import { nextInvoiceNumber } from "@/hooks/useAppSettings";
 import {
   Breadcrumb,
   BreadcrumbItem,
