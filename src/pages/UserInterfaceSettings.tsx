@@ -20,8 +20,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { useUISettings, defaultUI } from "@/hooks/useAppSettings";
 import dashboardHomeIcon from "@/assets/smart-home-3d-icon-10.png";
 import uiIcon from "@/assets/user-interface-icon.png";
-import dashboardHomeIcon from "@/assets/smart-home-3d-icon-10.png";
-import uiIcon from "@/assets/user-interface-icon.png";
 
 const THEME = {
   primary: '#B87C4C',
