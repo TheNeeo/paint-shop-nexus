@@ -52,16 +52,8 @@ export function BackgroundSettings({ settings, setSettings }: BackgroundSettings
           <div>
             <Label className="text-ruby-blue-700 mb-2 block">Background Color</Label>
             <div className="flex items-center gap-2">
-              <input
-                type="color"
-                defaultValue="#f9fafb"
-                className="w-12 h-10 rounded border border-ruby-blue-300"
-              />
-              <input
-                type="text"
-                defaultValue="#f9fafb"
-                className="flex-1 px-3 py-2 border border-ruby-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-ruby-blue-500"
-              />
+              <input type="color" value={settings.bgColor || "#f9fafb"} onChange={(e) => setSettings({ ...settings, bgColor: e.target.value })} className="w-12 h-10 rounded border border-ruby-blue-300" />
+              <input type="text" value={settings.bgColor || "#f9fafb"} onChange={(e) => setSettings({ ...settings, bgColor: e.target.value })} className="flex-1 px-3 py-2 border border-ruby-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-ruby-blue-500" />
             </div>
           </div>
         )}
@@ -71,31 +63,15 @@ export function BackgroundSettings({ settings, setSettings }: BackgroundSettings
             <div>
               <Label className="text-ruby-blue-700 mb-2 block">Start Color</Label>
               <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  defaultValue="#83B2E2"
-                  className="w-12 h-10 rounded border border-ruby-blue-300"
-                />
-                <input
-                  type="text"
-                  defaultValue="#83B2E2"
-                  className="flex-1 px-3 py-2 border border-ruby-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-ruby-blue-500"
-                />
+                <input type="color" value={settings.bgGradientStart || "#83B2E2"} onChange={(e) => setSettings({ ...settings, bgGradientStart: e.target.value })} className="w-12 h-10 rounded border border-ruby-blue-300" />
+                <input type="text" value={settings.bgGradientStart || "#83B2E2"} onChange={(e) => setSettings({ ...settings, bgGradientStart: e.target.value })} className="flex-1 px-3 py-2 border border-ruby-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-ruby-blue-500" />
               </div>
             </div>
             <div>
               <Label className="text-ruby-blue-700 mb-2 block">End Color</Label>
               <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  defaultValue="#ffffff"
-                  className="w-12 h-10 rounded border border-ruby-blue-300"
-                />
-                <input
-                  type="text"
-                  defaultValue="#ffffff"
-                  className="flex-1 px-3 py-2 border border-ruby-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-ruby-blue-500"
-                />
+                <input type="color" value={settings.bgGradientEnd || "#ffffff"} onChange={(e) => setSettings({ ...settings, bgGradientEnd: e.target.value })} className="w-12 h-10 rounded border border-ruby-blue-300" />
+                <input type="text" value={settings.bgGradientEnd || "#ffffff"} onChange={(e) => setSettings({ ...settings, bgGradientEnd: e.target.value })} className="flex-1 px-3 py-2 border border-ruby-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-ruby-blue-500" />
               </div>
             </div>
           </div>
@@ -105,21 +81,31 @@ export function BackgroundSettings({ settings, setSettings }: BackgroundSettings
           <div className="space-y-4">
             <div>
               <Label className="text-ruby-blue-700 mb-2 block">Upload Background Image</Label>
-              <Button 
-                variant="outline" 
-                className="w-full h-32 border-2 border-dashed border-ruby-blue-300 hover:border-ruby-blue-400"
-              >
-                <div className="text-center">
-                  <Upload className="h-8 w-8 text-ruby-blue-500 mx-auto mb-2" />
-                  <p className="text-ruby-blue-700">Click to upload image</p>
-                  <p className="text-sm text-ruby-blue-500">or drag and drop</p>
+              <label className="block">
+                <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                  const f = e.target.files?.[0]; if (!f) return;
+                  if (f.size > 2 * 1024 * 1024) { alert("Image must be under 2MB"); return; }
+                  const reader = new FileReader();
+                  reader.onload = () => setSettings({ ...settings, bgImage: reader.result as string });
+                  reader.readAsDataURL(f);
+                }} />
+                <div className="w-full h-32 border-2 border-dashed border-ruby-blue-300 hover:border-ruby-blue-400 rounded-md flex items-center justify-center cursor-pointer">
+                  {settings.bgImage ? (
+                    <img src={settings.bgImage} alt="bg" className="h-full object-contain" />
+                  ) : (
+                    <div className="text-center">
+                      <Upload className="h-8 w-8 text-ruby-blue-500 mx-auto mb-2" />
+                      <p className="text-ruby-blue-700">Click to upload image</p>
+                      <p className="text-sm text-ruby-blue-500">PNG/JPG up to 2MB</p>
+                    </div>
+                  )}
                 </div>
-              </Button>
+              </label>
             </div>
             
             <div>
               <Label className="text-ruby-blue-700 mb-3 block">Image Fit Options</Label>
-              <RadioGroup defaultValue="cover" className="grid grid-cols-3 gap-4">
+              <RadioGroup value={settings.bgImageFit || "cover"} onValueChange={(v) => setSettings({ ...settings, bgImageFit: v })} className="grid grid-cols-3 gap-4">
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="cover" id="cover" />
                   <Label htmlFor="cover" className="text-ruby-blue-700">Cover</Label>
