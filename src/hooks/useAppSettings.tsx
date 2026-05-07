@@ -33,11 +33,55 @@ export interface BackupSettings {
   lastSync: string;
 }
 
+export interface UISettings {
+  // Theme
+  theme: "light" | "dark" | "custom";
+  primaryColor: string;
+  secondaryColor: string;
+  // Typography
+  fontFamily: string;
+  secondaryFont: string;
+  fontSize: number;
+  lineHeight: number;
+  // Sidebar
+  enableCollapse: boolean;
+  sidebarStyle: string;
+  sidebarBg: string;
+  sidebarText: string;
+  iconStyle: string;
+  // Header
+  headerStyle: string;
+  headerBg: string;
+  headerText: string;
+  headerGradient: boolean;
+  // Background
+  backgroundType: string;
+  bgColor: string;
+  bgGradientStart: string;
+  bgGradientEnd: string;
+  bgImage: string;
+  bgImageFit: string;
+  // Buttons & forms
+  buttonStyle: string;
+  buttonFill: string;
+  btnPrimary: string;
+  btnHover: string;
+  formFieldBg: string;
+  // Animations
+  animationsEnabled: boolean;
+  hoverAnim: boolean;
+  animSpeed: string;
+  fadeAnim: boolean;
+  scaleAnim: boolean;
+  slideAnim: boolean;
+}
+
 const KEYS = {
   shop: "ncf_shop_info",
   invoice: "ncf_invoice_settings",
   theme: "ncf_theme_settings",
   backup: "ncf_backup_settings",
+  ui: "ncf_ui_settings",
 };
 
 export const defaultShop: ShopInfo = {
