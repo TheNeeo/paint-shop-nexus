@@ -33,11 +33,55 @@ export interface BackupSettings {
   lastSync: string;
 }
 
+export interface UISettings {
+  // Theme
+  theme: "light" | "dark" | "custom";
+  primaryColor: string;
+  secondaryColor: string;
+  // Typography
+  fontFamily: string;
+  secondaryFont: string;
+  fontSize: number;
+  lineHeight: number;
+  // Sidebar
+  enableCollapse: boolean;
+  sidebarStyle: string;
+  sidebarBg: string;
+  sidebarText: string;
+  iconStyle: string;
+  // Header
+  headerStyle: string;
+  headerBg: string;
+  headerText: string;
+  headerGradient: boolean;
+  // Background
+  backgroundType: string;
+  bgColor: string;
+  bgGradientStart: string;
+  bgGradientEnd: string;
+  bgImage: string;
+  bgImageFit: string;
+  // Buttons & forms
+  buttonStyle: string;
+  buttonFill: string;
+  btnPrimary: string;
+  btnHover: string;
+  formFieldBg: string;
+  // Animations
+  animationsEnabled: boolean;
+  hoverAnim: boolean;
+  animSpeed: string;
+  fadeAnim: boolean;
+  scaleAnim: boolean;
+  slideAnim: boolean;
+}
+
 const KEYS = {
   shop: "ncf_shop_info",
   invoice: "ncf_invoice_settings",
   theme: "ncf_theme_settings",
   backup: "ncf_backup_settings",
+  ui: "ncf_ui_settings",
 };
 
 export const defaultShop: ShopInfo = {
@@ -71,6 +115,42 @@ export const defaultBackup: BackupSettings = {
   autoBackup: true,
   cloudSync: false,
   lastSync: "",
+};
+
+export const defaultUI: UISettings = {
+  theme: "light",
+  primaryColor: "#7DBE3C",
+  secondaryColor: "#83B2E2",
+  fontFamily: "inter",
+  secondaryFont: "roboto",
+  fontSize: 16,
+  lineHeight: 1.5,
+  enableCollapse: true,
+  sidebarStyle: "fixed",
+  sidebarBg: "#ffffff",
+  sidebarText: "#374151",
+  iconStyle: "outline",
+  headerStyle: "solid",
+  headerBg: "#ffffff",
+  headerText: "#374151",
+  headerGradient: false,
+  backgroundType: "solid",
+  bgColor: "#f9fafb",
+  bgGradientStart: "#83B2E2",
+  bgGradientEnd: "#ffffff",
+  bgImage: "",
+  bgImageFit: "cover",
+  buttonStyle: "rounded",
+  buttonFill: "filled",
+  btnPrimary: "#7DBE3C",
+  btnHover: "#6BA833",
+  formFieldBg: "#ffffff",
+  animationsEnabled: true,
+  hoverAnim: true,
+  animSpeed: "medium",
+  fadeAnim: true,
+  scaleAnim: true,
+  slideAnim: true,
 };
 
 function load<T>(key: string, fallback: T): T {
@@ -113,6 +193,7 @@ export const useShopInfo = () => useAppSettings<ShopInfo>("shop", defaultShop);
 export const useInvoiceSettings = () => useAppSettings<InvoiceSettings>("invoice", defaultInvoice);
 export const useThemeSettings = () => useAppSettings<ThemeSettings>("theme", defaultTheme);
 export const useBackupSettings = () => useAppSettings<BackupSettings>("backup", defaultBackup);
+export const useUISettings = () => useAppSettings<UISettings>("ui", defaultUI);
 
 // Helper for non-hook contexts (e.g. invoice number generation)
 export function getInvoiceSettings(): InvoiceSettings {

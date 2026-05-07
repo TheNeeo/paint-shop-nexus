@@ -46,18 +46,14 @@ export function ButtonFormStyles({ settings, setSettings }: ButtonFormStylesProp
 
         <div>
           <Label className="text-ruby-blue-700 mb-3 block">Button Fill Style</Label>
-          <RadioGroup defaultValue="filled" className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <RadioGroup value={settings.buttonFill || "filled"} onValueChange={(v) => setSettings({ ...settings, buttonFill: v })} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="filled" id="filled" />
-              <Label htmlFor="filled" className="text-ruby-blue-700">
-                Filled Buttons
-              </Label>
+              <Label htmlFor="filled" className="text-ruby-blue-700">Filled Buttons</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="outlined" id="outlined" />
-              <Label htmlFor="outlined" className="text-ruby-blue-700">
-                Outlined Buttons
-              </Label>
+              <Label htmlFor="outlined" className="text-ruby-blue-700">Outlined Buttons</Label>
             </div>
           </RadioGroup>
         </div>
@@ -66,48 +62,24 @@ export function ButtonFormStyles({ settings, setSettings }: ButtonFormStylesProp
           <div>
             <Label className="text-ruby-blue-700 mb-2 block">Button Primary Color</Label>
             <div className="flex items-center gap-2">
-              <input
-                type="color"
-                defaultValue="#83B2E2"
-                className="w-12 h-10 rounded border border-ruby-blue-300"
-              />
-              <input
-                type="text"
-                defaultValue="#83B2E2"
-                className="flex-1 px-3 py-2 border border-ruby-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-ruby-blue-500"
-              />
+              <input type="color" value={settings.btnPrimary || "#83B2E2"} onChange={(e) => setSettings({ ...settings, btnPrimary: e.target.value })} className="w-12 h-10 rounded border border-ruby-blue-300" />
+              <input type="text" value={settings.btnPrimary || "#83B2E2"} onChange={(e) => setSettings({ ...settings, btnPrimary: e.target.value })} className="flex-1 px-3 py-2 border border-ruby-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-ruby-blue-500" />
             </div>
           </div>
 
           <div>
             <Label className="text-ruby-blue-700 mb-2 block">Button Hover Color</Label>
             <div className="flex items-center gap-2">
-              <input
-                type="color"
-                defaultValue="#6B9FDC"
-                className="w-12 h-10 rounded border border-ruby-blue-300"
-              />
-              <input
-                type="text"
-                defaultValue="#6B9FDC"
-                className="flex-1 px-3 py-2 border border-ruby-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-ruby-blue-500"
-              />
+              <input type="color" value={settings.btnHover || "#6B9FDC"} onChange={(e) => setSettings({ ...settings, btnHover: e.target.value })} className="w-12 h-10 rounded border border-ruby-blue-300" />
+              <input type="text" value={settings.btnHover || "#6B9FDC"} onChange={(e) => setSettings({ ...settings, btnHover: e.target.value })} className="flex-1 px-3 py-2 border border-ruby-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-ruby-blue-500" />
             </div>
           </div>
 
           <div>
             <Label className="text-ruby-blue-700 mb-2 block">Form Field Background</Label>
             <div className="flex items-center gap-2">
-              <input
-                type="color"
-                defaultValue="#ffffff"
-                className="w-12 h-10 rounded border border-ruby-blue-300"
-              />
-              <input
-                type="text"
-                defaultValue="#ffffff"
-                className="flex-1 px-3 py-2 border border-ruby-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-ruby-blue-500"
-              />
+              <input type="color" value={settings.formFieldBg || "#ffffff"} onChange={(e) => setSettings({ ...settings, formFieldBg: e.target.value })} className="w-12 h-10 rounded border border-ruby-blue-300" />
+              <input type="text" value={settings.formFieldBg || "#ffffff"} onChange={(e) => setSettings({ ...settings, formFieldBg: e.target.value })} className="flex-1 px-3 py-2 border border-ruby-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-ruby-blue-500" />
             </div>
           </div>
         </div>

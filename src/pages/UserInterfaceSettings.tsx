@@ -17,6 +17,7 @@ import { AnimationSettings } from "@/components/settings/AnimationSettings";
 import { PreviewPanel } from "@/components/settings/PreviewPanel";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { useUISettings, defaultUI } from "@/hooks/useAppSettings";
 import dashboardHomeIcon from "@/assets/smart-home-3d-icon-10.png";
 import uiIcon from "@/assets/user-interface-icon.png";
 
@@ -46,30 +47,22 @@ export default function UserInterfaceSettings() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("theme");
-  const [settings, setSettings] = useState({
-    theme: "light",
-    primaryColor: "#5959f7",
-    secondaryColor: "#83B2E2",
-    fontFamily: "inter",
-    fontSize: 16,
-    sidebarStyle: "fixed",
-    headerTransparent: false,
-    backgroundType: "solid",
-    buttonStyle: "rounded",
-    animationsEnabled: true,
-  });
+  const [persisted, persist] = useUISettings();
+  const [settings, setSettings] = useState(persisted);
+
+  // Live-apply on every change so user sees instant effect
+  React.useEffect(() => {
+    persist(settings);
+  }, [settings]);
 
   const handleSaveSettings = () => {
+    persist(settings);
     toast({ title: "Settings Saved", description: "Your interface settings have been applied successfully." });
   };
 
   const handleResetSettings = () => {
-    setSettings({
-      theme: "light", primaryColor: "#5959f7", secondaryColor: "#83B2E2",
-      fontFamily: "inter", fontSize: 16, sidebarStyle: "fixed",
-      headerTransparent: false, backgroundType: "solid",
-      buttonStyle: "rounded", animationsEnabled: true,
-    });
+    setSettings(defaultUI);
+    persist(defaultUI);
     toast({ title: "Settings Reset", description: "All settings have been reset to default values." });
   };
 

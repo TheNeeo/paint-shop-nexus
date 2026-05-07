@@ -37,13 +37,13 @@ export function AnimationSettings({ settings, setSettings }: AnimationSettingsPr
               <Label className="text-ruby-blue-700">Hover Animations</Label>
               <p className="text-sm text-ruby-blue-600">Enable hover effects on interactive elements</p>
             </div>
-            <Switch defaultChecked />
+            <Switch checked={!!settings.hoverAnim} onCheckedChange={(c) => setSettings({ ...settings, hoverAnim: c })} />
           </div>
         </div>
 
         <div>
           <Label className="text-ruby-blue-700 mb-2 block">Animation Speed</Label>
-          <Select defaultValue="medium">
+          <Select value={settings.animSpeed || "medium"} onValueChange={(v) => setSettings({ ...settings, animSpeed: v })}>
             <SelectTrigger className="border-ruby-blue-300 focus:border-ruby-blue-500">
               <SelectValue />
             </SelectTrigger>
@@ -61,7 +61,7 @@ export function AnimationSettings({ settings, setSettings }: AnimationSettingsPr
               <Label className="text-ruby-blue-700">Fade Animations</Label>
               <p className="text-sm text-ruby-blue-600">Fade in/out effects</p>
             </div>
-            <Switch defaultChecked />
+            <Switch checked={!!settings.fadeAnim} onCheckedChange={(c) => setSettings({ ...settings, fadeAnim: c })} />
           </div>
 
           <div className="flex items-center justify-between">
@@ -69,7 +69,7 @@ export function AnimationSettings({ settings, setSettings }: AnimationSettingsPr
               <Label className="text-ruby-blue-700">Scale Animations</Label>
               <p className="text-sm text-ruby-blue-600">Scaling effects on interactions</p>
             </div>
-            <Switch defaultChecked />
+            <Switch checked={!!settings.scaleAnim} onCheckedChange={(c) => setSettings({ ...settings, scaleAnim: c })} />
           </div>
         </div>
 
@@ -78,7 +78,7 @@ export function AnimationSettings({ settings, setSettings }: AnimationSettingsPr
             <Label className="text-ruby-blue-700">Slide Animations</Label>
             <p className="text-sm text-ruby-blue-600">Sliding effects for drawers and panels</p>
           </div>
-          <Switch defaultChecked />
+          <Switch checked={!!settings.slideAnim} onCheckedChange={(c) => setSettings({ ...settings, slideAnim: c })} />
         </div>
 
         {/* Animation Preview */}

@@ -43,7 +43,7 @@ export function TypographySettings({ settings, setSettings }: TypographySettings
 
           <div>
             <Label className="text-ruby-blue-700 mb-2 block">Secondary Font Family</Label>
-            <Select defaultValue="roboto">
+            <Select value={settings.secondaryFont || "roboto"} onValueChange={(v) => setSettings({ ...settings, secondaryFont: v })}>
               <SelectTrigger className="border-ruby-blue-300 focus:border-ruby-blue-500">
                 <SelectValue />
               </SelectTrigger>
@@ -87,9 +87,10 @@ export function TypographySettings({ settings, setSettings }: TypographySettings
           </div>
 
           <div>
-            <Label className="text-ruby-blue-700 mb-2 block">Line Height: 1.5</Label>
+            <Label className="text-ruby-blue-700 mb-2 block">Line Height: {settings.lineHeight ?? 1.5}</Label>
             <Slider
-              defaultValue={[1.5]}
+              value={[settings.lineHeight ?? 1.5]}
+              onValueChange={(v) => setSettings({ ...settings, lineHeight: v[0] })}
               max={2}
               min={1}
               step={0.1}
