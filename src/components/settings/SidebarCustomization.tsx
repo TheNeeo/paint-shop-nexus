@@ -27,7 +27,7 @@ export function SidebarCustomization({ settings, setSettings }: SidebarCustomiza
               <Label className="text-ruby-blue-700">Enable Collapse</Label>
               <p className="text-sm text-ruby-blue-600">Allow users to collapse sidebar</p>
             </div>
-            <Switch defaultChecked />
+            <Switch checked={!!settings.enableCollapse} onCheckedChange={(c) => setSettings({ ...settings, enableCollapse: c })} />
           </div>
 
           <div>
@@ -52,59 +52,34 @@ export function SidebarCustomization({ settings, setSettings }: SidebarCustomiza
           <div>
             <Label className="text-ruby-blue-700 mb-2 block">Sidebar Background Color</Label>
             <div className="flex items-center gap-2">
-              <input
-                type="color"
-                defaultValue="#ffffff"
-                className="w-12 h-10 rounded border border-ruby-blue-300"
-              />
-              <input
-                type="text"
-                defaultValue="#ffffff"
-                className="flex-1 px-3 py-2 border border-ruby-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-ruby-blue-500"
-              />
+              <input type="color" value={settings.sidebarBg || "#ffffff"} onChange={(e) => setSettings({ ...settings, sidebarBg: e.target.value })} className="w-12 h-10 rounded border border-ruby-blue-300" />
+              <input type="text" value={settings.sidebarBg || "#ffffff"} onChange={(e) => setSettings({ ...settings, sidebarBg: e.target.value })} className="flex-1 px-3 py-2 border border-ruby-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-ruby-blue-500" />
             </div>
           </div>
 
           <div>
             <Label className="text-ruby-blue-700 mb-2 block">Sidebar Text Color</Label>
             <div className="flex items-center gap-2">
-              <input
-                type="color"
-                defaultValue="#374151"
-                className="w-12 h-10 rounded border border-ruby-blue-300"
-              />
-              <input
-                type="text"
-                defaultValue="#374151"
-                className="flex-1 px-3 py-2 border border-ruby-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-ruby-blue-500"
-              />
+              <input type="color" value={settings.sidebarText || "#374151"} onChange={(e) => setSettings({ ...settings, sidebarText: e.target.value })} className="w-12 h-10 rounded border border-ruby-blue-300" />
+              <input type="text" value={settings.sidebarText || "#374151"} onChange={(e) => setSettings({ ...settings, sidebarText: e.target.value })} className="flex-1 px-3 py-2 border border-ruby-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-ruby-blue-500" />
             </div>
           </div>
         </div>
 
         <div>
           <Label className="text-ruby-blue-700 mb-3 block">Icon Style</Label>
-          <RadioGroup defaultValue="outline" className="grid grid-cols-3 gap-4">
+          <RadioGroup value={settings.iconStyle || "outline"} onValueChange={(v) => setSettings({ ...settings, iconStyle: v })} className="grid grid-cols-3 gap-4">
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="flat" id="flat" />
-              <Label htmlFor="flat" className="flex items-center gap-2">
-                <Square className="h-4 w-4" />
-                Flat
-              </Label>
+              <Label htmlFor="flat" className="flex items-center gap-2"><Square className="h-4 w-4" />Flat</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="3d" id="3d" />
-              <Label htmlFor="3d" className="flex items-center gap-2">
-                <Circle className="h-4 w-4" />
-                3D
-              </Label>
+              <Label htmlFor="3d" className="flex items-center gap-2"><Circle className="h-4 w-4" />3D</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="outline" id="outline" />
-              <Label htmlFor="outline" className="flex items-center gap-2">
-                <Minus className="h-4 w-4" />
-                Outline
-              </Label>
+              <Label htmlFor="outline" className="flex items-center gap-2"><Minus className="h-4 w-4" />Outline</Label>
             </div>
           </RadioGroup>
         </div>
