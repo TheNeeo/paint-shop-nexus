@@ -22,18 +22,14 @@ export function HeaderCustomization({ settings, setSettings }: HeaderCustomizati
       <CardContent className="pt-6 space-y-6">
         <div>
           <Label className="text-ruby-blue-700 mb-3 block">Header Style</Label>
-          <RadioGroup defaultValue="solid" className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <RadioGroup value={settings.headerStyle || "solid"} onValueChange={(v) => setSettings({ ...settings, headerStyle: v })} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="transparent" id="transparent" />
-              <Label htmlFor="transparent" className="text-ruby-blue-700">
-                Transparent Header
-              </Label>
+              <Label htmlFor="transparent" className="text-ruby-blue-700">Transparent Header</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="solid" id="solid" />
-              <Label htmlFor="solid" className="text-ruby-blue-700">
-                Solid Color Header
-              </Label>
+              <Label htmlFor="solid" className="text-ruby-blue-700">Solid Color Header</Label>
             </div>
           </RadioGroup>
         </div>
@@ -42,32 +38,16 @@ export function HeaderCustomization({ settings, setSettings }: HeaderCustomizati
           <div>
             <Label className="text-ruby-blue-700 mb-2 block">Header Background Color</Label>
             <div className="flex items-center gap-2">
-              <input
-                type="color"
-                defaultValue="#ffffff"
-                className="w-12 h-10 rounded border border-ruby-blue-300"
-              />
-              <input
-                type="text"
-                defaultValue="#ffffff"
-                className="flex-1 px-3 py-2 border border-ruby-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-ruby-blue-500"
-              />
+              <input type="color" value={settings.headerBg || "#ffffff"} onChange={(e) => setSettings({ ...settings, headerBg: e.target.value })} className="w-12 h-10 rounded border border-ruby-blue-300" />
+              <input type="text" value={settings.headerBg || "#ffffff"} onChange={(e) => setSettings({ ...settings, headerBg: e.target.value })} className="flex-1 px-3 py-2 border border-ruby-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-ruby-blue-500" />
             </div>
           </div>
 
           <div>
             <Label className="text-ruby-blue-700 mb-2 block">Header Text Color</Label>
             <div className="flex items-center gap-2">
-              <input
-                type="color"
-                defaultValue="#374151"
-                className="w-12 h-10 rounded border border-ruby-blue-300"
-              />
-              <input
-                type="text"
-                defaultValue="#374151"
-                className="flex-1 px-3 py-2 border border-ruby-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-ruby-blue-500"
-              />
+              <input type="color" value={settings.headerText || "#374151"} onChange={(e) => setSettings({ ...settings, headerText: e.target.value })} className="w-12 h-10 rounded border border-ruby-blue-300" />
+              <input type="text" value={settings.headerText || "#374151"} onChange={(e) => setSettings({ ...settings, headerText: e.target.value })} className="flex-1 px-3 py-2 border border-ruby-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-ruby-blue-500" />
             </div>
           </div>
         </div>
@@ -77,10 +57,7 @@ export function HeaderCustomization({ settings, setSettings }: HeaderCustomizati
             <Label className="text-ruby-blue-700">Enable Gradient Backgrounds</Label>
             <p className="text-sm text-ruby-blue-600">Add gradient effects to header</p>
           </div>
-          <Switch 
-            checked={settings.headerTransparent}
-            onCheckedChange={(checked) => setSettings({...settings, headerTransparent: checked})}
-          />
+          <Switch checked={!!settings.headerGradient} onCheckedChange={(c) => setSettings({ ...settings, headerGradient: c })} />
         </div>
 
         {/* Header Preview */}
