@@ -193,6 +193,7 @@ export const useShopInfo = () => useAppSettings<ShopInfo>("shop", defaultShop);
 export const useInvoiceSettings = () => useAppSettings<InvoiceSettings>("invoice", defaultInvoice);
 export const useThemeSettings = () => useAppSettings<ThemeSettings>("theme", defaultTheme);
 export const useBackupSettings = () => useAppSettings<BackupSettings>("backup", defaultBackup);
+export const useUISettings = () => useAppSettings<UISettings>("ui", defaultUI);
 
 // Helper for non-hook contexts (e.g. invoice number generation)
 export function getInvoiceSettings(): InvoiceSettings {
