@@ -117,6 +117,42 @@ export const defaultBackup: BackupSettings = {
   lastSync: "",
 };
 
+export const defaultUI: UISettings = {
+  theme: "light",
+  primaryColor: "#7DBE3C",
+  secondaryColor: "#83B2E2",
+  fontFamily: "inter",
+  secondaryFont: "roboto",
+  fontSize: 16,
+  lineHeight: 1.5,
+  enableCollapse: true,
+  sidebarStyle: "fixed",
+  sidebarBg: "#ffffff",
+  sidebarText: "#374151",
+  iconStyle: "outline",
+  headerStyle: "solid",
+  headerBg: "#ffffff",
+  headerText: "#374151",
+  headerGradient: false,
+  backgroundType: "solid",
+  bgColor: "#f9fafb",
+  bgGradientStart: "#83B2E2",
+  bgGradientEnd: "#ffffff",
+  bgImage: "",
+  bgImageFit: "cover",
+  buttonStyle: "rounded",
+  buttonFill: "filled",
+  btnPrimary: "#7DBE3C",
+  btnHover: "#6BA833",
+  formFieldBg: "#ffffff",
+  animationsEnabled: true,
+  hoverAnim: true,
+  animSpeed: "medium",
+  fadeAnim: true,
+  scaleAnim: true,
+  slideAnim: true,
+};
+
 function load<T>(key: string, fallback: T): T {
   try {
     const raw = localStorage.getItem(key);
