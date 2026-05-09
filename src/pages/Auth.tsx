@@ -2,15 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { signInSchema, signUpSchema, validateInput } from '@/lib/validation';
-import { Mail, Lock, User, Building2, Palette, Brush, Droplets, Sparkles } from 'lucide-react';
-
+import { Mail, Lock, User, Building2, Eye, EyeOff } from 'lucide-react';
+import pandaMascot from '@/assets/panda-mascot.png';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -18,14 +16,11 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
 
-  // Sign In Form State
-  const [signInData, setSignInData] = useState({
-    email: '',
-    password: '',
-  });
-
-  // Sign Up Form State
+  const [signInData, setSignInData] = useState({ email: '', password: '' });
   const [signUpData, setSignUpData] = useState({
     email: '',
     password: '',
@@ -33,46 +28,33 @@ const Auth = () => {
     companyName: '',
   });
 
-  // Redirect if already authenticated
   useEffect(() => {
-    if (!loading && user) {
-      navigate('/');
-    }
+    if (!loading && user) navigate('/');
   }, [user, loading, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-
     try {
-      // Validate input
-      const validation = validateInput(signInSchema, {
-        email: signInData.email,
-        password: signInData.password,
-      });
-      
+      const validation = validateInput(signInSchema, signInData);
       if (!validation.success) {
         setError(validation.error || 'Invalid input');
         return;
       }
-
       const { error } = await supabase.auth.signInWithPassword({
         email: validation.data.email,
         password: validation.data.password,
       });
-
       if (error) {
         if (error.message.includes('Invalid login credentials')) {
-          setError('Invalid email or password. Please check your credentials.');
+          setError('Invalid email or password.');
         } else if (error.message.includes('Email not confirmed')) {
-          setError('Please check your email and confirm your account before signing in.');
-        } else {
-          setError(error.message);
-        }
+          setError('Please confirm your email before signing in.');
+        } else setError(error.message);
       }
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
+    } catch {
+      setError('An unexpected error occurred.');
     } finally {
       setIsLoading(false);
     }
@@ -83,47 +65,34 @@ const Auth = () => {
     setIsLoading(true);
     setError('');
     setMessage('');
-
     try {
-      // Validate input
-      const validation = validateInput(signUpSchema, {
-        email: signUpData.email,
-        password: signUpData.password,
-        fullName: signUpData.fullName,
-        companyName: signUpData.companyName,
-      });
-      
+      const validation = validateInput(signUpSchema, signUpData);
       if (!validation.success) {
         setError(validation.error || 'Invalid input');
         return;
       }
-
-      const redirectUrl = `${window.location.origin}/`;
-      
       const { error } = await supabase.auth.signUp({
         email: validation.data.email,
         password: validation.data.password,
         options: {
-          emailRedirectTo: redirectUrl,
+          emailRedirectTo: `${window.location.origin}/`,
           data: {
             full_name: validation.data.fullName,
             company_name: validation.data.companyName || '',
-          }
-        }
+          },
+        },
       });
-
       if (error) {
         if (error.message.includes('User already registered')) {
-          setError('An account with this email already exists. Please sign in instead.');
-        } else {
-          setError(error.message);
-        }
+          setError('Account already exists. Please sign in.');
+        } else setError(error.message);
       } else {
-        setMessage('Account created successfully! Please check your email to confirm your account.');
+        setMessage('Account created! Check your email to confirm.');
         setSignUpData({ email: '', password: '', fullName: '', companyName: '' });
+        setMode('signin');
       }
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
+    } catch {
+      setError('An unexpected error occurred.');
     } finally {
       setIsLoading(false);
     }
@@ -131,245 +100,226 @@ const Auth = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center bg-[#1E6BE6]">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-white" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-green-50 relative overflow-hidden">
-      {/* Decorative Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-32 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-green-400/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-32 w-96 h-96 bg-gradient-to-tr from-green-400/20 to-blue-400/20 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-primary/10 to-blue-500/10 rounded-full blur-2xl"></div>
-      </div>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-200 via-blue-100 to-slate-200">
+      <div
+        className="relative w-full max-w-md rounded-[36px] overflow-hidden shadow-2xl"
+        style={{
+          background: 'linear-gradient(180deg, #2B7DEF 0%, #1E6BE6 55%, #1A5FD1 100%)',
+        }}
+      >
+        {/* Decorative blobs */}
+        <div className="absolute -top-20 -left-20 w-64 h-64 rounded-full bg-white/10 blur-3xl" />
+        <div className="absolute bottom-40 -right-16 w-56 h-56 rounded-full bg-pink-400/20 blur-3xl" />
 
-      {/* Floating Paint Drops */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <Droplets className="absolute top-20 left-20 w-6 h-6 text-blue-400/30 animate-bounce" style={{ animationDelay: '0s' }} />
-        <Droplets className="absolute top-40 right-40 w-4 h-4 text-green-400/30 animate-bounce" style={{ animationDelay: '1s' }} />
-        <Droplets className="absolute bottom-32 left-32 w-5 h-5 text-primary/30 animate-bounce" style={{ animationDelay: '2s' }} />
-        <Sparkles className="absolute top-32 left-1/2 w-4 h-4 text-blue-500/40 animate-pulse" />
-        <Sparkles className="absolute bottom-40 right-20 w-3 h-3 text-green-500/40 animate-pulse" style={{ animationDelay: '1.5s' }} />
-      </div>
-
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
-        <div className="w-full max-w-md space-y-8">
-          {/* Header */}
-          <div className="text-center space-y-4">
-            <div className="flex justify-center items-center space-x-3 mb-4">
-              <div className="relative">
-                <Palette className="w-12 h-12 text-primary drop-shadow-lg" />
-                <Brush className="absolute -top-1 -right-1 w-6 h-6 text-blue-600 rotate-45" />
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-blue-600 to-green-600 bg-clip-text text-transparent">
-                NEO COLOR FACTORY
-              </h1>
-              <p className="text-lg font-medium text-slate-600">
-                Professional Paint Shop Management
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Streamline your paint business operations
-              </p>
-            </div>
+        <div className="relative px-7 pt-8 pb-10">
+          {/* Hero / Mascot */}
+          <div className="flex justify-center">
+            <img
+              src={pandaMascot}
+              alt="NEO COLOR FACTORY mascot"
+              className="w-72 h-72 object-contain drop-shadow-2xl select-none"
+              draggable={false}
+            />
           </div>
 
-          {/* Error/Success Messages */}
+          {/* Brand Title */}
+          <div className="text-center -mt-2 mb-6">
+            <h1 className="text-4xl font-extrabold tracking-tight">
+              <span className="text-white">NEO </span>
+              <span className="bg-gradient-to-r from-cyan-300 via-pink-300 to-amber-300 bg-clip-text text-transparent">
+                COLOR FACTORY
+              </span>
+            </h1>
+          </div>
+
+          {/* Welcome */}
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-white">
+              {mode === 'signin' ? 'Welcome Back!' : 'Create Account'}
+            </h2>
+            <p className="text-sm text-blue-100/90 mt-1">
+              {mode === 'signin'
+                ? 'Login to continue your colorful journey'
+                : 'Start your colorful paint shop journey'}
+            </p>
+          </div>
+
           {error && (
-            <Alert variant="destructive" className="backdrop-blur-sm bg-destructive/95 border-destructive/50">
-              <AlertDescription className="text-destructive-foreground">{error}</AlertDescription>
+            <Alert variant="destructive" className="mb-4 bg-red-500/90 border-red-300/40 text-white">
+              <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-          
           {message && (
-            <Alert className="backdrop-blur-sm bg-green-50/95 border-green-200/50 text-green-800">
+            <Alert className="mb-4 bg-emerald-500/90 border-emerald-300/40 text-white">
               <AlertDescription>{message}</AlertDescription>
             </Alert>
           )}
 
-          <Card className="w-full backdrop-blur-sm bg-white/95 border-white/50 shadow-2xl shadow-blue-500/10">
-            <Tabs defaultValue="signin" className="w-full">
-              <CardHeader className="pb-4">
-                <TabsList className="grid w-full grid-cols-2 bg-slate-100/80">
-                  <TabsTrigger value="signin" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">Sign In</TabsTrigger>
-                  <TabsTrigger value="signup" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">Sign Up</TabsTrigger>
-                </TabsList>
-              </CardHeader>
+          {mode === 'signin' ? (
+            <form onSubmit={handleSignIn} className="space-y-4">
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/80" />
+                <Input
+                  type="email"
+                  placeholder="Email address"
+                  value={signInData.email}
+                  onChange={(e) => setSignInData({ ...signInData, email: e.target.value })}
+                  className="h-14 pl-12 pr-4 rounded-full bg-transparent border-2 border-white/40 text-white placeholder:text-white/70 focus-visible:ring-white/60 focus-visible:border-white"
+                  required
+                />
+              </div>
 
-            <CardContent className="px-6 pb-6">
-              <TabsContent value="signin" className="space-y-6 mt-6">
-                <div className="text-center space-y-2">
-                  <CardTitle className="text-xl font-semibold text-slate-800">Welcome Back</CardTitle>
-                  <CardDescription className="text-slate-600">
-                    Sign in to access your paint shop dashboard
-                  </CardDescription>
-                </div>
-                
-                <form onSubmit={handleSignIn} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="signin-email" className="text-sm font-medium text-slate-700">Email Address</Label>
-                    <div className="relative group">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-                      <Input
-                        id="signin-email"
-                        type="email"
-                        placeholder="your.email@company.com"
-                        value={signInData.email}
-                        onChange={(e) => setSignInData({ ...signInData, email: e.target.value })}
-                        className="pl-10 bg-white/50 border-slate-200 focus:border-primary focus:ring-primary/20 transition-all"
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="signin-password" className="text-sm font-medium text-slate-700">Password</Label>
-                    <div className="relative group">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-                      <Input
-                        id="signin-password"
-                        type="password"
-                        placeholder="Enter your password"
-                        value={signInData.password}
-                        onChange={(e) => setSignInData({ ...signInData, password: e.target.value })}
-                        className="pl-10 bg-white/50 border-slate-200 focus:border-primary focus:ring-primary/20 transition-all"
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 text-white shadow-lg hover:shadow-xl transition-all duration-200 mt-6" 
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <div className="flex items-center space-x-2">
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        <span>Signing in...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center space-x-2">
-                        <Palette className="w-4 h-4" />
-                        <span>Sign In to Dashboard</span>
-                      </div>
-                    )}
-                  </Button>
-                </form>
-              </TabsContent>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/80" />
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Password"
+                  value={signInData.password}
+                  onChange={(e) => setSignInData({ ...signInData, password: e.target.value })}
+                  className="h-14 pl-12 pr-12 rounded-full bg-transparent border-2 border-white/40 text-white placeholder:text-white/70 focus-visible:ring-white/60 focus-visible:border-white"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white"
+                  aria-label="Toggle password"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
 
-              <TabsContent value="signup" className="space-y-6 mt-6">
-                <div className="text-center space-y-2">
-                  <CardTitle className="text-xl font-semibold text-slate-800">Create Account</CardTitle>
-                  <CardDescription className="text-slate-600">
-                    Start managing your paint shop efficiently
-                  </CardDescription>
-                </div>
-                
-                <form onSubmit={handleSignUp} className="space-y-4">
-                  <div className="grid grid-cols-1 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-name" className="text-sm font-medium text-slate-700">Full Name</Label>
-                      <div className="relative group">
-                        <User className="absolute left-3 top-3 h-4 w-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-                        <Input
-                          id="signup-name"
-                          type="text"
-                          placeholder="John Smith"
-                          value={signUpData.fullName}
-                          onChange={(e) => setSignUpData({ ...signUpData, fullName: e.target.value })}
-                          className="pl-10 bg-white/50 border-slate-200 focus:border-primary focus:ring-primary/20 transition-all"
-                          required
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-company" className="text-sm font-medium text-slate-700">Paint Shop Name</Label>
-                      <div className="relative group">
-                        <Building2 className="absolute left-3 top-3 h-4 w-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-                        <Input
-                          id="signup-company"
-                          type="text"
-                          placeholder="Premium Paint Co. (Optional)"
-                          value={signUpData.companyName}
-                          onChange={(e) => setSignUpData({ ...signUpData, companyName: e.target.value })}
-                          className="pl-10 bg-white/50 border-slate-200 focus:border-primary focus:ring-primary/20 transition-all"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email" className="text-sm font-medium text-slate-700">Email Address</Label>
-                    <div className="relative group">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-                      <Input
-                        id="signup-email"
-                        type="email"
-                        placeholder="your.email@paintshop.com"
-                        value={signUpData.email}
-                        onChange={(e) => setSignUpData({ ...signUpData, email: e.target.value })}
-                        className="pl-10 bg-white/50 border-slate-200 focus:border-primary focus:ring-primary/20 transition-all"
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password" className="text-sm font-medium text-slate-700">Password</Label>
-                    <div className="relative group">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-                      <Input
-                        id="signup-password"
-                        type="password"
-                        placeholder="Minimum 6 characters"
-                        value={signUpData.password}
-                        onChange={(e) => setSignUpData({ ...signUpData, password: e.target.value })}
-                        className="pl-10 bg-white/50 border-slate-200 focus:border-primary focus:ring-primary/20 transition-all"
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-600/90 hover:to-green-600/90 text-white shadow-lg hover:shadow-xl transition-all duration-200 mt-6" 
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <div className="flex items-center space-x-2">
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        <span>Creating account...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center space-x-2">
-                        <Brush className="w-4 h-4" />
-                        <span>Create Paint Shop Account</span>
-                      </div>
-                    )}
-                  </Button>
-                </form>
-              </TabsContent>
-            </CardContent>
-          </Tabs>
-        </Card>
+              <div className="flex items-center justify-between px-2 py-1">
+                <label className="flex items-center gap-2 text-sm text-white cursor-pointer">
+                  <Checkbox
+                    checked={rememberMe}
+                    onCheckedChange={(v) => setRememberMe(!!v)}
+                    className="bg-white/90 border-white data-[state=checked]:bg-white data-[state=checked]:text-blue-600"
+                  />
+                  Remember me
+                </label>
+                <button
+                  type="button"
+                  className="text-sm font-medium text-amber-300 hover:text-amber-200"
+                >
+                  Forgot Password?
+                </button>
+              </div>
 
-          <div className="text-center space-y-2">
-            <p className="text-sm text-slate-500 flex items-center justify-center space-x-1">
-              <Sparkles className="w-3 h-3" />
-              <span>Trusted by paint professionals worldwide</span>
-              <Sparkles className="w-3 h-3" />
-            </p>
-            <p className="text-xs text-slate-400">
-              By signing in, you agree to our terms of service and privacy policy
-            </p>
-          </div>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full h-14 rounded-full text-lg font-bold text-white shadow-xl border-0 hover:opacity-95 transition"
+                style={{
+                  background:
+                    'linear-gradient(90deg, #FF8A2A 0%, #FF4F8B 50%, #E91E63 100%)',
+                }}
+              >
+                {isLoading ? 'Signing in...' : 'Login'}
+              </Button>
+
+              <p className="text-center text-sm text-white/90 pt-2">
+                Don't have an account?{' '}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode('signup');
+                    setError('');
+                  }}
+                  className="font-bold text-amber-300 hover:text-amber-200"
+                >
+                  Sign Up
+                </button>
+              </p>
+            </form>
+          ) : (
+            <form onSubmit={handleSignUp} className="space-y-4">
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/80" />
+                <Input
+                  type="text"
+                  placeholder="Full Name"
+                  value={signUpData.fullName}
+                  onChange={(e) => setSignUpData({ ...signUpData, fullName: e.target.value })}
+                  className="h-14 pl-12 rounded-full bg-transparent border-2 border-white/40 text-white placeholder:text-white/70 focus-visible:ring-white/60 focus-visible:border-white"
+                  required
+                />
+              </div>
+              <div className="relative">
+                <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/80" />
+                <Input
+                  type="text"
+                  placeholder="Paint Shop Name (optional)"
+                  value={signUpData.companyName}
+                  onChange={(e) => setSignUpData({ ...signUpData, companyName: e.target.value })}
+                  className="h-14 pl-12 rounded-full bg-transparent border-2 border-white/40 text-white placeholder:text-white/70 focus-visible:ring-white/60 focus-visible:border-white"
+                />
+              </div>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/80" />
+                <Input
+                  type="email"
+                  placeholder="Email address"
+                  value={signUpData.email}
+                  onChange={(e) => setSignUpData({ ...signUpData, email: e.target.value })}
+                  className="h-14 pl-12 rounded-full bg-transparent border-2 border-white/40 text-white placeholder:text-white/70 focus-visible:ring-white/60 focus-visible:border-white"
+                  required
+                />
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/80" />
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Password (min 6 chars)"
+                  value={signUpData.password}
+                  onChange={(e) => setSignUpData({ ...signUpData, password: e.target.value })}
+                  className="h-14 pl-12 pr-12 rounded-full bg-transparent border-2 border-white/40 text-white placeholder:text-white/70 focus-visible:ring-white/60 focus-visible:border-white"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white"
+                  aria-label="Toggle password"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full h-14 rounded-full text-lg font-bold text-white shadow-xl border-0 hover:opacity-95 transition"
+                style={{
+                  background:
+                    'linear-gradient(90deg, #FF8A2A 0%, #FF4F8B 50%, #E91E63 100%)',
+                }}
+              >
+                {isLoading ? 'Creating...' : 'Create Account'}
+              </Button>
+
+              <p className="text-center text-sm text-white/90 pt-2">
+                Already have an account?{' '}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode('signin');
+                    setError('');
+                  }}
+                  className="font-bold text-amber-300 hover:text-amber-200"
+                >
+                  Sign In
+                </button>
+              </p>
+            </form>
+          )}
         </div>
       </div>
     </div>
