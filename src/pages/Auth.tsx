@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { signInSchema, signUpSchema, validateInput } from '@/lib/validation';
 import { Mail, Lock, User, Building2, Eye, EyeOff } from 'lucide-react';
-import pandaMascot from '@/assets/panda-mascot.jpg';
+import pandaMascot from '@/assets/panda-mascot.png';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -120,11 +120,13 @@ const Auth = () => {
 
         <div className="relative px-7 pt-8 pb-10">
           {/* Hero / Mascot (branding baked into image) */}
-          <div className="flex justify-center mb-2">
+          <div className="flex justify-center -mt-2 mb-1">
             <img
               src={pandaMascot}
               alt="NEO COLOR FACTORY"
-              className="w-80 h-80 object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.35)] select-none rounded-3xl"
+              width={1024}
+              height={1024}
+              className="w-[22rem] h-[22rem] object-contain drop-shadow-[0_25px_45px_rgba(0,0,0,0.4)] select-none"
               draggable={false}
             />
           </div>
