@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { signInSchema, signUpSchema, validateInput } from '@/lib/validation';
 import { Mail, Lock, User, Building2, Eye, EyeOff } from 'lucide-react';
-import pandaMascot from '@/assets/panda-mascot.png';
+import pandaMascot from '@/assets/panda-mascot.jpg';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -119,24 +119,14 @@ const Auth = () => {
         <div className="absolute bottom-40 -right-16 w-56 h-56 rounded-full bg-pink-400/20 blur-3xl" />
 
         <div className="relative px-7 pt-8 pb-10">
-          {/* Hero / Mascot */}
-          <div className="flex justify-center">
+          {/* Hero / Mascot (branding baked into image) */}
+          <div className="flex justify-center mb-2">
             <img
               src={pandaMascot}
-              alt="NEO COLOR FACTORY mascot"
-              className="w-72 h-72 object-contain drop-shadow-2xl select-none"
+              alt="NEO COLOR FACTORY"
+              className="w-80 h-80 object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.35)] select-none rounded-3xl"
               draggable={false}
             />
-          </div>
-
-          {/* Brand Title */}
-          <div className="text-center -mt-2 mb-6">
-            <h1 className="text-4xl font-extrabold tracking-tight">
-              <span className="text-white">NEO </span>
-              <span className="bg-gradient-to-r from-cyan-300 via-pink-300 to-amber-300 bg-clip-text text-transparent">
-                COLOR FACTORY
-              </span>
-            </h1>
           </div>
 
           {/* Welcome */}
