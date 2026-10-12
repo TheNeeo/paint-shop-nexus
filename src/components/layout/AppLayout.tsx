@@ -14,12 +14,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className="flex h-dvh w-full min-w-0 bg-muted overflow-hidden">
+    <div className="app-shell flex h-dvh w-full min-w-0 bg-muted overflow-hidden">
       {/* Sidebar */}
       <div
         className={cn(
           "w-0 shrink-0 transition-all duration-300 ease-in-out relative z-20",
-          collapsed ? "md:w-16" : "md:w-72"
+          collapsed ? "md:w-16" : "app-sidebar-expanded"
         )}
         onClick={() => { if (collapsed) setCollapsed(false); }}
       >
@@ -34,7 +34,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         aria-expanded={!collapsed}
-        className={cn("hidden md:flex fixed top-1/2 z-30 -translate-x-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-card text-muted-foreground shadow-md transition-all duration-300 hover:bg-accent", collapsed ? "left-16" : "left-72")}
+        className={cn("hidden md:flex fixed top-1/2 z-30 -translate-x-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-card text-muted-foreground shadow-md transition-all duration-300 hover:bg-accent", collapsed ? "left-16" : "app-sidebar-toggle")}
       >
         {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
       </Button>
