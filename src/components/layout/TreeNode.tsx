@@ -39,7 +39,7 @@ export function TreeNode({ item, level, expandedItems, onToggle, onAction, colla
     <div
       className={cn(
         "group relative flex items-center gap-3 rounded-xl cursor-pointer transition-all duration-200",
-        collapsed && level === 0 ? "justify-center py-2.5 px-2 mx-2" : "py-2.5 px-3",
+        collapsed && level === 0 ? "justify-center py-2.5 px-0" : "py-2.5 px-3",
         isActive
           ? "bg-gradient-to-r from-cyan-500/90 to-blue-500/90 text-white shadow-lg shadow-cyan-500/20"
           : isParentActive

@@ -66,7 +66,7 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
     <>
       <div className={cn(
         "h-full bg-gradient-to-b from-[#0b1220] via-[#0f172a] to-[#0b1220] border-r border-slate-800/80 transition-all duration-300 flex flex-col shadow-2xl",
-        collapsed ? "w-16" : "w-64"
+        collapsed ? "w-16" : "w-72"
       )}>
         {/* Brand Header */}
         <div className={cn(

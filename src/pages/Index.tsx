@@ -71,7 +71,7 @@ const Index = () => {
 
   return (
     <AppLayout>
-      <div className="space-y-6">
+      <div className="w-full min-w-0 space-y-6">
         <div className="flex flex-col space-y-2">
           <h1 className="text-3xl font-bold text-foreground">
             Welcome to <span className="text-primary">NEO COLOR FACTORY</span>
@@ -79,7 +79,7 @@ const Index = () => {
           <p className="text-muted-foreground">Your complete paint shop management dashboard</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
           <DashboardCard
             title="Today's Sales"
             value={`₹${stats.todaysSales.toLocaleString()}`}
@@ -118,10 +118,10 @@ const Index = () => {
 
         {/* Row 2: Weather + Todo */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          <div className="lg:col-span-3">
+          <div className="min-w-0 lg:col-span-3">
             <WeatherWidget />
           </div>
-          <div className="lg:col-span-2">
+          <div className="min-w-0 lg:col-span-2">
             <TodoWidget />
           </div>
         </div>
@@ -129,7 +129,7 @@ const Index = () => {
         {/* Row 3: Chart + Activity + Mini cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <PaintChart />
-          <div className="space-y-6">
+          <div className="min-w-0 space-y-6">
             <RecentActivity />
             <div className="grid grid-cols-2 gap-4">
               <DashboardCard
