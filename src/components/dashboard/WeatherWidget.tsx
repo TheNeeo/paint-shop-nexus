@@ -263,8 +263,9 @@ export function WeatherWidget() {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="dashboard-weather relative overflow-hidden rounded-[28px] w-full h-full"
+      className="relative overflow-hidden rounded-[28px] mx-auto"
       style={{
+        maxWidth: 900,
         background: "linear-gradient(150deg, #E0F2FE 0%, #BAE6FD 35%, #7DD3FC 70%, #38BDF8 100%)",
         boxShadow: "0 20px 50px -12px rgba(56,189,248,0.3), 0 8px 20px -8px rgba(0,0,0,0.08)",
       }}
@@ -279,10 +280,10 @@ export function WeatherWidget() {
       <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.08) 100%)" }} />
 
       {/* Content */}
-      <div className="relative z-10 p-6 h-full flex flex-col justify-between gap-5">
+      <div className="relative z-10 p-6">
 
         {/* Top: Location + Metrics + Temp badge */}
-        <div className="weather-overview flex items-start justify-between gap-3 mb-4">
+        <div className="flex items-start justify-between mb-4">
           {/* Left: location, day, metrics */}
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
@@ -312,7 +313,8 @@ export function WeatherWidget() {
           </div>
 
           {/* Center: Hero weather illustration */}
-          <div className="weather-illustration relative flex items-center justify-center shrink-0 w-32 h-36">
+          <div className="relative flex items-center justify-center" style={{ width: 160, height: 140 }}>
+            <div className="absolute inset-0 rounded-full" style={{ background: "radial-gradient(circle, rgba(251,191,36,0.2) 0%, transparent 70%)", filter: "blur(16px)" }} />
             <motion.div
               animate={{ y: [0, -8, 0] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
@@ -352,7 +354,7 @@ export function WeatherWidget() {
 
         {/* Forecast Section */}
         <div className="mt-2">
-          <div className="weather-forecast flex gap-2.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+          <div className="flex justify-center gap-2.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
             {weather.forecast.map((f, i) => (
               <motion.div
                 key={i}
@@ -360,8 +362,9 @@ export function WeatherWidget() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.08 * i, duration: 0.35 }}
                 whileHover={{ scale: 1.06, y: -3 }}
-                className="weather-day flex-shrink-0 flex flex-col items-center gap-1 p-2 cursor-default"
+                className="flex-shrink-0 flex flex-col items-center gap-1 p-2 cursor-default"
                 style={{
+                  width: 90,
                   minHeight: 110,
                   background: "rgba(255,255,255,0.3)",
                   backdropFilter: "blur(12px)",

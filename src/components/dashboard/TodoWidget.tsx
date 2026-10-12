@@ -110,11 +110,14 @@ export function TodoWidget() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="dashboard-tasks relative overflow-hidden rounded-3xl bg-card border border-border p-6 shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col h-full min-h-[420px]"
+      className="relative overflow-hidden rounded-3xl bg-card border border-border p-5 shadow-xl hover:shadow-2xl hover:scale-[1.005] transition-all duration-300 flex flex-col"
+      style={{ minHeight: 420 }}
     >
       {/* Decorative blurs */}
+      <div className="absolute -top-10 -right-10 w-40 h-40 bg-purple-100/30 rounded-full blur-3xl" />
+      <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-violet-100/20 rounded-full blur-3xl" />
 
-      <div className="relative z-10 flex flex-col flex-1 min-h-0">
+      <div className="relative z-10 flex flex-col h-full">
         {/* Header */}
         <div className="flex items-center justify-between mb-3">
           <div>
@@ -139,7 +142,7 @@ export function TodoWidget() {
         </div>
 
         {/* Task list */}
-        <div className="task-list flex-1 overflow-y-auto space-y-2 max-h-[320px] pr-1">
+        <div className="flex-1 overflow-y-auto space-y-2 max-h-[250px] pr-1">
           <AnimatePresence>
             {tasks.map((task) => {
               const pConfig = PRIORITY_CONFIG[task.priority];

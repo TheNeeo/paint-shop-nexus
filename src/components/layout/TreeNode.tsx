@@ -39,7 +39,7 @@ export function TreeNode({ item, level, expandedItems, onToggle, onAction, colla
     <div
       className={cn(
         "group relative flex items-center gap-3 rounded-xl cursor-pointer transition-all duration-200",
-        collapsed && level === 0 ? "justify-center py-2.5 px-0" : "py-3 px-3",
+        collapsed && level === 0 ? "justify-center py-2.5 px-2 mx-2" : "py-2.5 px-3",
         isActive
           ? "bg-gradient-to-r from-cyan-500/90 to-blue-500/90 text-white shadow-lg shadow-cyan-500/20"
           : isParentActive
@@ -58,7 +58,7 @@ export function TreeNode({ item, level, expandedItems, onToggle, onAction, colla
       <div
         className={cn(
           "flex items-center justify-center rounded-lg flex-shrink-0 transition-all duration-200",
-          collapsed && level === 0 ? "h-9 w-9" : "h-10 w-10",
+          collapsed && level === 0 ? "h-9 w-9" : "h-8 w-8",
           isActive
             ? "bg-white/15 ring-1 ring-white/30"
             : "bg-slate-800/60 group-hover:bg-slate-700/70 ring-1 ring-slate-700/50"
@@ -66,7 +66,7 @@ export function TreeNode({ item, level, expandedItems, onToggle, onAction, colla
       >
         <item.icon
           className={cn(
-            "h-5 w-5 transition-colors",
+            "h-[18px] w-[18px] transition-colors",
             isActive
               ? "text-white"
               : isTailwindColor
@@ -84,7 +84,7 @@ export function TreeNode({ item, level, expandedItems, onToggle, onAction, colla
         <div className="flex items-center justify-between w-full min-w-0">
           <span
             className={cn(
-              "flex-1 text-base leading-snug break-words",
+              "truncate flex-1 text-sm",
               isActive ? "font-semibold" : "font-medium"
             )}
           >

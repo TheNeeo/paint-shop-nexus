@@ -29,7 +29,7 @@ export function DashboardCard({
 }: DashboardCardProps) {
   return (
     <div className={cn(
-      "dashboard-stat paint-card paint-shimmer group hover:shadow-xl transition-all duration-300 hover:-translate-y-1",
+      "paint-card paint-shimmer group hover:shadow-xl transition-all duration-300 hover:-translate-y-1",
       className
     )}>
       <div className={cn("absolute inset-0 rounded-lg bg-gradient-to-br opacity-50", gradient)} />
