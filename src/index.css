@@ -7,6 +7,7 @@
 
 @layer base {
   :root {
+    --app-sidebar-width: clamp(18rem, 18vw, 26rem);
     --background: 0 0% 100%;
     --foreground: 215 25% 11%;
 
@@ -412,6 +413,42 @@
 }
 
 @layer components {
+  @media (min-width: 768px) {
+    .app-sidebar-expanded { width: var(--app-sidebar-width); }
+    .app-sidebar-toggle { left: var(--app-sidebar-width); }
+  }
+
+  .dashboard-stat { min-height: 210px; padding: 28px; }
+  .dashboard-stat h3 { font-size: 18px; line-height: 1.4; }
+  .dashboard-stat .text-3xl { font-size: 36px; line-height: 1.2; }
+  .dashboard-stat .space-x-3 { gap: 12px; }
+  .dashboard-stat .space-x-3 > :not([hidden]) ~ :not([hidden]) { margin-left: 0; }
+  .dashboard-stat .relative > .p-3 { padding: 16px; }
+  .dashboard-stat.p-4 { min-height: 180px; padding: 24px; }
+  .dashboard-weather { min-height: 440px; }
+  .weather-day { width: 90px; flex: 1 0 76px; }
+  .dashboard-view h3.text-lg { font-size: 20px; line-height: 1.4; }
+  .dashboard-analysis .text-sm { font-size: 16px; line-height: 1.5; }
+  .dashboard-analysis .text-xs { font-size: 13px; line-height: 1.5; }
+  .dashboard-tasks .task-list .text-sm { font-size: 16px; line-height: 1.5; }
+
+  @media (min-width: 1280px) {
+    .dashboard-widgets > div { min-height: 460px; }
+    .dashboard-weather { min-height: 460px; }
+    .dashboard-weather > .relative { padding: 32px; }
+    .dashboard-chart { min-height: 580px; }
+  }
+
+  @media (max-width: 639px) {
+    .dashboard-stat { min-height: 180px; padding: 24px; }
+    .dashboard-stat.p-4 { min-height: 180px; padding: 16px; }
+    .dashboard-stat.p-4 h3 { font-size: 16px; }
+    .dashboard-stat.p-4 .space-x-3 { flex-wrap: wrap; }
+    .weather-illustration { display: none; }
+    .weather-overview > :last-child { flex-shrink: 0; padding: 14px 12px !important; }
+    .weather-day { flex-grow: 0; }
+  }
+
   .paint-sparkle {
     position: relative;
     overflow: hidden;

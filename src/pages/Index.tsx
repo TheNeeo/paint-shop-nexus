@@ -71,7 +71,7 @@ const Index = () => {
 
   return (
     <AppLayout>
-      <div className="w-full min-w-0 space-y-6">
+      <div className="dashboard-view w-full min-w-0 space-y-6">
         <div className="flex flex-col space-y-2">
           <h1 className="text-3xl font-bold text-foreground">
             Welcome to <span className="text-primary">NEO COLOR FACTORY</span>
@@ -117,17 +117,17 @@ const Index = () => {
         
 
         {/* Row 2: Weather + Todo */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          <div className="min-w-0 lg:col-span-3">
+        <div className="dashboard-widgets grid grid-cols-1 xl:grid-cols-5 gap-6 items-stretch">
+          <div className="min-w-0 xl:col-span-3">
             <WeatherWidget />
           </div>
-          <div className="min-w-0 lg:col-span-2">
+          <div className="min-w-0 xl:col-span-2">
             <TodoWidget />
           </div>
         </div>
 
         {/* Row 3: Chart + Activity + Mini cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="dashboard-analysis grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
           <PaintChart />
           <div className="min-w-0 space-y-6">
             <RecentActivity />

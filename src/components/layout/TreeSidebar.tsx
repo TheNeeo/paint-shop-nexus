@@ -66,12 +66,12 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
     <>
       <div className={cn(
         "h-full bg-gradient-to-b from-[#0b1220] via-[#0f172a] to-[#0b1220] border-r border-slate-800/80 transition-all duration-300 flex flex-col shadow-2xl",
-        collapsed ? "w-16" : "w-72"
+        collapsed ? "w-16" : "w-72 md:w-full"
       )}>
         {/* Brand Header */}
         <div className={cn(
           "border-b border-slate-800/80 bg-slate-900/40 backdrop-blur",
-          collapsed ? "p-3" : "p-4"
+          collapsed ? "p-3" : "px-5 py-6"
         )}>
           <div className={cn("flex items-center", collapsed ? "justify-center" : "gap-3")}>
             <div className="relative h-10 w-10 rounded-xl bg-gradient-to-br from-cyan-400/20 to-blue-500/20 ring-1 ring-cyan-400/40 flex items-center justify-center shadow-lg shadow-cyan-500/10 shrink-0">
@@ -80,7 +80,7 @@ export function TreeSidebar({ collapsed }: TreeSidebarProps) {
             {!collapsed && (
               <div className="leading-tight">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-cyan-400/80 font-semibold">Welcome</div>
-                <div className="font-bold text-base">
+                <div className="font-bold text-xl">
                   <span className="text-slate-100">NEO </span>
                   <span className="text-red-400">C</span>
                   <span className="text-orange-400">O</span>
