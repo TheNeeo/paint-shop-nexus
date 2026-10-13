@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { VendorHistoryHeader } from "@/components/vendor/VendorHistoryHeader";
 import { VendorHistorySummary } from "@/components/vendor/VendorHistorySummary";
 import { VendorHistoryFilters } from "@/components/vendor/VendorHistoryFilters";
 import { VendorHistoryTable } from "@/components/vendor/VendorHistoryTable";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export interface VendorHistoryData {
   id: string;
@@ -30,6 +32,13 @@ export interface FilterType {
   outstanding: string;
 }
 
+const mapPaymentStatus = (status: string | null): "Paid" | "Pending" | "Overdue" => {
+  const s = (status || "").toLowerCase();
+  if (s === "paid") return "Paid";
+  if (s === "overdue") return "Overdue";
+  return "Pending";
+};
+
 const VendorHistory: React.FC = () => {
   const [filters, setFilters] = useState<FilterType>({
     search: "",
@@ -38,52 +47,67 @@ const VendorHistory: React.FC = () => {
     outstanding: "",
   });
 
-  // Mock data for vendor history
-  const vendorHistoryData: VendorHistoryData[] = [
-    {
-      id: "1",
-      vendorName: "Asian Paints Ltd",
-      mobile: "+91 98765 43210",
-      gstNo: "27AAAAA0000A1Z5",
-      totalOrders: 45,
-      totalAmount: 125000,
-      lastPurchase: "2024-01-15",
-      outstanding: 15000,
-      status: "Active",
-      purchaseOrders: [
-        { poNumber: "PO-2024-001", date: "2024-01-15", amount: 25000, paymentStatus: "Paid" },
-        { poNumber: "PO-2024-002", date: "2024-01-10", amount: 15000, paymentStatus: "Pending" },
-      ],
-    },
-    {
-      id: "2",
-      vendorName: "Berger Paints",
-      mobile: "+91 87654 32109",
-      gstNo: "19BBBBB1111B2Z6",
-      totalOrders: 32,
-      totalAmount: 95000,
-      lastPurchase: "2024-01-12",
-      outstanding: 0,
-      status: "Active",
-      purchaseOrders: [
-        { poNumber: "PO-2024-003", date: "2024-01-12", amount: 35000, paymentStatus: "Paid" },
-      ],
-    },
-    {
-      id: "3",
-      vendorName: "Nerolac Paints",
-      mobile: "+91 76543 21098",
-      gstNo: "36CCCCC2222C3Z7",
-      totalOrders: 28,
-      totalAmount: 78000,
-      lastPurchase: "2024-01-08",
-      outstanding: 12000,
-      status: "Active",
-      purchaseOrders: [
-        { poNumber: "PO-2024-004", date: "2024-01-08", amount: 18000, paymentStatus: "Overdue" },
-      ],
-    },
-  ];
+  const [vendorHistoryData, setVendorHistoryData] = useState<VendorHistoryData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchVendors = async () => {
+      setLoading(true);
+      try {
+        const { data: vendors, error: vendorsError } = await supabase
+          .from("vendors")
+          .select("id, name, contact_person, email, phone, address, gst_number, status")
+          .order("created_at", { ascending: false });
+
+        if (vendorsError) throw vendorsError;
+
+        const { data: purchases, error: purchasesError } = await supabase
+          .from("purchases")
+          .select("invoice_number, purchase_date, total_amount, status, balance_amount, vendor_id");
+
+        if (purchasesError) throw purchasesError;
+
+        const mapped: VendorHistoryData[] = (vendors || []).map((v) => {
+          const vendorPurchases = (purchases || []).filter((p) => p.vendor_id === v.id);
+          const totalOrders = vendorPurchases.length;
+          const totalAmount = vendorPurchases.reduce((sum, p) => sum + (p.total_amount || 0), 0);
+          const outstanding = vendorPurchases.reduce((sum, p) => sum + (p.balance_amount || 0), 0);
+          const lastPurchase = vendorPurchases.length > 0
+            ? new Date(Math.max(...vendorPurchases.map((p) => new Date(p.purchase_date).getTime()))).toISOString().split('T')[0]
+            : "";
+
+          return {
+            id: v.id,
+            vendorName: v.name,
+            mobile: v.phone || "",
+            gstNo: v.gst_number || "",
+            totalOrders,
+            totalAmount,
+            lastPurchase,
+            outstanding,
+            status: (v.status === "Inactive" ? "Inactive" : "Active") as "Active" | "Inactive",
+            purchaseOrders: vendorPurchases
+              .sort((a, b) => new Date(b.purchase_date).getTime() - new Date(a.purchase_date).getTime())
+              .map((p) => ({
+                poNumber: p.invoice_number,
+                date: p.purchase_date,
+                amount: p.total_amount || 0,
+                paymentStatus: mapPaymentStatus(p.status),
+              })),
+          };
+        });
+
+        setVendorHistoryData(mapped);
+      } catch (error) {
+        console.error("Error fetching vendors:", error);
+        toast.error("Failed to load vendors");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVendors();
+  }, []);
 
   return (
     <AppLayout>

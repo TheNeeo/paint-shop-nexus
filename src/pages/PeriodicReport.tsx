@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
@@ -33,51 +35,100 @@ const THEME = {
   gradientTo: '#faf5fc',
 };
 
-const mockPeriodicData = [
-  { period: "Jan 2025", totalSales: 150000, totalPurchase: 95000, gst: 27000, netProfit: 55000, avgOrderValue: 3000 },
-  { period: "Feb 2025", totalSales: 175000, totalPurchase: 110000, gst: 31500, netProfit: 65000, avgOrderValue: 3500 },
-  { period: "Mar 2025", totalSales: 165000, totalPurchase: 105000, gst: 29700, netProfit: 60000, avgOrderValue: 3300 },
-  { period: "Apr 2025", totalSales: 190000, totalPurchase: 120000, gst: 34200, netProfit: 70000, avgOrderValue: 3800 },
-  { period: "May 2025", totalSales: 185000, totalPurchase: 115000, gst: 33300, netProfit: 70000, avgOrderValue: 3700 },
-  { period: "Jun 2025", totalSales: 210000, totalPurchase: 130000, gst: 37800, netProfit: 80000, avgOrderValue: 4200 },
-];
-
-const periodicComparisonData = [
-  { period: "Q1 2024", sales: 420000, purchase: 280000 },
-  { period: "Q2 2024", sales: 485000, purchase: 310000 },
-  { period: "Q3 2024", sales: 510000, purchase: 330000 },
-  { period: "Q4 2024", sales: 565000, purchase: 365000 },
-  { period: "Q1 2025", sales: 490000, purchase: 310000 },
-];
-
-const yearlyTrendData = [
-  { year: "2020", value: 1500000 },
-  { year: "2021", value: 1750000 },
-  { year: "2022", value: 1950000 },
-  { year: "2023", value: 2200000 },
-  { year: "2024", value: 2450000 },
-  { year: "2025", value: 2100000 },
-];
-
-const salesVsPurchaseData = [
-  { month: "Jan", sales: 150000, purchase: 95000 },
-  { month: "Feb", sales: 175000, purchase: 110000 },
-  { month: "Mar", sales: 165000, purchase: 105000 },
-  { month: "Apr", sales: 190000, purchase: 120000 },
-  { month: "May", sales: 185000, purchase: 115000 },
-  { month: "Jun", sales: 210000, purchase: 130000 },
-];
-
 const PeriodicReport = () => {
   const navigate = useNavigate();
   const [dateFrom, setDateFrom] = useState<Date>();
   const [dateTo, setDateTo] = useState<Date>();
   const [periodType, setPeriodType] = useState("monthly");
 
-  const totalSales = mockPeriodicData.reduce((sum, item) => sum + item.totalSales, 0);
-  const totalPurchase = mockPeriodicData.reduce((sum, item) => sum + item.totalPurchase, 0);
-  const totalGST = mockPeriodicData.reduce((sum, item) => sum + item.gst, 0);
-  const totalNetProfit = mockPeriodicData.reduce((sum, item) => sum + item.netProfit, 0);
+  const { data: salesRows = [] } = useQuery({
+    queryKey: ["periodic-report-sales"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("sales")
+        .select("invoice_date, total_amount, tax_amount");
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  const { data: purchaseRows = [] } = useQuery({
+    queryKey: ["periodic-report-purchases"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("purchases")
+        .select("purchase_date, total_amount, tax_amount");
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  const monthLabel = (d: Date) =>
+    d.toLocaleDateString("en-IN", { month: "short", year: "numeric" });
+
+  const periodicData = useMemo(() => {
+    const map = new Map<string, { period: string; totalSales: number; totalPurchase: number; gst: number; orderCount: number }>();
+
+    salesRows.forEach((row) => {
+      const d = new Date(row.invoice_date);
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      if (!map.has(key)) {
+        map.set(key, { period: monthLabel(d), totalSales: 0, totalPurchase: 0, gst: 0, orderCount: 0 });
+      }
+      const entry = map.get(key)!;
+      entry.totalSales += Number(row.total_amount) || 0;
+      entry.gst += Number(row.tax_amount) || 0;
+      entry.orderCount += 1;
+    });
+
+    purchaseRows.forEach((row) => {
+      const d = new Date(row.purchase_date);
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      if (!map.has(key)) {
+        map.set(key, { period: monthLabel(d), totalSales: 0, totalPurchase: 0, gst: 0, orderCount: 0 });
+      }
+      const entry = map.get(key)!;
+      entry.totalPurchase += Number(row.total_amount) || 0;
+      entry.gst += Number(row.tax_amount) || 0;
+    });
+
+    return Array.from(map.entries())
+      .sort(([a], [b]) => (a > b ? 1 : -1))
+      .map(([, value]) => ({
+        period: value.period,
+        totalSales: value.totalSales,
+        totalPurchase: value.totalPurchase,
+        gst: value.gst,
+        netProfit: value.totalSales - value.totalPurchase,
+        avgOrderValue: value.orderCount > 0 ? Math.round(value.totalSales / value.orderCount) : 0,
+      }));
+  }, [salesRows, purchaseRows]);
+
+  const periodicComparisonData = useMemo(
+    () => periodicData.map((row) => ({ period: row.period, sales: row.totalSales, purchase: row.totalPurchase })),
+    [periodicData]
+  );
+
+  const yearlyTrendData = useMemo(() => {
+    const map = new Map<string, number>();
+    salesRows.forEach((row) => {
+      const year = String(new Date(row.invoice_date).getFullYear());
+      map.set(year, (map.get(year) || 0) + (Number(row.total_amount) || 0));
+    });
+    return Array.from(map.entries())
+      .sort(([a], [b]) => (a > b ? 1 : -1))
+      .map(([year, value]) => ({ year, value }));
+  }, [salesRows]);
+
+  const salesVsPurchaseData = useMemo(
+    () => periodicData.map((row) => ({ month: row.period, sales: row.totalSales, purchase: row.totalPurchase })),
+    [periodicData]
+  );
+
+  const totalSales = periodicData.reduce((sum, item) => sum + item.totalSales, 0);
+  const totalPurchase = periodicData.reduce((sum, item) => sum + item.totalPurchase, 0);
+  const totalGST = periodicData.reduce((sum, item) => sum + item.gst, 0);
+  const totalNetProfit = periodicData.reduce((sum, item) => sum + item.netProfit, 0);
 
   return (
     <AppLayout>
@@ -343,7 +394,14 @@ const PeriodicReport = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {mockPeriodicData.map((row, idx) => (
+                      {periodicData.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                            No sales or purchase data available yet.
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                      periodicData.map((row, idx) => (
                         <TableRow key={idx} style={{ borderColor: THEME.primaryLightest }}>
                           <TableCell className="font-medium">{row.period}</TableCell>
                           <TableCell className="text-right">₹{row.totalSales.toLocaleString()}</TableCell>
@@ -354,7 +412,8 @@ const PeriodicReport = () => {
                           </TableCell>
                           <TableCell className="text-right">₹{row.avgOrderValue.toLocaleString()}</TableCell>
                         </TableRow>
-                      ))}
+                      ))
+                      )}
                     </TableBody>
                   </Table>
                 </div>
