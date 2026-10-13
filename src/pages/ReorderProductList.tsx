@@ -1,6 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
+import { supabase } from '@/integrations/supabase/client';
 import { ReorderHeader } from '@/components/reorder/ReorderHeader';
 import { ReorderSummaryCards } from '@/components/reorder/ReorderSummaryCards';
 import { ReorderFilters } from '@/components/reorder/ReorderFilters';
@@ -31,52 +32,75 @@ const ReorderProductList = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [supplierFilter, setSupplierFilter] = useState('all');
   const [stockStatusFilter, setStockStatusFilter] = useState('all');
+  const [products, setProducts] = useState<ReorderProduct[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data for demonstration
-  const mockProducts: ReorderProduct[] = [
-    {
-      id: '1',
-      name: 'Wall Paint Premium',
-      category: 'Paint',
-      hsnCode: '32091000',
-      unit: 'Ltr',
-      currentStock: 5,
-      minThreshold: 20,
-      suggestedQty: 50,
-      purchaseRate: 250,
-      supplierName: 'Asian Paints Ltd',
-      status: 'critical'
-    },
-    {
-      id: '2',
-      name: 'Brush Set Professional',
-      category: 'Tools',
-      hsnCode: '96034010',
-      unit: 'Set',
-      currentStock: 12,
-      minThreshold: 25,
-      suggestedQty: 40,
-      purchaseRate: 150,
-      supplierName: 'Tools India',
-      status: 'low'
-    },
-    {
-      id: '3',
-      name: 'Roller Kit Standard',
-      category: 'Tools',
-      hsnCode: '96034020',
-      unit: 'Set',
-      currentStock: 8,
-      minThreshold: 15,
-      suggestedQty: 30,
-      purchaseRate: 180,
-      supplierName: 'Tools India',
-      status: 'low'
-    }
-  ];
+  useEffect(() => {
+    const fetchLowStockProducts = async () => {
+      setLoading(true);
+      const { data: productsData, error } = await supabase
+        .from('products')
+        .select('*');
+
+      if (error || !productsData) {
+        setProducts([]);
+        setLoading(false);
+        return;
+      }
+
+      const lowStock = productsData.filter(
+        (p) => (p.current_stock ?? 0) <= (p.threshold_qty ?? 0)
+      );
+
+      const categoryIds = Array.from(new Set(lowStock.map(p => p.category_id).filter(Boolean))) as string[];
+      const vendorIds = Array.from(new Set(lowStock.map(p => p.preferred_vendor_id).filter(Boolean))) as string[];
+
+      const [categoriesRes, vendorsRes] = await Promise.all([
+        categoryIds.length
+          ? supabase.from('categories').select('id, name').in('id', categoryIds)
+          : Promise.resolve({ data: [] as { id: string; name: string }[] }),
+        vendorIds.length
+          ? supabase.from('vendors').select('id, name').in('id', vendorIds)
+          : Promise.resolve({ data: [] as { id: string; name: string }[] }),
+      ]);
+
+      const categoryMap = new Map((categoriesRes.data || []).map(c => [c.id, c.name]));
+      const vendorMap = new Map((vendorsRes.data || []).map(v => [v.id, v.name]));
+
+      const mapped: ReorderProduct[] = lowStock.map((p) => {
+        const currentStock = p.current_stock ?? 0;
+        const minThreshold = p.threshold_qty ?? 0;
+        let status: ReorderProduct['status'] = 'normal';
+        if (minThreshold > 0 && currentStock <= minThreshold * 0.5) {
+          status = 'critical';
+        } else if (currentStock <= minThreshold) {
+          status = 'low';
+        }
+
+        return {
+          id: p.id,
+          name: p.name,
+          category: p.category_id ? (categoryMap.get(p.category_id) || '') : '',
+          hsnCode: p.hsn_code || '',
+          unit: p.unit || '',
+          currentStock,
+          minThreshold,
+          suggestedQty: Math.max(minThreshold - currentStock, 0) || minThreshold,
+          purchaseRate: Number(p.purchase_price) || 0,
+          supplierName: p.preferred_vendor_id ? (vendorMap.get(p.preferred_vendor_id) || '') : '',
+          status,
+        };
+      });
+
+      setProducts(mapped);
+      setLoading(false);
+    };
+
+    fetchLowStockProducts();
+  }, []);
 
   const totalEstimatedCost = selectedProducts.reduce((total, productId) => {
-    const product = mockProducts.find(p => p.id === productId);
+    const product = products.find(p => p.id === productId);
     return total + (product ? product.suggestedQty * product.purchaseRate : 0);
   }, 0);
 
@@ -85,7 +109,7 @@ const ReorderProductList = () => {
       <div className="w-full bg-gradient-to-br from-pink-50 via-white to-rose-50 min-h-screen p-6">
         <div className="space-y-6">
           <ReorderHeader />
-          <ReorderSummaryCards products={mockProducts} />
+          <ReorderSummaryCards products={products} />
           <ReorderFilters 
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
@@ -96,15 +120,21 @@ const ReorderProductList = () => {
             stockStatusFilter={stockStatusFilter}
             setStockStatusFilter={setStockStatusFilter}
           />
-          <ReorderTable 
-            products={mockProducts}
-            selectedProducts={selectedProducts}
-            setSelectedProducts={setSelectedProducts}
-            searchTerm={searchTerm}
-            categoryFilter={categoryFilter}
-            supplierFilter={supplierFilter}
-            stockStatusFilter={stockStatusFilter}
-          />
+          {!loading && products.length === 0 ? (
+            <div className="bg-white rounded-lg shadow-sm border border-pink-200 p-12 text-center text-gray-500">
+              No low-stock products to reorder right now.
+            </div>
+          ) : (
+            <ReorderTable 
+              products={products}
+              selectedProducts={selectedProducts}
+              setSelectedProducts={setSelectedProducts}
+              searchTerm={searchTerm}
+              categoryFilter={categoryFilter}
+              supplierFilter={supplierFilter}
+              stockStatusFilter={stockStatusFilter}
+            />
+          )}
           
           {selectedProducts.length > 0 && (
             <BulkActionBar 
