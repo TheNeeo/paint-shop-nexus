@@ -28,7 +28,7 @@ export default function VendorInformation() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
-  const vendorTableRef = useRef<{ fetchVendors: () => void }>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const handleAddVendor = () => {
     setEditingVendor(null);
@@ -43,10 +43,8 @@ export default function VendorInformation() {
   const handleModalClose = () => {
     setIsAddVendorOpen(false);
     setEditingVendor(null);
-    // Refresh the vendor table if there's a ref to it
-    if (vendorTableRef.current) {
-      vendorTableRef.current.fetchVendors();
-    }
+    // Refresh list + summary after add/edit
+    setRefreshKey((k) => k + 1);
   };
 
   const clearFilters = () => {
