@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
@@ -95,7 +95,7 @@ export default function VendorInformation() {
 
           <VendorHeader onAddVendor={handleAddVendor} />
           
-          <VendorSummaryCards />
+          <VendorSummaryCards refreshKey={refreshKey} />
           
           <VendorFilters
             searchTerm={searchTerm}
@@ -112,6 +112,7 @@ export default function VendorInformation() {
             statusFilter={statusFilter}
             locationFilter={locationFilter}
             onEditVendor={handleEditVendor}
+            refreshKey={refreshKey}
           />
         </div>
 
