@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
@@ -64,50 +62,59 @@ export default function InventoryMovementHistory() {
   const [filterType, setFilterType] = useState("all");
   const [dateRange, setDateRange] = useState("7days");
 
-  const { data: movements = [], isLoading } = useQuery({
-    queryKey: ["stock-adjustments"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("stock_adjustments")
-        .select(`
-          id,
-          adjustment_type,
-          quantity,
-          reason,
-          reference_id,
-          created_at,
-          products:product_id (
-            name,
-            unit
-          )
-        `)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-
-      const typeLabel = (t: string) => {
-        const normalized = (t || "").toLowerCase();
-        if (normalized.includes("purchase")) return "Purchase";
-        if (normalized.includes("sale")) return "Sale";
-        if (normalized.includes("return")) return "Return";
-        return "Manual Adjust";
-      };
-
-      return (data || []).map((row) => ({
-        id: row.id,
-        date: new Date(row.created_at).toLocaleString("en-IN", {
-          dateStyle: "medium",
-          timeStyle: "short",
-        }),
-        productName: row.products?.name || "Unknown Product",
-        quantityChange: Number(row.quantity) || 0,
-        type: typeLabel(row.adjustment_type),
-        reason: row.reason || "-",
-        notes: row.reference_id ? `Ref: ${row.reference_id}` : "-",
-        user: "-",
-      }));
+  // Mock data - replace with actual Supabase query
+  const movements = [
+    {
+      id: "1",
+      date: "2024-01-15 10:30 AM",
+      productName: "Asian Paints Apex",
+      quantityChange: 50,
+      type: "Purchase",
+      reason: "Restock",
+      notes: "New stock arrival",
+      user: "Admin",
     },
-  });
+    {
+      id: "2",
+      date: "2024-01-15 02:15 PM",
+      productName: "Berger Easy Clean",
+      quantityChange: -25,
+      type: "Sale",
+      reason: "Customer Sale",
+      notes: "Invoice #INV-1234",
+      user: "Cashier 1",
+    },
+    {
+      id: "3",
+      date: "2024-01-14 11:00 AM",
+      productName: "Nerolac Excel",
+      quantityChange: -5,
+      type: "Manual Adjust",
+      reason: "Damage",
+      notes: "Container damaged during handling",
+      user: "Manager",
+    },
+    {
+      id: "4",
+      date: "2024-01-14 09:45 AM",
+      productName: "Dulux Weathershield",
+      quantityChange: 30,
+      type: "Purchase",
+      reason: "Restock",
+      notes: "Regular stock replenishment",
+      user: "Admin",
+    },
+    {
+      id: "5",
+      date: "2024-01-13 03:30 PM",
+      productName: "Nippon Odour-Less",
+      quantityChange: -15,
+      type: "Sale",
+      reason: "Customer Sale",
+      notes: "Invoice #INV-1230",
+      user: "Cashier 2",
+    },
+  ];
 
   const getTypeColor = (type: string) => {
     switch (type) {
@@ -385,20 +392,7 @@ export default function InventoryMovementHistory() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {isLoading ? (
-                      <TableRow>
-                        <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                          Loading movement history...
-                        </TableCell>
-                      </TableRow>
-                    ) : movements.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                          No inventory movements recorded yet.
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                    movements.map((movement, index) => (
+                    {movements.map((movement, index) => (
                       <motion.tr
                         key={movement.id}
                         initial={{ opacity: 0, x: -20 }}
@@ -431,8 +425,7 @@ export default function InventoryMovementHistory() {
                         </TableCell>
                         <TableCell>{movement.user}</TableCell>
                       </motion.tr>
-                    ))
-                    )}
+                    ))}
                   </TableBody>
                 </Table>
               </CardContent>

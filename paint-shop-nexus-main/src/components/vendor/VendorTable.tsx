@@ -21,7 +21,6 @@ interface VendorTableProps {
   statusFilter: string;
   locationFilter: string;
   onEditVendor: (vendor: any) => void;
-  refreshKey?: number;
 }
 
 export function VendorTable({
@@ -29,7 +28,6 @@ export function VendorTable({
   statusFilter,
   locationFilter,
   onEditVendor,
-  refreshKey = 0,
 }: VendorTableProps) {
   const { user } = useAuth();
   const { isAdmin } = useUserRoles();
@@ -42,7 +40,7 @@ export function VendorTable({
     if (user) {
       fetchVendors();
     }
-  }, [user, refreshKey]);
+  }, [user]);
 
   const fetchVendors = async () => {
     try {

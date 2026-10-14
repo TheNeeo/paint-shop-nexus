@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import { CustomerHistoryHeader } from '@/components/customer/CustomerHistoryHeader';
 import { CustomerHistorySummary } from '@/components/customer/CustomerHistorySummary';
 import { CustomerHistoryFilters } from '@/components/customer/CustomerHistoryFilters';
 import { CustomerHistoryTable } from '@/components/customer/CustomerHistoryTable';
 import { CustomerDetailModal } from '@/components/customer/CustomerDetailModal';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 import { 
   Breadcrumb, 
   BreadcrumbItem, 
@@ -45,13 +43,6 @@ export interface CustomerHistoryFilters {
   outstandingAmount: 'all' | 'zero' | 'low' | 'high';
 }
 
-const mapPaymentStatus = (status: string | null): 'paid' | 'pending' | 'overdue' => {
-  const s = (status || '').toLowerCase();
-  if (s === 'paid') return 'paid';
-  if (s === 'overdue') return 'overdue';
-  return 'pending';
-};
-
 const CustomerHistory: React.FC = () => {
   const [filters, setFilters] = useState<CustomerHistoryFilters>({
     searchTerm: '',
@@ -62,69 +53,59 @@ const CustomerHistory: React.FC = () => {
   
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerHistoryData | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [customersData, setCustomersData] = useState<CustomerHistoryData[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  const fetchCustomers = async () => {
-    setLoading(true);
-    try {
-      const { data: customers, error: customersError } = await supabase
-        .from('customers')
-        .select('id, name, mobile, email, customer_type, total_sales, outstanding_balance, status, created_at')
-        .order('created_at', { ascending: false });
-
-      if (customersError) throw customersError;
-
-      const { data: sales, error: salesError } = await supabase
-        .from('sales')
-        .select('invoice_number, invoice_date, total_amount, payment_status, customer_id');
-
-      if (salesError) throw salesError;
-
-      const mapped: CustomerHistoryData[] = (customers || []).map((c) => {
-        const customerSales = (sales || []).filter((s) => s.customer_id === c.id);
-        const totalInvoices = customerSales.length;
-        const totalPurchaseValue = customerSales.reduce((sum, s) => sum + (s.total_amount || 0), 0);
-        const lastPurchaseDate = customerSales.length > 0
-          ? new Date(Math.max(...customerSales.map((s) => new Date(s.invoice_date).getTime())))
-          : null;
-
-        const invoiceHistory: InvoiceHistory[] = customerSales
-          .sort((a, b) => new Date(b.invoice_date).getTime() - new Date(a.invoice_date).getTime())
-          .map((s) => ({
-            invoiceNo: s.invoice_number,
-            date: new Date(s.invoice_date),
-            amount: s.total_amount || 0,
-            paymentStatus: mapPaymentStatus(s.payment_status),
-          }));
-
-        return {
-          id: c.id,
-          name: c.name,
-          mobile: c.mobile,
-          email: c.email || undefined,
-          customerType: (c.customer_type === 'wholesale' ? 'wholesale' : 'retail') as 'retail' | 'wholesale',
-          totalInvoices,
-          totalPurchaseValue,
-          lastPurchaseDate,
-          outstandingBalance: c.outstanding_balance || 0,
-          invoiceHistory,
-          createdAt: new Date(c.created_at),
-        };
-      });
-
-      setCustomersData(mapped);
-    } catch (error) {
-      console.error('Error fetching customers:', error);
-      toast.error('Failed to load customers');
-    } finally {
-      setLoading(false);
+  // Mock data
+  const [customersData, setCustomersData] = useState<CustomerHistoryData[]>([
+    {
+      id: '1',
+      name: 'Rajesh Kumar',
+      mobile: '+91 98765 43210',
+      email: 'rajesh@example.com',
+      customerType: 'wholesale',
+      totalInvoices: 15,
+      totalPurchaseValue: 125000,
+      lastPurchaseDate: new Date('2024-02-15'),
+      outstandingBalance: 15000,
+      createdAt: new Date('2024-01-15'),
+      invoiceHistory: [
+        { invoiceNo: 'INV-001', date: new Date('2024-02-15'), amount: 8500, paymentStatus: 'pending' },
+        { invoiceNo: 'INV-002', date: new Date('2024-02-10'), amount: 12000, paymentStatus: 'paid' },
+        { invoiceNo: 'INV-003', date: new Date('2024-01-28'), amount: 9500, paymentStatus: 'paid' }
+      ]
+    },
+    {
+      id: '2', 
+      name: 'Priya Sharma',
+      mobile: '+91 87654 32109',
+      email: 'priya@example.com',
+      customerType: 'retail',
+      totalInvoices: 8,
+      totalPurchaseValue: 45000,
+      lastPurchaseDate: new Date('2024-02-20'),
+      outstandingBalance: 0,
+      createdAt: new Date('2024-02-20'),
+      invoiceHistory: [
+        { invoiceNo: 'INV-004', date: new Date('2024-02-20'), amount: 5500, paymentStatus: 'paid' },
+        { invoiceNo: 'INV-005', date: new Date('2024-02-15'), amount: 7200, paymentStatus: 'paid' }
+      ]
+    },
+    {
+      id: '3',
+      name: 'Amit Patel',
+      mobile: '+91 76543 21098',
+      email: 'amit@example.com',
+      customerType: 'wholesale',
+      totalInvoices: 22,
+      totalPurchaseValue: 185000,
+      lastPurchaseDate: new Date('2024-02-18'),
+      outstandingBalance: 25000,
+      createdAt: new Date('2023-12-10'),
+      invoiceHistory: [
+        { invoiceNo: 'INV-006', date: new Date('2024-02-18'), amount: 15000, paymentStatus: 'overdue' },
+        { invoiceNo: 'INV-007', date: new Date('2024-02-12'), amount: 18500, paymentStatus: 'paid' }
+      ]
     }
-  };
-
-  useEffect(() => {
-    fetchCustomers();
-  }, []);
+  ]);
 
   const handleViewDetails = (customer: CustomerHistoryData) => {
     setSelectedCustomer(customer);
@@ -136,21 +117,8 @@ const CustomerHistory: React.FC = () => {
     console.log('Edit customer:', customer);
   };
 
-  const handleDeleteCustomer = async (customerId: string) => {
-    try {
-      const { error } = await supabase
-        .from('customers')
-        .delete()
-        .eq('id', customerId);
-
-      if (error) throw error;
-
-      setCustomersData(prev => prev.filter(c => c.id !== customerId));
-      toast.success('Customer deleted');
-    } catch (error) {
-      console.error('Error deleting customer:', error);
-      toast.error('Failed to delete customer');
-    }
+  const handleDeleteCustomer = (customerId: string) => {
+    setCustomersData(prev => prev.filter(c => c.id !== customerId));
   };
 
   const filteredCustomers = customersData.filter(customer => {

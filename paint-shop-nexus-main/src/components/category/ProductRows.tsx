@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TableCell, TableRow } from "@/components/ui/table";
@@ -11,16 +11,33 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 
-interface Product {
-  id: string;
-  name: string;
-  sku: string;
-  price: number;
-  stock: number;
-  status: string;
-}
+// Mock products data for each category
+const getMockProducts = (categoryName: string) => {
+  const baseProducts = [
+    { id: "p1", name: "Premium Brush Set", sku: "BR001", price: 29.99, stock: 45, status: "Active" },
+    { id: "p2", name: "Professional Canvas", sku: "CV001", price: 15.99, stock: 32, status: "Active" },
+    { id: "p3", name: "Acrylic Paint - Red", sku: "AP001", price: 8.99, stock: 78, status: "Active" },
+    { id: "p4", name: "Oil Paint - Blue", sku: "OP001", price: 12.99, stock: 23, status: "Low Stock" },
+    { id: "p5", name: "Watercolor Set", sku: "WC001", price: 24.99, stock: 56, status: "Active" },
+    { id: "p6", name: "Drawing Pencils", sku: "DP001", price: 6.99, stock: 89, status: "Active" },
+    { id: "p7", name: "Palette Knife", sku: "PK001", price: 4.99, stock: 34, status: "Active" },
+    { id: "p8", name: "Easel Stand", sku: "ES001", price: 89.99, stock: 12, status: "Low Stock" },
+    { id: "p9", name: "Paint Thinner", sku: "PT001", price: 7.99, stock: 67, status: "Active" },
+    { id: "p10", name: "Mixing Palette", sku: "MP001", price: 9.99, stock: 43, status: "Active" },
+    { id: "p11", name: "Spray Varnish", sku: "SV001", price: 14.99, stock: 28, status: "Active" },
+    { id: "p12", name: "Charcoal Sticks", sku: "CS001", price: 5.99, stock: 76, status: "Active" },
+    { id: "p13", name: "Art Paper Pad", sku: "APP001", price: 11.99, stock: 54, status: "Active" },
+    { id: "p14", name: "Color Wheel", sku: "CW001", price: 3.99, stock: 91, status: "Active" },
+    { id: "p15", name: "Artist Apron", sku: "AA001", price: 19.99, stock: 37, status: "Active" },
+  ];
+
+  return baseProducts.map((product, index) => ({
+    ...product,
+    name: `${categoryName} - ${product.name}`,
+    id: `${categoryName.toLowerCase()}-${product.id}`,
+  }));
+};
 
 const getStockStatus = (stock: number) => {
   if (stock <= 10) return { status: "Low Stock", color: "bg-red-100 text-red-800 border-red-200" };
@@ -57,48 +74,11 @@ const getColorClasses = (color: string) => {
 };
 
 export function ProductRows({ categoryName, categoryColor = "green", categoryId, allCategories }: ProductRowsProps) {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const products = getMockProducts(categoryName);
   const colors = getColorClasses(categoryColor);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('products')
-        .select('id, name, hsn_code, sale_price, current_stock, status')
-        .eq('category_id', categoryId);
-
-      if (!error && data) {
-        setProducts(data.map((p) => ({
-          id: p.id,
-          name: p.name,
-          sku: p.hsn_code || '-',
-          price: Number(p.sale_price) || 0,
-          stock: p.current_stock ?? 0,
-          status: p.status || 'Active',
-        })));
-      } else {
-        setProducts([]);
-      }
-      setLoading(false);
-    };
-
-    fetchProducts();
-  }, [categoryId]);
-
-  const handleMoveProduct = async (productId: string, productName: string, targetCategory: Category) => {
-    const { error } = await supabase
-      .from('products')
-      .update({ category_id: targetCategory.id })
-      .eq('id', productId);
-
-    if (error) {
-      toast.error(`Failed to move "${productName}"`);
-      return;
-    }
-
-    setProducts(prev => prev.filter(p => p.id !== productId));
+  const handleMoveProduct = (productId: string, productName: string, targetCategory: Category) => {
+    // TODO: Implement actual move logic with database
     toast.success(`"${productName}" moved to "${targetCategory.name}"`);
   };
 
@@ -117,17 +97,9 @@ export function ProductRows({ categoryName, categoryColor = "green", categoryId,
         <TableCell></TableCell>
         <TableCell className={`font-semibold ${colors.text}`}>Actions</TableCell>
       </TableRow>
-
-      {!loading && products.length === 0 && (
-        <TableRow className={`bg-gradient-to-r ${colors.light} border-l-4 ${colors.border}`}>
-          <TableCell colSpan={8} className="text-center py-6 text-gray-500">
-            No products in this category.
-          </TableCell>
-        </TableRow>
-      )}
-
+      
       {/* Product Rows */}
-      {products.map((product) => (
+      {products.map((product, index) => (
         <TableRow 
           key={product.id} 
           className={`bg-gradient-to-r ${colors.light} border-l-4 ${colors.border} hover:opacity-80`}

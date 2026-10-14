@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import { nextInvoiceNumber } from "@/hooks/useAppSettings";
@@ -88,11 +88,6 @@ export default function InvoiceGenerate() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedCustomer, setSelectedCustomer] = useState<string>("");
-  const [customerList, setCustomerList] = useState<any[]>([]);
-  useEffect(() => {
-    supabase.from('customers').select('id, name, mobile, email, gst_no, address').order('name').then(({ data }) => setCustomerList(data || []));
-  }, []);
-  const customerObj = customerList.find((c) => c.id === selectedCustomer);
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
   const [discount, setDiscount] = useState<number>(0);
   const [gstRate, setGstRate] = useState<number>(18);
@@ -108,7 +103,7 @@ export default function InvoiceGenerate() {
     invoice_number: `PREVIEW-${Date.now().toString().slice(-6)}`,
     invoice_date: new Date().toISOString().split('T')[0],
     created_at: new Date().toISOString(),
-    customer_name: customerObj?.name || 'Walk-in Customer',
+    customer_name: selectedCustomer || 'Walk-in Customer',
     subtotal,
     tax_amount: gstAmount,
     discount_amount: discountAmount,
@@ -254,8 +249,7 @@ export default function InvoiceGenerate() {
         .insert([{
           invoice_number: invoiceNumber,
           invoice_date: new Date().toISOString().split('T')[0],
-          customer_id: customerObj?.id || null,
-          customer_name: customerObj?.name || 'Walk-in',
+          customer_name: selectedCustomer || 'Walk-in',
           subtotal,
           tax_amount: gstAmount,
           discount_amount: discountAmount,
@@ -582,11 +576,9 @@ export default function InvoiceGenerate() {
                         <SelectValue placeholder="Choose a customer..." />
                       </SelectTrigger>
                       <SelectContent style={{ borderColor: THEME_BORDER }}>
-                        {customerList.length === 0 ? (
-                          <div className="px-3 py-2 text-sm text-muted-foreground">No customers found</div>
-                        ) : customerList.map((c) => (
-                          <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                        ))}
+                        <SelectItem value="customer1">John Doe</SelectItem>
+                        <SelectItem value="customer2">Jane Smith</SelectItem>
+                        <SelectItem value="customer3">Bob Johnson</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -603,26 +595,26 @@ export default function InvoiceGenerate() {
                   </div>
                 </div>
 
-                {customerObj && (
+                {selectedCustomer && (
                   <div 
                     className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-lg" 
                     style={{ backgroundColor: `${THEME_BG}40` }}
                   >
                     <div>
                       <Label className="text-xs" style={{ color: THEME_SECONDARY }}>Name</Label>
-                      <p className="font-medium" style={{ color: THEME_PRIMARY }}>{customerObj.name}</p>
+                      <p className="font-medium" style={{ color: THEME_PRIMARY }}>John Doe</p>
                     </div>
                     <div>
                       <Label className="text-xs" style={{ color: THEME_SECONDARY }}>Mobile / Email</Label>
-                      <p className="font-medium" style={{ color: THEME_PRIMARY }}>{customerObj.mobile}{customerObj.email ? ` | ${customerObj.email}` : ''}</p>
+                      <p className="font-medium" style={{ color: THEME_PRIMARY }}>+91 98765 43210 | john@example.com</p>
                     </div>
                     <div>
                       <Label className="text-xs" style={{ color: THEME_SECONDARY }}>GST Number</Label>
-                      <p className="font-medium" style={{ color: THEME_PRIMARY }}>{customerObj.gst_no || '-'}</p>
+                      <p className="font-medium" style={{ color: THEME_PRIMARY }}>29ABCDE1234F1Z5</p>
                     </div>
                     <div>
                       <Label className="text-xs" style={{ color: THEME_SECONDARY }}>Billing Address</Label>
-                      <p className="font-medium" style={{ color: THEME_PRIMARY }}>{customerObj.address || '-'}</p>
+                      <p className="font-medium" style={{ color: THEME_PRIMARY }}>123 Main St, City, State - 123456</p>
                     </div>
                   </div>
                 )}

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import AppLayout from '@/components/layout/AppLayout';
 import { CustomerSummaryCards } from '@/components/customer/CustomerSummaryCards';
@@ -97,21 +96,13 @@ const CustomerInformation: React.FC = () => {
 
   const handleDeleteCustomer = async (customerId: string) => {
     if (!confirm('Are you sure you want to delete this customer?')) return;
-    const { error } = await supabase.from('customers').delete().eq('id', customerId);
-    if (error) {
-      toast.error('Failed to delete customer: ' + error.message);
-      return;
-    }
-    toast.success('Customer deleted');
+    await supabase.from('customers').delete().eq('id', customerId);
     fetchCustomers();
   };
 
   const handleSaveCustomer = async (customerData: Omit<Customer, 'id' | 'createdAt'>) => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      toast.error('Please log in to save customers');
-      return;
-    }
+    if (!user) return;
 
     const dbData = {
       name: customerData.name,
@@ -126,16 +117,12 @@ const CustomerInformation: React.FC = () => {
       created_by_user_id: user.id,
     };
 
-    const { error } = editingCustomer
-      ? await supabase.from('customers').update(dbData).eq('id', editingCustomer.id)
-      : await supabase.from('customers').insert([dbData]);
-
-    if (error) {
-      toast.error('Failed to save customer: ' + error.message);
-      return;
+    if (editingCustomer) {
+      await supabase.from('customers').update(dbData).eq('id', editingCustomer.id);
+    } else {
+      await supabase.from('customers').insert([dbData]);
     }
 
-    toast.success(editingCustomer ? 'Customer updated' : 'Customer added');
     fetchCustomers();
     setIsModalOpen(false);
   };

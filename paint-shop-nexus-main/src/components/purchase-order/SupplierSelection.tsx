@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, User, Mail, Phone, MapPin } from 'lucide-react';
@@ -11,45 +11,35 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { SupplierData } from '@/pages/GeneratePurchaseOrder';
-import { supabase } from '@/integrations/supabase/client';
 
 interface SupplierSelectionProps {
   selectedSupplier: SupplierData | null;
   setSelectedSupplier: (supplier: SupplierData | null) => void;
 }
 
+// Mock suppliers data
+const mockSuppliers: SupplierData[] = [
+  {
+    id: '1',
+    name: 'Asian Paints Ltd',
+    contactPerson: 'Rajesh Kumar',
+    email: 'rajesh@asianpaints.com',
+    phone: '+91 9876543210',
+    address: '123 Industrial Area, Mumbai, Maharashtra 400001'
+  },
+  {
+    id: '2',
+    name: 'Tools India',
+    contactPerson: 'Suresh Gupta',
+    email: 'suresh@toolsindia.com',
+    phone: '+91 9876543211',
+    address: '456 Hardware Street, Delhi, Delhi 110001'
+  }
+];
+
 export function SupplierSelection({ selectedSupplier, setSelectedSupplier }: SupplierSelectionProps) {
-  const [suppliers, setSuppliers] = useState<SupplierData[]>([]);
-
-  useEffect(() => {
-    const fetchSuppliers = async () => {
-      const { data, error } = await supabase
-        .from('vendors')
-        .select('id, name, contact_person, email, phone, address')
-        .order('name', { ascending: true });
-
-      if (error) {
-        console.error('Error fetching suppliers:', error);
-        return;
-      }
-
-      const mapped: SupplierData[] = (data || []).map((v) => ({
-        id: v.id,
-        name: v.name,
-        contactPerson: v.contact_person || '',
-        email: v.email || '',
-        phone: v.phone || '',
-        address: v.address || '',
-      }));
-
-      setSuppliers(mapped);
-    };
-
-    fetchSuppliers();
-  }, []);
-
   const handleSupplierChange = (supplierId: string) => {
-    const supplier = suppliers.find(s => s.id === supplierId);
+    const supplier = mockSuppliers.find(s => s.id === supplierId);
     setSelectedSupplier(supplier || null);
   };
 
@@ -73,10 +63,10 @@ export function SupplierSelection({ selectedSupplier, setSelectedSupplier }: Sup
           <label className="text-sm font-medium text-pink-700 mb-2 block">Select Supplier</label>
           <Select onValueChange={handleSupplierChange}>
             <SelectTrigger className="border-pink-300 focus:border-pink-500 focus:ring-pink-500 bg-white">
-              <SelectValue placeholder={suppliers.length ? "Choose a supplier" : "No suppliers found"} />
+              <SelectValue placeholder="Choose a supplier" />
             </SelectTrigger>
             <SelectContent className="bg-white">
-              {suppliers.map((supplier) => (
+              {mockSuppliers.map((supplier) => (
                 <SelectItem key={supplier.id} value={supplier.id}>
                   {supplier.name}
                 </SelectItem>

@@ -59,7 +59,7 @@ export function AddEditVendorModal({
         gst_number: vendor.gst_number || "",
         address: vendor.address || "",
         contact_person: vendor.contact_person || "",
-        status: (vendor.status || "active").toLowerCase() === "active",
+        status: vendor.status === "Active",
       });
     } else {
       setFormData({
