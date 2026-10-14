@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Users, CreditCard, CheckCircle, Activity, LucideIcon } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SummaryCard {
   title: string;
@@ -8,29 +9,54 @@ interface SummaryCard {
   gradient: string;
 }
 
-export function VendorSummaryCards() {
+interface VendorSummaryCardsProps {
+  refreshKey?: number;
+}
+
+export function VendorSummaryCards({ refreshKey = 0 }: VendorSummaryCardsProps) {
+  const [stats, setStats] = useState({ total: 0, active: 0, payables: 0, recent: 0 });
+
+  useEffect(() => {
+    const load = async () => {
+      const [{ data: vendors }, { data: purchases }] = await Promise.all([
+        supabase.from("vendors").select("id, status"),
+        supabase.from("purchases").select("balance_amount, purchase_date"),
+      ]);
+      const monthStart = new Date();
+      monthStart.setDate(1);
+      monthStart.setHours(0, 0, 0, 0);
+      setStats({
+        total: vendors?.length || 0,
+        active: (vendors || []).filter((v) => (v.status || "active").toLowerCase() === "active").length,
+        payables: (purchases || []).reduce((s, p) => s + Number(p.balance_amount || 0), 0),
+        recent: (purchases || []).filter((p) => new Date(p.purchase_date) >= monthStart).length,
+      });
+    };
+    load();
+  }, [refreshKey]);
+
   const summaryData: SummaryCard[] = [
     {
       title: "Total Vendors",
-      subtitle: "125 vendors",
+      subtitle: `${stats.total} vendors`,
       Icon: Users,
       gradient: "from-violet-400 via-purple-400 to-indigo-400",
     },
     {
       title: "Total Payables",
-      subtitle: "₹2,45,000",
+      subtitle: `₹${stats.payables.toLocaleString("en-IN")}`,
       Icon: CreditCard,
       gradient: "from-blue-300 via-cyan-300 to-teal-300",
     },
     {
       title: "Active Vendors",
-      subtitle: "98 active",
+      subtitle: `${stats.active} active`,
       Icon: CheckCircle,
       gradient: "from-rose-300 via-pink-300 to-red-300",
     },
     {
       title: "Recent Transactions",
-      subtitle: "42 this month",
+      subtitle: `${stats.recent} this month`,
       Icon: Activity,
       gradient: "from-emerald-400 via-green-400 to-teal-400",
     },
@@ -43,17 +69,10 @@ export function VendorSummaryCards() {
           key={index}
           className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.gradient} p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]`}
         >
-          {/* Text Content */}
           <div className="relative z-10">
-            <h3 className="text-lg font-semibold text-white/90 mb-1">
-              {card.title}
-            </h3>
-            <p className="text-sm text-white/70">
-              {card.subtitle}
-            </p>
+            <h3 className="text-lg font-semibold text-white/90 mb-1">{card.title}</h3>
+            <p className="text-sm text-white/70">{card.subtitle}</p>
           </div>
-          
-          {/* Large Icon on the right */}
           <div className="absolute right-4 bottom-4 opacity-80">
             <card.Icon className="h-16 w-16 text-white/40" strokeWidth={1.5} />
           </div>

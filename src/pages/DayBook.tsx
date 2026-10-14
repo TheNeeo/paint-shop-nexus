@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Download, Printer, TrendingUp, TrendingDown, DollarSign, Wallet, Plus, BookOpen, RefreshCw, BarChart3, Search, Filter, Clock, Tag, AlignLeft, IndianRupee, CreditCard, Calculator } from "lucide-react";
@@ -69,37 +70,69 @@ const DayBook = () => {
   const [paymentFilter, setPaymentFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const summaryData = {
-    accountBalance: 85000,
-    cashInHand: 25000,
-    openingBalance: 75000,
-    totalCashIn: 35000,
-    totalCashOut: 25000,
-    closingBalance: 85000,
-  };
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
-  const transactions: Transaction[] = [
-    {
-      id: "1", time: "09:15", type: "Sale", description: "Paint Sale - Asian Paints",
-      debit: 0, credit: 15000, paymentMode: "UPI", balance: 90000,
-      details: { invoiceNo: "INV-001", customerName: "Raj Kumar", productName: "Asian Paints Premium", unit: "10L", amount: 1500, totalAmount: 15000, notes: "Bulk order for residential project" }
-    },
-    {
-      id: "2", time: "11:30", type: "Purchase", description: "Paint Stock Purchase",
-      debit: 12000, credit: 0, paymentMode: "Account Transfer", balance: 78000,
-      details: { invoiceNo: "PUR-001", customerName: "Berger Paints Ltd", productName: "Various Paint Colors", unit: "Multiple", amount: 12000, totalAmount: 12000, notes: "Monthly stock replenishment" }
-    },
-    {
-      id: "3", time: "14:45", type: "Expense", description: "Shop Rent Payment",
-      debit: 8000, credit: 0, paymentMode: "Cash", balance: 70000,
-      details: { invoiceNo: "EXP-001", notes: "Monthly shop rent for March 2024" }
-    },
-    {
-      id: "4", time: "16:20", type: "Sale", description: "Brush & Tools Sale",
-      debit: 0, credit: 2500, paymentMode: "Cash", balance: 72500,
-      details: { invoiceNo: "INV-002", customerName: "Amit Sharma", productName: "Paint Brushes & Rollers", unit: "Set", amount: 2500, totalAmount: 2500 }
-    }
-  ];
+  useEffect(() => {
+    const toISO = (d: Date) => format(d, "yyyy-MM-dd");
+    const from = toISO(dateFrom || new Date());
+    const to = toISO(dateTo || dateFrom || new Date());
+    const normMode = (m?: string | null): Transaction["paymentMode"] => {
+      const s = (m || "").toLowerCase();
+      if (s.includes("upi")) return "UPI";
+      if (s.includes("cheque")) return "Cheque";
+      if (s.includes("bank") || s.includes("transfer") || s.includes("card") || s.includes("online")) return "Account Transfer";
+      return "Cash";
+    };
+    const load = async () => {
+      const [sales, purchases, expenses, receipts] = await Promise.all([
+        supabase.from("sales").select("id, invoice_number, customer_name, total_amount, paid_amount, payment_mode, created_at, notes").gte("invoice_date", from).lte("invoice_date", to),
+        supabase.from("purchases").select("id, invoice_number, total_amount, paid_amount, payment_method, created_at, notes, vendors(name)").gte("purchase_date", from).lte("purchase_date", to),
+        supabase.from("expenses").select("id, type, amount, payment_mode, description, ref_no, created_at").gte("date", from).lte("date", to),
+        supabase.from("cash_receipts").select("id, receipt_no, payer_name, amount, payment_mode, reason, created_at").gte("receipt_date", from).lte("receipt_date", to),
+      ]);
+      const list: (Transaction & { ts: number })[] = [];
+      (sales.data || []).forEach((s: any) => list.push({
+        id: "s-" + s.id, ts: new Date(s.created_at).getTime(), time: format(new Date(s.created_at), "HH:mm"),
+        type: "Sale", description: `Sale - ${s.customer_name || "Walk-in"}`, debit: 0, credit: Number(s.paid_amount ?? s.total_amount ?? 0),
+        paymentMode: normMode(s.payment_mode), balance: 0,
+        details: { invoiceNo: s.invoice_number, customerName: s.customer_name || undefined, totalAmount: Number(s.total_amount || 0), notes: s.notes || undefined },
+      }));
+      (purchases.data || []).forEach((p: any) => list.push({
+        id: "p-" + p.id, ts: new Date(p.created_at).getTime(), time: format(new Date(p.created_at), "HH:mm"),
+        type: "Purchase", description: `Purchase - ${p.vendors?.name || "Vendor"}`, debit: Number(p.paid_amount ?? p.total_amount ?? 0), credit: 0,
+        paymentMode: normMode(p.payment_method), balance: 0,
+        details: { invoiceNo: p.invoice_number, customerName: p.vendors?.name, totalAmount: Number(p.total_amount || 0), notes: p.notes || undefined },
+      }));
+      (expenses.data || []).forEach((e: any) => list.push({
+        id: "e-" + e.id, ts: new Date(e.created_at).getTime(), time: format(new Date(e.created_at), "HH:mm"),
+        type: "Expense", description: e.type, debit: Number(e.amount || 0), credit: 0,
+        paymentMode: normMode(e.payment_mode), balance: 0,
+        details: { invoiceNo: e.ref_no || undefined, notes: e.description || undefined, totalAmount: Number(e.amount || 0) },
+      }));
+      (receipts.data || []).forEach((r: any) => list.push({
+        id: "r-" + r.id, ts: new Date(r.created_at).getTime(), time: format(new Date(r.created_at), "HH:mm"),
+        type: "Receipt", description: `Receipt - ${r.payer_name}`, debit: 0, credit: Number(r.amount || 0),
+        paymentMode: normMode(r.payment_mode), balance: 0,
+        details: { invoiceNo: r.receipt_no, customerName: r.payer_name, totalAmount: Number(r.amount || 0), notes: r.reason || undefined },
+      }));
+      list.sort((a, b) => a.ts - b.ts);
+      let bal = 0;
+      setTransactions(list.map(({ ts, ...t }) => { bal += t.credit - t.debit; return { ...t, balance: bal }; }));
+    };
+    load();
+  }, [dateFrom, dateTo, isAddTransactionOpen]);
+
+  const cashIn = transactions.reduce((s, t) => s + t.credit, 0);
+  const cashOut = transactions.reduce((s, t) => s + t.debit, 0);
+  const cashOnly = transactions.filter((t) => t.paymentMode === "Cash").reduce((s, t) => s + t.credit - t.debit, 0);
+  const summaryData = {
+    accountBalance: cashIn - cashOut - cashOnly,
+    cashInHand: cashOnly,
+    openingBalance: 0,
+    totalCashIn: cashIn,
+    totalCashOut: cashOut,
+    closingBalance: cashIn - cashOut,
+  };
 
   const getTypeColor = (type: string) => {
     switch (type) {

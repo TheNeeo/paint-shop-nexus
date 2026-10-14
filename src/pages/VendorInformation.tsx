@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
@@ -28,7 +28,7 @@ export default function VendorInformation() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
-  const vendorTableRef = useRef<{ fetchVendors: () => void }>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const handleAddVendor = () => {
     setEditingVendor(null);
@@ -43,10 +43,8 @@ export default function VendorInformation() {
   const handleModalClose = () => {
     setIsAddVendorOpen(false);
     setEditingVendor(null);
-    // Refresh the vendor table if there's a ref to it
-    if (vendorTableRef.current) {
-      vendorTableRef.current.fetchVendors();
-    }
+    // Refresh list + summary after add/edit
+    setRefreshKey((k) => k + 1);
   };
 
   const clearFilters = () => {
@@ -97,7 +95,7 @@ export default function VendorInformation() {
 
           <VendorHeader onAddVendor={handleAddVendor} />
           
-          <VendorSummaryCards />
+          <VendorSummaryCards refreshKey={refreshKey} />
           
           <VendorFilters
             searchTerm={searchTerm}
@@ -114,6 +112,7 @@ export default function VendorInformation() {
             statusFilter={statusFilter}
             locationFilter={locationFilter}
             onEditVendor={handleEditVendor}
+            refreshKey={refreshKey}
           />
         </div>
 
