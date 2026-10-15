@@ -36,6 +36,8 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Plus, Trash2, Upload, X, FileImage, Package, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { uploadAppFile } from '@/lib/storage';
+import { toast } from 'sonner';
 import { Vendor } from '@/types/purchase';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -342,11 +344,23 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
         throw new Error("User not authenticated");
       }
 
+      // Upload bill image to storage (if selected)
+      let billImageUrl: string | null = null;
+      if (billImage) {
+        try {
+          billImageUrl = await uploadAppFile(billImage, 'purchase-bills');
+        } catch (uploadErr) {
+          console.error('Bill image upload failed:', uploadErr);
+          toast.error('Bill image upload nahi ho payi, purchase bina image ke save hoga');
+        }
+      }
+
       // Create purchase record
       const { data: purchase, error: purchaseError } = await supabase
         .from('purchases')
         .insert([{
           invoice_number: data.billNumber,
+          invoice_file_url: billImageUrl,
           vendor_id: data.vendorId,
           purchase_date: data.purchaseDate,
           subtotal: totals.subtotal,
