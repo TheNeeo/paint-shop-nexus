@@ -210,7 +210,13 @@ export function nextInvoiceNumber(): string {
   return `${s.prefix || "INV"}-${next}`;
 }
 
-export function fileToBase64(file: File): Promise<string> {
+export async function fileToBase64(file: File): Promise<string> {
+  try {
+    const { uploadAppFile } = await import("@/lib/storage");
+    return await uploadAppFile(file, "settings");
+  } catch {
+    // fall back to inline data if storage upload fails
+  }
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result as string);
