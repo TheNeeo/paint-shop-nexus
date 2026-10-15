@@ -1,3 +1,4 @@
+import { uploadAppFile } from '@/lib/storage';
 
 import React, { useState, useEffect } from "react";
 import {
@@ -556,11 +557,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
     
     const file = e.dataTransfer.files?.[0];
     if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData({...formData, image_url: reader.result as string});
-      };
-      reader.readAsDataURL(file);
+      uploadAppFile(file, 'products').then((url) => setFormData({...formData, image_url: url})).catch((err) => toast({ title: 'Upload failed', description: err.message, variant: 'destructive' }));
     } else {
       toast({
         title: "Invalid File",
@@ -576,11 +573,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
     
     const file = e.dataTransfer.files?.[0];
     if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        updateVariant(index, "image_url", reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      uploadAppFile(file, 'products').then((url) => updateVariant(index, "image_url", url)).catch((err) => toast({ title: 'Upload failed', description: err.message, variant: 'destructive' }));
     } else {
       toast({
         title: "Invalid File",
@@ -788,11 +781,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) {
-                      const reader = new FileReader();
-                      reader.onloadend = () => {
-                        setFormData({...formData, image_url: reader.result as string});
-                      };
-                      reader.readAsDataURL(file);
+                      uploadAppFile(file, 'products').then((url) => setFormData({...formData, image_url: url})).catch((err) => toast({ title: 'Upload failed', description: err.message, variant: 'destructive' }));
                     }
                   }}
                 />
@@ -1389,11 +1378,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
                             onChange={(e) => {
                               const file = e.target.files?.[0];
                               if (file) {
-                                const reader = new FileReader();
-                                reader.onloadend = () => {
-                                  updateVariant(index, "image_url", reader.result as string);
-                                };
-                                reader.readAsDataURL(file);
+                                uploadAppFile(file, 'products').then((url) => updateVariant(index, "image_url", url)).catch((err) => toast({ title: 'Upload failed', description: err.message, variant: 'destructive' }));
                               }
                             }}
                           />
