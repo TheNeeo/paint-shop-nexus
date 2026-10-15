@@ -36,6 +36,8 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Plus, Trash2, Upload, X, FileImage, Package, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { uploadAppFile } from '@/lib/storage';
+import { toast } from 'sonner';
 import { Vendor } from '@/types/purchase';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
