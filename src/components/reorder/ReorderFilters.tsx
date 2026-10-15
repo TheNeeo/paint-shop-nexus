@@ -66,8 +66,6 @@ export function ReorderFilters({
             </SelectTrigger>
             <SelectContent className="bg-white">
               <SelectItem value="all">All Suppliers</SelectItem>
-              <SelectItem value="asian-paints">Asian Paints Ltd</SelectItem>
-              <SelectItem value="tools-india">Tools India</SelectItem>
             </SelectContent>
           </Select>
 
