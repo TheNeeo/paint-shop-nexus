@@ -1,0 +1,571 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Paint shop design system with sparkle and shimmer effects */
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 215 25% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 25% 11%;
+
+    --primary: 142 69% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 215 25% 11%;
+
+    --muted: 210 40% 98%;
+    --muted-foreground: 215 20% 35%;
+
+    --accent: 210 40% 96%;
+    --accent-foreground: 215 25% 11%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 142 69% 45%;
+
+    --radius: 0.75rem;
+
+    /* Paint shop custom colors - Updated to Kelly green theme */
+    --paint-red: 0 84% 60%;
+    --paint-orange: 25 95% 53%;
+    --paint-green: 88 52% 49%; /* Kelly green #7DBE3C */
+    --paint-blue: 217 91% 60%;
+    --paint-purple: 271 81% 56%;
+    --paint-teal: 173 80% 40%;
+    --paint-cream: 216 33% 97%;
+    
+    /* Kelly green theme colors */
+    --kelly-green-main: 88 52% 49%; /* #7DBE3C */
+    --kelly-green-dark: 160 60% 22%;   /* #16583f */
+    --kelly-green-light: 88 52% 69%; /* #7DBE3C lighter */
+    
+    /* Cadet gray theme colors - Proper HSL values for Cadet Gray #9BA2A3 */
+    --cadet-gray-50: 210 20% 98%;  /* Very light gray */
+    --cadet-gray-100: 210 17% 95%; /* Light gray */
+    --cadet-gray-200: 214 14% 91%; /* Medium light gray */
+    --cadet-gray-300: 214 12% 83%; /* Medium gray */
+    --cadet-gray-400: 215 14% 65%; /* Base cadet gray */
+    --cadet-gray-500: 184 4% 64%; /* Main Cadet Gray #9BA2A3 */
+    --cadet-gray-600: 215 17% 47%; /* Darker gray */
+    --cadet-gray-700: 215 20% 34%;    /* Dark gray */
+    --cadet-gray-800: 215 23% 27%;    /* Very dark gray */
+    --cadet-gray-900: 215 28% 17%;    /* Almost black */
+    
+    /* Coral theme colors for Day Book - HSL format with consistent hue 357 */
+    --coral-25: 357 40% 98%;      /* Very light coral - almost white with coral tint */
+    --coral-50: 357 100% 97%;     /* Very light coral */
+    --coral-100: 357 100% 94%;    /* Light coral */
+    --coral-200: 357 100% 88%;    /* Medium light coral */
+    --coral-300: 357 100% 79%;    /* Medium coral */
+    --coral-400: 357 100% 67%;    /* Base coral */
+    --coral-500: 357 96% 60%;     /* Main Coral */
+    --coral-600: 357 77% 52%;     /* Darker coral */
+    --coral-700: 357 84% 41%;     /* Dark coral */
+    --coral-800: 357 80% 35%;     /* Very dark coral */
+    --coral-900: 357 74% 30%;     /* Almost black coral */
+    --coral-950: 357 80% 16%;     /* Darkest coral */
+    
+    /* Gradient variables - Updated to remove yellow */
+    --shimmer: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%);
+    --paint-gradient: linear-gradient(135deg, 
+      rgba(34,197,94,0.1) 0%, 
+      rgba(59,130,246,0.1) 25%, 
+      rgba(147,51,234,0.1) 50%, 
+      rgba(20,184,166,0.1) 75%, 
+      rgba(239,68,68,0.1) 100%);
+  }
+
+  .dark {
+    --background: 215 28% 11%;
+    --foreground: 210 40% 98%;
+    --card: 215 25% 18%;
+    --card-foreground: 210 40% 98%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    background: rgb(249, 250, 251);
+    min-height: 100vh;
+  }
+
+  /* No yellow/amber color overrides - using design system colors only */
+
+  /* Preserve orange backgrounds and hover states */
+  .bg-orange-50 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(255 247 237 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .bg-orange-600 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(234 88 12 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .hover\:bg-orange-700:hover {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(194 65 12 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .text-orange-600 {
+    --tw-text-opacity: 1 !important;
+    color: rgb(234 88 12 / var(--tw-text-opacity)) !important;
+  }
+
+  /* Preserve blue colors for vendor history theme */
+  .bg-blue-50 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(239 246 255 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .bg-blue-100 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(219 234 254 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .bg-blue-25 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(248 250 252 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .text-blue-600 {
+    --tw-text-opacity: 1 !important;
+    color: rgb(37 99 235 / var(--tw-text-opacity)) !important;
+  }
+  
+  .text-blue-700 {
+    --tw-text-opacity: 1 !important;
+    color: rgb(29 78 216 / var(--tw-text-opacity)) !important;
+  }
+  
+  .text-blue-900 {
+    --tw-text-opacity: 1 !important;
+    color: rgb(30 58 138 / var(--tw-text-opacity)) !important;
+  }
+  
+  .border-blue-200 {
+    --tw-border-opacity: 1 !important;
+    border-color: rgb(191 219 254 / var(--tw-border-opacity)) !important;
+  }
+  
+  .border-blue-300 {
+    --tw-border-opacity: 1 !important;
+    border-color: rgb(147 197 253 / var(--tw-border-opacity)) !important;
+  }
+  
+  .hover\:bg-blue-100:hover {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(219 234 254 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .hover\:bg-blue-50:hover {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(239 246 255 / var(--tw-bg-opacity)) !important;
+  }
+
+  /* Preserve light green colors for expense activity theme - Mindaro #BAEA66 */
+  .bg-green-50 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(244 252 242 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .bg-green-100 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(220 252 231 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .bg-green-200 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(186 234 102 / var(--tw-bg-opacity)) !important; /* Mindaro color */
+  }
+  
+  .bg-green-25 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(248 252 248 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .text-green-600 {
+    --tw-text-opacity: 1 !important;
+    color: rgb(22 163 74 / var(--tw-text-opacity)) !important;
+  }
+  
+  .text-green-700 {
+    --tw-text-opacity: 1 !important;
+    color: rgb(21 128 61 / var(--tw-text-opacity)) !important;
+  }
+  
+  .text-green-800 {
+    --tw-text-opacity: 1 !important;
+    color: rgb(22 101 52 / var(--tw-text-opacity)) !important;
+  }
+  
+  .text-green-900 {
+    --tw-text-opacity: 1 !important;
+    color: rgb(20 83 45 / var(--tw-text-opacity)) !important;
+  }
+  
+  .border-green-200 {
+    --tw-border-opacity: 1 !important;
+    border-color: rgb(186 234 102 / var(--tw-border-opacity)) !important;
+  }
+  
+  .border-green-300 {
+    --tw-border-opacity: 1 !important;
+    border-color: rgb(134 239 172 / var(--tw-border-opacity)) !important;
+  }
+  
+  .hover\:bg-green-100:hover {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(220 252 231 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .hover\:bg-green-50:hover {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(244 252 242 / var(--tw-bg-opacity)) !important;
+  }
+
+  .focus\:ring-green-500:focus {
+    --tw-ring-color: rgb(34 197 94) !important;
+  }
+  
+  .focus\:border-green-500:focus {
+    --tw-border-opacity: 1 !important;
+    border-color: rgb(34 197 94 / var(--tw-border-opacity)) !important;
+  }
+
+  /* Preserve turquoise colors for expense report theme - Turquoise #5AE0C1 */
+  .bg-turquoise-50 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(240 253 250 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .bg-turquoise-100 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(204 251 241 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .bg-turquoise-200 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(153 246 228 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .bg-turquoise-600 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(13 148 136 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .bg-turquoise-700 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(15 118 110 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .text-turquoise-400 {
+    --tw-text-opacity: 1 !important;
+    color: rgb(45 212 191 / var(--tw-text-opacity)) !important;
+  }
+  
+  .text-turquoise-600 {
+    --tw-text-opacity: 1 !important;
+    color: rgb(13 148 136 / var(--tw-text-opacity)) !important;
+  }
+  
+  .text-turquoise-700 {
+    --tw-text-opacity: 1 !important;
+    color: rgb(15 118 110 / var(--tw-text-opacity)) !important;
+  }
+  
+  .text-turquoise-800 {
+    --tw-text-opacity: 1 !important;
+    color: rgb(17 94 89 / var(--tw-text-opacity)) !important;
+  }
+  
+  .text-turquoise-900 {
+    --tw-text-opacity: 1 !important;
+    color: rgb(19 78 74 / var(--tw-text-opacity)) !important;
+  }
+  
+  .border-turquoise-200 {
+    --tw-border-opacity: 1 !important;
+    border-color: rgb(153 246 228 / var(--tw-border-opacity)) !important;
+  }
+  
+  .border-turquoise-300 {
+    --tw-border-opacity: 1 !important;
+    border-color: rgb(94 234 212 / var(--tw-border-opacity)) !important;
+  }
+  
+  .hover\:bg-turquoise-50:hover {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(240 253 250 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .hover\:bg-turquoise-100:hover {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(204 251 241 / var(--tw-bg-opacity)) !important;
+  }
+
+  .focus\:ring-turquoise-500:focus {
+    --tw-ring-color: rgb(20 184 166) !important;
+  }
+  
+  .focus\:border-turquoise-500:focus {
+    --tw-border-opacity: 1 !important;
+    border-color: rgb(20 184 166 / var(--tw-border-opacity)) !important;
+  }
+
+  /* Preserve cadet gray colors for settings theme - Cadet Gray #9BA2A3 */
+  .bg-gray-50 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(249 250 251 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .bg-gray-100 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(243 244 246 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .bg-gray-200 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(229 231 235 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .bg-cadet-gray-50 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(248 249 250 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .bg-cadet-gray-100 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(241 243 244 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .bg-cadet-gray-200 {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(155 162 163 / var(--tw-bg-opacity)) !important; /* Cadet Gray #9BA2A3 */
+  }
+  
+  .text-cadet-gray-600 {
+    --tw-text-opacity: 1 !important;
+    color: rgb(107 114 128 / var(--tw-text-opacity)) !important;
+  }
+  
+  .text-cadet-gray-700 {
+    --tw-text-opacity: 1 !important;
+    color: rgb(75 85 99 / var(--tw-text-opacity)) !important;
+  }
+  
+  .text-cadet-gray-800 {
+    --tw-text-opacity: 1 !important;
+    color: rgb(55 65 81 / var(--tw-text-opacity)) !important;
+  }
+  
+  .text-cadet-gray-900 {
+    --tw-text-opacity: 1 !important;
+    color: rgb(31 41 55 / var(--tw-text-opacity)) !important;
+  }
+  
+  .border-cadet-gray-200 {
+    --tw-border-opacity: 1 !important;
+    border-color: rgb(155 162 163 / var(--tw-border-opacity)) !important;
+  }
+  
+  .border-cadet-gray-300 {
+    --tw-border-opacity: 1 !important;
+    border-color: rgb(209 213 219 / var(--tw-border-opacity)) !important;
+  }
+  
+  .hover\:bg-cadet-gray-50:hover {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(248 249 250 / var(--tw-bg-opacity)) !important;
+  }
+  
+  .hover\:bg-cadet-gray-100:hover {
+    --tw-bg-opacity: 1 !important;
+    background-color: rgb(241 243 244 / var(--tw-bg-opacity)) !important;
+  }
+
+  .focus\:ring-cadet-gray-500:focus {
+    --tw-ring-color: rgb(107 114 128) !important;
+  }
+  
+  .focus\:border-cadet-gray-500:focus {
+    --tw-border-opacity: 1 !important;
+    border-color: rgb(107 114 128 / var(--tw-border-opacity)) !important;
+  }
+}
+
+@layer components {
+  .paint-sparkle {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .paint-sparkle::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(34,197,94,0.05) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(59,130,246,0.05) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(147,51,234,0.05) 0%, transparent 50%);
+    animation: sparkle 8s ease-in-out infinite;
+    pointer-events: none;
+  }
+  
+  .paint-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .paint-shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--shimmer);
+    animation: shimmer 3s ease-in-out infinite;
+    pointer-events: none;
+  }
+  
+  .gradient-border {
+    background: linear-gradient(135deg, 
+      rgba(34,197,94,0.2) 0%, 
+      rgba(59,130,246,0.2) 25%, 
+      rgba(147,51,234,0.2) 50%, 
+      rgba(20,184,166,0.2) 75%, 
+      rgba(249,115,22,0.2) 100%);
+    padding: 2px;
+    border-radius: calc(var(--radius) + 2px);
+  }
+  
+  .paint-card {
+    @apply bg-card border border-border rounded-lg p-6 shadow-lg;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(226,232,240,0.5);
+  }
+
+  /* Form styling - pink theme */
+  .form-input {
+    @apply bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500;
+  }
+  
+  .form-select {
+    @apply bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500;
+  }
+  
+  .form-textarea {
+    @apply bg-white border-pink-300 focus:border-pink-500 focus:ring-pink-500;
+  }
+  
+  /* Table styling - pink theme */
+  .table-header {
+    @apply bg-gradient-to-r from-pink-100 to-rose-100 border-pink-200;
+  }
+  
+  .table-row-hover {
+    @apply hover:bg-pink-50/50;
+  }
+  
+  /* Card styling - pink theme */
+  .card-border {
+    @apply border-pink-200;
+  }
+  
+  .card-shadow {
+    @apply shadow-sm hover:shadow-md;
+  }
+
+  /* Purchase specific overrides */
+  .purchase-card {
+    @apply bg-pink-50 border-pink-200;
+  }
+  
+  .purchase-header {
+    @apply bg-pink-100 text-pink-800;
+  }
+  
+  .purchase-button {
+    @apply bg-pink-600 hover:bg-pink-700 text-white;
+  }
+}
+
+@keyframes sparkle {
+  0%, 100% { 
+    opacity: 0;
+    transform: scale(0.8) rotate(0deg);
+  }
+  50% { 
+    opacity: 1;
+    transform: scale(1.2) rotate(180deg);
+  }
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.floating {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Custom scrollbar */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thumb-primary {
+  scrollbar-color: hsl(var(--primary)) hsl(var(--muted));
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary));
+  opacity: 0.8;
+}
+
+@keyframes fab-ripple {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(2.2); opacity: 0; }
+}

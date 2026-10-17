@@ -1,0 +1,542 @@
+import React, { useState, useMemo } from "react";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import {
+  Plus,
+  Download,
+  Zap,
+  Package,
+  RefreshCw,
+  Paintbrush,
+  Activity,
+} from "lucide-react";
+import { ProductStats } from "@/components/product/ProductStats";
+import { ProductFilters } from "@/components/product/ProductFilters";
+import { ProductTable } from "@/components/product/ProductTable";
+import { BulkActions } from "@/components/product/BulkActions";
+import { ProductFooter } from "@/components/product/ProductFooter";
+import { AddProductModal } from "@/components/inventory/AddProductModal";
+import AppLayout from "@/components/layout/AppLayout";
+import dashboardHomeIcon from "@/assets/dashboard-home-icon.png";
+import productActivityIcon from "@/assets/product-activity-icon.png";
+
+const categories = ["All", "Tools", "Paint", "Canvas", "Brushes"];
+const stockStatuses = ["All", "In Stock", "Low Stock", "Out of Stock"];
+const sortOptions = [
+  { value: "name", label: "Name" },
+  { value: "price", label: "Price" },
+  { value: "stock", label: "Stock Quantity" },
+  { value: "sales", label: "Total Sales" },
+  { value: "rating", label: "Rating" },
+];
+
+const getCategoryColor = (category: string, categoryColor?: string) => {
+  // Use category color from database if available
+  if (categoryColor) {
+    // Normalize color name (lowercase, trim)
+    const normalizedColor = categoryColor.toLowerCase().trim();
+    
+    const colorMap: Record<string, string> = {
+      blue: "bg-blue-100 text-blue-800 border-blue-200",
+      red: "bg-red-100 text-red-800 border-red-200",
+      green: "bg-green-100 text-green-800 border-green-200",
+      purple: "bg-purple-100 text-purple-800 border-purple-200",
+      orange: "bg-orange-100 text-orange-800 border-orange-200",
+      yellow: "bg-amber-100 text-amber-800 border-amber-200",
+      amber: "bg-amber-100 text-amber-800 border-amber-200",
+      pink: "bg-pink-100 text-pink-800 border-pink-200",
+      cyan: "bg-cyan-100 text-cyan-800 border-cyan-200",
+      teal: "bg-teal-100 text-teal-800 border-teal-200",
+      indigo: "bg-indigo-100 text-indigo-800 border-indigo-200",
+      slate: "bg-slate-100 text-slate-800 border-slate-200",
+      gray: "bg-gray-100 text-gray-800 border-gray-200",
+      rose: "bg-rose-100 text-rose-800 border-rose-200",
+      coral: "bg-coral-100 text-coral-800 border-coral-200",
+      lime: "bg-lime-100 text-lime-800 border-lime-200",
+      emerald: "bg-emerald-100 text-emerald-800 border-emerald-200",
+      sky: "bg-sky-100 text-sky-800 border-sky-200",
+      violet: "bg-violet-100 text-violet-800 border-violet-200",
+      fuchsia: "bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200",
+    };
+    return colorMap[normalizedColor] || `bg-${normalizedColor}-100 text-${normalizedColor}-800 border-${normalizedColor}-200`;
+  }
+  
+  // Fallback to category name based colors
+  const colors: Record<string, string> = {
+    Tools: "bg-blue-100 text-blue-800 border-blue-200",
+    Paint: "bg-red-100 text-red-800 border-red-200",
+    Canvas: "bg-green-100 text-green-800 border-green-200",
+    Brushes: "bg-purple-100 text-purple-800 border-purple-200",
+  };
+  return colors[category] || "bg-slate-100 text-slate-800 border-slate-200";
+};
+
+const getStockStatus = (quantity: number) => {
+  if (quantity === 0) return { status: "Out of Stock", color: "bg-red-100 text-red-800 border-red-200" };
+  if (quantity <= 10) return { status: "Low Stock", color: "bg-orange-100 text-orange-800 border-orange-200" };
+  return { status: "In Stock", color: "bg-green-100 text-green-800 border-green-200" };
+};
+
+export default function ProductManagement() {
+  const navigate = useNavigate();
+  // Fetch products from database with vendors and variants
+  const { data: dbProducts = [], isLoading } = useQuery({
+    queryKey: ["products"],
+    queryFn: async () => {
+      // Fetch main products with categories and vendors
+      const { data: mainProducts, error } = await supabase
+        .from("products")
+        .select(`
+          *,
+          categories (
+            name,
+            color
+          ),
+          vendors:preferred_vendor_id (
+            name
+          )
+        `)
+        .is("parent_product_id", null)
+        .order("created_at", { ascending: false });
+      
+      if (error) throw error;
+
+      // Fetch variants for each main product
+      const productsWithVariants = await Promise.all(
+        (mainProducts || []).map(async (product, index) => {
+          const { data: variants } = await supabase
+            .from("products")
+            .select(`
+              *,
+              vendors:preferred_vendor_id (
+                name
+              )
+            `)
+            .eq("parent_product_id", product.id)
+            .order("created_at", { ascending: true });
+
+          return {
+            id: product.id,
+            name: product.name,
+            category: product.categories?.name || "Uncategorized",
+            categoryColor: product.categories?.color || "green",
+            unit: product.unit,
+            unitPrice: Number(product.sale_price) || Number(product.unit_price) || 0,
+            stockQuantity: product.current_stock || 0,
+            image: product.image_url || "/placeholder.svg",
+            baseCode: product.hsn_code || `PRD${String(index + 1).padStart(3, '0')}`,
+            description: "",
+            dateAdded: new Date(product.created_at).toISOString().split('T')[0],
+            featured: false,
+            rating: 4.5,
+            totalSales: product.sale_qty || 0,
+            lastSold: "",
+            vendorName: product.vendors?.name || "",
+            expiryDate: product.expiry_date || "",
+            remainingWarranty: product.remaining_warranty || "",
+            variants: (variants || []).map(v => ({
+              id: v.id,
+              name: v.name,
+              unitPrice: Number(v.sale_price) || Number(v.unit_price) || 0,
+              salePrice: Number(v.sale_price) || 0,
+              purchasePrice: Number(v.purchase_price) || 0,
+              stockQuantity: v.current_stock || 0,
+              currentStock: v.current_stock || 0,
+              sku: v.hsn_code || "",
+              hsnCode: v.hsn_code || "",
+              image: v.image_url || "",
+              vendorName: v.vendors?.name || "",
+              expiryDate: v.expiry_date || "",
+              remainingWarranty: v.remaining_warranty || "",
+            }))
+          };
+        })
+      );
+      
+      return productsWithVariants;
+    },
+  });
+
+  const products = dbProducts;
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("All");
+  const [stockFilter, setStockFilter] = useState("All");
+  const [sortBy, setSortBy] = useState("name");
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isAddProductOpen, setIsAddProductOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
+  const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
+
+  const toggleRowExpansion = (productId: string) => {
+    const newExpanded = new Set(expandedRows);
+    if (newExpanded.has(productId)) {
+      newExpanded.delete(productId);
+    } else {
+      newExpanded.add(productId);
+    }
+    setExpandedRows(newExpanded);
+  };
+
+  const toggleProductSelection = (productId: string) => {
+    const newSelected = new Set(selectedProducts);
+    if (newSelected.has(productId)) {
+      newSelected.delete(productId);
+    } else {
+      newSelected.add(productId);
+    }
+    setSelectedProducts(newSelected);
+  };
+
+  const selectAllProducts = () => {
+    if (selectedProducts.size === filteredProducts.length) {
+      setSelectedProducts(new Set());
+    } else {
+      setSelectedProducts(new Set(filteredProducts.map(p => p.id)));
+    }
+  };
+
+  const filteredProducts = useMemo(() => {
+    return products.filter(product => {
+      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           product.baseCode.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = categoryFilter === "All" || product.category === categoryFilter;
+      const stockStatus = getStockStatus(product.stockQuantity).status;
+      const matchesStock = stockFilter === "All" || stockStatus === stockFilter;
+      const matchesFeatured = !showFeaturedOnly || product.featured;
+      
+      return matchesSearch && matchesCategory && matchesStock && matchesFeatured;
+    }).sort((a, b) => {
+      switch (sortBy) {
+        case "price":
+          return a.unitPrice - b.unitPrice;
+        case "stock":
+          return b.stockQuantity - a.stockQuantity;
+        case "sales":
+          return b.totalSales - a.totalSales;
+        case "rating":
+          return b.rating - a.rating;
+        default:
+          return a.name.localeCompare(b.name);
+      }
+    });
+  }, [products, searchTerm, categoryFilter, stockFilter, sortBy, showFeaturedOnly]);
+
+  const stats = useMemo(() => {
+    const totalValue = products.reduce((sum, product) => sum + (product.unitPrice * product.stockQuantity), 0);
+    const lowStockCount = products.filter(p => p.stockQuantity <= 10 && p.stockQuantity > 0).length;
+    const outOfStockCount = products.filter(p => p.stockQuantity === 0).length;
+    const featuredCount = products.filter(p => p.featured).length;
+    
+    return { totalValue, lowStockCount, outOfStockCount, featuredCount };
+  }, [products]);
+
+  const handleBulkAction = (action: string) => {
+    const selectedProductsList = filteredProducts.filter(p => selectedProducts.has(p.id));
+    
+    switch (action) {
+      case "export":
+        // Export selected products as CSV
+        const headers = ["Product Name", "Category", "Unit", "Unit Price", "Stock Quantity", "Vendor", "HSN Code"];
+        const csvContent = [
+          headers.join(","),
+          ...selectedProductsList.map(product => [
+            `"${product.name}"`,
+            `"${product.category}"`,
+            `"${product.unit}"`,
+            product.unitPrice,
+            product.stockQuantity,
+            `"${product.vendorName || ''}"`,
+            `"${product.baseCode}"`
+          ].join(","))
+        ].join("\n");
+        
+        const blob = new Blob([csvContent], { type: "text/csv" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `selected_products_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        alert(`✅ Exported ${selectedProductsList.length} product(s) successfully!`);
+        break;
+        
+      case "edit":
+        alert(`📝 Bulk Edit: ${selectedProductsList.length} product(s) selected.\n\nProducts:\n${selectedProductsList.map(p => `• ${p.name}`).join('\n')}\n\nBulk edit feature will open a form to update common fields.`);
+        break;
+        
+      case "duplicate":
+        alert(`📋 Duplicate: ${selectedProductsList.length} product(s) will be duplicated.\n\nProducts:\n${selectedProductsList.map(p => `• ${p.name}`).join('\n')}\n\nDuplicate feature coming soon!`);
+        break;
+        
+      case "feature":
+        alert(`⭐ Mark as Featured: ${selectedProductsList.length} product(s) will be marked as featured.\n\nProducts:\n${selectedProductsList.map(p => `• ${p.name}`).join('\n')}`);
+        break;
+        
+      case "tag":
+        alert(`🏷️ Add Tags: Add tags to ${selectedProductsList.length} product(s).\n\nProducts:\n${selectedProductsList.map(p => `• ${p.name}`).join('\n')}\n\nTag management feature coming soon!`);
+        break;
+        
+      case "archive":
+        alert(`📦 Archive: ${selectedProductsList.length} product(s) will be archived.\n\nProducts:\n${selectedProductsList.map(p => `• ${p.name}`).join('\n')}`);
+        break;
+        
+      case "delete":
+        alert(`🗑️ Delete: ${selectedProductsList.length} product(s) will be permanently deleted.\n\nProducts:\n${selectedProductsList.map(p => `• ${p.name}`).join('\n')}\n\nThis action cannot be undone!`);
+        setSelectedProducts(new Set());
+        break;
+        
+      default:
+        console.log(`Unknown action: ${action}`);
+    }
+  };
+
+  return (
+    <AppLayout>
+      <TooltipProvider>
+        <div className="w-full bg-gradient-to-br from-green-50 via-white to-blue-50 min-h-screen p-6">
+          {isLoading ? (
+            <div className="flex items-center justify-center min-h-[400px]">
+              <div className="text-center">
+                <RefreshCw className="h-12 w-12 animate-spin text-green-600 mx-auto mb-4" />
+                <p className="text-gray-600">Loading products...</p>
+              </div>
+            </div>
+          ) : (
+            <>
+          {/* Breadcrumb - Outside Header Box */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+            className="mb-3"
+          >
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink 
+                    onClick={() => navigate("/")} 
+                    className="cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-1.5"
+                  >
+                    <img src={dashboardHomeIcon} alt="Dashboard" className="h-5 w-5 object-contain bg-transparent" style={{ mixBlendMode: 'multiply' }} />
+                    <span className="text-cyan-600 font-medium">Dashboard</span>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="flex items-center gap-1.5">
+                    <Package className="h-4 w-4 text-orange-400" />
+                    <span className="text-orange-600 font-medium">Product Management</span>
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="flex items-center gap-1.5">
+                    <Activity className="h-4 w-4 text-green-400" />
+                    <span className="text-green-700 font-semibold">Product Activity</span>
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </motion.div>
+
+          {/* Enhanced Animated Header */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-gradient-to-r from-green-100 via-emerald-50 to-teal-50 rounded-3xl p-6 mb-8 shadow-lg border-2 border-green-200 relative overflow-hidden"
+          >
+            {/* Animated background pattern */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 left-0 w-40 h-40 bg-green-400 rounded-full blur-3xl animate-pulse"></div>
+              <div className="absolute bottom-0 right-0 w-40 h-40 bg-teal-400 rounded-full blur-3xl animate-pulse delay-1000"></div>
+            </div>
+            
+            <div className="relative z-10 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+              <div className="space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                  <motion.h1 
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2, duration: 0.5 }}
+                    className="text-2xl sm:text-4xl font-bold text-green-900 flex items-center gap-3"
+                  >
+                    <motion.div
+                      animate={{ rotate: [0, 10, -10, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                    >
+                      <img src={productActivityIcon} alt="Product Activity" className="h-10 w-10 sm:h-12 sm:w-12 object-contain" style={{ mixBlendMode: 'multiply' }} />
+                    </motion.div>
+                    <div className="flex flex-col">
+                      <span>Product Activity</span>
+                      <motion.span 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.5, duration: 0.5 }}
+                        className="text-sm font-normal text-green-700 italic ml-[3.5ch]"
+                      >
+                        Advanced Product & Variant Control
+                      </motion.span>
+                    </div>
+                  </motion.h1>
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
+                  >
+                    <Badge className="bg-gradient-to-r from-green-600 to-teal-600 text-white border-none text-sm px-4 py-1 shadow-md">
+                      {filteredProducts.length} products
+                    </Badge>
+                  </motion.div>
+                </div>
+              </div>
+              
+              <motion.div 
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+                className="flex flex-col sm:flex-row gap-2"
+              >
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => window.location.reload()}
+                  className="w-full sm:w-auto bg-white hover:bg-green-50 border-2 border-green-300 text-green-700 hover:border-green-400 transition-all duration-300 shadow-sm hover:shadow-md group"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2 group-hover:rotate-180 transition-transform duration-500" />
+                  Refresh
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => {
+                    const csvContent = filteredProducts.map(p => 
+                      `${p.name},${p.category},${p.unit},${p.unitPrice},${p.stockQuantity}`
+                    ).join('\n');
+                    const blob = new Blob([`Name,Category,Unit,Price,Stock\n${csvContent}`], { type: 'text/csv' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'products_export.csv';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  }}
+                  className="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700 border-blue-600 transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+              
+                <Dialog open={isAddProductOpen} onOpenChange={setIsAddProductOpen}>
+                  <DialogTrigger asChild>
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl w-full sm:w-auto border-2 border-green-400 transition-all duration-300 relative overflow-hidden group">
+                        <span className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
+                        <Plus className="h-4 w-4 mr-2 relative z-10" />
+                        <span className="relative z-10">Add New Product</span>
+                      </Button>
+                    </motion.div>
+                  </DialogTrigger>
+                </Dialog>
+                
+                <AddProductModal 
+                  isOpen={isAddProductOpen} 
+                  onClose={() => setIsAddProductOpen(false)} 
+                />
+              </motion.div>
+            </div>
+          </motion.div>
+
+          {/* Stats */}
+          <div className="mb-8">
+            <ProductStats
+              totalProducts={products.length}
+              totalValue={stats.totalValue}
+              lowStockCount={stats.lowStockCount}
+              featuredCount={stats.featuredCount}
+            />
+          </div>
+
+          {/* Filters */}
+          <div className="mb-6">
+            <ProductFilters
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              categoryFilter={categoryFilter}
+              setCategoryFilter={setCategoryFilter}
+              stockFilter={stockFilter}
+              setStockFilter={setStockFilter}
+              sortBy={sortBy}
+              setSortBy={setSortBy}
+              showFeaturedOnly={showFeaturedOnly}
+              setShowFeaturedOnly={setShowFeaturedOnly}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+              categories={categories}
+              stockStatuses={stockStatuses}
+              sortOptions={sortOptions}
+            />
+          </div>
+
+          {/* Bulk Actions */}
+          <div className="mb-6">
+            <BulkActions
+              selectedCount={selectedProducts.size}
+              onBulkAction={handleBulkAction}
+            />
+          </div>
+
+          {/* Product Table */}
+          <div className="overflow-hidden mb-6">
+            <ProductTable
+              products={filteredProducts}
+              expandedRows={expandedRows}
+              selectedProducts={selectedProducts}
+              onToggleRowExpansion={toggleRowExpansion}
+              onToggleProductSelection={toggleProductSelection}
+              onSelectAllProducts={selectAllProducts}
+              onSetSelectedProduct={setSelectedProduct}
+              selectedProduct={selectedProduct}
+              getCategoryColor={getCategoryColor}
+              getStockStatus={getStockStatus}
+            />
+          </div>
+
+          {/* Footer */}
+          <ProductFooter
+            totalProducts={products.length}
+            totalValue={stats.totalValue}
+            lowStockCount={stats.lowStockCount}
+          />
+            </>
+          )}
+        </div>
+      </TooltipProvider>
+    </AppLayout>
+  );
+}
