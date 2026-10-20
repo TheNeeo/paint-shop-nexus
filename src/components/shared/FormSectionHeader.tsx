@@ -1,6 +1,7 @@
 import React from "react";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Icon3D } from "./Icon3D";
 
 interface FormSectionHeaderProps {
   icon: LucideIcon;
@@ -44,11 +45,11 @@ export function FormSectionHeader({
     <div className={cn("flex items-center gap-3 mb-4", className)}>
       <div
         className={cn(
-          "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm",
+          "neo-section-icon w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0",
           c.iconBg
         )}
       >
-        <Icon className={cn("h-5 w-5", c.iconText)} />
+        <Icon3D label={title} icon={Icon} className="h-11 w-11" />
       </div>
       <div className="flex flex-col">
         <h3 className={cn("text-base font-bold leading-tight", c.text)}>{title}</h3>

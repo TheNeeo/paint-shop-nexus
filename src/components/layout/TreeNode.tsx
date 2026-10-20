@@ -31,12 +31,6 @@ export function TreeNode({ item, level, expandedItems, onToggle, onAction, colla
     }
   };
 
-  // Resolve icon color (supports tailwind class OR raw hex/css color)
-  const iconColorRaw: string | undefined = item.iconColor;
-  const isTailwindColor = iconColorRaw?.startsWith("text-");
-  const iconStyle =
-    iconColorRaw && !isTailwindColor ? { color: iconColorRaw } : undefined;
-
   const NodeContent = () => (
     <div
       className={cn(
@@ -48,7 +42,6 @@ export function TreeNode({ item, level, expandedItems, onToggle, onAction, colla
           ? "bg-sidebar-accent text-sidebar-accent-foreground"
           : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
       )}
-      onClick={handleClick}
       title={collapsed && level === 0 ? item.title : undefined}
     >
       {/* Active indicator bar (left) */}

@@ -10,6 +10,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Home, RefreshCw, Download, Plus, LucideIcon } from "lucide-react";
+import { Icon3D } from "./Icon3D";
 
 interface BreadcrumbItem {
   label: string;
@@ -121,14 +122,8 @@ export function PageHeader({
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`bg-gradient-to-r ${gradientFrom} ${gradientVia} ${gradientTo} rounded-3xl p-6 mb-8 shadow-lg border-2 ${colors.border} relative overflow-hidden`}
+      className={`neo-page-header bg-gradient-to-r ${gradientFrom} ${gradientVia} ${gradientTo} rounded-3xl p-6 mb-8 shadow-lg border-2 ${colors.border} relative overflow-hidden`}
     >
-      {/* Animated background pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className={`absolute top-0 left-0 w-40 h-40 ${colors.blob1} rounded-full blur-3xl animate-pulse`}></div>
-        <div className={`absolute bottom-0 right-0 w-40 h-40 ${colors.blob2} rounded-full blur-3xl animate-pulse delay-1000`}></div>
-      </div>
-
       <div className="relative z-10 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
         <div className="space-y-3">
           <Breadcrumb>
@@ -160,7 +155,7 @@ export function PageHeader({
                 animate={{ rotate: [0, 10, -10, 0] }}
                 transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
               >
-                <Icon className={`h-8 w-8 sm:h-10 sm:w-10 ${colors.iconText}`} />
+                <Icon3D label={title} icon={Icon} className="h-14 w-14 sm:h-16 sm:w-16" />
               </motion.div>
               {title}
             </motion.h1>
