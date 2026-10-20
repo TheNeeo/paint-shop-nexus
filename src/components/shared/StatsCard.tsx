@@ -1,5 +1,6 @@
 import React from "react";
 import { LucideIcon } from "lucide-react";
+import { Icon3D } from "./Icon3D";
 
 interface StatsCardProps {
   title: string;
@@ -35,7 +36,7 @@ export function StatsCard({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${gradient} p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]`}
+      className={`neo-stat relative overflow-hidden rounded-2xl bg-gradient-to-br ${gradient} p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]`}
     >
       <div className="relative z-10">
         <h3 className="text-lg font-semibold text-white/90 mb-1">
@@ -47,7 +48,7 @@ export function StatsCard({
       </div>
       
       <div className="absolute right-4 bottom-4 opacity-80">
-        <Icon className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+        <Icon3D label={title} icon={Icon} className="h-20 w-20" />
       </div>
     </div>
   );
