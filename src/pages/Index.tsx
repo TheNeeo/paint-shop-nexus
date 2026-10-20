@@ -7,6 +7,7 @@ import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { PaintChart } from "@/components/dashboard/PaintChart";
 import { WeatherWidget } from "@/components/dashboard/WeatherWidget";
 import { TodoWidget } from "@/components/dashboard/TodoWidget";
+import { Icon3D } from "@/components/shared/Icon3D";
 import { supabase } from "@/integrations/supabase/client";
 import { 
   ShoppingCart, 
@@ -72,14 +73,17 @@ const Index = () => {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <div className="flex flex-col space-y-2">
+        <div className="neo-dashboard-heading flex items-center gap-5 py-2">
+          <Icon3D name="paint" className="hidden sm:block h-24 w-24" />
+          <div className="space-y-2">
           <h1 className="text-3xl font-bold text-foreground">
             Welcome to <span className="text-primary">NEO COLOR FACTORY</span>
           </h1>
           <p className="text-muted-foreground">Your complete paint shop management dashboard</p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
           <DashboardCard
             title="Today's Sales"
             value={`₹${stats.todaysSales.toLocaleString()}`}
