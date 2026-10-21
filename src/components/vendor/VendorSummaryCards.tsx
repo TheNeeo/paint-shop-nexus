@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Icon3D } from "@/components/shared/Icon3D";
 import { Users, CreditCard, CheckCircle, Activity, LucideIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -74,7 +75,7 @@ export function VendorSummaryCards({ refreshKey = 0 }: VendorSummaryCardsProps) 
             <p className="text-sm text-white/70">{card.subtitle}</p>
           </div>
           <div className="absolute right-4 bottom-4 opacity-80">
-            <card.Icon className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            <Icon3D label={card.title} className="h-16 w-16" />
           </div>
         </div>
       ))}

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Icon3D } from "@/components/shared/Icon3D";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Download, RefreshCw, DollarSign, FileText, TrendingUp, BarChart, BarChart3, Search, Filter, X, Eye, Hash, Calendar, Tag, AlignLeft, IndianRupee, CreditCard, Receipt } from "lucide-react";
@@ -88,11 +89,10 @@ const ExpenseReport = () => {
         {/* Summary */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {summaryCards.map((card) => {
-            const Icon = card.icon;
             return (
               <div key={card.title} className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.gradient} p-6 min-h-[140px] shadow-lg`}>
                 <div className="relative z-10"><h3 className="text-lg font-semibold text-white/90 mb-1">{card.title}</h3><p className="text-2xl font-bold text-white">{card.value}</p></div>
-                <div className="absolute right-4 bottom-4 opacity-80"><Icon className="h-16 w-16 text-white/40" strokeWidth={1.5} /></div>
+                <div className="absolute right-4 bottom-4 opacity-80"><Icon3D label={card.title} className="h-16 w-16" /></div>
               </div>
             );
           })}

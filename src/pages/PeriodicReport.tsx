@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { Icon3D } from "@/components/shared/Icon3D";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -245,7 +246,7 @@ const PeriodicReport = () => {
               </p>
             </div>
             <div className="absolute right-4 bottom-4 opacity-80">
-              <CalendarIcon className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+              <Icon3D name="chart" className="h-16 w-16" />
             </div>
           </div>
 
@@ -275,7 +276,7 @@ const PeriodicReport = () => {
               <p className="text-2xl font-bold text-white">₹{totalNetProfit.toLocaleString()}</p>
             </div>
             <div className="absolute right-4 bottom-4 opacity-80">
-              <DollarSign className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+              <Icon3D name="invoice" className="h-16 w-16" />
             </div>
           </div>
 

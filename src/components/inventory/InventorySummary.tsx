@@ -1,4 +1,5 @@
 import React from "react";
+import { Icon3D } from "@/components/shared/Icon3D";
 import { Package, AlertTriangle, DollarSign, Tags, LucideIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -81,7 +82,7 @@ export function InventorySummary() {
           </div>
           
           <div className="absolute right-4 bottom-4 opacity-80">
-            <card.Icon className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            <Icon3D label={card.title} className="h-16 w-16" />
           </div>
         </div>
       ))}

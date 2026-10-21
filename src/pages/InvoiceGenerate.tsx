@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
+import { Icon3D } from "@/components/shared/Icon3D";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import { nextInvoiceNumber } from "@/hooks/useAppSettings";
@@ -504,7 +505,7 @@ export default function InvoiceGenerate() {
                 <p className="text-2xl font-bold" style={{ color: THEME_PRIMARY }}>₹45,231</p>
               </div>
               <div className="absolute right-4 bottom-4 opacity-30">
-                <FileText className="h-16 w-16" style={{ color: THEME_PRIMARY }} strokeWidth={1.5} />
+                <Icon3D name="invoice" className="h-16 w-16" />
               </div>
             </motion.div>
 
@@ -520,7 +521,7 @@ export default function InvoiceGenerate() {
                 <p className="text-2xl font-bold text-white">12</p>
               </div>
               <div className="absolute right-4 bottom-4 opacity-30">
-                <CreditCard className="h-16 w-16 text-white" strokeWidth={1.5} />
+                <Icon3D name="invoice" className="h-16 w-16" />
               </div>
             </motion.div>
 
@@ -536,7 +537,7 @@ export default function InvoiceGenerate() {
                 <p className="text-2xl font-bold text-white">₹8,142</p>
               </div>
               <div className="absolute right-4 bottom-4 opacity-30">
-                <DollarSign className="h-16 w-16 text-white" strokeWidth={1.5} />
+                <Icon3D name="invoice" className="h-16 w-16" />
               </div>
             </motion.div>
 

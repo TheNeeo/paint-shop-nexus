@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Icon3D } from "@/components/shared/Icon3D";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
@@ -374,7 +375,7 @@ export default function UpdateStock() {
                 <p className="text-2xl font-bold text-white">{totalStock}</p>
               </div>
               <div className="absolute right-4 bottom-4 opacity-80">
-                <Package className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+                <Icon3D name="boxes" className="h-16 w-16" />
               </div>
             </motion.div>
 
@@ -390,7 +391,7 @@ export default function UpdateStock() {
                 <p className="text-2xl font-bold text-white">{lowStockItems}</p>
               </div>
               <div className="absolute right-4 bottom-4 opacity-80">
-                <AlertTriangle className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+                <Icon3D name="boxes" className="h-16 w-16" />
               </div>
             </motion.div>
 
@@ -406,7 +407,7 @@ export default function UpdateStock() {
                 <p className="text-2xl font-bold text-white">₹{totalValue.toFixed(2)}</p>
               </div>
               <div className="absolute right-4 bottom-4 opacity-80">
-                <DollarSign className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+                <Icon3D name="invoice" className="h-16 w-16" />
               </div>
             </motion.div>
 
@@ -422,7 +423,7 @@ export default function UpdateStock() {
                 <p className="text-2xl font-bold text-white">{totalSKUs}</p>
               </div>
               <div className="absolute right-4 bottom-4 opacity-80">
-                <Layers className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+                <Icon3D name="boxes" className="h-16 w-16" />
               </div>
             </motion.div>
           </div>
