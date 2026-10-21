@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Icon3D } from "@/components/shared/Icon3D";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -252,7 +253,6 @@ const ExpenseActivity = () => {
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {summaryCards.map((card, index) => {
-            const Icon = card.icon;
             return (
               <motion.div
                 key={card.title}
@@ -266,7 +266,7 @@ const ExpenseActivity = () => {
                   <p className="text-2xl font-bold text-white">{card.value}</p>
                 </div>
                 <div className="absolute right-4 bottom-4 opacity-80">
-                  <Icon className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+                  <Icon3D label={card.title} className="h-16 w-16" />
                 </div>
               </motion.div>
             );

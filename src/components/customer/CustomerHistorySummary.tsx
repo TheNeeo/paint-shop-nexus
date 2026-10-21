@@ -1,4 +1,5 @@
 import React from 'react';
+import { Icon3D } from "@/components/shared/Icon3D";
 import { Users, DollarSign, ShoppingCart, AlertTriangle, LucideIcon } from 'lucide-react';
 import { CustomerHistoryData } from '@/pages/CustomerHistory';
 
@@ -63,7 +64,7 @@ export const CustomerHistorySummary: React.FC<CustomerHistorySummaryProps> = ({ 
           </div>
           
           <div className="absolute right-4 bottom-4 opacity-80">
-            <card.Icon className="h-16 w-16 text-white/40" strokeWidth={1.5} />
+            <Icon3D label={card.title} className="h-16 w-16" />
           </div>
         </div>
       ))}

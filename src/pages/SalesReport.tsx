@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Icon3D } from "@/components/shared/Icon3D";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
@@ -103,7 +104,7 @@ const SalesReport = () => {
                 <h3 className="text-lg font-semibold text-white/90 mb-1">{card.title}</h3>
                 <p className="text-2xl font-bold text-white">{card.value}</p>
               </div>
-              <div className="absolute right-4 bottom-4 opacity-80"><card.icon className="h-16 w-16 text-white/40" strokeWidth={1.5} /></div>
+              <div className="absolute right-4 bottom-4 opacity-80"><Icon3D label={card.title} className="h-16 w-16" /></div>
             </div>
           ))}
         </div>

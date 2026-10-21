@@ -18,9 +18,9 @@ export function resolve3DIcon(label: string): Icon3DName {
   if (/settings|interface|monitor|gear/i.test(label)) return "settings";
   if (/vendor|supplier|truck|purchase|reorder/i.test(label)) return "truck";
   if (/customer|contact|user|profile/i.test(label)) return "contacts";
-  if (/invoice|receipt|expense|revenue|dollar|pricing|payment|credit|book/i.test(label)) return "invoice";
-  if (/report|chart|growth|trend|analytics/i.test(label)) return "chart";
-  if (/inventory|stock|box|package/i.test(label)) return "boxes";
+  if (/invoice|receipt|expense|revenue|dollar|pricing|payment|credit|book|payable|due|profit|gst|cash|balance|cost|transaction/i.test(label)) return "invoice";
+  if (/report|chart|growth|trend|analytics|period/i.test(label)) return "chart";
+  if (/inventory|stock|box|package|product|categor|sku|layer/i.test(label)) return "boxes";
   if (/sales|sale|cart/i.test(label)) return "cart";
   return "paint";
 }
