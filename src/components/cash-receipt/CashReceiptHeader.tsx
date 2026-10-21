@@ -1,6 +1,8 @@
 import React from "react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Plus, Download, Filter } from "lucide-react";
+import cashReceiptIcon from "@/assets/cash-receipt-icon.png";
 
 interface CashReceiptHeaderProps {
   onAddReceipt: () => void;
@@ -12,9 +14,20 @@ export function CashReceiptHeader({ onAddReceipt, onExportCSV }: CashReceiptHead
     <div className="flex justify-between items-center">
       <div>
         <h1 
-          className="text-3xl font-bold" 
+          className="text-3xl font-bold flex items-center gap-3" 
           style={{ color: "#16583f" }}
         >
+          <motion.div
+            animate={{ y: [0, -6, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <img
+              src={cashReceiptIcon}
+              alt="Cash Receipts"
+              className="h-10 w-10 sm:h-12 sm:w-12 object-contain neo-icon-3d"
+              style={{ mixBlendMode: "multiply" }}
+            />
+          </motion.div>
           Cash Receipts
         </h1>
       </div>
