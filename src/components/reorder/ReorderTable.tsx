@@ -129,6 +129,13 @@ export function ReorderTable({
             </TableRow>
           </TableHeader>
           <TableBody>
+            {filteredProducts.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={13} className="py-10 text-center text-pink-600">
+                  No products match the current filters. New low-stock items will appear here automatically.
+                </TableCell>
+              </TableRow>
+            )}
             {filteredProducts.map((product, index) => {
               const isSelected = selectedProducts.includes(product.id);
               const isExpanded = expandedRows.includes(product.id);
@@ -210,20 +217,20 @@ export function ReorderTable({
                           <h4 className="font-medium text-pink-800 mb-2">Product Details</h4>
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                             <div>
-                              <span className="text-pink-600 font-medium">Last Purchase:</span>
-                              <p className="text-gray-600">2024-01-15</p>
+                              <span className="text-pink-600 font-medium">Category:</span>
+                              <p className="text-gray-600">{product.category || 'Uncategorized'}</p>
                             </div>
                             <div>
-                              <span className="text-pink-600 font-medium">Average Consumption:</span>
-                              <p className="text-gray-600">15 units/month</p>
+                              <span className="text-pink-600 font-medium">Unit:</span>
+                              <p className="text-gray-600">{product.unit || '—'}</p>
                             </div>
                             <div>
-                              <span className="text-pink-600 font-medium">Lead Time:</span>
-                              <p className="text-gray-600">5-7 days</p>
+                              <span className="text-pink-600 font-medium">Purchase Rate:</span>
+                              <p className="text-gray-600">₹{product.purchaseRate.toLocaleString('en-IN')}</p>
                             </div>
                             <div>
-                              <span className="text-pink-600 font-medium">Storage Location:</span>
-                              <p className="text-gray-600">Warehouse A-1</p>
+                              <span className="text-pink-600 font-medium">Supplier:</span>
+                              <p className="text-gray-600">{product.supplierName || 'Not set'}</p>
                             </div>
                           </div>
                         </div>

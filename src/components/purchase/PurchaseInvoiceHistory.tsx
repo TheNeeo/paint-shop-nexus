@@ -5,7 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Search, Filter, Download, Eye, Edit, Trash2, FileDown } from 'lucide-react';
+import { Search, Filter, Eye, Trash2, FileText, Truck, CalendarDays, IndianRupee, Activity, Settings } from 'lucide-react';
+import { TableHeaderCell } from '@/components/shared/TableHeaderCell';
+import { Icon3D } from '@/components/shared/Icon3D';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Purchase } from '@/types/purchase';
@@ -148,22 +150,27 @@ export const PurchaseInvoiceHistory = () => {
         <CardContent className="pt-6">
           {loading ? (
             <div className="text-center py-8 text-pink-600">Loading invoices...</div>
-          ) : filteredPurchases.length === 0 ? (
-            <div className="text-center py-8 text-pink-600">No purchase invoices found.</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full bg-white rounded-lg">
                 <thead>
                   <tr className="border-b border-pink-200 bg-pink-100">
-                    <th className="text-left p-4 font-medium text-pink-800">Invoice No.</th>
-                    <th className="text-left p-4 font-medium text-pink-800">Vendor Name</th>
-                    <th className="text-left p-4 font-medium text-pink-800">Date</th>
-                    <th className="text-left p-4 font-medium text-pink-800">Total Amount</th>
-                    <th className="text-left p-4 font-medium text-pink-800">Status</th>
-                    <th className="text-left p-4 font-medium text-pink-800">Actions</th>
+                    <TableHeaderCell icon={FileText} label="Invoice No." textColor="#9d174d" iconColor="#af0568" />
+                    <TableHeaderCell icon={Truck} label="Vendor Name" textColor="#9d174d" iconColor="#10b981" />
+                    <TableHeaderCell icon={CalendarDays} label="Date" textColor="#9d174d" iconColor="#6366f1" />
+                    <TableHeaderCell icon={IndianRupee} label="Total Amount" textColor="#9d174d" iconColor="#f59e0b" />
+                    <TableHeaderCell icon={Activity} label="Status" textColor="#9d174d" iconColor="#0d9488" />
+                    <TableHeaderCell icon={Settings} label="Actions" textColor="#9d174d" iconColor="#64748b" align="center" className="text-center" />
                   </tr>
                 </thead>
                 <tbody>
+                  {filteredPurchases.length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="p-8 text-center text-pink-600">
+                        No purchase invoices found. Create one from the Create Invoice tab.
+                      </td>
+                    </tr>
+                  )}
                   {filteredPurchases.map((purchase) => (
                     <tr key={purchase.id} className="border-b border-pink-100 hover:bg-pink-50">
                       <td className="p-4 font-medium text-pink-700">{purchase.invoice_number}</td>
