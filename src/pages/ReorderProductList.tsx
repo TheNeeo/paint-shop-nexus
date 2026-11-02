@@ -120,21 +120,16 @@ const ReorderProductList = () => {
             stockStatusFilter={stockStatusFilter}
             setStockStatusFilter={setStockStatusFilter}
           />
-          {!loading && products.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-sm border border-pink-200 p-12 text-center text-gray-500">
-              No low-stock products to reorder right now.
-            </div>
-          ) : (
-            <ReorderTable 
-              products={products}
-              selectedProducts={selectedProducts}
-              setSelectedProducts={setSelectedProducts}
-              searchTerm={searchTerm}
-              categoryFilter={categoryFilter}
-              supplierFilter={supplierFilter}
-              stockStatusFilter={stockStatusFilter}
-            />
-          )}
+          {/* Table always renders so header labels stay visible even when empty */}
+          <ReorderTable
+            products={products}
+            selectedProducts={selectedProducts}
+            setSelectedProducts={setSelectedProducts}
+            searchTerm={searchTerm}
+            categoryFilter={categoryFilter}
+            supplierFilter={supplierFilter}
+            stockStatusFilter={stockStatusFilter}
+          />
           
           {selectedProducts.length > 0 && (
             <BulkActionBar 
