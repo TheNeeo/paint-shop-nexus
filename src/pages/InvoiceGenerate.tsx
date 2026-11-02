@@ -186,6 +186,29 @@ export default function InvoiceGenerate() {
     },
   });
 
+  // Fetch invoice stats (live values for summary cards)
+  const { data: salesStats = [] } = useQuery({
+    queryKey: ["invoice-stats"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("sales")
+        .select("total_amount, tax_amount, pending_amount, invoice_date");
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  const todayStr = new Date().toISOString().split("T")[0];
+  const totalSalesToday = salesStats
+    .filter((s) => s.invoice_date === todayStr)
+    .reduce((sum, s) => sum + Number(s.total_amount), 0);
+  const pendingInvoices = salesStats.filter((s) => Number(s.pending_amount) > 0).length;
+  const totalGstCollected = salesStats.reduce((sum, s) => sum + Number(s.tax_amount), 0);
+  const avgInvoiceValue = salesStats.length
+    ? salesStats.reduce((sum, s) => sum + Number(s.total_amount), 0) / salesStats.length
+    : 0;
+  const fmt = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
+
   // Calculate totals
   const subtotal = invoiceItems.reduce((sum, item) => sum + item.amount, 0);
   const discountAmount = (subtotal * discount) / 100;
