@@ -186,6 +186,29 @@ export default function InvoiceGenerate() {
     },
   });
 
+  // Fetch invoice stats (live values for summary cards)
+  const { data: salesStats = [] } = useQuery({
+    queryKey: ["invoice-stats"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("sales")
+        .select("total_amount, tax_amount, pending_amount, invoice_date");
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  const todayStr = new Date().toISOString().split("T")[0];
+  const totalSalesToday = salesStats
+    .filter((s) => s.invoice_date === todayStr)
+    .reduce((sum, s) => sum + Number(s.total_amount), 0);
+  const pendingInvoices = salesStats.filter((s) => Number(s.pending_amount) > 0).length;
+  const totalGstCollected = salesStats.reduce((sum, s) => sum + Number(s.tax_amount), 0);
+  const avgInvoiceValue = salesStats.length
+    ? salesStats.reduce((sum, s) => sum + Number(s.total_amount), 0) / salesStats.length
+    : 0;
+  const fmt = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
+
   // Calculate totals
   const subtotal = invoiceItems.reduce((sum, item) => sum + item.amount, 0);
   const discountAmount = (subtotal * discount) / 100;
@@ -502,7 +525,7 @@ export default function InvoiceGenerate() {
             >
               <div className="relative z-10">
                 <h3 className="text-lg font-semibold mb-1" style={{ color: THEME_PRIMARY }}>Total Sales Today</h3>
-                <p className="text-2xl font-bold" style={{ color: THEME_PRIMARY }}>₹45,231</p>
+                <p className="text-2xl font-bold" style={{ color: THEME_PRIMARY }}>{fmt(totalSalesToday)}</p>
               </div>
               <div className="absolute right-4 bottom-4 opacity-30">
                 <Icon3D name="invoice" className="h-16 w-16" />
@@ -518,7 +541,7 @@ export default function InvoiceGenerate() {
             >
               <div className="relative z-10">
                 <h3 className="text-lg font-semibold text-white/90 mb-1">Pending Invoices</h3>
-                <p className="text-2xl font-bold text-white">12</p>
+                <p className="text-2xl font-bold text-white">{pendingInvoices}</p>
               </div>
               <div className="absolute right-4 bottom-4 opacity-30">
                 <Icon3D name="invoice" className="h-16 w-16" />
@@ -534,7 +557,7 @@ export default function InvoiceGenerate() {
             >
               <div className="relative z-10">
                 <h3 className="text-lg font-semibold text-white/90 mb-1">Total GST Collected</h3>
-                <p className="text-2xl font-bold text-white">₹8,142</p>
+                <p className="text-2xl font-bold text-white">{fmt(totalGstCollected)}</p>
               </div>
               <div className="absolute right-4 bottom-4 opacity-30">
                 <Icon3D name="invoice" className="h-16 w-16" />
@@ -550,10 +573,10 @@ export default function InvoiceGenerate() {
             >
               <div className="relative z-10">
                 <h3 className="text-lg font-semibold mb-1" style={{ color: THEME_PRIMARY }}>Avg Invoice Value</h3>
-                <p className="text-2xl font-bold" style={{ color: THEME_PRIMARY }}>₹3,769</p>
+                <p className="text-2xl font-bold" style={{ color: THEME_PRIMARY }}>{fmt(avgInvoiceValue)}</p>
               </div>
               <div className="absolute right-4 bottom-4 opacity-30">
-                <TrendingUp className="h-16 w-16" style={{ color: THEME_PRIMARY }} strokeWidth={1.5} />
+                <Icon3D name="invoice" className="h-16 w-16" />
               </div>
             </motion.div>
           </div>
