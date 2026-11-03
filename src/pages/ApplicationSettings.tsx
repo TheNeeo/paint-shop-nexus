@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Settings, Users, FileText, Palette, Database, BarChart3 } from "lucide-react";
+import { Icon3D } from "@/components/shared/Icon3D";
 import AppLayout from "@/components/layout/AppLayout";
 import {
   Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList,
