@@ -162,7 +162,6 @@ export default function UserInterfaceSettings() {
         {/* Colorful Tab Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
           {tabs.map((tab, index) => {
-            const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
               <motion.button
@@ -180,8 +179,8 @@ export default function UserInterfaceSettings() {
                   <h3 className="text-base font-bold text-white/95 mb-1">{tab.label}</h3>
                   <p className="text-xs text-white/70">{tab.description}</p>
                 </div>
-                <div className="absolute right-3 bottom-3 opacity-80">
-                  <Icon className="h-12 w-12 text-white/30" strokeWidth={1.5} />
+                <div className="absolute right-3 bottom-3 opacity-90">
+                  <Icon3D name={tab.icon3d} className="h-12 w-12" />
                 </div>
                 {isActive && (
                   <motion.div layoutId="uiActiveTab" className="absolute bottom-0 left-0 right-0 h-1 bg-white/80 rounded-full" />
