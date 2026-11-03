@@ -193,14 +193,14 @@ export const PurchaseInvoiceForm = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-pink-200">
-                  <th className="text-left p-2 text-pink-800">S.No</th>
-                  <th className="text-left p-2 text-pink-800">Product Name</th>
-                  <th className="text-left p-2 text-pink-800">HSN Code</th>
-                  <th className="text-left p-2 text-pink-800">Unit</th>
-                  <th className="text-left p-2 text-pink-800">Quantity</th>
-                  <th className="text-left p-2 text-pink-800">Rate</th>
-                  <th className="text-left p-2 text-pink-800">Amount</th>
-                  <th className="text-left p-2 text-pink-800">Actions</th>
+                  <TableHeaderCell icon={Hash} label="S.No" textColor="#9d174d" iconColor="#ec4899" />
+                  <TableHeaderCell icon={Package} label="Product Name" textColor="#9d174d" iconColor="#af0568" />
+                  <TableHeaderCell icon={Barcode} label="HSN Code" textColor="#9d174d" iconColor="#6366f1" />
+                  <TableHeaderCell icon={Ruler} label="Unit" textColor="#9d174d" iconColor="#0d9488" />
+                  <TableHeaderCell icon={Boxes} label="Quantity" textColor="#9d174d" iconColor="#f59e0b" />
+                  <TableHeaderCell icon={IndianRupee} label="Rate" textColor="#9d174d" iconColor="#10b981" />
+                  <TableHeaderCell icon={Calculator} label="Amount" textColor="#9d174d" iconColor="#ef4444" />
+                  <TableHeaderCell icon={Settings} label="Actions" textColor="#9d174d" iconColor="#64748b" align="center" className="text-center" />
                 </tr>
               </thead>
               <tbody>
