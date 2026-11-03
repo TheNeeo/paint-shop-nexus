@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Settings, Users, FileText, Palette, Database, BarChart3 } from "lucide-react";
+import { BarChart3 } from "lucide-react";
+import { Icon3D } from "@/components/shared/Icon3D";
 import AppLayout from "@/components/layout/AppLayout";
 import {
   Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList,
@@ -28,12 +29,12 @@ const THEME = {
 };
 
 const tabs = [
-  { id: "general", label: "General", icon: Settings, gradient: "from-purple-400 via-fuchsia-500 to-pink-500", description: "Shop info & preferences" },
-  { id: "users", label: "Users", icon: Users, gradient: "from-blue-400 via-indigo-500 to-purple-500", description: "Roles & permissions" },
-  { id: "invoice", label: "Invoice & Tax", icon: FileText, gradient: "from-amber-400 via-orange-500 to-red-500", description: "Invoice & GST config" },
-  { id: "theme", label: "Theme", icon: Palette, gradient: "from-emerald-400 via-teal-500 to-cyan-500", description: "Appearance settings" },
-  { id: "backup", label: "Backup", icon: Database, gradient: "from-sky-400 via-blue-500 to-indigo-500", description: "Data backup & sync" },
-];
+  { id: "general", label: "General", icon3d: "settings", gradient: "from-purple-400 via-fuchsia-500 to-pink-500", description: "Shop info & preferences" },
+  { id: "users", label: "Users", icon3d: "contacts", gradient: "from-blue-400 via-indigo-500 to-purple-500", description: "Roles & permissions" },
+  { id: "invoice", label: "Invoice & Tax", icon3d: "invoice", gradient: "from-amber-400 via-orange-500 to-red-500", description: "Invoice & GST config" },
+  { id: "theme", label: "Theme", icon3d: "paint", gradient: "from-emerald-400 via-teal-500 to-cyan-500", description: "Appearance settings" },
+  { id: "backup", label: "Backup", icon3d: "boxes", gradient: "from-sky-400 via-blue-500 to-indigo-500", description: "Data backup & sync" },
+] as const;
 
 export default function ApplicationSettings() {
   const navigate = useNavigate();
@@ -141,7 +142,6 @@ export default function ApplicationSettings() {
         {/* Colorful Tab Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           {tabs.map((tab, index) => {
-            const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
               <motion.button
@@ -160,8 +160,8 @@ export default function ApplicationSettings() {
                   <h3 className="text-base font-bold text-white/95 mb-1">{tab.label}</h3>
                   <p className="text-xs text-white/70">{tab.description}</p>
                 </div>
-                <div className="absolute right-3 bottom-3 opacity-80">
-                  <Icon className="h-12 w-12 text-white/30" strokeWidth={1.5} />
+                <div className="absolute right-3 bottom-3 opacity-90">
+                  <Icon3D name={tab.icon3d} className="h-12 w-12" />
                 </div>
                 {isActive && (
                   <motion.div

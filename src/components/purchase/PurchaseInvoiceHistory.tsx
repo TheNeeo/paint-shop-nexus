@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Search, Filter, Eye, Trash2, FileText, Truck, CalendarDays, IndianRupee, Activity, Settings } from 'lucide-react';
+import { Search, Filter, Eye, Trash2, FileText, Truck, CalendarDays, IndianRupee, Activity, Settings, FileDown } from 'lucide-react';
 import { TableHeaderCell } from '@/components/shared/TableHeaderCell';
 import { Icon3D } from '@/components/shared/Icon3D';
 import { useToast } from '@/hooks/use-toast';
@@ -95,7 +95,12 @@ export const PurchaseInvoiceHistory = () => {
       {/* Search and Filters */}
       <Card className="bg-pink-50 border-pink-200">
         <CardHeader className="bg-pink-100 border-b border-pink-200">
-          <CardTitle className="text-pink-800">Search & Filters</CardTitle>
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-xl bg-pink-100 flex items-center justify-center flex-shrink-0">
+              <Icon3D label="Search & Filters" className="h-9 w-9" />
+            </div>
+            <CardTitle className="text-pink-800">Search & Filters</CardTitle>
+          </div>
         </CardHeader>
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -141,7 +146,12 @@ export const PurchaseInvoiceHistory = () => {
       {/* Invoice History Table */}
       <Card className="bg-pink-50 border-pink-200">
         <CardHeader className="flex flex-row items-center justify-between bg-pink-100 border-b border-pink-200">
-          <CardTitle className="text-pink-800">Purchase Invoice History</CardTitle>
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-xl bg-pink-100 flex items-center justify-center flex-shrink-0">
+              <Icon3D label="Purchase Invoice History" className="h-9 w-9" />
+            </div>
+            <CardTitle className="text-pink-800">Purchase Invoice History</CardTitle>
+          </div>
           <Button variant="outline" className="border-pink-300 text-pink-700 hover:bg-pink-100">
             <FileDown className="w-4 h-4 mr-2" />
             Export All
@@ -212,27 +222,39 @@ export const PurchaseInvoiceHistory = () => {
       {/* Summary Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="bg-pink-50 border-pink-200">
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-pink-600">{filteredPurchases.length}</div>
-            <div className="text-sm text-pink-500">Total Invoices</div>
+          <CardContent className="p-4 flex items-center justify-center gap-3">
+            <Icon3D label="Total Invoices" name="invoice" className="h-12 w-12" />
+            <div className="text-center">
+              <div className="text-2xl font-bold text-pink-600">{filteredPurchases.length}</div>
+              <div className="text-sm text-pink-500">Total Invoices</div>
+            </div>
           </CardContent>
         </Card>
         <Card className="bg-pink-50 border-pink-200">
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-green-600">₹{totalAmount.toLocaleString('en-IN')}</div>
-            <div className="text-sm text-pink-500">Total Amount</div>
+          <CardContent className="p-4 flex items-center justify-center gap-3">
+            <Icon3D label="Total Amount" name="invoice" className="h-12 w-12" />
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">₹{totalAmount.toLocaleString('en-IN')}</div>
+              <div className="text-sm text-pink-500">Total Amount</div>
+            </div>
           </CardContent>
         </Card>
         <Card className="bg-pink-50 border-pink-200">
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-pink-600">₹{paidAmount.toLocaleString('en-IN')}</div>
-            <div className="text-sm text-pink-500">Paid Amount</div>
+          <CardContent className="p-4 flex items-center justify-center gap-3">
+            <Icon3D label="Paid Amount" name="invoice" className="h-12 w-12" />
+            <div className="text-center">
+              <div className="text-2xl font-bold text-pink-600">₹{paidAmount.toLocaleString('en-IN')}</div>
+              <div className="text-sm text-pink-500">Paid Amount</div>
+            </div>
           </CardContent>
         </Card>
         <Card className="bg-pink-50 border-pink-200">
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-red-600">₹{balanceDue.toLocaleString('en-IN')}</div>
-            <div className="text-sm text-pink-500">Balance Due</div>
+          <CardContent className="p-4 flex items-center justify-center gap-3">
+            <Icon3D label="Balance Due" name="invoice" className="h-12 w-12" />
+            <div className="text-center">
+              <div className="text-2xl font-bold text-red-600">₹{balanceDue.toLocaleString('en-IN')}</div>
+              <div className="text-sm text-pink-500">Balance Due</div>
+            </div>
           </CardContent>
         </Card>
       </div>

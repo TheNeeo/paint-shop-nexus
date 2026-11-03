@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Palette, Type, PanelLeft, LayoutDashboard, Image, MousePointerClick, Sparkles, BarChart3 } from "lucide-react";
+import { BarChart3 } from "lucide-react";
+import { Icon3D } from "@/components/shared/Icon3D";
 import AppLayout from "@/components/layout/AppLayout";
 import {
   Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList,
@@ -34,14 +35,14 @@ const THEME = {
 };
 
 const tabs = [
-  { id: "theme", label: "Theme", icon: Palette, gradient: "from-amber-400 via-orange-500 to-red-500", description: "Color scheme & mode" },
-  { id: "typography", label: "Typography", icon: Type, gradient: "from-purple-400 via-fuchsia-500 to-pink-500", description: "Fonts & text sizes" },
-  { id: "sidebar", label: "Sidebar", icon: PanelLeft, gradient: "from-blue-400 via-indigo-500 to-purple-500", description: "Navigation style" },
-  { id: "header", label: "Header", icon: LayoutDashboard, gradient: "from-emerald-400 via-teal-500 to-cyan-500", description: "Header appearance" },
-  { id: "background", label: "Background", icon: Image, gradient: "from-sky-400 via-blue-500 to-indigo-500", description: "Page backgrounds" },
-  { id: "buttons", label: "Buttons", icon: MousePointerClick, gradient: "from-rose-400 via-pink-500 to-fuchsia-500", description: "Button & form styles" },
-  { id: "animations", label: "Animations", icon: Sparkles, gradient: "from-yellow-400 via-amber-500 to-orange-500", description: "Motion & effects" },
-];
+  { id: "theme", label: "Theme", icon3d: "paint", gradient: "from-amber-400 via-orange-500 to-red-500", description: "Color scheme & mode" },
+  { id: "typography", label: "Typography", icon3d: "invoice", gradient: "from-purple-400 via-fuchsia-500 to-pink-500", description: "Fonts & text sizes" },
+  { id: "sidebar", label: "Sidebar", icon3d: "home", gradient: "from-blue-400 via-indigo-500 to-purple-500", description: "Navigation style" },
+  { id: "header", label: "Header", icon3d: "home", gradient: "from-emerald-400 via-teal-500 to-cyan-500", description: "Header appearance" },
+  { id: "background", label: "Background", icon3d: "paint", gradient: "from-sky-400 via-blue-500 to-indigo-500", description: "Page backgrounds" },
+  { id: "buttons", label: "Buttons", icon3d: "settings", gradient: "from-rose-400 via-pink-500 to-fuchsia-500", description: "Button & form styles" },
+  { id: "animations", label: "Animations", icon3d: "chart", gradient: "from-yellow-400 via-amber-500 to-orange-500", description: "Motion & effects" },
+] as const;
 
 export default function UserInterfaceSettings() {
   const navigate = useNavigate();
@@ -161,7 +162,6 @@ export default function UserInterfaceSettings() {
         {/* Colorful Tab Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
           {tabs.map((tab, index) => {
-            const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
               <motion.button
@@ -179,8 +179,8 @@ export default function UserInterfaceSettings() {
                   <h3 className="text-base font-bold text-white/95 mb-1">{tab.label}</h3>
                   <p className="text-xs text-white/70">{tab.description}</p>
                 </div>
-                <div className="absolute right-3 bottom-3 opacity-80">
-                  <Icon className="h-12 w-12 text-white/30" strokeWidth={1.5} />
+                <div className="absolute right-3 bottom-3 opacity-90">
+                  <Icon3D name={tab.icon3d} className="h-12 w-12" />
                 </div>
                 {isActive && (
                   <motion.div layoutId="uiActiveTab" className="absolute bottom-0 left-0 right-0 h-1 bg-white/80 rounded-full" />

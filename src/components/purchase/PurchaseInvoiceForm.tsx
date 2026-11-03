@@ -5,9 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Trash2, Upload, Save, FileText, Printer, Mail, MessageCircle } from 'lucide-react';
+import { Plus, Trash2, Upload, Save, FileText, Printer, Mail, MessageCircle, Truck, Package, ClipboardList, IndianRupee, Hash, Barcode, Ruler, Boxes, Calculator, Settings } from 'lucide-react';
+import { FormSectionHeader } from '@/components/shared/FormSectionHeader';
+import { TableHeaderCell } from '@/components/shared/TableHeaderCell';
 import { useToast } from '@/hooks/use-toast';
 
 interface InvoiceItem {
@@ -87,7 +89,7 @@ export const PurchaseInvoiceForm = () => {
       {/* Supplier Information */}
       <Card className="bg-pink-50 border border-pink-200">
         <CardHeader className="bg-pink-100 border-b border-pink-200">
-          <CardTitle className="text-pink-800">Supplier Information</CardTitle>
+          <FormSectionHeader icon={Truck} title="Supplier Information" color="pink" className="mb-0" />
         </CardHeader>
         <CardContent className="space-y-4 pt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -130,7 +132,7 @@ export const PurchaseInvoiceForm = () => {
       {/* Invoice Details */}
       <Card className="bg-pink-50 border border-pink-200">
         <CardHeader className="bg-pink-100 border-b border-pink-200">
-          <CardTitle className="text-pink-800">Purchase Invoice Details</CardTitle>
+          <FormSectionHeader icon={FileText} title="Purchase Invoice Details" color="pink" className="mb-0" />
         </CardHeader>
         <CardContent className="space-y-4 pt-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -180,7 +182,7 @@ export const PurchaseInvoiceForm = () => {
       {/* Product/Item Table */}
       <Card className="bg-pink-50 border border-pink-200">
         <CardHeader className="flex flex-row items-center justify-between bg-pink-100 border-b border-pink-200">
-          <CardTitle className="text-pink-800">Products/Items</CardTitle>
+          <FormSectionHeader icon={Package} title="Products/Items" color="pink" className="mb-0" />
           <Button onClick={addNewItem} size="sm" className="bg-pink-600 hover:bg-pink-700 text-white">
             <Plus className="w-4 h-4 mr-1" />
             Add Item
@@ -191,14 +193,14 @@ export const PurchaseInvoiceForm = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-pink-200">
-                  <th className="text-left p-2 text-pink-800">S.No</th>
-                  <th className="text-left p-2 text-pink-800">Product Name</th>
-                  <th className="text-left p-2 text-pink-800">HSN Code</th>
-                  <th className="text-left p-2 text-pink-800">Unit</th>
-                  <th className="text-left p-2 text-pink-800">Quantity</th>
-                  <th className="text-left p-2 text-pink-800">Rate</th>
-                  <th className="text-left p-2 text-pink-800">Amount</th>
-                  <th className="text-left p-2 text-pink-800">Actions</th>
+                  <TableHeaderCell icon={Hash} label="S.No" textColor="#9d174d" iconColor="#ec4899" />
+                  <TableHeaderCell icon={Package} label="Product Name" textColor="#9d174d" iconColor="#af0568" />
+                  <TableHeaderCell icon={Barcode} label="HSN Code" textColor="#9d174d" iconColor="#6366f1" />
+                  <TableHeaderCell icon={Ruler} label="Unit" textColor="#9d174d" iconColor="#0d9488" />
+                  <TableHeaderCell icon={Boxes} label="Quantity" textColor="#9d174d" iconColor="#f59e0b" />
+                  <TableHeaderCell icon={IndianRupee} label="Rate" textColor="#9d174d" iconColor="#10b981" />
+                  <TableHeaderCell icon={Calculator} label="Amount" textColor="#9d174d" iconColor="#ef4444" />
+                  <TableHeaderCell icon={Settings} label="Actions" textColor="#9d174d" iconColor="#64748b" align="center" className="text-center" />
                 </tr>
               </thead>
               <tbody>
@@ -277,7 +279,7 @@ export const PurchaseInvoiceForm = () => {
         <div className="lg:col-span-2 space-y-6">
           <Card className="bg-pink-50 border border-pink-200">
             <CardHeader className="bg-pink-100 border-b border-pink-200">
-              <CardTitle className="text-pink-800">Additional Details</CardTitle>
+              <FormSectionHeader icon={ClipboardList} title="Additional Details" color="pink" className="mb-0" />
             </CardHeader>
             <CardContent className="space-y-4 pt-6">
               <div className="space-y-2">
@@ -302,7 +304,7 @@ export const PurchaseInvoiceForm = () => {
         {/* Financial Summary */}
         <Card className="lg:sticky lg:top-6 bg-pink-50 border border-pink-200">
           <CardHeader className="bg-pink-100 border-b border-pink-200">
-            <CardTitle className="text-pink-800">Financial Summary</CardTitle>
+            <FormSectionHeader icon={IndianRupee} title="Financial Summary" color="pink" className="mb-0" />
           </CardHeader>
           <CardContent className="space-y-4 pt-6">
             <div className="space-y-2">
