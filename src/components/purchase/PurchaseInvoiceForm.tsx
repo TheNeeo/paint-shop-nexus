@@ -7,7 +7,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Trash2, Upload, Save, FileText, Printer, Mail, MessageCircle } from 'lucide-react';
+import { Plus, Trash2, Upload, Save, FileText, Printer, Mail, MessageCircle, Truck, Package, ClipboardList, IndianRupee, Hash, Barcode, Ruler, Boxes, Calculator, Settings } from 'lucide-react';
+import { FormSectionHeader } from '@/components/shared/FormSectionHeader';
+import { TableHeaderCell } from '@/components/shared/TableHeaderCell';
 import { useToast } from '@/hooks/use-toast';
 
 interface InvoiceItem {
@@ -87,7 +89,7 @@ export const PurchaseInvoiceForm = () => {
       {/* Supplier Information */}
       <Card className="bg-pink-50 border border-pink-200">
         <CardHeader className="bg-pink-100 border-b border-pink-200">
-          <CardTitle className="text-pink-800">Supplier Information</CardTitle>
+          <FormSectionHeader icon={Truck} title="Supplier Information" color="pink" className="mb-0" />
         </CardHeader>
         <CardContent className="space-y-4 pt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -130,7 +132,7 @@ export const PurchaseInvoiceForm = () => {
       {/* Invoice Details */}
       <Card className="bg-pink-50 border border-pink-200">
         <CardHeader className="bg-pink-100 border-b border-pink-200">
-          <CardTitle className="text-pink-800">Purchase Invoice Details</CardTitle>
+          <FormSectionHeader icon={FileText} title="Purchase Invoice Details" color="pink" className="mb-0" />
         </CardHeader>
         <CardContent className="space-y-4 pt-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -180,7 +182,7 @@ export const PurchaseInvoiceForm = () => {
       {/* Product/Item Table */}
       <Card className="bg-pink-50 border border-pink-200">
         <CardHeader className="flex flex-row items-center justify-between bg-pink-100 border-b border-pink-200">
-          <CardTitle className="text-pink-800">Products/Items</CardTitle>
+          <FormSectionHeader icon={Package} title="Products/Items" color="pink" className="mb-0" />
           <Button onClick={addNewItem} size="sm" className="bg-pink-600 hover:bg-pink-700 text-white">
             <Plus className="w-4 h-4 mr-1" />
             Add Item
@@ -277,7 +279,7 @@ export const PurchaseInvoiceForm = () => {
         <div className="lg:col-span-2 space-y-6">
           <Card className="bg-pink-50 border border-pink-200">
             <CardHeader className="bg-pink-100 border-b border-pink-200">
-              <CardTitle className="text-pink-800">Additional Details</CardTitle>
+              <FormSectionHeader icon={ClipboardList} title="Additional Details" color="pink" className="mb-0" />
             </CardHeader>
             <CardContent className="space-y-4 pt-6">
               <div className="space-y-2">
@@ -302,7 +304,7 @@ export const PurchaseInvoiceForm = () => {
         {/* Financial Summary */}
         <Card className="lg:sticky lg:top-6 bg-pink-50 border border-pink-200">
           <CardHeader className="bg-pink-100 border-b border-pink-200">
-            <CardTitle className="text-pink-800">Financial Summary</CardTitle>
+            <FormSectionHeader icon={IndianRupee} title="Financial Summary" color="pink" className="mb-0" />
           </CardHeader>
           <CardContent className="space-y-4 pt-6">
             <div className="space-y-2">
