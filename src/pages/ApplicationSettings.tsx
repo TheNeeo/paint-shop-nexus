@@ -34,7 +34,7 @@ const tabs = [
   { id: "invoice", label: "Invoice & Tax", icon3d: "invoice", gradient: "from-amber-400 via-orange-500 to-red-500", description: "Invoice & GST config" },
   { id: "theme", label: "Theme", icon3d: "paint", gradient: "from-emerald-400 via-teal-500 to-cyan-500", description: "Appearance settings" },
   { id: "backup", label: "Backup", icon3d: "boxes", gradient: "from-sky-400 via-blue-500 to-indigo-500", description: "Data backup & sync" },
-];
+] as const;
 
 export default function ApplicationSettings() {
   const navigate = useNavigate();

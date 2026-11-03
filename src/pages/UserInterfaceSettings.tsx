@@ -42,7 +42,7 @@ const tabs = [
   { id: "background", label: "Background", icon3d: "paint", gradient: "from-sky-400 via-blue-500 to-indigo-500", description: "Page backgrounds" },
   { id: "buttons", label: "Buttons", icon3d: "settings", gradient: "from-rose-400 via-pink-500 to-fuchsia-500", description: "Button & form styles" },
   { id: "animations", label: "Animations", icon3d: "chart", gradient: "from-yellow-400 via-amber-500 to-orange-500", description: "Motion & effects" },
-];
+] as const;
 
 export default function UserInterfaceSettings() {
   const navigate = useNavigate();
