@@ -29,11 +29,11 @@ const THEME = {
 };
 
 const tabs = [
-  { id: "general", label: "General", icon: Settings, gradient: "from-purple-400 via-fuchsia-500 to-pink-500", description: "Shop info & preferences" },
-  { id: "users", label: "Users", icon: Users, gradient: "from-blue-400 via-indigo-500 to-purple-500", description: "Roles & permissions" },
-  { id: "invoice", label: "Invoice & Tax", icon: FileText, gradient: "from-amber-400 via-orange-500 to-red-500", description: "Invoice & GST config" },
-  { id: "theme", label: "Theme", icon: Palette, gradient: "from-emerald-400 via-teal-500 to-cyan-500", description: "Appearance settings" },
-  { id: "backup", label: "Backup", icon: Database, gradient: "from-sky-400 via-blue-500 to-indigo-500", description: "Data backup & sync" },
+  { id: "general", label: "General", icon3d: "settings", gradient: "from-purple-400 via-fuchsia-500 to-pink-500", description: "Shop info & preferences" },
+  { id: "users", label: "Users", icon3d: "contacts", gradient: "from-blue-400 via-indigo-500 to-purple-500", description: "Roles & permissions" },
+  { id: "invoice", label: "Invoice & Tax", icon3d: "invoice", gradient: "from-amber-400 via-orange-500 to-red-500", description: "Invoice & GST config" },
+  { id: "theme", label: "Theme", icon3d: "paint", gradient: "from-emerald-400 via-teal-500 to-cyan-500", description: "Appearance settings" },
+  { id: "backup", label: "Backup", icon3d: "boxes", gradient: "from-sky-400 via-blue-500 to-indigo-500", description: "Data backup & sync" },
 ];
 
 export default function ApplicationSettings() {
