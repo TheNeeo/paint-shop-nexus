@@ -95,7 +95,12 @@ export const PurchaseInvoiceHistory = () => {
       {/* Search and Filters */}
       <Card className="bg-pink-50 border-pink-200">
         <CardHeader className="bg-pink-100 border-b border-pink-200">
-          <CardTitle className="text-pink-800">Search & Filters</CardTitle>
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-xl bg-pink-100 flex items-center justify-center flex-shrink-0">
+              <Icon3D label="Search & Filters" className="h-9 w-9" />
+            </div>
+            <CardTitle className="text-pink-800">Search & Filters</CardTitle>
+          </div>
         </CardHeader>
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -141,7 +146,12 @@ export const PurchaseInvoiceHistory = () => {
       {/* Invoice History Table */}
       <Card className="bg-pink-50 border-pink-200">
         <CardHeader className="flex flex-row items-center justify-between bg-pink-100 border-b border-pink-200">
-          <CardTitle className="text-pink-800">Purchase Invoice History</CardTitle>
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-xl bg-pink-100 flex items-center justify-center flex-shrink-0">
+              <Icon3D label="Purchase Invoice History" className="h-9 w-9" />
+            </div>
+            <CardTitle className="text-pink-800">Purchase Invoice History</CardTitle>
+          </div>
           <Button variant="outline" className="border-pink-300 text-pink-700 hover:bg-pink-100">
             <FileDown className="w-4 h-4 mr-2" />
             Export All
