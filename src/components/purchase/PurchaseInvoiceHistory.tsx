@@ -222,27 +222,39 @@ export const PurchaseInvoiceHistory = () => {
       {/* Summary Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="bg-pink-50 border-pink-200">
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-pink-600">{filteredPurchases.length}</div>
-            <div className="text-sm text-pink-500">Total Invoices</div>
+          <CardContent className="p-4 flex items-center justify-center gap-3">
+            <Icon3D label="Total Invoices" name="invoice" className="h-12 w-12" />
+            <div className="text-center">
+              <div className="text-2xl font-bold text-pink-600">{filteredPurchases.length}</div>
+              <div className="text-sm text-pink-500">Total Invoices</div>
+            </div>
           </CardContent>
         </Card>
         <Card className="bg-pink-50 border-pink-200">
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-green-600">₹{totalAmount.toLocaleString('en-IN')}</div>
-            <div className="text-sm text-pink-500">Total Amount</div>
+          <CardContent className="p-4 flex items-center justify-center gap-3">
+            <Icon3D label="Total Amount" name="invoice" className="h-12 w-12" />
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">₹{totalAmount.toLocaleString('en-IN')}</div>
+              <div className="text-sm text-pink-500">Total Amount</div>
+            </div>
           </CardContent>
         </Card>
         <Card className="bg-pink-50 border-pink-200">
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-pink-600">₹{paidAmount.toLocaleString('en-IN')}</div>
-            <div className="text-sm text-pink-500">Paid Amount</div>
+          <CardContent className="p-4 flex items-center justify-center gap-3">
+            <Icon3D label="Paid Amount" name="invoice" className="h-12 w-12" />
+            <div className="text-center">
+              <div className="text-2xl font-bold text-pink-600">₹{paidAmount.toLocaleString('en-IN')}</div>
+              <div className="text-sm text-pink-500">Paid Amount</div>
+            </div>
           </CardContent>
         </Card>
         <Card className="bg-pink-50 border-pink-200">
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-red-600">₹{balanceDue.toLocaleString('en-IN')}</div>
-            <div className="text-sm text-pink-500">Balance Due</div>
+          <CardContent className="p-4 flex items-center justify-center gap-3">
+            <Icon3D label="Balance Due" name="invoice" className="h-12 w-12" />
+            <div className="text-center">
+              <div className="text-2xl font-bold text-red-600">₹{balanceDue.toLocaleString('en-IN')}</div>
+              <div className="text-sm text-pink-500">Balance Due</div>
+            </div>
           </CardContent>
         </Card>
       </div>
