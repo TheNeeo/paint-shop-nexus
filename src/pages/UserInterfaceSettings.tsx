@@ -35,13 +35,13 @@ const THEME = {
 };
 
 const tabs = [
-  { id: "theme", label: "Theme", icon3d: "paint", gradient: "from-amber-400 via-orange-500 to-red-500", description: "Color scheme & mode" },
-  { id: "typography", label: "Typography", icon3d: "invoice", gradient: "from-purple-400 via-fuchsia-500 to-pink-500", description: "Fonts & text sizes" },
-  { id: "sidebar", label: "Sidebar", icon3d: "home", gradient: "from-blue-400 via-indigo-500 to-purple-500", description: "Navigation style" },
-  { id: "header", label: "Header", icon3d: "home", gradient: "from-emerald-400 via-teal-500 to-cyan-500", description: "Header appearance" },
-  { id: "background", label: "Background", icon3d: "paint", gradient: "from-sky-400 via-blue-500 to-indigo-500", description: "Page backgrounds" },
-  { id: "buttons", label: "Buttons", icon3d: "settings", gradient: "from-rose-400 via-pink-500 to-fuchsia-500", description: "Button & form styles" },
-  { id: "animations", label: "Animations", icon3d: "chart", gradient: "from-yellow-400 via-amber-500 to-orange-500", description: "Motion & effects" },
+  { id: "theme", label: "Theme", icon3d: "paint", gradient: "from-amber-400 via-orange-500 to-red-500", description: "Color Scheme & Mode" },
+  { id: "typography", label: "Typography", icon3d: "invoice", gradient: "from-purple-400 via-fuchsia-500 to-pink-500", description: "Fonts & Text Sizes" },
+  { id: "sidebar", label: "Sidebar", icon3d: "home", gradient: "from-blue-400 via-indigo-500 to-purple-500", description: "Navigation Style" },
+  { id: "header", label: "Header", icon3d: "home", gradient: "from-emerald-400 via-teal-500 to-cyan-500", description: "Header Appearance" },
+  { id: "background", label: "Background", icon3d: "paint", gradient: "from-sky-400 via-blue-500 to-indigo-500", description: "Page Backgrounds" },
+  { id: "buttons", label: "Buttons", icon3d: "settings", gradient: "from-rose-400 via-pink-500 to-fuchsia-500", description: "Button & Form Styles" },
+  { id: "animations", label: "Animations", icon3d: "chart", gradient: "from-yellow-400 via-amber-500 to-orange-500", description: "Motion & Effects" },
 ] as const;
 
 export default function UserInterfaceSettings() {
