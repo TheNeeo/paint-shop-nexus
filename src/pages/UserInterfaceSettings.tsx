@@ -169,7 +169,7 @@ export default function UserInterfaceSettings() {
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.08, duration: 0.4 }}
                 onClick={() => setActiveTab(tab.id)}
-                className={`relative overflow-hidden rounded-2xl p-5 min-h-[120px] shadow-lg transition-all duration-300 cursor-pointer text-left ${
+                className={`relative overflow-hidden rounded-2xl p-4 min-h-[128px] shadow-lg transition-all duration-300 cursor-pointer text-left ${
                   isActive
                     ? `bg-gradient-to-br ${tab.gradient} scale-[1.02] shadow-xl ring-2 ring-white/50`
                     : `bg-gradient-to-br ${tab.gradient} opacity-60 hover:opacity-90 hover:scale-[1.02] hover:shadow-xl`
