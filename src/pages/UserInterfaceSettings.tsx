@@ -175,13 +175,11 @@ export default function UserInterfaceSettings() {
                     : `bg-gradient-to-br ${tab.gradient} opacity-60 hover:opacity-90 hover:scale-[1.02] hover:shadow-xl`
                 }`}
               >
-                <div className="relative z-10 pr-16">
-                  <h3 className="text-base font-bold text-white/95 mb-0.5">{tab.label}</h3>
-                  <p className="text-xs text-white/70 leading-snug">{tab.description}</p>
+                <div className="relative z-10 flex items-start justify-between gap-2">
+                  <h3 className="text-base font-bold text-white/95">{tab.label}</h3>
+                  <Icon3D name={tab.icon3d} className="h-10 w-10 shrink-0" />
                 </div>
-                <div className="absolute right-3 bottom-3 opacity-90">
-                  <Icon3D name={tab.icon3d} className="h-12 w-12" />
-                </div>
+                <p className="relative z-10 mt-1.5 text-xs text-white/70 leading-snug">{tab.description}</p>
                 {isActive && (
                   <motion.div layoutId="uiActiveTab" className="absolute bottom-0 left-0 right-0 h-1 bg-white/80 rounded-full" />
                 )}
