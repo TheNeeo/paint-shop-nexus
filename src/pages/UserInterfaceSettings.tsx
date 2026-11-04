@@ -35,13 +35,13 @@ const THEME = {
 };
 
 const tabs = [
-  { id: "theme", label: "Theme", icon3d: "paint", gradient: "from-amber-400 via-orange-500 to-red-500", description: "Color scheme & mode" },
-  { id: "typography", label: "Typography", icon3d: "invoice", gradient: "from-purple-400 via-fuchsia-500 to-pink-500", description: "Fonts & text sizes" },
-  { id: "sidebar", label: "Sidebar", icon3d: "home", gradient: "from-blue-400 via-indigo-500 to-purple-500", description: "Navigation style" },
-  { id: "header", label: "Header", icon3d: "home", gradient: "from-emerald-400 via-teal-500 to-cyan-500", description: "Header appearance" },
-  { id: "background", label: "Background", icon3d: "paint", gradient: "from-sky-400 via-blue-500 to-indigo-500", description: "Page backgrounds" },
-  { id: "buttons", label: "Buttons", icon3d: "settings", gradient: "from-rose-400 via-pink-500 to-fuchsia-500", description: "Button & form styles" },
-  { id: "animations", label: "Animations", icon3d: "chart", gradient: "from-yellow-400 via-amber-500 to-orange-500", description: "Motion & effects" },
+  { id: "theme", label: "Theme", icon3d: "paint", gradient: "from-amber-400 via-orange-500 to-red-500", description: "Color Scheme & Mode" },
+  { id: "typography", label: "Typography", icon3d: "invoice", gradient: "from-purple-400 via-fuchsia-500 to-pink-500", description: "Fonts & Text Sizes" },
+  { id: "sidebar", label: "Sidebar", icon3d: "home", gradient: "from-blue-400 via-indigo-500 to-purple-500", description: "Navigation Style" },
+  { id: "header", label: "Header", icon3d: "home", gradient: "from-emerald-400 via-teal-500 to-cyan-500", description: "Header Appearance" },
+  { id: "background", label: "Background", icon3d: "paint", gradient: "from-sky-400 via-blue-500 to-indigo-500", description: "Page Backgrounds" },
+  { id: "buttons", label: "Buttons", icon3d: "settings", gradient: "from-rose-400 via-pink-500 to-fuchsia-500", description: "Button & Form Styles" },
+  { id: "animations", label: "Animations", icon3d: "chart", gradient: "from-yellow-400 via-amber-500 to-orange-500", description: "Motion & Effects" },
 ] as const;
 
 export default function UserInterfaceSettings() {
@@ -175,13 +175,11 @@ export default function UserInterfaceSettings() {
                     : `bg-gradient-to-br ${tab.gradient} opacity-60 hover:opacity-90 hover:scale-[1.02] hover:shadow-xl`
                 }`}
               >
-                <div className="relative z-10 pr-16">
-                  <h3 className="text-base font-bold text-white/95 mb-0.5">{tab.label}</h3>
-                  <p className="text-xs text-white/70 leading-snug">{tab.description}</p>
+                <div className="relative z-10 flex items-start justify-between gap-2">
+                  <h3 className="text-base font-bold text-white/95">{tab.label}</h3>
+                  <Icon3D name={tab.icon3d} className="h-10 w-10 shrink-0" />
                 </div>
-                <div className="absolute right-3 bottom-3 opacity-90">
-                  <Icon3D name={tab.icon3d} className="h-12 w-12" />
-                </div>
+                <p className="relative z-10 mt-1.5 text-xs text-white/70 leading-snug">{tab.description}</p>
                 {isActive && (
                   <motion.div layoutId="uiActiveTab" className="absolute bottom-0 left-0 right-0 h-1 bg-white/80 rounded-full" />
                 )}
