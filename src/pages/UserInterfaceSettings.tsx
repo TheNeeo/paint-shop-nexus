@@ -169,17 +169,19 @@ export default function UserInterfaceSettings() {
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.08, duration: 0.4 }}
                 onClick={() => setActiveTab(tab.id)}
-                className={`relative overflow-hidden rounded-2xl p-5 min-h-[120px] shadow-lg transition-all duration-300 cursor-pointer text-left ${
+                className={`relative overflow-hidden rounded-2xl p-4 min-h-[128px] shadow-lg transition-all duration-300 cursor-pointer text-left ${
                   isActive
                     ? `bg-gradient-to-br ${tab.gradient} scale-[1.02] shadow-xl ring-2 ring-white/50`
                     : `bg-gradient-to-br ${tab.gradient} opacity-60 hover:opacity-90 hover:scale-[1.02] hover:shadow-xl`
                 }`}
               >
-                <div className="relative z-10 flex items-start justify-between gap-2">
-                  <h3 className="text-base font-bold text-white/95">{tab.label}</h3>
-                  <Icon3D name={tab.icon3d} className="h-10 w-10 shrink-0" />
+                <div className="relative z-10 flex flex-col">
+                  <div className="flex justify-end">
+                    <Icon3D name={tab.icon3d} className="h-8 w-8 shrink-0" />
+                  </div>
+                  <h3 className="mt-1 text-sm font-bold text-white/95 leading-tight">{tab.label}</h3>
+                  <p className="mt-1 text-[11px] text-white/70 leading-snug">{tab.description}</p>
                 </div>
-                <p className="relative z-10 mt-1.5 text-xs text-white/70 leading-snug">{tab.description}</p>
                 {isActive && (
                   <motion.div layoutId="uiActiveTab" className="absolute bottom-0 left-0 right-0 h-1 bg-white/80 rounded-full" />
                 )}
