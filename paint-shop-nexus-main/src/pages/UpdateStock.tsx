@@ -215,7 +215,7 @@ export default function UpdateStock() {
     return category?.name || "N/A";
   };
 
-  const getStockStatus = (product: any) => {
+  const getStockStatus = (product: (typeof products)[number]) => {
     if (product.current_stock === 0) {
       return <Badge className="bg-red-100 text-red-700 border-red-200">Out of Stock</Badge>;
     }

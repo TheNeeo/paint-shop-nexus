@@ -17,7 +17,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Download, ShoppingCart, Receipt } from "lucide-react";
 import { CashReceiptSummary } from "@/components/cash-receipt/CashReceiptSummary";
-import { CashReceiptFilters } from "@/components/cash-receipt/CashReceiptFilters";
+import { CashReceiptFilters, type CashReceiptFilterState } from "@/components/cash-receipt/CashReceiptFilters";
+import type { Tables } from "@/integrations/supabase/types";
 import { CashReceiptTable } from "@/components/cash-receipt/CashReceiptTable";
 import { AddEditReceiptModal } from "@/components/cash-receipt/AddEditReceiptModal";
 import { DocumentViewer, DocumentData } from "@/components/shared/DocumentViewer";
@@ -27,10 +28,10 @@ import cashReceiptIcon from "@/assets/cash-receipt-icon.png";
 export default function CashReceipt() {
   const navigate = useNavigate();
   const [isNewReceiptModalOpen, setIsNewReceiptModalOpen] = useState(false);
-  const [editingReceipt, setEditingReceipt] = useState(null);
+  const [editingReceipt, setEditingReceipt] = useState<Tables<"cash_receipts"> | null>(null);
   const [viewingReceipt, setViewingReceipt] = useState<DocumentData | null>(null);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<CashReceiptFilterState>({
     dateRange: null,
     payerName: "",
     paymentMode: "all",
@@ -42,12 +43,12 @@ export default function CashReceipt() {
     setIsNewReceiptModalOpen(true);
   };
 
-  const handleEditReceipt = (receipt: any) => {
+  const handleEditReceipt = (receipt: Tables<"cash_receipts">) => {
     setEditingReceipt(receipt);
     setIsNewReceiptModalOpen(true);
   };
 
-  const handleViewReceipt = (receipt: any) => {
+  const handleViewReceipt = (receipt: Tables<"cash_receipts">) => {
     const amount = Number(receipt.amount) || 0;
     const docData: DocumentData = {
       documentType: "receipt",

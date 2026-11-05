@@ -226,7 +226,9 @@ export function NewInvoiceModal({ isOpen, onClose }: NewInvoiceModalProps) {
 
       toast.success(`Invoice ${invoiceNumber} created.`);
       await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["sales"] }),
         queryClient.invalidateQueries({ queryKey: ["finance-data"] }),
+        queryClient.invalidateQueries({ queryKey: ["sales"] }),
         queryClient.invalidateQueries({ queryKey: ["products"] }),
         queryClient.invalidateQueries({ queryKey: ["active-customers"] }),
         queryClient.invalidateQueries({ queryKey: ["customers"] }),

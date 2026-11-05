@@ -8,14 +8,16 @@ import { CalendarIcon, Search, Filter, X } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
+export interface CashReceiptFilterState {
+  dateRange: Date | null;
+  payerName: string;
+  paymentMode: string;
+  search: string;
+}
+
 interface CashReceiptFiltersProps {
-  filters: {
-    dateRange: any;
-    payerName: string;
-    paymentMode: string;
-    search: string;
-  };
-  onFiltersChange: (filters: any) => void;
+  filters: CashReceiptFilterState;
+  onFiltersChange: (filters: CashReceiptFilterState) => void;
 }
 
 export function CashReceiptFilters({ filters, onFiltersChange }: CashReceiptFiltersProps) {

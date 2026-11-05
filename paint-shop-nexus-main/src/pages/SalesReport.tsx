@@ -30,7 +30,7 @@ const SalesReport = () => {
   const [dateFrom, setDateFrom] = useState<Date>();
   const [dateTo, setDateTo] = useState<Date>();
 
-  const { data: salesData = [] } = useQuery({
+  const { data: salesData = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["sales-report", dateFrom, dateTo],
     queryFn: async () => {
       let query = supabase.from("sales").select("*, sale_items(*)").eq("status", "final").order("invoice_date", { ascending: false });
@@ -51,12 +51,17 @@ const SalesReport = () => {
       const { data, error } = await query;
       if (error) throw error;
       if (!data) return [];
-      const monthMap: Record<string, number> = {};
-      data.forEach((s) => {
-        const m = new Date(s.invoice_date).toLocaleString("default", { month: "short" });
-        monthMap[m] = (monthMap[m] || 0) + Number(s.total_amount);
+      const monthMap = new Map<string, number>();
+      data.forEach((sale) => {
+        const monthKey = sale.invoice_date.slice(0, 7);
+        monthMap.set(monthKey, (monthMap.get(monthKey) || 0) + (Number(sale.total_amount) || 0));
       });
-      return Object.entries(monthMap).map(([month, sales]) => ({ month, sales }));
+      return Array.from(monthMap.entries())
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([monthKey, sales]) => ({
+          month: new Date(`${monthKey}-01T00:00:00`).toLocaleString("en-IN", { month: "short", year: "numeric" }),
+          sales,
+        }));
     },
   });
 
@@ -90,7 +95,12 @@ const SalesReport = () => {
               </h1>
               <p className="text-sm italic" style={{ color: THEME.primary }}>Track all customer sales transactions & performance trends</p>
             </div>
-            <Badge className="text-white text-sm px-4 py-1" style={{ background: `linear-gradient(to right, ${THEME.primary}, ${THEME.primaryDark})` }}>{invoiceCount} Records</Badge>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => void refetch()} disabled={isLoading} style={{ borderColor: THEME.border, color: THEME.primaryDark }}>
+                <RefreshCw className="h-4 w-4 mr-2" />Refresh
+              </Button>
+              <Badge className="text-white text-sm px-4 py-1" style={{ background: `linear-gradient(to right, ${THEME.primary}, ${THEME.primaryDark})` }}>{invoiceCount} Records</Badge>
+            </div>
           </div>
         </motion.div>
 
@@ -144,8 +154,12 @@ const SalesReport = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {salesData.length === 0 ? (
-                  <TableRow><TableCell colSpan={8} className="text-center py-8 text-gray-500">No sales data found</TableCell></TableRow>
+                {isLoading ? (
+                  <TableRow><TableCell colSpan={8} className="text-center py-8 text-gray-500">Loading sales...</TableCell></TableRow>
+                ) : isError ? (
+                  <TableRow><TableCell colSpan={8} className="text-center py-8 text-red-600">Could not load sales. Check database access and refresh.</TableCell></TableRow>
+                ) : salesData.length === 0 ? (
+                  <TableRow><TableCell colSpan={8} className="text-center py-8 text-gray-500">No finalized sales found</TableCell></TableRow>
                 ) : salesData.map((sale) => (
                   <TableRow key={sale.id} className="hover:bg-red-50/30">
                     <TableCell>{sale.invoice_date}</TableCell>

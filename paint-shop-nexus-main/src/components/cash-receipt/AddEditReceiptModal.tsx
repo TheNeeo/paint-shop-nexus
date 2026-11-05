@@ -16,6 +16,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { FormSectionHeader } from "@/components/shared/FormSectionHeader";
 import { FormFieldLabel } from "@/components/shared/FormFieldLabel";
 import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import addCashReceiptIcon from "@/assets/add-cash-receipt-icon.png";
@@ -37,7 +38,7 @@ type ReceiptFormValues = z.infer<typeof receiptSchema>;
 interface AddEditReceiptModalProps {
   isOpen: boolean;
   onClose: () => void;
-  receipt?: any;
+  receipt?: Tables<"cash_receipts">;
 }
 
 export function AddEditReceiptModal({ isOpen, onClose, receipt }: AddEditReceiptModalProps) {
@@ -93,9 +94,10 @@ export function AddEditReceiptModal({ isOpen, onClose, receipt }: AddEditReceipt
 
       queryClient.invalidateQueries({ queryKey: ["cash-receipts"] });
       queryClient.invalidateQueries({ queryKey: ["cash-receipt-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["finance-data"] });
       onClose();
-    } catch (err: any) {
-      toast.error(err.message || "Failed to save");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to save");
     } finally {
       setSaving(false);
     }

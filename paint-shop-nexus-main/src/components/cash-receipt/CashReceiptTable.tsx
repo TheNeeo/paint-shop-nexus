@@ -8,11 +8,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import type { CashReceiptFilterState } from "@/components/cash-receipt/CashReceiptFilters";
+import type { Tables } from "@/integrations/supabase/types";
 
 interface CashReceiptTableProps {
-  filters: any;
-  onEditReceipt: (receipt: any) => void;
-  onViewReceipt?: (receipt: any) => void;
+  filters: CashReceiptFilterState;
+  onEditReceipt: (receipt: Tables<"cash_receipts">) => void;
+  onViewReceipt?: (receipt: Tables<"cash_receipts">) => void;
 }
 
 export function CashReceiptTable({ filters, onEditReceipt, onViewReceipt }: CashReceiptTableProps) {
@@ -22,6 +24,7 @@ export function CashReceiptTable({ filters, onEditReceipt, onViewReceipt }: Cash
     queryKey: ["cash-receipts", filters],
     queryFn: async () => {
       let query = supabase.from("cash_receipts").select("*").order("receipt_date", { ascending: false });
+      if (filters.dateRange) query = query.eq("receipt_date", format(filters.dateRange, "yyyy-MM-dd"));
       if (filters.payerName) query = query.ilike("payer_name", `%${filters.payerName}%`);
       if (filters.paymentMode && filters.paymentMode !== "all") query = query.eq("payment_mode", filters.paymentMode);
       if (filters.search) query = query.or(`payer_name.ilike.%${filters.search}%,receipt_no.ilike.%${filters.search}%,reason.ilike.%${filters.search}%`);
@@ -42,12 +45,13 @@ export function CashReceiptTable({ filters, onEditReceipt, onViewReceipt }: Cash
     return <Badge style={styles[mode] || { backgroundColor: "#6b7280", color: "white" }}>{label}</Badge>;
   };
 
-  const handleDelete = async (receipt: any) => {
+  const handleDelete = async (receipt: Tables<"cash_receipts">) => {
     if (!window.confirm("Are you sure you want to delete this receipt?")) return;
     const { error } = await supabase.from("cash_receipts").delete().eq("id", receipt.id);
     if (error) { toast.error("Failed to delete"); return; }
     toast.success("Receipt deleted!");
     queryClient.invalidateQueries({ queryKey: ["cash-receipts"] });
+    queryClient.invalidateQueries({ queryKey: ["finance-data"] });
   };
 
   const totalAmount = receipts.reduce((sum, r) => sum + Number(r.amount), 0);

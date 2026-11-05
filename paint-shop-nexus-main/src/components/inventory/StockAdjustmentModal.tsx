@@ -158,7 +158,7 @@ export function StockAdjustmentModal({ isOpen, onClose, product }: StockAdjustme
       console.error("Error adjusting stock:", error);
       toast({
         title: "Error",
-        description: "Failed to adjust stock",
+        description: error instanceof Error ? error.message : "Failed to adjust stock",
         variant: "destructive"
       });
     } finally {

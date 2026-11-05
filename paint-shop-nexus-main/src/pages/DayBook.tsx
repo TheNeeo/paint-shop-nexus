@@ -499,7 +499,9 @@ const DayBook = () => {
                       <SelectItem value="Cash">Cash</SelectItem>
                       <SelectItem value="UPI">UPI</SelectItem>
                       <SelectItem value="Account Transfer">Account Transfer</SelectItem>
+                      <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
                       <SelectItem value="Cheque">Cheque</SelectItem>
+                      <SelectItem value="Card">Card</SelectItem>
                     </SelectContent>
                   </Select>
                   {/* Search */}

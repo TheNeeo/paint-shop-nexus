@@ -85,6 +85,33 @@ interface InvoiceItem {
   amount: number;
 }
 
+interface InvoicePreviewData {
+  id?: string;
+  invoice_number: string;
+  invoice_date?: string | null;
+  created_at?: string | null;
+  customer_id?: string | null;
+  customer_name?: string | null;
+  subtotal?: number | null;
+  tax_amount?: number | null;
+  discount_amount?: number | null;
+  total_amount?: number | null;
+  paid_amount?: number | null;
+  pending_amount?: number | null;
+  payment_status?: string | null;
+  payment_mode?: string | null;
+  sale_items?: Array<{
+    product_id?: string | null;
+    product_name: string;
+    quantity: number | null;
+    rate: number | null;
+    gst_percent?: number | null;
+    amount: number | null;
+    unit?: string | null;
+    hsn_code?: string | null;
+  }>;
+}
+
 const generateInvoiceNumber = () => `INV-${format(new Date(), "yyyyMMdd")}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
 
 export default function InvoiceGenerate() {
@@ -98,11 +125,11 @@ export default function InvoiceGenerate() {
   const [discount, setDiscount] = useState<number>(0);
   const [gstRate, setGstRate] = useState<number>(18);
   const [paidAmount, setPaidAmount] = useState<number>(0);
+  const [paymentMode, setPaymentMode] = useState("");
   const [notes, setNotes] = useState<string>("");
-  const [terms, setTerms] = useState<string>("");
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("history");
-  const [viewerInvoice, setViewerInvoice] = useState<any>(null);
+  const [viewerInvoice, setViewerInvoice] = useState<InvoicePreviewData | null>(null);
   const [viewerOpen, setViewerOpen] = useState(false);
 
   const buildPreviewInvoice = () => ({
@@ -117,7 +144,7 @@ export default function InvoiceGenerate() {
     paid_amount: paidAmount,
     pending_amount: balanceDue,
     payment_status: paidAmount >= grandTotal && grandTotal > 0 ? 'paid' : paidAmount > 0 ? 'partial' : 'pending',
-    payment_mode: 'N/A',
+    payment_mode: paymentMode || 'N/A',
       sale_items: invoiceItems.map(i => ({
         product_id: i.productId || null,
         product_name: i.productName,
@@ -128,7 +155,7 @@ export default function InvoiceGenerate() {
     })),
   });
 
-  const openPreview = (inv: any) => {
+  const openPreview = (inv: InvoicePreviewData) => {
     setViewerInvoice(inv);
     setViewerOpen(true);
   };
@@ -196,6 +223,15 @@ export default function InvoiceGenerate() {
     },
   });
 
+  const today = format(new Date(), "yyyy-MM-dd");
+  const todaysInvoices = invoiceHistory.filter((invoice) => invoice.invoice_date === today);
+  const todaysSalesTotal = todaysInvoices.reduce((sum, invoice) => sum + (Number(invoice.total_amount) || 0), 0);
+  const pendingInvoiceCount = invoiceHistory.filter((invoice) => Number(invoice.pending_amount) > 0).length;
+  const totalInvoiceGST = invoiceHistory.reduce((sum, invoice) => sum + (Number(invoice.tax_amount) || 0), 0);
+  const averageInvoiceValue = invoiceHistory.length > 0
+    ? invoiceHistory.reduce((sum, invoice) => sum + (Number(invoice.total_amount) || 0), 0) / invoiceHistory.length
+    : 0;
+
   // Calculate totals
   const subtotal = invoiceItems.reduce((sum, item) => sum + item.amount, 0);
   const discountAmount = (subtotal * discount) / 100;
@@ -258,84 +294,144 @@ export default function InvoiceGenerate() {
     setDiscount(0);
     setGstRate(18);
     setPaidAmount(0);
+    setPaymentMode("");
     setNotes("");
-    setTerms("");
   };
 
-  const saveInvoice = async (status: 'draft' | 'final') => {
-    if (invoiceItems.length === 0) {
-      sonnerToast.error("कम से कम एक product add करें");
+  const saveInvoice = async (status: "draft" | "final") => {
+    if (invoiceItems.length === 0 || invoiceItems.some((item) => !item.productId || item.quantity <= 0 || item.rate <= 0)) {
+      sonnerToast.error("Select an inventory product and enter a positive quantity and rate for every line.");
       return;
     }
-    setSaving(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+    if (!selectedCustomer) {
+      sonnerToast.error("Select a customer or Walk-in Customer.");
+      return;
+    }
+    if (!Number.isFinite(discount) || discount < 0 || discount > 100 || !Number.isFinite(gstRate) || gstRate < 0) {
+      sonnerToast.error("Enter valid discount and GST percentages.");
+      return;
+    }
+    if (!Number.isFinite(paidAmount) || paidAmount < 0 || paidAmount > grandTotal) {
+      sonnerToast.error("Paid amount must be between zero and the invoice total.");
+      return;
+    }
+    if (paidAmount > 0 && !paymentMode) {
+      sonnerToast.error("Choose a payment mode for the amount received.");
+      return;
+    }
 
-      const invoiceNumber = nextInvoiceNumber();
-      const paymentStatus = paidAmount >= grandTotal ? 'paid' : paidAmount > 0 ? 'partial' : 'pending';
+    setSaving(true);
+    let saleId: string | null = null;
+    let inventoryChanges: AppliedInventoryChange[] = [];
+    try {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError) throw authError;
+      if (!user) throw new Error("Sign in before saving an invoice.");
+
+      const selectedCustomerRow = selectedCustomer === "walk-in" ? null : customers.find((customer) => customer.id === selectedCustomer);
+      if (selectedCustomer !== "walk-in" && !selectedCustomerRow) throw new Error("The selected customer is no longer available.");
+      const paymentStatus = paidAmount >= grandTotal ? "paid" : paidAmount > 0 ? "partial" : "pending";
 
       const { data: sale, error: saleError } = await supabase
-        .from('sales')
-        .insert([{
+        .from("sales")
+        .insert({
           invoice_number: invoiceNumber,
           invoice_date: invoiceDate,
-          customer_name: selectedCustomer || 'Walk-in',
+          customer_id: selectedCustomerRow?.id || null,
+          customer_name: selectedCustomerRow?.name || "Walk-in Customer",
           subtotal,
           tax_amount: gstAmount,
           discount_amount: discountAmount,
           total_amount: grandTotal,
           paid_amount: paidAmount,
           pending_amount: balanceDue,
-          payment_mode: null,
+          payment_mode: paidAmount > 0 ? paymentMode || null : null,
           payment_status: paymentStatus,
           is_gst_inclusive: false,
-          notes: notes || null,
+          notes: notes.trim() || null,
           created_by_user_id: user.id,
           status,
-        }])
-        .select()
+        })
+        .select("id")
         .single();
-
       if (saleError) throw saleError;
+      saleId = sale.id;
 
-      // Insert sale items
-      if (invoiceItems.length > 0) {
-        const saleItems = invoiceItems.map(item => ({
-          sale_id: sale!.id,
-          product_name: item.productName,
-          hsn_code: item.hsnCode,
-          quantity: item.quantity,
-          unit: item.unit,
-          rate: item.rate,
-          gst_percent: 0,
-          amount: item.amount,
-        }));
-        const { error: itemsError } = await supabase.from('sale_items').insert(saleItems);
-        if (itemsError) throw itemsError;
+      const saleItems = invoiceItems.map((item) => ({
+        sale_id: sale.id,
+        product_id: item.productId,
+        product_name: item.productName,
+        hsn_code: item.hsnCode || null,
+        quantity: item.quantity,
+        unit: item.unit,
+        rate: item.rate,
+        gst_percent: gstRate,
+        amount: item.amount,
+      }));
+      const { error: itemsError } = await supabase.from("sale_items").insert(saleItems);
+      if (itemsError) throw itemsError;
+
+      if (status === "final") {
+        inventoryChanges = await decreaseSaleInventory(
+          invoiceItems.map((item) => ({ productId: item.productId, productName: item.productName, quantity: item.quantity })),
+          sale.id,
+          invoiceNumber,
+          user.id,
+        );
+
+        if (selectedCustomerRow) {
+          const { data: customer, error: customerError } = await supabase
+            .from("customers")
+            .select("total_sales, outstanding_balance")
+            .eq("id", selectedCustomerRow.id)
+            .single();
+          if (customerError) throw customerError;
+          const { error: balanceError } = await supabase
+            .from("customers")
+            .update({
+              total_sales: (Number(customer.total_sales) || 0) + grandTotal,
+              outstanding_balance: (Number(customer.outstanding_balance) || 0) + balanceDue,
+            })
+            .eq("id", selectedCustomerRow.id);
+          if (balanceError) throw balanceError;
+        }
       }
 
-      queryClient.invalidateQueries({ queryKey: ["invoice-history"] });
-      queryClient.invalidateQueries({ queryKey: ["invoice-drafts"] });
+      void Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["invoice-history"] }),
+        queryClient.invalidateQueries({ queryKey: ["invoice-drafts"] }),
+        queryClient.invalidateQueries({ queryKey: ["sales"] }),
+        queryClient.invalidateQueries({ queryKey: ["finance-data"] }),
+        queryClient.invalidateQueries({ queryKey: ["products"] }),
+        queryClient.invalidateQueries({ queryKey: ["customers"] }),
+      ]);
 
-      if (status === 'draft') {
-        sonnerToast.success(`Draft ${invoiceNumber} save हो गया!`);
-        setActiveTab("drafts");
-      } else {
-        sonnerToast.success(`Invoice ${invoiceNumber} save हो गया!`);
-        setActiveTab("history");
-      }
+      sonnerToast.success(status === "draft" ? `Draft ${invoiceNumber} saved.` : `Invoice ${invoiceNumber} saved.`);
+      setActiveTab(status === "draft" ? "drafts" : "history");
       resetForm();
-    } catch (err: any) {
-      console.error("Error saving invoice:", err);
-      sonnerToast.error(err.message || "Invoice save करने में error आया");
+    } catch (error) {
+      let cleanupFailed = false;
+      if (inventoryChanges.length > 0) {
+        try {
+          await restoreSaleInventory(inventoryChanges);
+        } catch {
+          cleanupFailed = true;
+        }
+      }
+      if (saleId) {
+        const { error: itemCleanupError } = await supabase.from("sale_items").delete().eq("sale_id", saleId);
+        const { error: saleCleanupError } = await supabase.from("sales").delete().eq("id", saleId);
+        if (itemCleanupError || saleCleanupError) cleanupFailed = true;
+      }
+      const message = error instanceof Error ? error.message : "Invoice could not be saved.";
+      sonnerToast.error(cleanupFailed ? "Invoice save failed and cleanup was incomplete. Inspect the invoice and stock before retrying." : message);
     } finally {
       setSaving(false);
     }
   };
 
-  const handleSaveDraft = () => saveInvoice('draft');
-  const handleSaveInvoice = () => saveInvoice('final');
+  const handleSaveDraft = () => saveInvoice("draft");
+  const handleSaveInvoice = () => saveInvoice("final");
 
   const handleGeneratePDF = () => {
     if (invoiceItems.length === 0) {
@@ -346,25 +442,101 @@ export default function InvoiceGenerate() {
   };
 
   const handleDeleteDraft = async (id: string) => {
+    if (!window.confirm("Delete this draft invoice?")) return;
     try {
-      await supabase.from('sale_items').delete().eq('sale_id', id);
-      await supabase.from('sales').delete().eq('id', id);
-      queryClient.invalidateQueries({ queryKey: ["invoice-drafts"] });
-      sonnerToast.success("Draft delete हो गया!");
-    } catch {
-      sonnerToast.error("Draft delete करने में error आया");
+      const { error: itemsError } = await supabase.from("sale_items").delete().eq("sale_id", id);
+      if (itemsError) throw itemsError;
+      const { error: saleError } = await supabase.from("sales").delete().eq("id", id).eq("status", "draft");
+      if (saleError) throw saleError;
+      void queryClient.invalidateQueries({ queryKey: ["invoice-drafts"] });
+      void queryClient.invalidateQueries({ queryKey: ["finance-data"] });
+      sonnerToast.success("Draft deleted.");
+    } catch (error) {
+      sonnerToast.error(error instanceof Error ? error.message : "Draft could not be deleted.");
     }
   };
 
   const handleFinalizeDraft = async (id: string) => {
+    let inventoryChanges: AppliedInventoryChange[] = [];
+    let finalized = false;
     try {
-      await supabase.from('sales').update({ status: 'final' }).eq('id', id);
-      queryClient.invalidateQueries({ queryKey: ["invoice-history"] });
-      queryClient.invalidateQueries({ queryKey: ["invoice-drafts"] });
-      sonnerToast.success("Draft finalize हो गया! Invoice History में move किया।");
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError) throw authError;
+      if (!user) throw new Error("Sign in before finalizing a draft.");
+
+      const { data: draft, error: draftError } = await supabase
+        .from("sales")
+        .select("id, invoice_number, customer_id, total_amount, pending_amount")
+        .eq("id", id)
+        .eq("status", "draft")
+        .single();
+      if (draftError) throw draftError;
+
+      const { data: items, error: itemsError } = await supabase
+        .from("sale_items")
+        .select("product_id, product_name, quantity")
+        .eq("sale_id", id);
+      if (itemsError) throw itemsError;
+      inventoryChanges = await decreaseSaleInventory(
+        (items || []).map((item) => ({ productId: item.product_id, productName: item.product_name, quantity: Number(item.quantity) || 0 })),
+        draft.id,
+        draft.invoice_number,
+        user.id,
+      );
+
+      const { data: finalizedSale, error: finalizeError } = await supabase
+        .from("sales")
+        .update({ status: "final" })
+        .eq("id", draft.id)
+        .eq("status", "draft")
+        .select("id")
+        .maybeSingle();
+      if (finalizeError) throw finalizeError;
+      if (!finalizedSale) throw new Error("This draft has changed. Refresh and try again.");
+      finalized = true;
+
+      if (draft.customer_id) {
+        const { data: customer, error: customerError } = await supabase
+          .from("customers")
+          .select("total_sales, outstanding_balance")
+          .eq("id", draft.customer_id)
+          .single();
+        if (customerError) throw customerError;
+        const { error: customerUpdateError } = await supabase
+          .from("customers")
+          .update({
+            total_sales: (Number(customer.total_sales) || 0) + Number(draft.total_amount || 0),
+            outstanding_balance: (Number(customer.outstanding_balance) || 0) + Number(draft.pending_amount || 0),
+          })
+          .eq("id", draft.customer_id);
+        if (customerUpdateError) throw customerUpdateError;
+      }
+
+      void Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["invoice-history"] }),
+        queryClient.invalidateQueries({ queryKey: ["invoice-drafts"] }),
+        queryClient.invalidateQueries({ queryKey: ["sales"] }),
+        queryClient.invalidateQueries({ queryKey: ["finance-data"] }),
+        queryClient.invalidateQueries({ queryKey: ["products"] }),
+        queryClient.invalidateQueries({ queryKey: ["customers"] }),
+      ]);
+      sonnerToast.success("Draft finalized; stock and customer balances were updated.");
       setActiveTab("history");
-    } catch {
-      sonnerToast.error("Draft finalize करने में error आया");
+    } catch (error) {
+      let cleanupFailed = false;
+      if (finalized) {
+        const { error: statusRollbackError } = await supabase.from("sales").update({ status: "draft" }).eq("id", id).eq("status", "final");
+        if (statusRollbackError) cleanupFailed = true;
+      }
+      if (inventoryChanges.length > 0) {
+        try {
+          await restoreSaleInventory(inventoryChanges);
+        } catch {
+          cleanupFailed = true;
+        }
+      }
+      const message = error instanceof Error ? error.message : "Draft could not be finalized.";
+      sonnerToast.error(cleanupFailed ? "Draft finalization failed and cleanup was incomplete. Inspect stock and balances before retrying." : message);
     }
   };
 
@@ -526,7 +698,7 @@ export default function InvoiceGenerate() {
             >
               <div className="relative z-10">
                 <h3 className="text-lg font-semibold mb-1" style={{ color: THEME_PRIMARY }}>Total Sales Today</h3>
-                <p className="text-2xl font-bold" style={{ color: THEME_PRIMARY }}>₹45,231</p>
+                <p className="text-2xl font-bold" style={{ color: THEME_PRIMARY }}>₹{todaysSalesTotal.toLocaleString("en-IN")}</p>
               </div>
               <div className="absolute right-4 bottom-4 opacity-30">
                 <FileText className="h-16 w-16" style={{ color: THEME_PRIMARY }} strokeWidth={1.5} />
@@ -542,7 +714,7 @@ export default function InvoiceGenerate() {
             >
               <div className="relative z-10">
                 <h3 className="text-lg font-semibold text-white/90 mb-1">Pending Invoices</h3>
-                <p className="text-2xl font-bold text-white">12</p>
+                <p className="text-2xl font-bold text-white">{pendingInvoiceCount}</p>
               </div>
               <div className="absolute right-4 bottom-4 opacity-30">
                 <CreditCard className="h-16 w-16 text-white" strokeWidth={1.5} />
@@ -557,8 +729,8 @@ export default function InvoiceGenerate() {
               style={{ background: `linear-gradient(135deg, ${THEME_SECONDARY} 0%, ${THEME_PRIMARY} 100%)` }}
             >
               <div className="relative z-10">
-                <h3 className="text-lg font-semibold text-white/90 mb-1">Total GST Collected</h3>
-                <p className="text-2xl font-bold text-white">₹8,142</p>
+                <h3 className="text-lg font-semibold text-white/90 mb-1">GST on Invoices</h3>
+                <p className="text-2xl font-bold text-white">₹{totalInvoiceGST.toLocaleString("en-IN")}</p>
               </div>
               <div className="absolute right-4 bottom-4 opacity-30">
                 <DollarSign className="h-16 w-16 text-white" strokeWidth={1.5} />
@@ -574,7 +746,7 @@ export default function InvoiceGenerate() {
             >
               <div className="relative z-10">
                 <h3 className="text-lg font-semibold mb-1" style={{ color: THEME_PRIMARY }}>Avg Invoice Value</h3>
-                <p className="text-2xl font-bold" style={{ color: THEME_PRIMARY }}>₹3,769</p>
+                <p className="text-2xl font-bold" style={{ color: THEME_PRIMARY }}>₹{averageInvoiceValue.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</p>
               </div>
               <div className="absolute right-4 bottom-4 opacity-30">
                 <TrendingUp className="h-16 w-16" style={{ color: THEME_PRIMARY }} strokeWidth={1.5} />
@@ -796,16 +968,6 @@ export default function InvoiceGenerate() {
                       style={{ borderColor: THEME_BORDER }}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label style={{ color: THEME_SECONDARY }}>Terms & Conditions</Label>
-                    <Textarea
-                      value={terms}
-                      onChange={(e) => setTerms(e.target.value)}
-                      placeholder="Enter terms and conditions..."
-                      rows={3}
-                      style={{ borderColor: THEME_BORDER }}
-                    />
-                  </div>
                 </div>
 
                 <Card style={{ borderColor: THEME_BORDER, borderWidth: "2px" }}>
@@ -855,12 +1017,30 @@ export default function InvoiceGenerate() {
                       <span style={{ color: THEME_SECONDARY }}>Paid Amount:</span>
                       <Input
                         type="number"
+                        min="0"
+                        max={grandTotal}
+                        step="0.01"
                         value={paidAmount}
                         onChange={(e) => setPaidAmount(parseFloat(e.target.value) || 0)}
                         className="w-32 h-8"
                         style={{ borderColor: THEME_BORDER }}
                       />
                     </div>
+                    {paidAmount > 0 && (
+                      <div className="flex justify-between items-center gap-4">
+                        <span style={{ color: THEME_SECONDARY }}>Payment Mode:</span>
+                        <Select value={paymentMode} onValueChange={setPaymentMode}>
+                          <SelectTrigger className="w-40 h-8" style={{ borderColor: THEME_BORDER }}><SelectValue placeholder="Choose mode" /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="cash">Cash</SelectItem>
+                            <SelectItem value="upi">UPI</SelectItem>
+                            <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                            <SelectItem value="cheque">Cheque</SelectItem>
+                            <SelectItem value="credit_card">Credit Card</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
                     <div className="flex justify-between text-lg font-semibold">
                       <span style={{ color: THEME_PRIMARY }}>Balance Due:</span>
                       <span className={balanceDue > 0 ? "text-red-500" : "text-green-500"}>
@@ -961,7 +1141,7 @@ export default function InvoiceGenerate() {
                           </TableCell>
                         </TableRow>
                       ) : (
-                        invoiceHistory.map((inv: any) => (
+                        invoiceHistory.map((inv) => (
                           <TableRow key={inv.id}>
                             <TableCell className="font-medium" style={{ color: THEME_PRIMARY }}>{inv.invoice_number}</TableCell>
                             <TableCell style={{ color: THEME_SECONDARY }}>{inv.customer_name || 'Walk-in'}</TableCell>
@@ -1009,7 +1189,7 @@ export default function InvoiceGenerate() {
                           </TableCell>
                         </TableRow>
                       ) : (
-                        invoiceDrafts.map((draft: any) => (
+                        invoiceDrafts.map((draft) => (
                           <TableRow key={draft.id} className="bg-amber-50/30">
                             <TableCell className="font-medium" style={{ color: '#92400e' }}>{draft.invoice_number}</TableCell>
                             <TableCell style={{ color: '#b45309' }}>{draft.customer_name || 'Walk-in'}</TableCell>

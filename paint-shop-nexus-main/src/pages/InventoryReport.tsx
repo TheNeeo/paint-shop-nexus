@@ -26,7 +26,7 @@ export default function InventoryReport() {
   const [searchTerm, setSearchTerm] = useState("");
   const [stockStatus, setStockStatus] = useState("all");
 
-  const { data: products = [] } = useQuery({
+  const { data: products = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["inventory-report"],
     queryFn: async () => {
       const { data, error } = await supabase.from("products").select("*, categories(name)").is("parent_product_id", null).order("name");
@@ -68,7 +68,12 @@ export default function InventoryReport() {
               </h1>
               <p className="text-sm italic" style={{ color: THEME.primary }}>Monitor stock levels and inventory valuation</p>
             </div>
-            <Badge className="text-white text-sm px-4 py-1 h-fit" style={{ background: `linear-gradient(to right, ${THEME.primary}, ${THEME.primaryDark})` }}>{totalItems} Items</Badge>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => void refetch()} disabled={isLoading}>
+                <RefreshCw className="mr-2 h-4 w-4" />Refresh
+              </Button>
+              <Badge className="text-white text-sm px-4 py-1 h-fit" style={{ background: `linear-gradient(to right, ${THEME.primary}, ${THEME.primaryDark})` }}>{totalItems} Items</Badge>
+            </div>
           </div>
         </motion.div>
 
@@ -118,7 +123,11 @@ export default function InventoryReport() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.length === 0 ? (
+                {isLoading ? (
+                  <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Loading inventory...</TableCell></TableRow>
+                ) : isError ? (
+                  <TableRow><TableCell colSpan={7} className="text-center py-8 text-red-600">Could not load inventory. Check database access and refresh.</TableCell></TableRow>
+                ) : filtered.length === 0 ? (
                   <TableRow><TableCell colSpan={7} className="text-center py-8 text-gray-500">No products found</TableCell></TableRow>
                 ) : filtered.map((p) => {
                   const stock = Number(p.current_stock);
@@ -129,7 +138,7 @@ export default function InventoryReport() {
                   return (
                     <TableRow key={p.id} className="hover:bg-green-50/30">
                       <TableCell className="font-medium">{p.name}</TableCell>
-                      <TableCell>{(p as any).categories?.name || "Uncategorized"}</TableCell>
+                      <TableCell>{p.categories?.name || "Uncategorized"}</TableCell>
                       <TableCell className="text-right font-bold">{stock}</TableCell>
                       <TableCell>{p.unit}</TableCell>
                       <TableCell className="text-right">₹{price.toLocaleString()}</TableCell>

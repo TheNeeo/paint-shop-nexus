@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useCallback, useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -153,6 +153,14 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
   const getVariantsForProduct = (parentId: string) => 
     allProducts.filter(p => p.is_variant && p.parent_product_id === parentId);
 
+  const generateBillNumber = useCallback(() => {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const suffix = crypto.randomUUID().slice(0, 8).toUpperCase();
+    form.setValue("billNumber", `BILL-${year}${month}-${suffix}`);
+  }, [form]);
+
   useEffect(() => {
     if (isOpen) {
       fetchVendors();
@@ -160,7 +168,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
       fetchCategories();
       generateBillNumber();
     }
-  }, [isOpen]);
+  }, [isOpen, generateBillNumber]);
 
   const fetchVendors = async () => {
     try {
@@ -199,14 +207,6 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
-  };
-
-  const generateBillNumber = () => {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const random = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
-    form.setValue('billNumber', `BILL-${year}${month}-${random}`);
   };
 
   const getCategoryName = (categoryId: string | null) => {
@@ -277,7 +277,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
 
   const updateItem = (index: number, field: keyof PurchaseItem, value: string | number | boolean) => {
     const updatedItems = [...items];
-    (updatedItems[index] as any)[field] = value;
+    updatedItems[index] = { ...updatedItems[index], [field]: value } as PurchaseItem;
     updatedItems[index].total_amount = calculateItemTotal(updatedItems[index]);
     setItems(updatedItems);
     setItemsError('');

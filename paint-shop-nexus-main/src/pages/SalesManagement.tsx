@@ -14,8 +14,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Download, Activity, ShoppingCart } from "lucide-react";
-import { SalesFilters } from "@/components/sales/SalesFilters";
-import { SalesTable } from "@/components/sales/SalesTable";
+import { SalesFilters, type SalesFiltersState } from "@/components/sales/SalesFilters";
+import { SalesTable, type SaleWithItems } from "@/components/sales/SalesTable";
 import { supabase } from "@/integrations/supabase/client";
 import { exportToCSV } from "@/lib/exportUtils";
 import { toast } from "sonner";
@@ -30,23 +30,23 @@ export default function SalesManagement() {
   const navigate = useNavigate();
   const [isNewInvoiceModalOpen, setIsNewInvoiceModalOpen] = useState(false);
   const [isInvoiceViewerOpen, setIsInvoiceViewerOpen] = useState(false);
-  const [selectedInvoice, setSelectedInvoice] = useState(null);
-  const [filters, setFilters] = useState({
+  const [selectedInvoice, setSelectedInvoice] = useState<SaleWithItems | null>(null);
+  const [filters, setFilters] = useState<SalesFiltersState>({
     customer: "all",
     status: "all",
     paymentMode: "all",
     search: "",
-    dateRange: null,
+    dateRange: "all",
   });
 
-  const handleViewInvoice = (invoice: any) => {
+  const handleViewInvoice = (invoice: SaleWithItems) => {
     setSelectedInvoice(invoice);
     setIsInvoiceViewerOpen(true);
   };
 
   const handleExportCSV = async () => {
     try {
-      const { data, error } = await supabase.from('sales').select('invoice_number, invoice_date, customer_name, total_amount, paid_amount, pending_amount, payment_mode, payment_status').order('invoice_date', { ascending: false });
+      const { data, error } = await supabase.from('sales').select('invoice_number, invoice_date, customer_name, total_amount, paid_amount, pending_amount, payment_mode, payment_status').eq('status', 'final').order('invoice_date', { ascending: false });
       if (error) throw error;
       if (!data || data.length === 0) { toast.error("No sales data to export"); return; }
       const formatted = data.map(s => ({ Invoice: s.invoice_number, Date: s.invoice_date, Customer: s.customer_name || 'Walk-in', Total: s.total_amount, Paid: s.paid_amount, Pending: s.pending_amount, 'Payment Mode': s.payment_mode || 'N/A', Status: s.payment_status }));

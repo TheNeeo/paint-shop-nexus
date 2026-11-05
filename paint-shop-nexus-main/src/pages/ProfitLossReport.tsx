@@ -64,7 +64,7 @@ const ProfitLossReport = () => {
       cashIn,
       cashOut,
       netCashFlow: cashIn - cashOut,
-      trend: Array.from(monthMap.values()).sort((left, right) => left.month.localeCompare(right.month)),
+      trend: Array.from(monthMap.entries()).sort(([left], [right]) => left.localeCompare(right)).map(([, row]) => row),
       transactions,
     };
   }, [financeData]);

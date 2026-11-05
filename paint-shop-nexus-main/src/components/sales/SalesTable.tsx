@@ -1,50 +1,44 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ChevronDown, ChevronRight, Edit, Trash, Eye, Download, Calendar, Hash, User, IndianRupee, Wallet, CreditCard, Inbox, Settings } from "lucide-react";
+import { ChevronDown, ChevronRight, Edit, Eye, Download, Calendar, Hash, User, IndianRupee, Wallet, CreditCard, Inbox, Settings } from "lucide-react";
 import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
+import type { SalesFiltersState } from "@/components/sales/SalesFilters";
+import type { Tables } from "@/integrations/supabase/types";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
+import { useQuery } from "@tanstack/react-query";
+import { format, startOfMonth, startOfWeek, startOfYear } from "date-fns";
+
+export type SaleWithItems = Tables<"sales"> & { sale_items?: Tables<"sale_items">[] };
 
 interface SalesTableProps {
-  filters: any;
-  onViewInvoice: (invoice: any) => void;
+  filters: SalesFiltersState;
+  onViewInvoice: (invoice: SaleWithItems) => void;
 }
 
 export function SalesTable({ filters, onViewInvoice }: SalesTableProps) {
-  const [sales, setSales] = useState<any[]>([]);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [expandedRows, setExpandedRows] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchSales = async () => {
-    try {
-      setLoading(true);
+  const { data: sales = [], isLoading, isError } = useQuery({
+    queryKey: ["sales"],
+    queryFn: async () => {
       const { data, error } = await supabase
-        .from('sales')
-        .select('*, sale_items(*)')
-        .order('created_at', { ascending: false });
-
+        .from("sales")
+        .select("*, sale_items(*)")
+        .eq("status", "final")
+        .order("created_at", { ascending: false });
       if (error) throw error;
-      setSales(data || []);
-    } catch (err) {
-      console.error('Error fetching sales:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchSales();
-  }, []);
+      return data || [];
+    },
+  });
 
   const getPaymentStatusBadge = (status: string) => {
     const variants: Record<string, string> = {
@@ -63,7 +57,8 @@ export function SalesTable({ filters, onViewInvoice }: SalesTableProps) {
       "bank-transfer": "bg-indigo-100 text-indigo-800 border border-indigo-200",
       cheque: "bg-orange-100 text-orange-800 border border-orange-200",
     };
-    return variants[mode || ''] || "bg-gray-100 text-gray-800 border border-gray-200";
+    const normalizedMode = (mode || "").toLowerCase().replace(/_/g, "-");
+    return variants[normalizedMode] || "bg-gray-100 text-gray-800 border border-gray-200";
   };
 
   const toggleRowExpansion = (rowId: string) => {
@@ -74,23 +69,31 @@ export function SalesTable({ filters, onViewInvoice }: SalesTableProps) {
     setSelectedRows(prev => prev.includes(rowId) ? prev.filter(id => id !== rowId) : [...prev, rowId]);
   };
 
-  const filteredSales = sales.filter(sale => {
-    const matchesCustomer = !filters.customer || filters.customer === 'all' || (sale.customer_name || '').toLowerCase().includes(filters.customer.toLowerCase());
-    const matchesStatus = !filters.status || filters.status === 'all' || sale.payment_status === filters.status;
+  const rangeStart = filters.dateRange === "today" ? new Date(new Date().setHours(0, 0, 0, 0))
+    : filters.dateRange === "week" ? startOfWeek(new Date(), { weekStartsOn: 1 })
+    : filters.dateRange === "month" ? startOfMonth(new Date())
+    : filters.dateRange === "year" ? startOfYear(new Date())
+    : null;
+
+  const filteredSales = sales.filter((sale) => {
+    const matchesCustomer = !filters.customer || filters.customer === "all" || sale.customer_id === filters.customer;
+    const matchesStatus = !filters.status || filters.status === "all" || sale.payment_status === filters.status;
+    const normalizedMode = (sale.payment_mode || "").toLowerCase().replace(/_/g, "-");
+    const selectedMode = (filters.paymentMode || "").toLowerCase().replace(/_/g, "-");
+    const matchesPaymentMode = !selectedMode || selectedMode === "all" || normalizedMode === selectedMode;
+    const saleDate = new Date(`${sale.invoice_date}T00:00:00`);
+    const matchesDate = !rangeStart || saleDate >= rangeStart;
     const matchesSearch = !filters.search ||
-      (sale.invoice_number || '').toLowerCase().includes(filters.search.toLowerCase()) ||
-      (sale.customer_name || '').toLowerCase().includes(filters.search.toLowerCase());
-    return matchesCustomer && matchesStatus && matchesSearch;
+      (sale.invoice_number || "").toLowerCase().includes(filters.search.toLowerCase()) ||
+      (sale.customer_name || "").toLowerCase().includes(filters.search.toLowerCase());
+    return matchesCustomer && matchesStatus && matchesPaymentMode && matchesDate && matchesSearch;
   });
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this sale?')) return;
-    await supabase.from('sales').delete().eq('id', id);
-    fetchSales();
-  };
-
-  if (loading) {
+  if (isLoading) {
     return <div className="bg-white rounded-xl border-2 shadow-lg p-8 text-center" style={{ borderColor: '#fce7f3' }}>Loading sales...</div>;
+  }
+  if (isError) {
+    return <div role="alert" className="bg-white rounded-xl border-2 shadow-lg p-8 text-center text-red-700" style={{ borderColor: '#fce7f3' }}>Could not load sales. Check database access and refresh.</div>;
   }
 
   return (
@@ -131,7 +134,7 @@ export function SalesTable({ filters, onViewInvoice }: SalesTableProps) {
                 <TableCell className="font-semibold" style={{ color: '#831843' }}>₹{Number(sale.total_amount).toLocaleString()}</TableCell>
                 <TableCell className="font-semibold text-green-700">₹{Number(sale.paid_amount).toLocaleString()}</TableCell>
                 <TableCell>
-                  <Badge className={getPaymentModeBadge(sale.payment_mode)}>{(sale.payment_mode || 'N/A').toUpperCase()}</Badge>
+                  <Badge className={getPaymentModeBadge(sale.payment_mode)}>{(sale.payment_mode || 'N/A').replace(/[_-]/g, " ").toUpperCase()}</Badge>
                 </TableCell>
                 <TableCell>
                   <Badge className={getPaymentStatusBadge(sale.payment_status)}>
@@ -147,15 +150,12 @@ export function SalesTable({ filters, onViewInvoice }: SalesTableProps) {
                       <DropdownMenuItem onClick={() => onViewInvoice(sale)} className="hover:bg-pink-50 cursor-pointer">
                         <Eye className="h-4 w-4 mr-2" style={{ color: '#af0568' }} /> View
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600 hover:bg-red-50 cursor-pointer" onClick={() => handleDelete(sale.id)}>
-                        <Trash className="h-4 w-4 mr-2" /> Delete
-                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
               </TableRow>
 
-              {expandedRows.includes(sale.id) && sale.sale_items?.map((item: any, index: number) => (
+              {expandedRows.includes(sale.id) && sale.sale_items?.map((item, index) => (
                 <TableRow key={`${sale.id}-item-${index}`} style={{ backgroundColor: '#fdf2f8' }} className="border-l-4">
                   <TableCell></TableCell>
                   <TableCell></TableCell>
