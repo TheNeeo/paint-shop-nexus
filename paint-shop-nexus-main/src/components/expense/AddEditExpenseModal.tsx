@@ -23,7 +23,7 @@ const THEME = {
 };
 
 interface Expense {
-  id?: number;
+  id?: string;
   date: string;
   type: string;
   amount: number;
@@ -36,9 +36,10 @@ interface AddEditExpenseModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   expense?: Expense | null;
+  onSaved?: () => void;
 }
 
-export const AddEditExpenseModal = ({ open, onOpenChange, expense }: AddEditExpenseModalProps) => {
+export const AddEditExpenseModal = ({ open, onOpenChange, expense, onSaved }: AddEditExpenseModalProps) => {
   const [formData, setFormData] = useState<Expense>({
     date: new Date().toISOString().split('T')[0],
     type: "",
@@ -50,6 +51,7 @@ export const AddEditExpenseModal = ({ open, onOpenChange, expense }: AddEditExpe
 
   const [showNewTypeForm, setShowNewTypeForm] = useState(false);
   const [newExpenseType, setNewExpenseType] = useState("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (expense) {
@@ -68,31 +70,50 @@ export const AddEditExpenseModal = ({ open, onOpenChange, expense }: AddEditExpe
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { toast.error("Not authenticated"); return; }
+    if (!formData.type.trim() || !Number.isFinite(formData.amount) || formData.amount <= 0 || !formData.description.trim()) {
+      toast.error("Enter an expense type, positive amount, and description.");
+      return;
+    }
 
-      const dbData = {
+    setSaving(true);
+    try {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError) throw authError;
+      if (!user) throw new Error("Sign in before saving an expense.");
+
+      const dbFields = {
         date: formData.date,
-        type: formData.type,
+        type: formData.type.trim(),
         amount: formData.amount,
         payment_mode: formData.paymentMode || null,
-        description: formData.description || null,
-        ref_no: formData.refNo || null,
-        created_by_user_id: user.id,
+        description: formData.description.trim(),
+        ref_no: formData.refNo.trim() || null,
+        updated_at: new Date().toISOString(),
       };
 
       if (expense?.id) {
-        // For editing we'd need the real UUID, skipping for now
-        toast.info("Edit not supported yet");
-      } else {
-        const { error } = await supabase.from('expenses').insert([dbData]);
+        const { data, error } = await supabase
+          .from("expenses")
+          .update(dbFields)
+          .eq("id", expense.id)
+          .eq("created_by_user_id", user.id)
+          .select("id")
+          .maybeSingle();
         if (error) throw error;
-        toast.success("Expense saved successfully!");
+        if (!data) throw new Error("This expense could not be found or you do not have permission to edit it.");
+        toast.success("Expense updated.");
+      } else {
+        const { error } = await supabase.from("expenses").insert({ ...dbFields, created_by_user_id: user.id });
+        if (error) throw error;
+        toast.success("Expense saved.");
       }
+
+      onSaved?.();
       onOpenChange(false);
-    } catch (err: any) {
-      toast.error(err.message || "Failed to save expense");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to save expense.");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -155,7 +176,7 @@ export const AddEditExpenseModal = ({ open, onOpenChange, expense }: AddEditExpe
                   <Input
                     id="amount"
                     type="number"
-                    min="0"
+                    min="0.01"
                     step="0.01"
                     value={formData.amount || ""}
                     onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
@@ -240,7 +261,7 @@ export const AddEditExpenseModal = ({ open, onOpenChange, expense }: AddEditExpe
                     <SelectContent>
                       <SelectItem value="cash">Cash</SelectItem>
                       <SelectItem value="upi">UPI</SelectItem>
-                      <SelectItem value="bank">Bank Transfer</SelectItem>
+                      <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
                       <SelectItem value="cheque">Cheque</SelectItem>
                       <SelectItem value="card">Credit/Debit Card</SelectItem>
                     </SelectContent>
@@ -291,11 +312,12 @@ export const AddEditExpenseModal = ({ open, onOpenChange, expense }: AddEditExpe
               </Button>
               <Button
                 type="submit"
+                disabled={saving}
                 className="text-white"
                 style={{ backgroundColor: THEME.primary }}
               >
                 <Save className="w-4 h-4 mr-2" />
-                Save Expense
+                {saving ? "Saving..." : "Save Expense"}
               </Button>
             </div>
           </form>

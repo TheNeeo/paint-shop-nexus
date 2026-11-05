@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
-import { nextInvoiceNumber } from "@/hooks/useAppSettings";
+import { format } from "date-fns";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -65,6 +65,7 @@ import { toast as sonnerToast } from "sonner";
 import invoiceGenerateIcon from "@/assets/invoice-generate-icon.png";
 import dashboardHomeIcon from "@/assets/dashboard-home-icon.png";
 import { InvoiceViewer } from "@/components/sales/InvoiceViewer";
+import { decreaseSaleInventory, restoreSaleInventory, type AppliedInventoryChange } from "@/lib/salesInventory";
 
 // Champagne Brown theme colors
 const THEME_PRIMARY = "#5D3A1A";
@@ -74,6 +75,7 @@ const THEME_BORDER = "#D4A574";
 
 interface InvoiceItem {
   id: string;
+  productId: string;
   productName: string;
   category: string;
   hsnCode: string;
@@ -83,11 +85,15 @@ interface InvoiceItem {
   amount: number;
 }
 
+const generateInvoiceNumber = () => `INV-${format(new Date(), "yyyyMMdd")}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+
 export default function InvoiceGenerate() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedCustomer, setSelectedCustomer] = useState<string>("");
+  const [invoiceDate, setInvoiceDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [invoiceNumber, setInvoiceNumber] = useState(generateInvoiceNumber);
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
   const [discount, setDiscount] = useState<number>(0);
   const [gstRate, setGstRate] = useState<number>(18);
@@ -100,10 +106,10 @@ export default function InvoiceGenerate() {
   const [viewerOpen, setViewerOpen] = useState(false);
 
   const buildPreviewInvoice = () => ({
-    invoice_number: `PREVIEW-${Date.now().toString().slice(-6)}`,
-    invoice_date: new Date().toISOString().split('T')[0],
+    invoice_number: invoiceNumber,
+    invoice_date: invoiceDate,
     created_at: new Date().toISOString(),
-    customer_name: selectedCustomer || 'Walk-in Customer',
+    customer_name: selectedCustomer === "walk-in" ? "Walk-in Customer" : customers.find((customer) => customer.id === selectedCustomer)?.name || "Walk-in Customer",
     subtotal,
     tax_amount: gstAmount,
     discount_amount: discountAmount,
@@ -112,8 +118,9 @@ export default function InvoiceGenerate() {
     pending_amount: balanceDue,
     payment_status: paidAmount >= grandTotal && grandTotal > 0 ? 'paid' : paidAmount > 0 ? 'partial' : 'pending',
     payment_mode: 'N/A',
-    sale_items: invoiceItems.map(i => ({
-      product_name: i.productName,
+      sale_items: invoiceItems.map(i => ({
+        product_id: i.productId || null,
+        product_name: i.productName,
       quantity: i.quantity,
       rate: i.rate,
       gst_percent: gstRate,
@@ -126,13 +133,22 @@ export default function InvoiceGenerate() {
     setViewerOpen(true);
   };
 
+  const { data: customers = [], isLoading: customersLoading } = useQuery({
+    queryKey: ["active-customers"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("customers").select("id, name, mobile, email, gst_no, address, status").eq("status", "active").order("name");
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
   // Fetch products
   const { data: products = [] } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("*")
+        .select("id, name, category_id, hsn_code, unit, sale_price, unit_price, current_stock, is_variant, parent_product_id")
         .order("name");
       if (error) throw error;
       return data || [];
@@ -190,7 +206,8 @@ export default function InvoiceGenerate() {
 
   const addNewItem = () => {
     const newItem: InvoiceItem = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: crypto.randomUUID(),
+      productId: "",
       productName: "",
       category: "",
       hsnCode: "",
@@ -203,27 +220,41 @@ export default function InvoiceGenerate() {
   };
 
   const removeItem = (id: string) => {
-    setInvoiceItems(invoiceItems.filter((item) => item.id !== id));
+    setInvoiceItems((current) => current.filter((item) => item.id !== id));
   };
 
-  const updateItem = (id: string, field: keyof InvoiceItem, value: any) => {
-    setInvoiceItems(
-      invoiceItems.map((item) => {
-        if (item.id === id) {
-          const updated = { ...item, [field]: value };
-          if (field === "quantity" || field === "rate") {
-            updated.amount = updated.quantity * updated.rate;
-          }
-          return updated;
-        }
-        return item;
-      })
-    );
+  const updateItem = (id: string, field: keyof InvoiceItem, value: string | number) => {
+    setInvoiceItems((current) => current.map((item) => {
+      if (item.id !== id) return item;
+      const updated = { ...item, [field]: value };
+      if (field === "quantity" || field === "rate") {
+        updated.amount = Number(updated.quantity) * Number(updated.rate);
+      }
+      return updated;
+    }));
+  };
+
+  const handleProductChange = (itemId: string, productId: string) => {
+    const product = products.find((candidate) => candidate.id === productId);
+    if (!product) return;
+    const rate = Number(product.sale_price || product.unit_price || 0);
+    setInvoiceItems((current) => current.map((item) => item.id === itemId ? {
+      ...item,
+      productId: product.id,
+      productName: product.name,
+      category: categories.find((category) => category.id === product.category_id)?.name || "",
+      hsnCode: product.hsn_code || "",
+      unit: product.unit || "PC",
+      rate,
+      amount: item.quantity * rate,
+    } : item));
   };
 
   const resetForm = () => {
     setInvoiceItems([]);
     setSelectedCustomer("");
+    setInvoiceDate(format(new Date(), "yyyy-MM-dd"));
+    setInvoiceNumber(generateInvoiceNumber());
     setDiscount(0);
     setGstRate(18);
     setPaidAmount(0);
@@ -248,7 +279,7 @@ export default function InvoiceGenerate() {
         .from('sales')
         .insert([{
           invoice_number: invoiceNumber,
-          invoice_date: new Date().toISOString().split('T')[0],
+          invoice_date: invoiceDate,
           customer_name: selectedCustomer || 'Walk-in',
           subtotal,
           tax_amount: gstAmount,
@@ -573,51 +604,34 @@ export default function InvoiceGenerate() {
                     <Label style={{ color: THEME_SECONDARY }}>Select Customer</Label>
                     <Select value={selectedCustomer} onValueChange={setSelectedCustomer}>
                       <SelectTrigger style={{ borderColor: THEME_BORDER }}>
-                        <SelectValue placeholder="Choose a customer..." />
+                        <SelectValue placeholder={customersLoading ? "Loading customers..." : "Choose a customer..."} />
                       </SelectTrigger>
                       <SelectContent style={{ borderColor: THEME_BORDER }}>
-                        <SelectItem value="customer1">John Doe</SelectItem>
-                        <SelectItem value="customer2">Jane Smith</SelectItem>
-                        <SelectItem value="customer3">Bob Johnson</SelectItem>
+                        <SelectItem value="walk-in">Walk-in Customer</SelectItem>
+                        {customers.map((customer) => <SelectItem key={customer.id} value={customer.id}>{customer.name}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
-                  <div>
-                    <Label className="invisible">Action</Label>
-                    <Button
-                      variant="outline"
-                      style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }}
-                      className="w-full hover:opacity-80"
-                    >
+                  <div className="flex items-end">
+                    <Button type="button" variant="outline" onClick={() => navigate("/customers")} style={{ borderColor: THEME_BORDER, color: THEME_PRIMARY }} className="w-full hover:opacity-80">
                       <Plus className="h-4 w-4 mr-2" />
-                      Add New Customer
+                      Manage Customers
                     </Button>
                   </div>
                 </div>
 
-                {selectedCustomer && (
-                  <div 
-                    className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-lg" 
-                    style={{ backgroundColor: `${THEME_BG}40` }}
-                  >
-                    <div>
-                      <Label className="text-xs" style={{ color: THEME_SECONDARY }}>Name</Label>
-                      <p className="font-medium" style={{ color: THEME_PRIMARY }}>John Doe</p>
+                {selectedCustomer && selectedCustomer !== "walk-in" && (() => {
+                  const customer = customers.find((item) => item.id === selectedCustomer);
+                  if (!customer) return null;
+                  return (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-lg" style={{ backgroundColor: `${THEME_BG}40` }}>
+                      <div><Label className="text-xs" style={{ color: THEME_SECONDARY }}>Name</Label><p className="font-medium" style={{ color: THEME_PRIMARY }}>{customer.name}</p></div>
+                      <div><Label className="text-xs" style={{ color: THEME_SECONDARY }}>Mobile / Email</Label><p className="font-medium" style={{ color: THEME_PRIMARY }}>{[customer.mobile, customer.email].filter(Boolean).join(" | ") || "—"}</p></div>
+                      <div><Label className="text-xs" style={{ color: THEME_SECONDARY }}>GST Number</Label><p className="font-medium" style={{ color: THEME_PRIMARY }}>{customer.gst_no || "—"}</p></div>
+                      <div><Label className="text-xs" style={{ color: THEME_SECONDARY }}>Billing Address</Label><p className="font-medium" style={{ color: THEME_PRIMARY }}>{customer.address || "—"}</p></div>
                     </div>
-                    <div>
-                      <Label className="text-xs" style={{ color: THEME_SECONDARY }}>Mobile / Email</Label>
-                      <p className="font-medium" style={{ color: THEME_PRIMARY }}>+91 98765 43210 | john@example.com</p>
-                    </div>
-                    <div>
-                      <Label className="text-xs" style={{ color: THEME_SECONDARY }}>GST Number</Label>
-                      <p className="font-medium" style={{ color: THEME_PRIMARY }}>29ABCDE1234F1Z5</p>
-                    </div>
-                    <div>
-                      <Label className="text-xs" style={{ color: THEME_SECONDARY }}>Billing Address</Label>
-                      <p className="font-medium" style={{ color: THEME_PRIMARY }}>123 Main St, City, State - 123456</p>
-                    </div>
-                  </div>
-                )}
+                  );
+                })()}
               </div>
 
               {/* Invoice Details Block */}
@@ -625,51 +639,14 @@ export default function InvoiceGenerate() {
                 <h3 className="text-lg font-semibold" style={{ color: THEME_PRIMARY }}>
                   Invoice Details
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label style={{ color: THEME_SECONDARY }}>Invoice No.</Label>
-                    <Input 
-                      value="INV-2025-001" 
-                      readOnly 
-                      style={{ borderColor: THEME_BORDER }}
-                    />
+                    <Input value={invoiceNumber} readOnly style={{ borderColor: THEME_BORDER }} />
                   </div>
                   <div className="space-y-2">
                     <Label style={{ color: THEME_SECONDARY }}>Date</Label>
-                    <Input 
-                      type="date" 
-                      defaultValue={new Date().toISOString().split("T")[0]} 
-                      style={{ borderColor: THEME_BORDER }}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label style={{ color: THEME_SECONDARY }}>Due Date</Label>
-                    <Input type="date" style={{ borderColor: THEME_BORDER }} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label style={{ color: THEME_SECONDARY }}>Payment Terms</Label>
-                    <Select defaultValue="net30">
-                      <SelectTrigger style={{ borderColor: THEME_BORDER }}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent style={{ borderColor: THEME_BORDER }}>
-                        <SelectItem value="immediate">Immediate</SelectItem>
-                        <SelectItem value="net30">Net 30</SelectItem>
-                        <SelectItem value="net60">Net 60</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label style={{ color: THEME_SECONDARY }}>Salesperson</Label>
-                    <Select>
-                      <SelectTrigger style={{ borderColor: THEME_BORDER }}>
-                        <SelectValue placeholder="Select salesperson" />
-                      </SelectTrigger>
-                      <SelectContent style={{ borderColor: THEME_BORDER }}>
-                        <SelectItem value="sales1">Sales Person 1</SelectItem>
-                        <SelectItem value="sales2">Sales Person 2</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Input type="date" value={invoiceDate} onChange={(event) => setInvoiceDate(event.target.value)} style={{ borderColor: THEME_BORDER }} />
                   </div>
                 </div>
               </div>
@@ -718,25 +695,14 @@ export default function InvoiceGenerate() {
                           <TableRow key={item.id}>
                             <TableCell style={{ color: THEME_PRIMARY }}>{index + 1}</TableCell>
                             <TableCell>
-                              <Select
-                                value={item.productName}
-                                onValueChange={(value) => {
-                                  const product = products.find((p) => p.name === value);
-                                  if (product) {
-                                    updateItem(item.id, "productName", value);
-                                    updateItem(item.id, "hsnCode", product.hsn_code || "");
-                                    updateItem(item.id, "unit", product.unit);
-                                    updateItem(item.id, "rate", product.unit_price);
-                                  }
-                                }}
-                              >
+                              <Select value={item.productId} onValueChange={(productId) => handleProductChange(item.id, productId)}>
                                 <SelectTrigger style={{ borderColor: THEME_BORDER }}>
-                                  <SelectValue placeholder="Select product" />
+                                  <SelectValue placeholder="Select inventory product" />
                                 </SelectTrigger>
                                 <SelectContent style={{ borderColor: THEME_BORDER }}>
                                   {products.map((product) => (
-                                    <SelectItem key={product.id} value={product.name}>
-                                      {product.name}
+                                    <SelectItem key={product.id} value={product.id}>
+                                      {product.name} · {Number(product.current_stock) || 0} {product.unit || "units"}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>

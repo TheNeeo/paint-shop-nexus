@@ -42,7 +42,7 @@ export default function InventoryReport() {
   });
 
   const totalItems = products.length;
-  const totalValue = products.reduce((s, p) => s + Number(p.current_stock) * Number(p.sale_price || p.unit_price || 0), 0);
+  const totalValue = products.reduce((sum, product) => sum + Number(product.current_stock || 0) * Number(product.purchase_price || 0), 0);
   const lowStock = products.filter((p) => Number(p.current_stock) > 0 && Number(p.current_stock) <= Number(p.threshold_qty || 10)).length;
 
   return (
@@ -76,7 +76,7 @@ export default function InventoryReport() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             { title: "Total Stock Items", value: totalItems, icon: Package, gradient: "from-amber-400 via-yellow-400 to-orange-400" },
-            { title: "Total Stock Value", value: `₹${totalValue.toLocaleString()}`, icon: TrendingUp, gradient: "from-emerald-400 via-green-400 to-teal-400" },
+            { title: "Inventory Cost Value", value: `₹${totalValue.toLocaleString()}`, icon: TrendingUp, gradient: "from-emerald-400 via-green-400 to-teal-400" },
             { title: "Low Stock Alerts", value: lowStock, icon: AlertCircle, gradient: "from-red-400 via-rose-400 to-pink-400" },
             { title: "Out of Stock", value: products.filter((p) => Number(p.current_stock) === 0).length, icon: Star, gradient: "from-violet-400 via-purple-400 to-indigo-400" },
           ].map((card) => (
@@ -112,7 +112,7 @@ export default function InventoryReport() {
                   <TableHeaderCell icon={Tag} label="Category" textColor={THEME.primaryDark} iconColor="#8b5cf6" />
                   <TableHeaderCell icon={Boxes} label="Current Stock" textColor={THEME.primaryDark} iconColor="#0ea5e9" align="right" className="text-right" />
                   <TableHeaderCell icon={Ruler} label="Unit" textColor={THEME.primaryDark} iconColor="#0d9488" />
-                  <TableHeaderCell icon={IndianRupee} label="Unit Price" textColor={THEME.primaryDark} iconColor="#f59e0b" align="right" className="text-right" />
+                  <TableHeaderCell icon={IndianRupee} label="Unit Cost" textColor={THEME.primaryDark} iconColor="#f59e0b" align="right" className="text-right" />
                   <TableHeaderCell icon={Calculator} label="Stock Value" textColor={THEME.primaryDark} iconColor="#ec4899" align="right" className="text-right" />
                   <TableHeaderCell icon={CheckCircle} label="Status" textColor={THEME.primaryDark} iconColor="#22c55e" />
                 </TableRow>
@@ -123,7 +123,7 @@ export default function InventoryReport() {
                 ) : filtered.map((p) => {
                   const stock = Number(p.current_stock);
                   const threshold = Number(p.threshold_qty || 10);
-                  const price = Number(p.sale_price || p.unit_price || 0);
+                  const price = Number(p.purchase_price || 0);
                   const status = stock === 0 ? "Out of Stock" : stock <= threshold ? "Low Stock" : "In Stock";
                   const statusColor = stock === 0 ? "bg-red-100 text-red-800" : stock <= threshold ? "bg-yellow-100 text-yellow-800" : "bg-green-100 text-green-800";
                   return (

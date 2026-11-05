@@ -117,7 +117,8 @@ export default function UpdateStock() {
   });
 
   const selectedProduct = products.find((p) => p.id === selectedProductId);
-  const newStock = selectedProduct ? selectedProduct.current_stock + adjustQuantity : 0;
+  const currentStock = Number(selectedProduct?.current_stock) || 0;
+  const newStock = selectedProduct ? currentStock + adjustQuantity : 0;
 
   // Calculate summary stats
   const totalStock = products.reduce((sum, p) => sum + p.current_stock, 0);
@@ -139,47 +140,54 @@ export default function UpdateStock() {
   const outOfStockProducts = products.filter((p) => p.current_stock === 0);
 
   const handleSave = async () => {
-    if (!selectedProductId || adjustQuantity === 0 || !reason) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill all required fields",
-        variant: "destructive",
-      });
+    if (!selectedProductId || !selectedProduct || !Number.isFinite(adjustQuantity) || adjustQuantity === 0 || !reason.trim()) {
+      toast({ title: "Missing Information", description: "Choose a product, enter a non-zero quantity, and provide a reason.", variant: "destructive" });
+      return;
+    }
+    if (newStock < 0) {
+      toast({ title: "Invalid Quantity", description: "Stock cannot be reduced below zero.", variant: "destructive" });
       return;
     }
 
+    const previousStock = selectedProduct.current_stock;
     try {
-      // Insert stock adjustment record
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
-      const { error: adjustmentError } = await supabase
-        .from("stock_adjustments")
-        .insert([{
-          product_id: selectedProductId,
-          adjustment_type: adjustQuantity > 0 ? 'increase' : 'decrease',
-          quantity: adjustQuantity,
-          reason: `${reason}: ${notes || 'N/A'}`,
-          created_by_user_id: currentUser?.id || '',
-        }]);
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError) throw authError;
+      if (!user) throw new Error("Sign in before adjusting stock.");
 
-      if (adjustmentError) throw adjustmentError;
+      const updateResult = previousStock === null
+        ? await supabase.from("products").update({ current_stock: newStock }).eq("id", selectedProductId).is("current_stock", null).select("id").maybeSingle()
+        : await supabase.from("products").update({ current_stock: newStock }).eq("id", selectedProductId).eq("current_stock", previousStock).select("id").maybeSingle();
+      if (updateResult.error) throw updateResult.error;
+      if (!updateResult.data) throw new Error("Stock changed in another session. Refresh and try again.");
 
-      // Update product stock
-      const { error } = await supabase
-        .from("products")
-        .update({ current_stock: newStock })
-        .eq("id", selectedProductId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Stock Updated",
-        description: `Successfully updated stock for ${selectedProduct?.name}`,
+      const { error: adjustmentError } = await supabase.from("stock_adjustments").insert({
+        product_id: selectedProductId,
+        adjustment_type: adjustQuantity > 0 ? "increase" : "decrease",
+        quantity: adjustQuantity,
+        reason: `${reason.trim()}: ${notes.trim() || "N/A"}`,
+        created_by_user_id: user.id,
       });
 
-      // Refresh products data
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      if (adjustmentError) {
+        const { data: rollback, error: rollbackError } = await supabase
+          .from("products")
+          .update({ current_stock: previousStock })
+          .eq("id", selectedProductId)
+          .eq("current_stock", newStock)
+          .select("id")
+          .maybeSingle();
+        if (rollbackError || !rollback) throw new Error("Adjustment log failed and stock could not be restored automatically. Refresh and inspect this product before retrying.");
+        throw adjustmentError;
+      }
 
-      // Reset form
+      toast({ title: "Stock Updated", description: `Successfully updated stock for ${selectedProduct.name}` });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["products"] }),
+        queryClient.invalidateQueries({ queryKey: ["inventory-summary"] }),
+        queryClient.invalidateQueries({ queryKey: ["inventory-report"] }),
+        queryClient.invalidateQueries({ queryKey: ["finance-data"] }),
+      ]);
       setSelectedProductId("");
       setAdjustQuantity(0);
       setReason("");
@@ -187,7 +195,7 @@ export default function UpdateStock() {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to update stock",
+        description: error instanceof Error ? error.message : "Failed to update stock",
         variant: "destructive",
       });
     }

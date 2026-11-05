@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Download, Printer, TrendingUp, TrendingDown, DollarSign, Wallet, Plus, BookOpen, RefreshCw, BarChart3, Search, Filter, Clock, Tag, AlignLeft, IndianRupee, CreditCard, Calculator } from "lucide-react";
@@ -7,11 +7,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { exportToCSV } from "@/lib/exportUtils";
+import { useFinanceData } from "@/hooks/useFinanceData";
+import { supabase } from "@/integrations/supabase/client";
 import { Calendar as CalendarIcon } from "lucide-react";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -40,12 +44,14 @@ const THEME = {
 
 interface Transaction {
   id: string;
+  date: string;
   time: string;
+  createdAt: string;
   type: "Sale" | "Purchase" | "Expense" | "Receipt" | "Adjustment";
   description: string;
   debit: number;
   credit: number;
-  paymentMode: "Cash" | "UPI" | "Account Transfer" | "Cheque";
+  paymentMode: string;
   balance: number;
   details?: {
     invoiceNo?: string;
@@ -58,10 +64,32 @@ interface Transaction {
   };
 }
 
+const formatPaymentMode = (mode?: string | null) => {
+  if (!mode) return "N/A";
+  const normalized = mode.toLowerCase().replace(/[\s-]+/g, "_");
+  const labels: Record<string, string> = {
+    cash: "Cash",
+    upi: "UPI",
+    bank: "Bank Transfer",
+    bank_transfer: "Account Transfer",
+    account_transfer: "Account Transfer",
+    cheque: "Cheque",
+    card: "Card",
+    credit_card: "Card",
+  };
+  return labels[normalized] || mode;
+};
+
+const formatTransactionTime = (createdAt: string) => {
+  const parsed = new Date(createdAt);
+  return Number.isNaN(parsed.getTime()) ? "—" : format(parsed, "HH:mm");
+};
+
 const DayBook = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { data: financeData, isLoading, isError, refetch, dataUpdatedAt } = useFinanceData();
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
-  const [dailyNotes, setDailyNotes] = useState("");
   const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
   const [dateFrom, setDateFrom] = useState<Date>();
   const [dateTo, setDateTo] = useState<Date>();
@@ -69,37 +97,149 @@ const DayBook = () => {
   const [paymentFilter, setPaymentFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const summaryData = {
-    accountBalance: 85000,
-    cashInHand: 25000,
-    openingBalance: 75000,
-    totalCashIn: 35000,
-    totalCashOut: 25000,
-    closingBalance: 85000,
-  };
+  const allTransactions = useMemo(() => {
+    if (!financeData) return [];
 
-  const transactions: Transaction[] = [
-    {
-      id: "1", time: "09:15", type: "Sale", description: "Paint Sale - Asian Paints",
-      debit: 0, credit: 15000, paymentMode: "UPI", balance: 90000,
-      details: { invoiceNo: "INV-001", customerName: "Raj Kumar", productName: "Asian Paints Premium", unit: "10L", amount: 1500, totalAmount: 15000, notes: "Bulk order for residential project" }
-    },
-    {
-      id: "2", time: "11:30", type: "Purchase", description: "Paint Stock Purchase",
-      debit: 12000, credit: 0, paymentMode: "Account Transfer", balance: 78000,
-      details: { invoiceNo: "PUR-001", customerName: "Berger Paints Ltd", productName: "Various Paint Colors", unit: "Multiple", amount: 12000, totalAmount: 12000, notes: "Monthly stock replenishment" }
-    },
-    {
-      id: "3", time: "14:45", type: "Expense", description: "Shop Rent Payment",
-      debit: 8000, credit: 0, paymentMode: "Cash", balance: 70000,
-      details: { invoiceNo: "EXP-001", notes: "Monthly shop rent for March 2024" }
-    },
-    {
-      id: "4", time: "16:20", type: "Sale", description: "Brush & Tools Sale",
-      debit: 0, credit: 2500, paymentMode: "Cash", balance: 72500,
-      details: { invoiceNo: "INV-002", customerName: "Amit Sharma", productName: "Paint Brushes & Rollers", unit: "Set", amount: 2500, totalAmount: 2500 }
-    }
-  ];
+    const rows: Omit<Transaction, "balance">[] = [];
+
+    financeData.sales.forEach((sale) => {
+      const amountReceived = Number(sale.paid_amount) || 0;
+      if (sale.status === "draft" || amountReceived <= 0) return;
+      rows.push({
+        id: `sale-${sale.id}`,
+        date: sale.invoice_date,
+        time: formatTransactionTime(sale.created_at),
+        createdAt: sale.created_at,
+        type: "Sale",
+        description: `Sale payment ${sale.invoice_number}`,
+        debit: 0,
+        credit: amountReceived,
+        paymentMode: formatPaymentMode(sale.payment_mode),
+        details: {
+          invoiceNo: sale.invoice_number,
+          customerName: sale.customer_name || "Walk-in",
+          amount: amountReceived,
+          totalAmount: Number(sale.total_amount) || 0,
+          notes: sale.pending_amount ? `Pending balance: ₹${Number(sale.pending_amount).toLocaleString("en-IN")}` : undefined,
+        },
+      });
+    });
+
+    financeData.purchases.forEach((purchase) => {
+      const amountPaid = Number(purchase.paid_amount) || 0;
+      if (amountPaid <= 0) return;
+      rows.push({
+        id: `purchase-${purchase.id}`,
+        date: purchase.purchase_date,
+        time: formatTransactionTime(purchase.created_at),
+        createdAt: purchase.created_at,
+        type: "Purchase",
+        description: `Purchase payment ${purchase.invoice_number}`,
+        debit: amountPaid,
+        credit: 0,
+        paymentMode: formatPaymentMode(purchase.payment_method),
+        details: {
+          invoiceNo: purchase.invoice_number,
+          customerName: purchase.vendors?.name || undefined,
+          amount: amountPaid,
+          totalAmount: Number(purchase.total_amount) || 0,
+          notes: purchase.balance_amount ? `Pending balance: ₹${Number(purchase.balance_amount).toLocaleString("en-IN")}` : undefined,
+        },
+      });
+    });
+
+    financeData.expenses.forEach((expense) => {
+      const amount = Number(expense.amount) || 0;
+      if (amount <= 0) return;
+      rows.push({
+        id: `expense-${expense.id}`,
+        date: expense.date,
+        time: formatTransactionTime(expense.created_at),
+        createdAt: expense.created_at,
+        type: "Expense",
+        description: expense.description || expense.type,
+        debit: amount,
+        credit: 0,
+        paymentMode: formatPaymentMode(expense.payment_mode),
+        details: {
+          invoiceNo: expense.ref_no || undefined,
+          amount,
+          totalAmount: amount,
+          notes: expense.type,
+        },
+      });
+    });
+
+    financeData.receipts.forEach((receipt) => {
+      const amount = Number(receipt.amount) || 0;
+      if (amount <= 0) return;
+      rows.push({
+        id: `receipt-${receipt.id}`,
+        date: receipt.receipt_date,
+        time: formatTransactionTime(receipt.created_at),
+        createdAt: receipt.created_at,
+        type: "Receipt",
+        description: receipt.reason || `Cash receipt ${receipt.receipt_no}`,
+        debit: 0,
+        credit: amount,
+        paymentMode: formatPaymentMode(receipt.payment_mode),
+        details: {
+          invoiceNo: receipt.receipt_no,
+          customerName: receipt.payer_name,
+          amount,
+          totalAmount: amount,
+          notes: receipt.notes || undefined,
+        },
+      });
+    });
+
+    financeData.stockAdjustments.forEach((adjustment) => {
+      rows.push({
+        id: `adjustment-${adjustment.id}`,
+        date: adjustment.created_at.slice(0, 10),
+        time: formatTransactionTime(adjustment.created_at),
+        createdAt: adjustment.created_at,
+        type: "Adjustment",
+        description: adjustment.reason || `Stock ${adjustment.adjustment_type}`,
+        debit: 0,
+        credit: 0,
+        paymentMode: "N/A",
+        details: {
+          productName: adjustment.products?.name || `Product ${adjustment.product_id.slice(0, 8)}`,
+          notes: `${adjustment.adjustment_type}: ${adjustment.quantity} units`,
+        },
+      });
+    });
+
+    rows.sort((left, right) => left.date.localeCompare(right.date) || left.createdAt.localeCompare(right.createdAt));
+    let runningBalance = 0;
+    return rows.map((row) => {
+      runningBalance += row.credit - row.debit;
+      return { ...row, balance: runningBalance };
+    });
+  }, [financeData]);
+
+  const fromDate = dateFrom ? format(dateFrom, "yyyy-MM-dd") : undefined;
+  const toDate = dateTo ? format(dateTo, "yyyy-MM-dd") : undefined;
+  const periodTransactions = allTransactions.filter((transaction) =>
+    (!fromDate || transaction.date >= fromDate) && (!toDate || transaction.date <= toDate),
+  );
+  const visibleTransactions = periodTransactions.filter((transaction) => {
+    const matchesType = typeFilter === "all" || transaction.type === typeFilter;
+    const matchesPayment = paymentFilter === "all" || transaction.paymentMode === paymentFilter;
+    const searchText = `${transaction.description} ${transaction.details?.invoiceNo || ""} ${transaction.details?.customerName || ""} ${transaction.details?.productName || ""}`.toLowerCase();
+    return matchesType && matchesPayment && searchText.includes(searchQuery.toLowerCase());
+  }).slice().reverse();
+  const openingBalance = fromDate
+    ? allTransactions.filter((transaction) => transaction.date < fromDate).reduce((sum, transaction) => sum + transaction.credit - transaction.debit, 0)
+    : 0;
+  const totalCashIn = periodTransactions.reduce((sum, transaction) => sum + transaction.credit, 0);
+  const totalCashOut = periodTransactions.reduce((sum, transaction) => sum + transaction.debit, 0);
+  const closingBalance = openingBalance + totalCashIn - totalCashOut;
+  const accountBalance = allTransactions.at(-1)?.balance || 0;
+  const cashInHand = allTransactions
+    .filter((transaction) => transaction.paymentMode === "Cash")
+    .reduce((sum, transaction) => sum + transaction.credit - transaction.debit, 0);
 
   const getTypeColor = (type: string) => {
     switch (type) {
@@ -116,7 +256,9 @@ const DayBook = () => {
     switch (mode) {
       case "Cash": return { bg: '#dcfce7', text: '#15803d', border: '#bbf7d0' };
       case "UPI": return { bg: '#dbeafe', text: '#1d4ed8', border: '#bfdbfe' };
-      case "Account Transfer": return { bg: '#f3e8ff', text: '#7c3aed', border: '#e9d5ff' };
+      case "Account Transfer":
+      case "Bank Transfer": return { bg: '#f3e8ff', text: '#7c3aed', border: '#e9d5ff' };
+      case "Card": return { bg: '#cffafe', text: '#155e75', border: '#a5f3fc' };
       case "Cheque": return { bg: '#fce7f3', text: '#be185d', border: '#fbcfe8' };
       default: return { bg: '#f3f4f6', text: '#374151', border: '#e5e7eb' };
     }
@@ -126,18 +268,36 @@ const DayBook = () => {
     return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(amount);
   };
 
-  const totalDebit = transactions.reduce((sum, t) => sum + t.debit, 0);
-  const totalCredit = transactions.reduce((sum, t) => sum + t.credit, 0);
+  const totalDebit = visibleTransactions.reduce((sum, transaction) => sum + transaction.debit, 0);
+  const totalCredit = visibleTransactions.reduce((sum, transaction) => sum + transaction.credit, 0);
   const netBalance = totalCredit - totalDebit;
 
   const summaryCards = [
-    { title: "Account Balance", value: summaryData.accountBalance, icon: Wallet, gradient: "from-rose-400 via-pink-400 to-red-400" },
-    { title: "Cash in Hand", value: summaryData.cashInHand, icon: DollarSign, gradient: "from-amber-400 via-orange-400 to-red-400" },
-    { title: "Opening Balance", value: summaryData.openingBalance, icon: BookOpen, gradient: "from-violet-400 via-purple-400 to-indigo-400" },
-    { title: "Total Cash In", value: summaryData.totalCashIn, icon: TrendingUp, gradient: "from-emerald-400 via-green-400 to-teal-400" },
-    { title: "Total Cash Out", value: summaryData.totalCashOut, icon: TrendingDown, gradient: "from-red-400 via-rose-500 to-pink-500" },
-    { title: "Closing Balance", value: summaryData.closingBalance, icon: BookOpen, gradient: "from-fuchsia-400 via-pink-500 to-rose-500" },
+    { title: "Account Balance", value: accountBalance, icon: Wallet, gradient: "from-rose-400 via-pink-400 to-red-400" },
+    { title: "Cash in Hand", value: cashInHand, icon: DollarSign, gradient: "from-amber-400 via-orange-400 to-red-400" },
+    { title: "Opening Balance", value: openingBalance, icon: BookOpen, gradient: "from-violet-400 via-purple-400 to-indigo-400" },
+    { title: "Total Cash In", value: totalCashIn, icon: TrendingUp, gradient: "from-emerald-400 via-green-400 to-teal-400" },
+    { title: "Total Cash Out", value: totalCashOut, icon: TrendingDown, gradient: "from-red-400 via-rose-500 to-pink-500" },
+    { title: "Closing Balance", value: closingBalance, icon: BookOpen, gradient: "from-fuchsia-400 via-pink-500 to-rose-500" },
   ];
+
+  const handleExportCSV = () => {
+    if (visibleTransactions.length === 0) {
+      toast.error("No transactions to export");
+      return;
+    }
+
+    exportToCSV(visibleTransactions.map((transaction) => ({
+      Date: transaction.date,
+      Time: transaction.time,
+      Type: transaction.type,
+      Description: transaction.description,
+      Debit: transaction.debit,
+      Credit: transaction.credit,
+      "Payment Mode": transaction.paymentMode,
+      Balance: transaction.balance,
+    })), "day_book");
+  };
 
   return (
     <AppLayout>
@@ -228,15 +388,15 @@ const DayBook = () => {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" style={{ borderColor: THEME.border, color: THEME.primaryDark }}>
+              <Button variant="outline" size="sm" onClick={() => void refetch()} disabled={isLoading} style={{ borderColor: THEME.border, color: THEME.primaryDark }}>
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Refresh
               </Button>
-              <Button variant="outline" size="sm" style={{ borderColor: THEME.border, color: THEME.primaryDark }}>
+              <Button variant="outline" size="sm" onClick={handleExportCSV} style={{ borderColor: THEME.border, color: THEME.primaryDark }}>
                 <Download className="h-4 w-4 mr-2" />
                 Export CSV
               </Button>
-              <Button variant="outline" size="sm" style={{ borderColor: THEME.border, color: THEME.primaryDark }}>
+              <Button variant="outline" size="sm" onClick={() => window.print()} style={{ borderColor: THEME.border, color: THEME.primaryDark }}>
                 <Printer className="h-4 w-4 mr-2" />
                 Print
               </Button>
@@ -276,6 +436,10 @@ const DayBook = () => {
             );
           })}
         </div>
+
+        <p className="text-sm text-muted-foreground">
+          Balances start at ₹0 and include recorded invoice payments, receipts, purchases, and expenses. Keep a payment in either the invoice or standalone receipt flow, not both.
+        </p>
 
         {/* Filter Controls */}
         <motion.div
@@ -371,6 +535,7 @@ const DayBook = () => {
                   <TableHeader>
                     <TableRow style={{ backgroundColor: THEME.primaryLightest, borderBottomColor: THEME.border }}>
                       <TableHead className="text-center w-12"><div className="w-4"></div></TableHead>
+                      <TableHeaderCell icon={CalendarIcon} label="Date" textColor={THEME.primaryDark} iconColor="#0ea5e9" className="w-28" />
                       <TableHeaderCell icon={Clock} label="Time" textColor={THEME.primaryDark} iconColor="#0ea5e9" className="w-20" />
                       <TableHeaderCell icon={Tag} label="Type" textColor={THEME.primaryDark} iconColor="#8b5cf6" className="w-32" />
                       <TableHeaderCell icon={AlignLeft} label="Description" textColor={THEME.primaryDark} iconColor="#ec4899" className="min-w-[200px]" />
@@ -381,7 +546,13 @@ const DayBook = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {transactions.map((transaction) => {
+                    {isLoading ? (
+                      <TableRow><TableCell colSpan={9} className="py-8 text-center text-gray-500">Loading transactions…</TableCell></TableRow>
+                    ) : isError ? (
+                      <TableRow><TableCell colSpan={9} className="py-8 text-center text-red-600">Could not load transactions. Check database access and try refreshing.</TableCell></TableRow>
+                    ) : visibleTransactions.length === 0 ? (
+                      <TableRow><TableCell colSpan={9} className="py-8 text-center text-gray-500">No transactions found for these filters.</TableCell></TableRow>
+                    ) : visibleTransactions.map((transaction) => {
                       const typeColor = getTypeColor(transaction.type);
                       const payColor = getPaymentModeColor(transaction.paymentMode);
                       return (
@@ -400,6 +571,7 @@ const DayBook = () => {
                                 <ChevronRight className="h-4 w-4 mx-auto" style={{ color: THEME.primary }} />
                               )}
                             </TableCell>
+                            <TableCell className="font-medium w-28" style={{ color: THEME.primaryDark }}>{new Date(`${transaction.date}T00:00:00`).toLocaleDateString("en-IN")}</TableCell>
                             <TableCell className="font-medium w-20" style={{ color: THEME.primaryDark }}>{transaction.time}</TableCell>
                             <TableCell className="w-32">
                               <Badge variant="outline" style={{ backgroundColor: typeColor.bg, color: typeColor.text, borderColor: typeColor.border }}>
@@ -424,7 +596,7 @@ const DayBook = () => {
                           </TableRow>
                           {expandedRow === transaction.id && transaction.details && (
                             <TableRow style={{ backgroundColor: THEME.primaryLightest }}>
-                              <TableCell colSpan={8}>
+                              <TableCell colSpan={9}>
                                 <div className="py-4 px-6 rounded-lg mx-4" style={{ backgroundColor: `${THEME.primaryLighter}30` }}>
                                   <h4 className="font-semibold mb-3" style={{ color: THEME.primaryDark }}>Transaction Details</h4>
                                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
@@ -464,25 +636,6 @@ const DayBook = () => {
           </Card>
         </motion.div>
 
-        {/* Daily Notes */}
-        <Card className="border-2 shadow-sm" style={{ borderColor: THEME.primaryLighter }}>
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold" style={{ color: THEME.primaryDark }}>Daily Notes / Remarks</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Textarea
-              placeholder="Add your daily notes and remarks here..."
-              value={dailyNotes}
-              onChange={(e) => setDailyNotes(e.target.value)}
-              className="min-h-[100px]"
-              style={{ borderColor: THEME.border }}
-            />
-            <Button style={{ backgroundColor: THEME.primary, color: '#fff' }} className="hover:opacity-90">
-              Save Remarks
-            </Button>
-          </CardContent>
-        </Card>
-
         {/* Footer Totals */}
         <Card className="border-2 shadow-sm" style={{ borderColor: THEME.primaryLighter, background: `linear-gradient(to right, ${THEME.primaryLightest}, #fff)` }}>
           <CardContent className="p-6">
@@ -506,7 +659,7 @@ const DayBook = () => {
               <div className="text-right">
                 <p className="text-sm text-gray-600">Last Updated</p>
                 <p className="text-sm font-medium" style={{ color: THEME.primaryDark }}>
-                  {new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
+                  {dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : "Not loaded"}
                 </p>
               </div>
             </div>
@@ -517,6 +670,9 @@ const DayBook = () => {
       <AddNewTransactionModal
         open={isAddTransactionOpen}
         onOpenChange={setIsAddTransactionOpen}
+        onSaved={() => {
+          void queryClient.invalidateQueries({ queryKey: ["finance-data"] });
+        }}
       />
     </AppLayout>
   );

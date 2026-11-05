@@ -36,6 +36,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Plus, Trash2, Upload, X, FileImage, Package, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 import { Vendor } from '@/types/purchase';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -121,6 +122,7 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
   onClose,
   onPurchaseCreated
 }) => {
+  const queryClient = useQueryClient();
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [allProducts, setAllProducts] = useState<ProductData[]>([]);
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
@@ -320,13 +322,24 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
   };
 
   const validateItems = () => {
-    const hasValidItems = items.some(item => 
-      item.product_id !== '' && item.quantity > 0 && item.unit_price > 0
-    );
-    if (!hasValidItems) {
-      setItemsError('At least one item with product, quantity, and rate is required');
+    const selectedItems = items.filter((item) => item.product_id !== "");
+    if (selectedItems.length === 0) {
+      setItemsError("At least one product with a quantity and rate is required.");
       return false;
     }
+
+    const hasInvalidItem = selectedItems.some((item) =>
+      !Number.isFinite(item.quantity) || item.quantity <= 0 ||
+      !Number.isFinite(item.unit_price) || item.unit_price <= 0 ||
+      !Number.isFinite(item.tax_rate) || item.tax_rate < 0 ||
+      !Number.isFinite(item.discount_rate) || item.discount_rate < 0 || item.discount_rate > 100,
+    );
+    if (hasInvalidItem) {
+      setItemsError("Every selected product needs a positive quantity and rate; tax and discount must be valid percentages.");
+      return false;
+    }
+
+    setItemsError("");
     return true;
   };
 
@@ -334,18 +347,44 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
     if (!validateItems()) return;
 
     setLoading(true);
+    let purchaseId: string | null = null;
+    const updatedStocks: Array<{ id: string; previousStock: number | null; nextStock: number }> = [];
+    const adjustmentIds: string[] = [];
+
     try {
       const totals = calculateTotals();
-      
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
-      if (!currentUser) {
-        throw new Error("User not authenticated");
+      if (!Number.isFinite(discountAmount) || discountAmount < 0 || discountAmount > totals.subtotal + totals.taxAmount) {
+        throw new Error("Purchase discount must be between zero and the purchase total.");
+      }
+      if (!Number.isFinite(paidAmount) || paidAmount < 0 || paidAmount > totals.total) {
+        throw new Error("Paid amount must be between zero and the purchase total.");
       }
 
-      // Create purchase record
+      const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser();
+      if (authError) throw authError;
+      if (!currentUser) throw new Error("Sign in before saving a purchase.");
+
+      const validItems = items.filter((item) => item.product_id !== "");
+      const stockDeltas = new Map<string, number>();
+      validItems.forEach((item) => {
+        const targetProductId = item.variant_id || item.product_id;
+        stockDeltas.set(targetProductId, (stockDeltas.get(targetProductId) || 0) + item.quantity);
+        if (item.variant_id && item.product_id) {
+          stockDeltas.set(item.product_id, (stockDeltas.get(item.product_id) || 0) + item.quantity);
+        }
+      });
+
+      const { data: stockProducts, error: stockReadError } = await supabase
+        .from("products")
+        .select("id, name, current_stock")
+        .in("id", Array.from(stockDeltas.keys()));
+      if (stockReadError) throw stockReadError;
+      const stockById = new Map((stockProducts || []).map((product) => [product.id, product]));
+      if (stockById.size !== stockDeltas.size) throw new Error("One or more selected products are no longer available.");
+
       const { data: purchase, error: purchaseError } = await supabase
-        .from('purchases')
-        .insert([{
+        .from("purchases")
+        .insert({
           invoice_number: data.billNumber,
           vendor_id: data.vendorId,
           purchase_date: data.purchaseDate,
@@ -357,78 +396,83 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
           balance_amount: totals.balance,
           payment_method: data.paymentMethod || null,
           notes: data.notes || null,
-          status: 'pending',
-          created_by_user_id: currentUser.id
-        }])
-        .select()
+          status: totals.balance <= 0 ? "paid" : paidAmount > 0 ? "partial" : "pending",
+          created_by_user_id: currentUser.id,
+        })
+        .select("id")
         .single();
-
       if (purchaseError) throw purchaseError;
+      purchaseId = purchase.id;
 
-      // Create purchase items
-      const validItems = items.filter(item => item.product_id !== '');
-      const purchaseItems = validItems.map(item => ({
-        purchase_id: purchase!.id,
+      const purchaseItems = validItems.map((item) => ({
+        purchase_id: purchase.id,
         product_name: item.variant_name || item.product_name,
-        product_id: item.variant_id || item.product_id || null,
+        product_id: item.variant_id || item.product_id,
         quantity: item.quantity,
         unit_price: item.unit_price,
         tax_rate: item.tax_rate,
         discount_rate: item.discount_rate,
         total_amount: item.total_amount,
-        created_by_user_id: currentUser.id
+        created_by_user_id: currentUser.id,
       }));
+      const { error: itemsError } = await supabase.from("purchase_items").insert(purchaseItems);
+      if (itemsError) throw itemsError;
 
-      const { error: itemsErr } = await supabase
-        .from('purchase_items')
-        .insert(purchaseItems);
+      for (const [productId, quantity] of stockDeltas) {
+        const product = stockById.get(productId)!;
+        const previousStock = product.current_stock;
+        const nextStock = (Number(previousStock) || 0) + quantity;
+        const stockUpdate = previousStock === null
+          ? await supabase.from("products").update({ current_stock: nextStock }).eq("id", productId).is("current_stock", null).select("id").maybeSingle()
+          : await supabase.from("products").update({ current_stock: nextStock }).eq("id", productId).eq("current_stock", previousStock).select("id").maybeSingle();
+        if (stockUpdate.error) throw stockUpdate.error;
+        if (!stockUpdate.data) throw new Error(`Stock for ${product.name} changed while saving. Refresh and try again.`);
+        updatedStocks.push({ id: productId, previousStock, nextStock });
 
-      if (itemsErr) throw itemsErr;
-
-      // Update stock for each item
-      for (const item of validItems) {
-        const targetProductId = item.variant_id || item.product_id;
-        if (!targetProductId) continue;
-
-        const product = allProducts.find(p => p.id === targetProductId);
-        const currentStock = product?.current_stock || 0;
-        const newStock = currentStock + item.quantity;
-
-        await supabase
-          .from('products')
-          .update({ current_stock: newStock })
-          .eq('id', targetProductId);
-
-        // If variant, also update parent stock
-        if (item.variant_id && item.product_id) {
-          const parentProduct = allProducts.find(p => p.id === item.product_id);
-          if (parentProduct) {
-            const parentStock = (parentProduct.current_stock || 0) + item.quantity;
-            await supabase
-              .from('products')
-              .update({ current_stock: parentStock })
-              .eq('id', item.product_id);
-          }
-        }
-
-        // Log stock adjustment
-        await supabase
-          .from('stock_adjustments')
+        const { data: adjustment, error: adjustmentError } = await supabase
+          .from("stock_adjustments")
           .insert({
-            product_id: targetProductId,
-            quantity: item.quantity,
-            adjustment_type: 'purchase',
+            product_id: productId,
+            quantity,
+            adjustment_type: "purchase",
             reason: `Purchase: ${data.billNumber}`,
-            reference_id: purchase!.id,
-            created_by_user_id: currentUser.id
-          });
+            reference_id: purchase.id,
+            created_by_user_id: currentUser.id,
+          })
+          .select("id")
+          .single();
+        if (adjustmentError) throw adjustmentError;
+        adjustmentIds.push(adjustment.id);
       }
 
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["finance-data"] }),
+        queryClient.invalidateQueries({ queryKey: ["products"] }),
+        queryClient.invalidateQueries({ queryKey: ["inventory-summary"] }),
+      ]);
       onPurchaseCreated();
       resetForm();
     } catch (error) {
-      console.error('Error creating purchase:', error);
-      alert('Error creating purchase. Please try again.');
+      let rollbackFailed = false;
+      for (const update of updatedStocks.reverse()) {
+        const { error: rollbackError } = await supabase
+          .from("products")
+          .update({ current_stock: update.previousStock })
+          .eq("id", update.id)
+          .eq("current_stock", update.nextStock);
+        if (rollbackError) rollbackFailed = true;
+      }
+      if (adjustmentIds.length > 0) {
+        const { error: adjustmentRollbackError } = await supabase.from("stock_adjustments").delete().in("id", adjustmentIds);
+        if (adjustmentRollbackError) rollbackFailed = true;
+      }
+      if (purchaseId) {
+        const { error: itemsRollbackError } = await supabase.from("purchase_items").delete().eq("purchase_id", purchaseId);
+        const { error: purchaseRollbackError } = await supabase.from("purchases").delete().eq("id", purchaseId);
+        if (itemsRollbackError || purchaseRollbackError) rollbackFailed = true;
+      }
+      console.error("Error creating purchase:", error);
+      alert(rollbackFailed ? "Purchase save failed and automatic cleanup was incomplete. Refresh and check this purchase before retrying." : error instanceof Error ? error.message : "Could not save the purchase.");
     } finally {
       setLoading(false);
     }
@@ -882,6 +926,9 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                     <Label style={{ color: THEME_PRIMARY }}>Discount Amount:</Label>
                     <Input
                       type="number"
+                      min="0"
+                      max={totals.subtotal + totals.taxAmount}
+                      step="0.01"
                       value={discountAmount}
                       onChange={(e) => setDiscountAmount(parseFloat(e.target.value) || 0)}
                       className="w-24 text-right"
@@ -896,6 +943,9 @@ export const NewPurchaseModal: React.FC<NewPurchaseModalProps> = ({
                     <Label style={{ color: THEME_PRIMARY }}>Paid Amount:</Label>
                     <Input
                       type="number"
+                      min="0"
+                      max={totals.total}
+                      step="0.01"
                       value={paidAmount}
                       onChange={(e) => setPaidAmount(parseFloat(e.target.value) || 0)}
                       className="w-24 text-right"

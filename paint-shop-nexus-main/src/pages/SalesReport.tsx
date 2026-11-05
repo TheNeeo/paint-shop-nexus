@@ -33,7 +33,7 @@ const SalesReport = () => {
   const { data: salesData = [] } = useQuery({
     queryKey: ["sales-report", dateFrom, dateTo],
     queryFn: async () => {
-      let query = supabase.from("sales").select("*, sale_items(*)").order("invoice_date", { ascending: false });
+      let query = supabase.from("sales").select("*, sale_items(*)").eq("status", "final").order("invoice_date", { ascending: false });
       if (dateFrom) query = query.gte("invoice_date", format(dateFrom, "yyyy-MM-dd"));
       if (dateTo) query = query.lte("invoice_date", format(dateTo, "yyyy-MM-dd"));
       const { data, error } = await query;
@@ -43,9 +43,13 @@ const SalesReport = () => {
   });
 
   const { data: trendData = [] } = useQuery({
-    queryKey: ["sales-trend"],
+    queryKey: ["sales-trend", dateFrom, dateTo],
     queryFn: async () => {
-      const { data } = await supabase.from("sales").select("invoice_date, total_amount");
+      let query = supabase.from("sales").select("invoice_date, total_amount").eq("status", "final");
+      if (dateFrom) query = query.gte("invoice_date", format(dateFrom, "yyyy-MM-dd"));
+      if (dateTo) query = query.lte("invoice_date", format(dateTo, "yyyy-MM-dd"));
+      const { data, error } = await query;
+      if (error) throw error;
       if (!data) return [];
       const monthMap: Record<string, number> = {};
       data.forEach((s) => {

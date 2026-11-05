@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
@@ -10,13 +10,13 @@ import {
   Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList,
   BreadcrumbPage, BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RefreshCw, Download, Printer, Calendar as CalendarIcon, TrendingUp, ShoppingCart, DollarSign, BarChart3, IndianRupee, Percent, Calculator } from "lucide-react";
 import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
+import { format, startOfWeek } from "date-fns";
+import { useFinanceData } from "@/hooks/useFinanceData";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart } from "recharts";
 import dashboardHomeIcon from "@/assets/smart-home-3d-icon-5.png";
 import periodicReportIcon from "@/assets/periodic-report-icon.png";
@@ -33,51 +33,154 @@ const THEME = {
   gradientTo: '#faf5fc',
 };
 
-const mockPeriodicData = [
-  { period: "Jan 2025", totalSales: 150000, totalPurchase: 95000, gst: 27000, netProfit: 55000, avgOrderValue: 3000 },
-  { period: "Feb 2025", totalSales: 175000, totalPurchase: 110000, gst: 31500, netProfit: 65000, avgOrderValue: 3500 },
-  { period: "Mar 2025", totalSales: 165000, totalPurchase: 105000, gst: 29700, netProfit: 60000, avgOrderValue: 3300 },
-  { period: "Apr 2025", totalSales: 190000, totalPurchase: 120000, gst: 34200, netProfit: 70000, avgOrderValue: 3800 },
-  { period: "May 2025", totalSales: 185000, totalPurchase: 115000, gst: 33300, netProfit: 70000, avgOrderValue: 3700 },
-  { period: "Jun 2025", totalSales: 210000, totalPurchase: 130000, gst: 37800, netProfit: 80000, avgOrderValue: 4200 },
-];
+interface PeriodRow {
+  period: string;
+  periodStart: string;
+  totalSales: number;
+  totalPurchase: number;
+  totalExpenses: number;
+  gst: number;
+  cashIn: number;
+  cashOut: number;
+  netCashFlow: number;
+  invoiceCount: number;
+  avgOrderValue: number;
+}
 
-const periodicComparisonData = [
-  { period: "Q1 2024", sales: 420000, purchase: 280000 },
-  { period: "Q2 2024", sales: 485000, purchase: 310000 },
-  { period: "Q3 2024", sales: 510000, purchase: 330000 },
-  { period: "Q4 2024", sales: 565000, purchase: 365000 },
-  { period: "Q1 2025", sales: 490000, purchase: 310000 },
-];
-
-const yearlyTrendData = [
-  { year: "2020", value: 1500000 },
-  { year: "2021", value: 1750000 },
-  { year: "2022", value: 1950000 },
-  { year: "2023", value: 2200000 },
-  { year: "2024", value: 2450000 },
-  { year: "2025", value: 2100000 },
-];
-
-const salesVsPurchaseData = [
-  { month: "Jan", sales: 150000, purchase: 95000 },
-  { month: "Feb", sales: 175000, purchase: 110000 },
-  { month: "Mar", sales: 165000, purchase: 105000 },
-  { month: "Apr", sales: 190000, purchase: 120000 },
-  { month: "May", sales: 185000, purchase: 115000 },
-  { month: "Jun", sales: 210000, purchase: 130000 },
-];
+const getPeriodBucket = (day: string, periodType: string) => {
+  const date = new Date(`${day.slice(0, 10)}T00:00:00`);
+  if (periodType === "daily") {
+    return { key: format(date, "yyyy-MM-dd"), label: format(date, "dd MMM yyyy"), periodStart: format(date, "yyyy-MM-dd") };
+  }
+  if (periodType === "weekly") {
+    const weekStart = startOfWeek(date, { weekStartsOn: 1 });
+    return { key: format(weekStart, "yyyy-MM-dd"), label: `Week of ${format(weekStart, "dd MMM yyyy")}`, periodStart: format(weekStart, "yyyy-MM-dd") };
+  }
+  if (periodType === "yearly") {
+    return { key: format(date, "yyyy"), label: format(date, "yyyy"), periodStart: `${format(date, "yyyy")}-01-01` };
+  }
+  return { key: format(date, "yyyy-MM"), label: format(date, "MMM yyyy"), periodStart: `${format(date, "yyyy-MM")}-01` };
+};
 
 const PeriodicReport = () => {
   const navigate = useNavigate();
   const [dateFrom, setDateFrom] = useState<Date>();
   const [dateTo, setDateTo] = useState<Date>();
   const [periodType, setPeriodType] = useState("monthly");
+  const { data: financeData, isLoading, isError, refetch } = useFinanceData();
+  const fromDate = dateFrom ? format(dateFrom, "yyyy-MM-dd") : undefined;
+  const toDate = dateTo ? format(dateTo, "yyyy-MM-dd") : undefined;
 
-  const totalSales = mockPeriodicData.reduce((sum, item) => sum + item.totalSales, 0);
-  const totalPurchase = mockPeriodicData.reduce((sum, item) => sum + item.totalPurchase, 0);
-  const totalGST = mockPeriodicData.reduce((sum, item) => sum + item.gst, 0);
-  const totalNetProfit = mockPeriodicData.reduce((sum, item) => sum + item.netProfit, 0);
+  const periodRows = useMemo(() => {
+    if (!financeData) return [];
+    const grouped = new Map<string, PeriodRow>();
+    const getRow = (date: string) => {
+      const bucket = getPeriodBucket(date, periodType);
+      let row = grouped.get(bucket.key);
+      if (!row) {
+        row = {
+          period: bucket.label,
+          periodStart: bucket.periodStart,
+          totalSales: 0,
+          totalPurchase: 0,
+          totalExpenses: 0,
+          gst: 0,
+          cashIn: 0,
+          cashOut: 0,
+          netCashFlow: 0,
+          invoiceCount: 0,
+          avgOrderValue: 0,
+        };
+        grouped.set(bucket.key, row);
+      }
+      return row;
+    };
+    const withinRange = (date: string) =>
+      (!fromDate || date >= fromDate) && (!toDate || date <= toDate);
+
+    financeData.sales.forEach((sale) => {
+      const date = sale.invoice_date.slice(0, 10);
+      if (sale.status === "draft" || !withinRange(date)) return;
+      const row = getRow(date);
+      row.totalSales += Number(sale.total_amount) || 0;
+      row.gst += Number(sale.tax_amount) || 0;
+      row.cashIn += Number(sale.paid_amount) || 0;
+      row.invoiceCount += 1;
+    });
+
+    financeData.purchases.forEach((purchase) => {
+      const date = purchase.purchase_date.slice(0, 10);
+      if (!withinRange(date)) return;
+      const row = getRow(date);
+      row.totalPurchase += Number(purchase.total_amount) || 0;
+      row.cashOut += Number(purchase.paid_amount) || 0;
+    });
+
+    financeData.expenses.forEach((expense) => {
+      const date = expense.date.slice(0, 10);
+      if (!withinRange(date)) return;
+      const row = getRow(date);
+      const amount = Number(expense.amount) || 0;
+      row.totalExpenses += amount;
+      row.cashOut += amount;
+    });
+
+    financeData.receipts.forEach((receipt) => {
+      const date = receipt.receipt_date.slice(0, 10);
+      if (!withinRange(date)) return;
+      getRow(date).cashIn += Number(receipt.amount) || 0;
+    });
+
+    return Array.from(grouped.values())
+      .map((row) => ({
+        ...row,
+        netCashFlow: row.cashIn - row.cashOut,
+        avgOrderValue: row.invoiceCount > 0 ? row.totalSales / row.invoiceCount : 0,
+      }))
+      .sort((left, right) => left.periodStart.localeCompare(right.periodStart));
+  }, [financeData, fromDate, periodType, toDate]);
+
+  const totalSales = periodRows.reduce((sum, row) => sum + row.totalSales, 0);
+  const totalPurchase = periodRows.reduce((sum, row) => sum + row.totalPurchase, 0);
+  const totalGST = periodRows.reduce((sum, row) => sum + row.gst, 0);
+  const totalCashIn = periodRows.reduce((sum, row) => sum + row.cashIn, 0);
+  const totalCashOut = periodRows.reduce((sum, row) => sum + row.cashOut, 0);
+  const netCashFlow = totalCashIn - totalCashOut;
+  const currentBucket = getPeriodBucket(format(new Date(), "yyyy-MM-dd"), periodType);
+  const currentPeriod = periodRows.find((row) => row.period === currentBucket.label);
+  const comparisonRows = periodRows.slice(-6);
+  const salesVsPurchaseData = periodRows.map((row) => ({ period: row.period, sales: row.totalSales, purchase: row.totalPurchase }));
+  const yearlyTrendData = useMemo(() => {
+    const yearly = new Map<string, number>();
+    periodRows.forEach((row) => {
+      const year = row.periodStart.slice(0, 4);
+      yearly.set(year, (yearly.get(year) || 0) + row.totalSales);
+    });
+    return Array.from(yearly, ([year, value]) => ({ year, value })).sort((left, right) => left.year.localeCompare(right.year));
+  }, [periodRows]);
+
+  const handleExport = () => {
+    if (periodRows.length === 0) return;
+    const csvRows = periodRows.map((row) => ({
+      Period: row.period,
+      Sales: row.totalSales,
+      Purchases: row.totalPurchase,
+      Expenses: row.totalExpenses,
+      GST: row.gst,
+      "Cash In": row.cashIn,
+      "Cash Out": row.cashOut,
+      "Net Cash Flow": row.netCashFlow,
+      "Average Order Value": row.avgOrderValue,
+    }));
+    const headers = Object.keys(csvRows[0]);
+    const csv = [headers.join(","), ...csvRows.map((row) => headers.map((header) => `"${row[header as keyof typeof row]}"`).join(","))].join("\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `periodic-report-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <AppLayout>
@@ -168,15 +271,15 @@ const PeriodicReport = () => {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" style={{ borderColor: THEME.border, color: THEME.primaryDark }}>
+              <Button variant="outline" size="sm" onClick={() => void refetch()} disabled={isLoading} style={{ borderColor: THEME.border, color: THEME.primaryDark }}>
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Refresh
               </Button>
-              <Button variant="outline" size="sm" style={{ borderColor: THEME.border, color: THEME.primaryDark }}>
+              <Button variant="outline" size="sm" onClick={handleExport} disabled={periodRows.length === 0} style={{ borderColor: THEME.border, color: THEME.primaryDark }}>
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
-              <Button variant="outline" size="sm" style={{ borderColor: THEME.border, color: THEME.primaryDark }}>
+              <Button variant="outline" size="sm" onClick={() => window.print()} style={{ borderColor: THEME.border, color: THEME.primaryDark }}>
                 <Printer className="h-4 w-4 mr-2" />
                 Print
               </Button>
@@ -220,8 +323,8 @@ const PeriodicReport = () => {
 
           <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-400 via-green-400 to-teal-400 p-6 min-h-[140px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
             <div className="relative z-10">
-              <h3 className="text-lg font-semibold text-white/90 mb-1">Net Profit</h3>
-              <p className="text-2xl font-bold text-white">₹{totalNetProfit.toLocaleString()}</p>
+              <h3 className="text-lg font-semibold text-white/90 mb-1">Net Cash Flow</h3>
+              <p className="text-2xl font-bold text-white">₹{netCashFlow.toLocaleString()}</p>
             </div>
             <div className="absolute right-4 bottom-4 opacity-80">
               <DollarSign className="h-16 w-16 text-white/40" strokeWidth={1.5} />
@@ -239,13 +342,17 @@ const PeriodicReport = () => {
           </div>
         </div>
 
+        <p className="text-sm text-muted-foreground">
+          Net cash flow uses recorded invoice payments, standalone receipts, paid purchases, and expenses. A receipt is not linked to an invoice yet, so avoid recording the same payment twice.
+        </p>
+
         {/* Filter Controls */}
         <Card style={{ borderColor: THEME.border, backgroundColor: "white" }}>
           <CardHeader>
             <CardTitle style={{ color: THEME.primaryDark }}>Filter Controls</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium" style={{ color: THEME.primaryDark }}>Period Type</label>
                 <Select value={periodType} onValueChange={setPeriodType}>
@@ -291,27 +398,13 @@ const PeriodicReport = () => {
                 </Popover>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium" style={{ color: THEME.primaryDark }}>Category / Product</label>
-                <Select>
-                  <SelectTrigger style={{ borderColor: THEME.border }}>
-                    <SelectValue placeholder="All Categories" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
-                    <SelectItem value="paints">Paints</SelectItem>
-                    <SelectItem value="hardware">Hardware</SelectItem>
-                    <SelectItem value="cement">Cement</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
 
             <div className="flex gap-2 mt-4">
-              <Button style={{ backgroundColor: THEME.primaryLight, color: "white" }} className="hover:opacity-90">
+              <Button onClick={() => void refetch()} disabled={isLoading} style={{ backgroundColor: THEME.primaryLight, color: "white" }} className="hover:opacity-90">
                 Generate Report
               </Button>
-              <Button variant="outline" style={{ borderColor: THEME.border, color: THEME.primaryDark }}>Reset</Button>
+              <Button variant="outline" onClick={() => { setDateFrom(undefined); setDateTo(undefined); setPeriodType("monthly"); }} style={{ borderColor: THEME.border, color: THEME.primaryDark }}>Reset</Button>
             </div>
           </CardContent>
         </Card>
@@ -335,49 +428,73 @@ const PeriodicReport = () => {
                     <TableHeader>
                       <TableRow style={{ borderColor: THEME.primaryLighter }}>
                         <TableHeaderCell icon={CalendarIcon} label="Period" textColor={THEME.primaryDark} iconColor="#0ea5e9" />
-                        <TableHeaderCell icon={TrendingUp} label="Total Sales" textColor={THEME.primaryDark} iconColor="#10b981" align="right" className="text-right" />
-                        <TableHeaderCell icon={ShoppingCart} label="Total Purchase" textColor={THEME.primaryDark} iconColor="#1e40af" align="right" className="text-right" />
+                        <TableHeaderCell icon={TrendingUp} label="Sales" textColor={THEME.primaryDark} iconColor="#10b981" align="right" className="text-right" />
+                        <TableHeaderCell icon={ShoppingCart} label="Purchases" textColor={THEME.primaryDark} iconColor="#1e40af" align="right" className="text-right" />
+                        <TableHeaderCell icon={IndianRupee} label="Expenses" textColor={THEME.primaryDark} iconColor="#ef4444" align="right" className="text-right" />
                         <TableHeaderCell icon={Percent} label="GST" textColor={THEME.primaryDark} iconColor="#8b5cf6" align="right" className="text-right" />
-                        <TableHeaderCell icon={IndianRupee} label="Net Profit" textColor={THEME.primaryDark} iconColor="#f59e0b" align="right" className="text-right" />
-                        <TableHeaderCell icon={Calculator} label="Avg. Order Value" textColor={THEME.primaryDark} iconColor="#ec4899" align="right" className="text-right" />
+                        <TableHeaderCell icon={TrendingUp} label="Cash In" textColor={THEME.primaryDark} iconColor="#10b981" align="right" className="text-right" />
+                        <TableHeaderCell icon={TrendingUp} label="Cash Out" textColor={THEME.primaryDark} iconColor="#ef4444" align="right" className="text-right" />
+                        <TableHeaderCell icon={IndianRupee} label="Net Cash Flow" textColor={THEME.primaryDark} iconColor="#f59e0b" align="right" className="text-right" />
+                        <TableHeaderCell icon={Calculator} label="Avg. Order" textColor={THEME.primaryDark} iconColor="#ec4899" align="right" className="text-right" />
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {mockPeriodicData.map((row, idx) => (
-                        <TableRow key={idx} style={{ borderColor: THEME.primaryLightest }}>
+                      {isLoading ? (
+                        <TableRow><TableCell colSpan={9} className="py-8 text-center text-muted-foreground">Loading report data...</TableCell></TableRow>
+                      ) : isError ? (
+                        <TableRow><TableCell colSpan={9} className="py-8 text-center text-red-600">Could not load report data. Check database access and refresh.</TableCell></TableRow>
+                      ) : periodRows.length === 0 ? (
+                        <TableRow><TableCell colSpan={9} className="py-8 text-center text-muted-foreground">No finalized sales or transactions in this date range.</TableCell></TableRow>
+                      ) : periodRows.map((row) => (
+                        <TableRow key={row.periodStart} style={{ borderColor: THEME.primaryLightest }}>
                           <TableCell className="font-medium">{row.period}</TableCell>
-                          <TableCell className="text-right">₹{row.totalSales.toLocaleString()}</TableCell>
-                          <TableCell className="text-right">₹{row.totalPurchase.toLocaleString()}</TableCell>
-                          <TableCell className="text-right">₹{row.gst.toLocaleString()}</TableCell>
-                          <TableCell className="text-right font-semibold" style={{ color: "hsl(142, 76%, 36%)" }}>
-                            ₹{row.netProfit.toLocaleString()}
-                          </TableCell>
-                          <TableCell className="text-right">₹{row.avgOrderValue.toLocaleString()}</TableCell>
+                          <TableCell className="text-right">₹{row.totalSales.toLocaleString("en-IN")}</TableCell>
+                          <TableCell className="text-right">₹{row.totalPurchase.toLocaleString("en-IN")}</TableCell>
+                          <TableCell className="text-right">₹{row.totalExpenses.toLocaleString("en-IN")}</TableCell>
+                          <TableCell className="text-right">₹{row.gst.toLocaleString("en-IN")}</TableCell>
+                          <TableCell className="text-right">₹{row.cashIn.toLocaleString("en-IN")}</TableCell>
+                          <TableCell className="text-right">₹{row.cashOut.toLocaleString("en-IN")}</TableCell>
+                          <TableCell className={`text-right font-semibold ${row.netCashFlow >= 0 ? "text-green-700" : "text-red-700"}`}>₹{row.netCashFlow.toLocaleString("en-IN")}</TableCell>
+                          <TableCell className="text-right">₹{row.avgOrderValue.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
                   </Table>
                 </div>
-
-                <div className="mt-4">
-                  <Pagination>
-                    <PaginationContent>
-                      <PaginationItem><PaginationPrevious href="#" /></PaginationItem>
-                      <PaginationItem><PaginationLink href="#" isActive>1</PaginationLink></PaginationItem>
-                      <PaginationItem><PaginationLink href="#">2</PaginationLink></PaginationItem>
-                      <PaginationItem><PaginationLink href="#">3</PaginationLink></PaginationItem>
-                      <PaginationItem><PaginationNext href="#" /></PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
-                </div>
               </TabsContent>
 
               <TabsContent value="current" className="mt-4">
-                <div className="p-4 text-center text-muted-foreground">Current period data will be displayed here</div>
+                {isLoading ? (
+                  <div className="p-4 text-center text-muted-foreground">Loading current period...</div>
+                ) : isError ? (
+                  <div className="p-4 text-center text-red-600">Could not load the current period.</div>
+                ) : currentPeriod ? (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 rounded-lg border p-4">
+                    <div><p className="text-sm text-muted-foreground">Period</p><p className="font-semibold">{currentPeriod.period}</p></div>
+                    <div><p className="text-sm text-muted-foreground">Sales</p><p className="font-semibold">₹{currentPeriod.totalSales.toLocaleString("en-IN")}</p></div>
+                    <div><p className="text-sm text-muted-foreground">Purchases</p><p className="font-semibold">₹{currentPeriod.totalPurchase.toLocaleString("en-IN")}</p></div>
+                    <div><p className="text-sm text-muted-foreground">Expenses</p><p className="font-semibold">₹{currentPeriod.totalExpenses.toLocaleString("en-IN")}</p></div>
+                    <div><p className="text-sm text-muted-foreground">GST</p><p className="font-semibold">₹{currentPeriod.gst.toLocaleString("en-IN")}</p></div>
+                    <div><p className="text-sm text-muted-foreground">Cash In</p><p className="font-semibold">₹{currentPeriod.cashIn.toLocaleString("en-IN")}</p></div>
+                    <div><p className="text-sm text-muted-foreground">Cash Out</p><p className="font-semibold">₹{currentPeriod.cashOut.toLocaleString("en-IN")}</p></div>
+                    <div><p className="text-sm text-muted-foreground">Net Cash Flow</p><p className="font-semibold">₹{currentPeriod.netCashFlow.toLocaleString("en-IN")}</p></div>
+                  </div>
+                ) : (
+                  <div className="p-4 text-center text-muted-foreground">No current-period data yet.</div>
+                )}
               </TabsContent>
 
               <TabsContent value="comparison" className="mt-4">
-                <div className="p-4 text-center text-muted-foreground">Period comparison data will be displayed here</div>
+                {comparisonRows.length < 2 ? (
+                  <div className="p-4 text-center text-muted-foreground">At least two periods are needed for a comparison.</div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader><TableRow><TableHead>Period</TableHead><TableHead className="text-right">Sales</TableHead><TableHead className="text-right">Purchases</TableHead><TableHead className="text-right">Expenses</TableHead><TableHead className="text-right">Net Cash Flow</TableHead></TableRow></TableHeader>
+                      <TableBody>{comparisonRows.map((row) => <TableRow key={row.periodStart}><TableCell>{row.period}</TableCell><TableCell className="text-right">₹{row.totalSales.toLocaleString("en-IN")}</TableCell><TableCell className="text-right">₹{row.totalPurchase.toLocaleString("en-IN")}</TableCell><TableCell className="text-right">₹{row.totalExpenses.toLocaleString("en-IN")}</TableCell><TableCell className={`text-right font-semibold ${row.netCashFlow >= 0 ? "text-green-700" : "text-red-700"}`}>₹{row.netCashFlow.toLocaleString("en-IN")}</TableCell></TableRow>)}</TableBody>
+                    </Table>
+                  </div>
+                )}
               </TabsContent>
             </Tabs>
           </CardContent>
@@ -391,7 +508,7 @@ const PeriodicReport = () => {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={periodicComparisonData}>
+                <BarChart data={comparisonRows.map((row) => ({ period: row.period, sales: row.totalSales, purchase: row.totalPurchase }))}>
                   <CartesianGrid strokeDasharray="3 3" stroke={THEME.primaryLighter} />
                   <XAxis dataKey="period" stroke={THEME.primary} />
                   <YAxis stroke={THEME.primary} />
@@ -432,7 +549,7 @@ const PeriodicReport = () => {
             <ResponsiveContainer width="100%" height={300}>
               <ComposedChart data={salesVsPurchaseData}>
                 <CartesianGrid strokeDasharray="3 3" stroke={THEME.primaryLighter} />
-                <XAxis dataKey="month" stroke={THEME.primary} />
+                <XAxis dataKey="period" stroke={THEME.primary} />
                 <YAxis stroke={THEME.primary} />
                 <Tooltip />
                 <Legend />
@@ -448,7 +565,7 @@ const PeriodicReport = () => {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <p className="text-lg font-semibold" style={{ color: THEME.primaryDark }}>
-                Summary Totals: Sales ₹{totalSales.toLocaleString()} | Profit ₹{totalNetProfit.toLocaleString()}
+                Summary Totals: Sales ₹{totalSales.toLocaleString("en-IN")} | Net Cash Flow ₹{netCashFlow.toLocaleString("en-IN")}
               </p>
               <p className="text-sm text-muted-foreground">
                 Last Generated: {new Date().toLocaleString()}

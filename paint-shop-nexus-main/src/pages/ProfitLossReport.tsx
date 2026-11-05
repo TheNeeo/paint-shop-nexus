@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import AppLayout from "@/components/layout/AppLayout";
@@ -7,11 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { RefreshCw, Download, TrendingUp, TrendingDown, DollarSign, Percent, BarChart3, Calendar, FileText, IndianRupee } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, BarChart3, Calendar, FileText, IndianRupee, ShoppingCart } from "lucide-react";
 import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useFinanceData } from "@/hooks/useFinanceData";
 import dashboardHomeIcon from "@/assets/smart-home-3d-icon-4.png";
 import profitLossIcon from "@/assets/profit-loss-report-icon.png";
 
@@ -23,46 +22,54 @@ const THEME = {
 
 const ProfitLossReport = () => {
   const navigate = useNavigate();
+  const { data: financeData, isLoading, isError } = useFinanceData();
 
-  const { data: stats } = useQuery({
-    queryKey: ["profit-loss-stats"],
-    queryFn: async () => {
-      const [salesRes, purchasesRes, expensesRes] = await Promise.all([
-        supabase.from("sales").select("total_amount, invoice_date"),
-        supabase.from("purchases").select("total_amount, purchase_date"),
-        supabase.from("expenses").select("amount, date"),
-      ]);
-      const sales = salesRes.data || [];
-      const purchases = purchasesRes.data || [];
-      const expenses = expensesRes.data || [];
+  const stats = useMemo(() => {
+    if (!financeData) return { totalSales: 0, totalPurchases: 0, totalExpenses: 0, cashIn: 0, cashOut: 0, netCashFlow: 0, trend: [], transactions: [] };
 
-      const totalIncome = sales.reduce((s, r) => s + Number(r.total_amount), 0);
-      const totalPurchase = purchases.reduce((s, r) => s + Number(r.total_amount), 0);
-      const totalExpense = expenses.reduce((s, r) => s + Number(r.amount), 0);
-      const totalCost = totalPurchase + totalExpense;
-      const grossProfit = totalIncome - totalCost;
-      const margin = totalIncome > 0 ? ((grossProfit / totalIncome) * 100).toFixed(2) : "0.00";
+    const sales = financeData.sales.filter((sale) => sale.status !== "draft");
+    const monthMap = new Map<string, { month: string; income: number; expense: number }>();
+    const addMonth = (date: string) => {
+      const key = date.slice(0, 7);
+      let row = monthMap.get(key);
+      if (!row) {
+        row = { month: new Date(`${key}-01T00:00:00`).toLocaleString("en-IN", { month: "short", year: "numeric" }), income: 0, expense: 0 };
+        monthMap.set(key, row);
+      }
+      return row;
+    };
 
-      // Monthly trend
-      const monthMap: Record<string, { income: number; cost: number }> = {};
-      sales.forEach((s) => { const m = new Date(s.invoice_date).toLocaleString("default", { month: "short" }); if (!monthMap[m]) monthMap[m] = { income: 0, cost: 0 }; monthMap[m].income += Number(s.total_amount); });
-      purchases.forEach((p) => { const m = new Date(p.purchase_date).toLocaleString("default", { month: "short" }); if (!monthMap[m]) monthMap[m] = { income: 0, cost: 0 }; monthMap[m].cost += Number(p.total_amount); });
-      expenses.forEach((e) => { const m = new Date(e.date).toLocaleString("default", { month: "short" }); if (!monthMap[m]) monthMap[m] = { income: 0, cost: 0 }; monthMap[m].cost += Number(e.amount); });
+    const transactions = [
+      ...sales.filter((sale) => Number(sale.paid_amount) > 0).map((sale) => ({ date: sale.invoice_date, description: `Invoice payment ${sale.invoice_number}`, income: Number(sale.paid_amount) || 0, expense: 0, net: Number(sale.paid_amount) || 0 })),
+      ...financeData.receipts.map((receipt) => ({ date: receipt.receipt_date, description: receipt.reason || `Receipt ${receipt.receipt_no}`, income: Number(receipt.amount) || 0, expense: 0, net: Number(receipt.amount) || 0 })),
+      ...financeData.purchases.filter((purchase) => Number(purchase.paid_amount) > 0).map((purchase) => ({ date: purchase.purchase_date, description: `Purchase payment ${purchase.invoice_number}`, income: 0, expense: Number(purchase.paid_amount) || 0, net: -(Number(purchase.paid_amount) || 0) })),
+      ...financeData.expenses.map((expense) => ({ date: expense.date, description: expense.description || expense.type, income: 0, expense: Number(expense.amount) || 0, net: -(Number(expense.amount) || 0) })),
+    ].sort((left, right) => right.date.localeCompare(left.date));
 
-      const trend = Object.entries(monthMap).map(([month, v]) => ({ month, income: v.income, expense: v.cost, profit: v.income - v.cost }));
+    sales.forEach((sale) => { addMonth(sale.invoice_date).income += Number(sale.paid_amount) || 0; });
+    financeData.receipts.forEach((receipt) => { addMonth(receipt.receipt_date).income += Number(receipt.amount) || 0; });
+    financeData.purchases.forEach((purchase) => { addMonth(purchase.purchase_date).expense += Number(purchase.paid_amount) || 0; });
+    financeData.expenses.forEach((expense) => { addMonth(expense.date).expense += Number(expense.amount) || 0; });
 
-      // Transaction list
-      const transactions = [
-        ...sales.map((s) => ({ date: s.invoice_date, description: "Sales Revenue", income: Number(s.total_amount), expense: 0, net: Number(s.total_amount) })),
-        ...purchases.map((p) => ({ date: p.purchase_date, description: "Purchase", income: 0, expense: Number(p.total_amount), net: -Number(p.total_amount) })),
-        ...expenses.map((e) => ({ date: e.date, description: "Expense", income: 0, expense: Number(e.amount), net: -Number(e.amount) })),
-      ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const totalSales = sales.reduce((sum, sale) => sum + (Number(sale.total_amount) || 0), 0);
+    const totalPurchases = financeData.purchases.reduce((sum, purchase) => sum + (Number(purchase.total_amount) || 0), 0);
+    const totalExpenses = financeData.expenses.reduce((sum, expense) => sum + (Number(expense.amount) || 0), 0);
+    const cashIn = transactions.reduce((sum, transaction) => sum + transaction.income, 0);
+    const cashOut = transactions.reduce((sum, transaction) => sum + transaction.expense, 0);
 
-      return { totalIncome, totalCost, grossProfit, margin, trend, transactions };
-    },
-  });
+    return {
+      totalSales,
+      totalPurchases,
+      totalExpenses,
+      cashIn,
+      cashOut,
+      netCashFlow: cashIn - cashOut,
+      trend: Array.from(monthMap.values()).sort((left, right) => left.month.localeCompare(right.month)),
+      transactions,
+    };
+  }, [financeData]);
 
-  const { totalIncome = 0, totalCost = 0, grossProfit = 0, margin = "0", trend = [], transactions = [] } = stats || {};
+  const { totalSales, totalPurchases, totalExpenses, netCashFlow, trend, transactions } = stats;
 
   return (
     <AppLayout>
@@ -74,7 +81,7 @@ const ProfitLossReport = () => {
               <BreadcrumbSeparator />
               <BreadcrumbItem><BreadcrumbPage className="flex items-center gap-1.5"><BarChart3 className="h-4 w-4 text-orange-400" /><span className="text-orange-600 font-medium">Reports</span></BreadcrumbPage></BreadcrumbItem>
               <BreadcrumbSeparator />
-              <BreadcrumbItem><BreadcrumbPage className="flex items-center gap-1.5"><img src={profitLossIcon} alt="P&L" className="h-5 w-5 object-contain" style={{ mixBlendMode: "multiply" }} /><span className="font-semibold" style={{ color: THEME.primary }}>Profit/Loss Report</span></BreadcrumbPage></BreadcrumbItem>
+              <BreadcrumbItem><BreadcrumbPage className="flex items-center gap-1.5"><img src={profitLossIcon} alt="P&L" className="h-5 w-5 object-contain" style={{ mixBlendMode: "multiply" }} />                  <span className="font-semibold" style={{ color: THEME.primary }}>Financial Summary</span></BreadcrumbPage></BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </motion.div>
@@ -83,9 +90,9 @@ const ProfitLossReport = () => {
           <div className="relative z-10 flex flex-col sm:flex-row sm:justify-between gap-4">
             <div className="space-y-2">
               <h1 className="text-2xl sm:text-4xl font-bold flex items-center gap-3" style={{ color: THEME.primaryDark }}>
-                <img src={profitLossIcon} alt="P&L" className="h-8 w-8 sm:h-10 sm:w-10 object-contain" /> Profit / Loss Report
+                <img src={profitLossIcon} alt="Financial summary" className="h-8 w-8 sm:h-10 sm:w-10 object-contain" /> Financial Summary
               </h1>
-              <p className="text-sm italic" style={{ color: THEME.primary }}>Analyze overall business profitability & trends</p>
+              <p className="text-sm italic" style={{ color: THEME.primary }}>Final invoices, recorded costs, and actual cash movement</p>
             </div>
           </div>
         </motion.div>
@@ -93,10 +100,10 @@ const ProfitLossReport = () => {
         {/* Summary */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { title: "Total Revenue", value: `₹${totalIncome.toLocaleString()}`, icon: TrendingUp, gradient: "from-amber-400 via-yellow-400 to-orange-400" },
-            { title: "Total Costs", value: `₹${totalCost.toLocaleString()}`, icon: TrendingDown, gradient: "from-red-400 via-rose-400 to-pink-400" },
-            { title: "Gross Profit", value: `₹${grossProfit.toLocaleString()}`, icon: DollarSign, gradient: "from-emerald-400 via-green-400 to-teal-400" },
-            { title: "Net Profit Margin", value: `${margin}%`, icon: Percent, gradient: "from-violet-400 via-purple-400 to-indigo-400" },
+            { title: "Final Sales", value: `₹${totalSales.toLocaleString("en-IN")}`, icon: TrendingUp, gradient: "from-amber-400 via-yellow-400 to-orange-400" },
+            { title: "Recorded Purchases", value: `₹${totalPurchases.toLocaleString("en-IN")}`, icon: ShoppingCart, gradient: "from-red-400 via-rose-400 to-pink-400" },
+            { title: "Operating Expenses", value: `₹${totalExpenses.toLocaleString("en-IN")}`, icon: TrendingDown, gradient: "from-emerald-400 via-green-400 to-teal-400" },
+            { title: "Net Cash Flow", value: `₹${netCashFlow.toLocaleString("en-IN")}`, icon: DollarSign, gradient: "from-violet-400 via-purple-400 to-indigo-400" },
           ].map((card) => (
             <div key={card.title} className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.gradient} p-6 min-h-[140px] shadow-lg`}>
               <div className="relative z-10"><h3 className="text-lg font-semibold text-white/90 mb-1">{card.title}</h3><p className="text-2xl font-bold text-white">{card.value}</p></div>
@@ -105,13 +112,17 @@ const ProfitLossReport = () => {
           ))}
         </div>
 
+        <p className="text-sm text-muted-foreground">
+          Net cash flow uses paid invoice amounts, standalone receipts, paid purchases, and expenses. Historical cost of goods sold and receipt-to-invoice links are not stored, so this summary should not be used as accounting profit.
+        </p>
+
         {/* Chart */}
         {trend.length > 0 && (
           <Card className="border-2" style={{ borderColor: THEME.primaryLight }}>
-            <CardHeader><CardTitle style={{ color: THEME.primaryDark }}>Revenue vs Expenses</CardTitle></CardHeader>
+            <CardHeader><CardTitle style={{ color: THEME.primaryDark }}>Cash In vs Cash Out</CardTitle></CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={trend}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="month" /><YAxis /><Tooltip /><Legend /><Bar dataKey="income" fill="#7a8a3a" name="Revenue (₹)" /><Bar dataKey="expense" fill="#e74c3c" name="Expenses (₹)" /></BarChart>
+                <BarChart data={trend}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="month" /><YAxis /><Tooltip /><Legend /><Bar dataKey="income" fill="#7a8a3a" name="Cash In (₹)" /><Bar dataKey="expense" fill="#e74c3c" name="Cash Out (₹)" /></BarChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
@@ -120,7 +131,7 @@ const ProfitLossReport = () => {
         {/* Transactions */}
         <div className="bg-white rounded-xl border-2 shadow-lg overflow-hidden" style={{ borderColor: THEME.primaryLight }}>
           <div className="p-4 border-b-2" style={{ background: `linear-gradient(to right, ${THEME.gradientFrom}, ${THEME.gradientMid})`, borderColor: THEME.primaryLight }}>
-            <h2 className="text-lg font-semibold" style={{ color: THEME.primaryDark }}>Profit & Loss Transactions</h2>
+            <h2 className="text-lg font-semibold" style={{ color: THEME.primaryDark }}>Cash Transactions</h2>
           </div>
           <div className="overflow-x-auto">
             <Table>
@@ -135,7 +146,7 @@ const ProfitLossReport = () => {
               </TableHeader>
               <TableBody>
                 {transactions.length === 0 ? (
-                  <TableRow><TableCell colSpan={5} className="text-center py-8 text-gray-500">No data found</TableCell></TableRow>
+                  <TableRow>                  <TableCell colSpan={5} className="text-center py-8 text-gray-500">{isLoading ? "Loading transactions..." : isError ? "Could not load financial data. Check database access and refresh." : "No cash transactions found."}</TableCell></TableRow>
                 ) : transactions.slice(0, 50).map((t, i) => (
                   <TableRow key={i} className="hover:bg-yellow-50/30">
                     <TableCell>{t.date}</TableCell>

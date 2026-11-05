@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { exportToCSV } from "@/lib/exportUtils";
+import { startOfMonth, startOfQuarter, startOfWeek, startOfYear } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Download, Printer, RefreshCw, Plus, DollarSign, FileText, TrendingUp, Target, BarChart3, Search, Filter, Calendar as CalendarIcon, CreditCard, X, Eye, Edit, Trash2, ChevronLeft, ChevronRight, Hash, Tag, IndianRupee, AlignLeft, Receipt, Settings } from "lucide-react";
+import { Download, Printer, RefreshCw, Plus, DollarSign, FileText, TrendingUp, Target, BarChart3, Search, Filter, Calendar as CalendarIcon, CreditCard, X, Edit, Trash2, ChevronLeft, ChevronRight, Hash, Tag, IndianRupee, AlignLeft, Receipt, Settings } from "lucide-react";
 import { TableHeaderCell } from "@/components/shared/TableHeaderCell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,7 +37,7 @@ const THEME = {
 };
 
 interface Expense {
-  id: number;
+  id: string;
   date: string;
   type: string;
   amount: number;
@@ -54,78 +57,122 @@ const ExpenseActivity = () => {
   const [dateRange, setDateRange] = useState("all");
   const itemsPerPage = 10;
 
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [summaryCards, setSummaryCards] = useState([
-    { title: "Total Expenses (This Month)", value: "₹0", icon: DollarSign, gradient: "from-amber-400 via-yellow-500 to-orange-400" },
-    { title: "No. of Expense Entries", value: "0", icon: FileText, gradient: "from-teal-400 via-cyan-500 to-blue-500" },
-    { title: "Most Frequent Expense Type", value: "-", icon: TrendingUp, gradient: "from-emerald-400 via-green-500 to-teal-500" },
-    { title: "Highest Single Expense", value: "₹0", icon: Target, gradient: "from-rose-400 via-pink-500 to-fuchsia-500" },
-  ]);
+  const queryClient = useQueryClient();
+  const { data: expenses = [], isLoading, isError, refetch } = useQuery({
+    queryKey: ["expenses"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("expenses")
+        .select("id, date, type, amount, payment_mode, description, ref_no")
+        .order("date", { ascending: false });
+      if (error) throw error;
+      return (data || []).map((expense) => ({
+        id: expense.id,
+        date: expense.date,
+        type: expense.type,
+        amount: Number(expense.amount) || 0,
+        paymentMode: expense.payment_mode || "",
+        description: expense.description || "",
+        refNo: expense.ref_no || "",
+      }));
+    },
+  });
 
-  const fetchExpenses = async () => {
-    const { data, error } = await supabase
-      .from('expenses')
-      .select('*')
-      .order('date', { ascending: false });
+  const filteredExpenses = useMemo(() => {
+    const today = new Date();
+    const rangeStart = dateRange === "today" ? today
+      : dateRange === "week" ? startOfWeek(today, { weekStartsOn: 1 })
+      : dateRange === "month" ? startOfMonth(today)
+      : dateRange === "quarter" ? startOfQuarter(today)
+      : dateRange === "year" ? startOfYear(today)
+      : null;
 
-    if (!error && data) {
-      setExpenses(data.map((e, idx) => ({
-        id: idx + 1,
-        date: e.date,
-        type: e.type,
-        amount: Number(e.amount),
-        paymentMode: e.payment_mode || '',
-        description: e.description || '',
-        refNo: e.ref_no || '',
-      })));
-
-      // Update summary
-      const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
-      const monthExpenses = data.filter(e => e.date >= monthStart);
-      const totalMonth = monthExpenses.reduce((sum, e) => sum + Number(e.amount), 0);
-      const highest = data.length > 0 ? Math.max(...data.map(e => Number(e.amount))) : 0;
-      const typeCounts: Record<string, number> = {};
-      data.forEach(e => { typeCounts[e.type] = (typeCounts[e.type] || 0) + 1; });
-      const mostFrequent = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || '-';
-
-      setSummaryCards([
-        { title: "Total Expenses (This Month)", value: `₹${totalMonth.toLocaleString()}`, icon: DollarSign, gradient: "from-amber-400 via-yellow-500 to-orange-400" },
-        { title: "No. of Expense Entries", value: data.length.toString(), icon: FileText, gradient: "from-teal-400 via-cyan-500 to-blue-500" },
-        { title: "Most Frequent Type", value: mostFrequent, icon: TrendingUp, gradient: "from-emerald-400 via-green-500 to-teal-500" },
-        { title: "Highest Single Expense", value: `₹${highest.toLocaleString()}`, icon: Target, gradient: "from-rose-400 via-pink-500 to-fuchsia-500" },
-      ]);
-    }
-  };
+    return expenses.filter((expense) => {
+      const matchesSearch = `${expense.description} ${expense.refNo}`.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesType = expenseType === "all" || expense.type.toLowerCase() === expenseType.toLowerCase();
+      const normalizedMode = expense.paymentMode.toLowerCase().replace(/-/g, "_");
+      const matchesMode = paymentMode === "all" || normalizedMode === paymentMode || (paymentMode === "bank_transfer" && normalizedMode === "bank");
+      const expenseDate = new Date(`${expense.date}T00:00:00`);
+      const matchesDate = !rangeStart || expenseDate >= new Date(rangeStart.getFullYear(), rangeStart.getMonth(), rangeStart.getDate());
+      return matchesSearch && matchesType && matchesMode && matchesDate;
+    });
+  }, [dateRange, expenses, expenseType, paymentMode, searchTerm]);
 
   useEffect(() => {
-    fetchExpenses();
-  }, []);
-  const totalPages = Math.ceil(expenses.length / itemsPerPage);
+    setCurrentPage(1);
+  }, [dateRange, expenseType, paymentMode, searchTerm]);
+
+  const monthStart = startOfMonth(new Date());
+  const monthExpenses = expenses.filter((expense) => new Date(`${expense.date}T00:00:00`) >= monthStart);
+  const totalMonth = monthExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const highest = expenses.reduce((max, expense) => Math.max(max, expense.amount), 0);
+  const typeCounts = expenses.reduce<Record<string, number>>((counts, expense) => {
+    const key = expense.type || "other";
+    counts[key] = (counts[key] || 0) + 1;
+    return counts;
+  }, {});
+  const mostFrequent = Object.entries(typeCounts).sort((left, right) => right[1] - left[1])[0]?.[0] || "-";
+  const summaryCards = [
+    { title: "Total Expenses (This Month)", value: `₹${totalMonth.toLocaleString("en-IN")}`, icon: DollarSign, gradient: "from-amber-400 via-yellow-500 to-orange-400" },
+    { title: "No. of Expense Entries", value: String(expenses.length), icon: FileText, gradient: "from-teal-400 via-cyan-500 to-blue-500" },
+    { title: "Most Frequent Type", value: mostFrequent, icon: TrendingUp, gradient: "from-emerald-400 via-green-500 to-teal-500" },
+    { title: "Highest Single Expense", value: `₹${highest.toLocaleString("en-IN")}`, icon: Target, gradient: "from-rose-400 via-pink-500 to-fuchsia-500" },
+  ];
+
+  const totalPages = Math.max(1, Math.ceil(filteredExpenses.length / itemsPerPage));
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentExpenses = expenses.slice(startIndex, endIndex);
+  const currentExpenses = filteredExpenses.slice(startIndex, endIndex);
+
+  const handleDeleteExpense = async (expense: Expense) => {
+    if (!window.confirm(`Delete expense "${expense.description || expense.type}"?`)) return;
+    const { error } = await supabase.from("expenses").delete().eq("id", expense.id);
+    if (error) {
+      toast.error("Could not delete this expense.");
+      return;
+    }
+    toast.success("Expense deleted.");
+    await queryClient.invalidateQueries({ queryKey: ["expenses"] });
+    await queryClient.invalidateQueries({ queryKey: ["finance-data"] });
+  };
+
+  const handleExport = () => {
+    if (filteredExpenses.length === 0) {
+      toast.error("No expenses to export.");
+      return;
+    }
+    exportToCSV(filteredExpenses.map((expense) => ({
+      Date: expense.date,
+      Type: expense.type,
+      Amount: expense.amount,
+      "Payment Mode": expense.paymentMode,
+      Description: expense.description,
+      Reference: expense.refNo,
+    })), "expenses");
+  };
 
   const getExpenseTypeBadge = (type: string) => {
     const colors: Record<string, { bg: string; text: string }> = {
-      Transport: { bg: '#dcfce7', text: '#166534' },
-      Utilities: { bg: '#dbeafe', text: '#1e40af' },
-      Office: { bg: '#f3e8ff', text: '#6b21a8' },
-      Rent: { bg: '#ffedd5', text: '#9a3412' },
-      Marketing: { bg: '#fce7f3', text: '#9d174d' },
-      Maintenance: { bg: '#fef3c7', text: '#92400e' },
+      transport: { bg: '#dcfce7', text: '#166534' },
+      utilities: { bg: '#dbeafe', text: '#1e40af' },
+      office: { bg: '#f3e8ff', text: '#6b21a8' },
+      rent: { bg: '#ffedd5', text: '#9a3412' },
+      marketing: { bg: '#fce7f3', text: '#9d174d' },
+      maintenance: { bg: '#fef3c7', text: '#92400e' },
     };
-    return colors[type] || { bg: '#f3f4f6', text: '#374151' };
+    return colors[type.toLowerCase()] || { bg: '#f3f4f6', text: '#374151' };
   };
 
   const getPaymentModeBadge = (mode: string) => {
     const colors: Record<string, { bg: string; text: string }> = {
-      UPI: { bg: '#dcfce7', text: '#15803d' },
-      Bank: { bg: '#dbeafe', text: '#1d4ed8' },
-      Cash: { bg: '#fef3c7', text: '#92400e' },
-      Cheque: { bg: '#f3e8ff', text: '#7c3aed' },
-      Card: { bg: '#fce7f3', text: '#be185d' },
+      upi: { bg: '#dcfce7', text: '#15803d' },
+      bank: { bg: '#dbeafe', text: '#1d4ed8' },
+      bank_transfer: { bg: '#dbeafe', text: '#1d4ed8' },
+      cash: { bg: '#fef3c7', text: '#92400e' },
+      cheque: { bg: '#f3e8ff', text: '#7c3aed' },
+      card: { bg: '#fce7f3', text: '#be185d' },
     };
-    return colors[mode] || { bg: '#f3f4f6', text: '#374151' };
+    return colors[mode.toLowerCase().replace(/-/g, "_")] || { bg: '#f3f4f6', text: '#374151' };
   };
 
   const clearFilters = () => {
@@ -224,15 +271,15 @@ const ExpenseActivity = () => {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" style={{ borderColor: THEME.border, color: THEME.primaryDark }}>
+              <Button variant="outline" size="sm" onClick={() => void refetch()} disabled={isLoading} style={{ borderColor: THEME.border, color: THEME.primaryDark }}>
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Refresh
               </Button>
-              <Button variant="outline" size="sm" style={{ borderColor: THEME.border, color: THEME.primaryDark }}>
+              <Button variant="outline" size="sm" onClick={handleExport} style={{ borderColor: THEME.border, color: THEME.primaryDark }}>
                 <Download className="h-4 w-4 mr-2" />
                 Export CSV
               </Button>
-              <Button variant="outline" size="sm" style={{ borderColor: THEME.border, color: THEME.primaryDark }}>
+              <Button variant="outline" size="sm" onClick={() => window.print()} style={{ borderColor: THEME.border, color: THEME.primaryDark }}>
                 <Printer className="h-4 w-4 mr-2" />
                 Print
               </Button>
@@ -332,7 +379,7 @@ const ExpenseActivity = () => {
                       <SelectItem value="all">All Modes</SelectItem>
                       <SelectItem value="cash">Cash</SelectItem>
                       <SelectItem value="upi">UPI</SelectItem>
-                      <SelectItem value="bank">Bank Transfer</SelectItem>
+                      <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
                       <SelectItem value="cheque">Cheque</SelectItem>
                       <SelectItem value="card">Credit/Debit Card</SelectItem>
                     </SelectContent>
@@ -373,7 +420,13 @@ const ExpenseActivity = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {currentExpenses.map((expense, index) => {
+                    {isLoading ? (
+                      <TableRow><TableCell colSpan={8} className="py-8 text-center text-muted-foreground">Loading expenses...</TableCell></TableRow>
+                    ) : isError ? (
+                      <TableRow><TableCell colSpan={8} className="py-8 text-center text-red-600">Could not load expenses. Check database access and refresh.</TableCell></TableRow>
+                    ) : currentExpenses.length === 0 ? (
+                      <TableRow><TableCell colSpan={8} className="py-8 text-center text-gray-500">No expenses match these filters.</TableCell></TableRow>
+                    ) : currentExpenses.map((expense, index) => {
                       const typeColor = getExpenseTypeBadge(expense.type);
                       const pmColor = getPaymentModeBadge(expense.paymentMode);
                       return (
@@ -385,15 +438,14 @@ const ExpenseActivity = () => {
                           </TableCell>
                           <TableCell className="font-semibold" style={{ color: THEME.primaryDark }}>₹{expense.amount.toLocaleString()}</TableCell>
                           <TableCell>
-                            <Badge style={{ backgroundColor: pmColor.bg, color: pmColor.text, border: 'none' }}>{expense.paymentMode}</Badge>
+                            <Badge style={{ backgroundColor: pmColor.bg, color: pmColor.text, border: 'none' }}>{expense.paymentMode.replace(/[_-]/g, " ").replace(/\b\w/g, (character) => character.toUpperCase())}</Badge>
                           </TableCell>
                           <TableCell className="max-w-xs truncate" title={expense.description}>{expense.description}</TableCell>
                           <TableCell className="text-gray-600">{expense.refNo}</TableCell>
                           <TableCell>
                             <div className="flex items-center gap-1">
-                              <Button variant="ghost" size="sm" style={{ color: THEME.primary }}><Eye className="w-4 h-4" /></Button>
                               <Button variant="ghost" size="sm" className="text-blue-600" onClick={() => setEditingExpense(expense)}><Edit className="w-4 h-4" /></Button>
-                              <Button variant="ghost" size="sm" className="text-red-600"><Trash2 className="w-4 h-4" /></Button>
+                              <Button variant="ghost" size="sm" className="text-red-600" onClick={() => void handleDeleteExpense(expense)} aria-label={`Delete expense ${expense.description || expense.type}`}><Trash2 className="w-4 h-4" /></Button>
                             </div>
                           </TableCell>
                         </TableRow>
@@ -406,7 +458,7 @@ const ExpenseActivity = () => {
               {/* Pagination */}
               <div className="flex items-center justify-between p-4" style={{ borderTopColor: THEME.border, borderTopWidth: 1 }}>
                 <div className="text-sm" style={{ color: THEME.primary }}>
-                  Showing {startIndex + 1} to {Math.min(endIndex, expenses.length)} of {expenses.length} entries
+                  Showing {filteredExpenses.length === 0 ? 0 : startIndex + 1} to {Math.min(endIndex, filteredExpenses.length)} of {filteredExpenses.length} entries
                 </div>
                 <div className="flex items-center gap-2">
                   <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1} style={{ borderColor: THEME.border, color: THEME.primaryDark }}>
@@ -454,6 +506,10 @@ const ExpenseActivity = () => {
             }
           }}
           expense={editingExpense}
+          onSaved={() => {
+            void queryClient.invalidateQueries({ queryKey: ["expenses"] });
+            void queryClient.invalidateQueries({ queryKey: ["finance-data"] });
+          }}
         />
       </div>
     </AppLayout>

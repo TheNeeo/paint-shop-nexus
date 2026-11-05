@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import { useEffect } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
@@ -8,6 +8,8 @@ import { PaintChart } from "@/components/dashboard/PaintChart";
 import { WeatherWidget } from "@/components/dashboard/WeatherWidget";
 import { TodoWidget } from "@/components/dashboard/TodoWidget";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { format, startOfMonth, subMonths } from "date-fns";
 import { 
   ShoppingCart, 
   Package, 
@@ -18,7 +20,11 @@ import {
 } from "lucide-react";
 
 const Index = () => {
-  const [stats, setStats] = useState({
+  const queryClient = useQueryClient();
+  const today = format(new Date(), "yyyy-MM-dd");
+  const monthStart = format(startOfMonth(new Date()), "yyyy-MM-dd");
+  const previousMonthStart = format(startOfMonth(subMonths(new Date(), 1)), "yyyy-MM-dd");
+  const initialStats = {
     todaysSales: 0,
     todaysSalesCount: 0,
     totalProducts: 0,
@@ -27,47 +33,55 @@ const Index = () => {
     newCustomersThisMonth: 0,
     monthlyRevenue: 0,
     lowStockCount: 0,
-  });
+    monthlyGrowth: 0,
+  };
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      const today = new Date().toISOString().split('T')[0];
-      const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
-
-      const [todaySalesRes, productsRes, categoriesRes, customersRes, newCustRes, monthSalesRes, lowStockRes] = await Promise.all([
-        supabase.from('sales').select('total_amount').eq('invoice_date', today),
-        supabase.from('products').select('id', { count: 'exact', head: true }).eq('is_variant', false),
-        supabase.from('categories').select('id', { count: 'exact', head: true }),
-        supabase.from('customers').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-        supabase.from('customers').select('id', { count: 'exact', head: true }).gte('created_at', monthStart),
-        supabase.from('sales').select('total_amount').gte('invoice_date', monthStart),
-        supabase.from('products').select('id', { count: 'exact', head: true }).eq('is_variant', false).lt('current_stock', 10),
+  const { data: stats = initialStats, isError: statsError } = useQuery({
+    queryKey: ["dashboard-stats", today, monthStart],
+    queryFn: async () => {
+      const [todaySalesRes, productsRes, categoriesRes, customersRes, newCustomersRes, monthSalesRes, previousMonthSalesRes] = await Promise.all([
+        supabase.from("sales").select("total_amount").eq("status", "final").eq("invoice_date", today),
+        supabase.from("products").select("id, current_stock, threshold_qty", { count: "exact" }).eq("is_variant", false),
+        supabase.from("categories").select("id", { count: "exact", head: true }),
+        supabase.from("customers").select("id", { count: "exact", head: true }).eq("status", "active"),
+        supabase.from("customers").select("id", { count: "exact", head: true }).gte("created_at", monthStart),
+        supabase.from("sales").select("total_amount").eq("status", "final").gte("invoice_date", monthStart),
+        supabase.from("sales").select("total_amount").eq("status", "final").gte("invoice_date", previousMonthStart).lt("invoice_date", monthStart),
       ]);
+      const failedResult = [todaySalesRes, productsRes, categoriesRes, customersRes, newCustomersRes, monthSalesRes, previousMonthSalesRes].find((result) => result.error);
+      if (failedResult?.error) throw failedResult.error;
 
-      setStats({
-        todaysSales: todaySalesRes.data?.reduce((sum, s) => sum + Number(s.total_amount), 0) || 0,
+      const monthlyRevenue = monthSalesRes.data?.reduce((sum, sale) => sum + Number(sale.total_amount || 0), 0) || 0;
+      const previousMonthRevenue = previousMonthSalesRes.data?.reduce((sum, sale) => sum + Number(sale.total_amount || 0), 0) || 0;
+      const todaysSales = todaySalesRes.data?.reduce((sum, sale) => sum + Number(sale.total_amount || 0), 0) || 0;
+
+      return {
+        todaysSales,
         todaysSalesCount: todaySalesRes.data?.length || 0,
         totalProducts: productsRes.count || 0,
         totalCategories: categoriesRes.count || 0,
         activeCustomers: customersRes.count || 0,
-        newCustomersThisMonth: newCustRes.count || 0,
-        monthlyRevenue: monthSalesRes.data?.reduce((sum, s) => sum + Number(s.total_amount), 0) || 0,
-        lowStockCount: lowStockRes.count || 0,
-      });
+        newCustomersThisMonth: newCustomersRes.count || 0,
+        monthlyRevenue,
+        lowStockCount: productsRes.data?.filter((product) => Number(product.current_stock || 0) <= Number(product.threshold_qty ?? 10)).length || 0,
+        monthlyGrowth: previousMonthRevenue > 0 ? ((monthlyRevenue - previousMonthRevenue) / previousMonthRevenue) * 100 : 0,
+      };
+    },
+  });
+
+  useEffect(() => {
+    const refreshDashboard = () => {
+      void queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
     };
-
-    fetchStats();
-
-    // Realtime updates
     const channel = supabase
-      .channel('dashboard-stats')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'sales' }, fetchStats)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, fetchStats)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'customers' }, fetchStats)
+      .channel("dashboard-stats")
+      .on("postgres_changes", { event: "*", schema: "public", table: "sales" }, refreshDashboard)
+      .on("postgres_changes", { event: "*", schema: "public", table: "products" }, refreshDashboard)
+      .on("postgres_changes", { event: "*", schema: "public", table: "customers" }, refreshDashboard)
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
-  }, []);
+    return () => { void supabase.removeChannel(channel); };
+  }, [queryClient]);
 
   return (
     <AppLayout>
@@ -77,6 +91,7 @@ const Index = () => {
             Welcome to <span className="text-primary">NEO COLOR FACTORY</span>
           </h1>
           <p className="text-muted-foreground">Your complete paint shop management dashboard</p>
+          {statsError && <p role="alert" className="text-sm text-destructive">Dashboard figures could not be loaded. Check database access and refresh.</p>}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -143,9 +158,9 @@ const Index = () => {
               />
               <DashboardCard
                 title="Growth"
-                value="+18%"
+                value={`${stats.monthlyGrowth >= 0 ? "+" : ""}${stats.monthlyGrowth.toFixed(1)}%`}
                 icon={TrendingUp}
-                description="vs last month"
+                description="vs previous month"
                 gradient="from-teal-400/20 to-teal-600/10"
                 iconColor="from-teal-400 to-teal-600"
                 className="p-4"

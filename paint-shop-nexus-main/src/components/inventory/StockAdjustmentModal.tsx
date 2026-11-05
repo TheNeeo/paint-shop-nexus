@@ -109,27 +109,40 @@ export function StockAdjustmentModal({ isOpen, onClose, product }: StockAdjustme
 
       const quantityChange = adjustmentType === "increase" ? quantity : -quantity;
       const calculatedNewStock = product.current_stock + quantityChange;
+      const { data: stockUpdate, error: updateError } = await supabase
+        .from("products")
+        .update({ current_stock: calculatedNewStock })
+        .eq("id", product.id)
+        .eq("current_stock", product.current_stock)
+        .select("id")
+        .maybeSingle();
 
-      // Insert stock adjustment record
+      if (updateError) throw updateError;
+      if (!stockUpdate) throw new Error("Stock changed in another session. Refresh and try again.");
+
       const { error: adjustmentError } = await supabase
         .from("stock_adjustments")
-        .insert([{
+        .insert({
           product_id: product.id,
           adjustment_type: adjustmentType,
           quantity: quantityChange,
-          reason: `${reasonCode}: ${notes.trim() || 'N/A'}`,
-          created_by_user_id: user.id
-        }]);
+          reason: `${reasonCode}: ${notes.trim() || "N/A"}`,
+          created_by_user_id: user.id,
+        });
 
-      if (adjustmentError) throw adjustmentError;
-
-      // Update product stock
-      const { error: updateError } = await supabase
-        .from("products")
-        .update({ current_stock: calculatedNewStock })
-        .eq("id", product.id);
-
-      if (updateError) throw updateError;
+      if (adjustmentError) {
+        const { data: rollback, error: rollbackError } = await supabase
+          .from("products")
+          .update({ current_stock: product.current_stock })
+          .eq("id", product.id)
+          .eq("current_stock", calculatedNewStock)
+          .select("id")
+          .maybeSingle();
+        if (rollbackError || !rollback) {
+          throw new Error("The adjustment log failed and stock could not be restored automatically. Refresh and inspect this product before retrying.");
+        }
+        throw adjustmentError;
+      }
 
       toast({
         title: "Success",

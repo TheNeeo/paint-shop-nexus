@@ -2,71 +2,131 @@ import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { CalendarIcon, Save, X, Clock, Tag, FileText, IndianRupee, CreditCard, Hash, User, Package, Layers, MessageSquare, Info } from "lucide-react";
+import { CalendarIcon, Save, X, Tag, FileText, IndianRupee, CreditCard, Hash, User, MessageSquare, Info, Receipt } from "lucide-react";
 import { FormSectionHeader } from "@/components/shared/FormSectionHeader";
 import { FormFieldLabel } from "@/components/shared/FormFieldLabel";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface AddNewTransactionModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSaved?: () => void;
 }
+
+type TransactionForm = {
+  date: string;
+  type: "" | "Expense" | "Receipt";
+  expenseType: string;
+  description: string;
+  amount: string;
+  paymentMode: string;
+  invoiceNo: string;
+  customerName: string;
+  notes: string;
+};
+
+const createEmptyForm = (): TransactionForm => ({
+  date: new Date().toISOString().slice(0, 10),
+  type: "",
+  expenseType: "other",
+  description: "",
+  amount: "",
+  paymentMode: "",
+  invoiceNo: "",
+  customerName: "",
+  notes: "",
+});
 
 const AddNewTransactionModal: React.FC<AddNewTransactionModalProps> = ({
   open,
   onOpenChange,
+  onSaved,
 }) => {
-  const [formData, setFormData] = useState({
-    date: new Date().toISOString().split('T')[0],
-    time: new Date().toTimeString().slice(0, 5),
-    type: "",
-    description: "",
-    amount: "",
-    paymentMode: "",
-    invoiceNo: "",
-    customerName: "",
-    productName: "",
-    unit: "",
-    notes: "",
-  });
+  const [formData, setFormData] = useState<TransactionForm>(createEmptyForm);
+  const [saving, setSaving] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission here
-    console.log("Transaction Data:", formData);
-    onOpenChange(false);
-    // Reset form
-    setFormData({
-      date: new Date().toISOString().split('T')[0],
-      time: new Date().toTimeString().slice(0, 5),
-      type: "",
-      description: "",
-      amount: "",
-      paymentMode: "",
-      invoiceNo: "",
-      customerName: "",
-      productName: "",
-      unit: "",
-      notes: "",
-    });
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const amount = Number(formData.amount);
+
+    if (!formData.type || !Number.isFinite(amount) || amount <= 0 || !formData.paymentMode) {
+      toast.error("Choose a transaction type, payment mode, and a positive amount.");
+      return;
+    }
+
+    if (formData.type === "Receipt" && !formData.customerName.trim()) {
+      toast.error("Enter who paid this receipt.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError) throw authError;
+      if (!user) throw new Error("Sign in before adding a transaction.");
+
+      if (formData.type === "Receipt") {
+        const noteParts = [
+          formData.invoiceNo.trim() ? `Reference: ${formData.invoiceNo.trim()}` : "",
+          formData.notes.trim(),
+        ].filter(Boolean);
+        const { error } = await supabase.from("cash_receipts").insert({
+          receipt_no: `CR-${Date.now().toString().slice(-8)}`,
+          receipt_date: formData.date,
+          payer_name: formData.customerName.trim(),
+          amount,
+          payment_mode: formData.paymentMode,
+          reason: formData.description.trim(),
+          notes: noteParts.join("\n") || null,
+          created_by_user_id: user.id,
+        });
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("expenses").insert({
+          date: formData.date,
+          type: formData.expenseType,
+          amount,
+          payment_mode: formData.paymentMode,
+          description: formData.description.trim(),
+          ref_no: formData.invoiceNo.trim() || null,
+          created_by_user_id: user.id,
+        });
+        if (error) throw error;
+      }
+
+      toast.success(`${formData.type} saved.`);
+      onSaved?.();
+      setFormData(createEmptyForm());
+      onOpenChange(false);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not save this transaction.");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleChange = <K extends keyof TransactionForm>(field: K, value: TransactionForm[K]) => {
+    setFormData((current) => ({ ...current, [field]: value }));
+  };
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) setFormData(createEmptyForm());
+    onOpenChange(nextOpen);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader className="border-b border-coral-200 pb-4">
           <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
             <div className="p-2 bg-coral-100 rounded-lg">
-              <CalendarIcon className="h-5 w-5" style={{ color: '#F56E75' }} />
+              <CalendarIcon className="h-5 w-5 text-rose-500" />
             </div>
-            Add New Transaction
+            Add Cash Transaction
           </DialogTitle>
         </DialogHeader>
 
@@ -75,30 +135,38 @@ const AddNewTransactionModal: React.FC<AddNewTransactionModalProps> = ({
           <Card className="border-coral-200/30">
             <CardContent className="p-4">
               <FormSectionHeader icon={Info} title="Basic Information" color="rose" />
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <FormFieldLabel icon={CalendarIcon} label="Date" htmlFor="date" required color="blue" />
-                  <Input id="date" type="date" value={formData.date} onChange={(e) => handleChange('date', e.target.value)} className="border-coral-200 focus:border-coral-400" required />
+                  <FormFieldLabel icon={CalendarIcon} label="Date" htmlFor="transaction-date" required color="blue" />
+                  <Input id="transaction-date" type="date" value={formData.date} onChange={(event) => handleChange("date", event.target.value)} required />
                 </div>
                 <div>
-                  <FormFieldLabel icon={Clock} label="Time" htmlFor="time" required color="cyan" />
-                  <Input id="time" type="time" value={formData.time} onChange={(e) => handleChange('time', e.target.value)} className="border-coral-200 focus:border-coral-400" required />
-                </div>
-                <div>
-                  <FormFieldLabel icon={Tag} label="Transaction Type" htmlFor="type" required color="purple" />
-                  <Select value={formData.type} onValueChange={(value) => handleChange('type', value)}>
-                    <SelectTrigger className="border-coral-200 focus:border-coral-400">
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
+                  <FormFieldLabel icon={Tag} label="Transaction Type" required color="purple" />
+                  <Select value={formData.type} onValueChange={(value) => handleChange("type", value as TransactionForm["type"])}>
+                    <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Sale">Sale</SelectItem>
-                      <SelectItem value="Purchase">Purchase</SelectItem>
-                      <SelectItem value="Expense">Expense</SelectItem>
-                      <SelectItem value="Receipt">Receipt</SelectItem>
-                      <SelectItem value="Adjustment">Adjustment</SelectItem>
+                      <SelectItem value="Receipt">Receipt / Money In</SelectItem>
+                      <SelectItem value="Expense">Expense / Money Out</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
+                {formData.type === "Expense" && (
+                  <div>
+                    <FormFieldLabel icon={Tag} label="Expense Category" required color="amber" />
+                    <Select value={formData.expenseType} onValueChange={(value) => handleChange("expenseType", value)}>
+                      <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="rent">Rent</SelectItem>
+                        <SelectItem value="utilities">Utilities</SelectItem>
+                        <SelectItem value="transport">Transport</SelectItem>
+                        <SelectItem value="office">Office Supplies</SelectItem>
+                        <SelectItem value="marketing">Marketing</SelectItem>
+                        <SelectItem value="maintenance">Maintenance</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -109,24 +177,23 @@ const AddNewTransactionModal: React.FC<AddNewTransactionModalProps> = ({
               <FormSectionHeader icon={FileText} title="Transaction Details" color="emerald" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
-                  <FormFieldLabel icon={FileText} label="Description" htmlFor="description" required color="emerald" />
-                  <Input id="description" value={formData.description} onChange={(e) => handleChange('description', e.target.value)} className="border-coral-200 focus:border-coral-400" placeholder="Transaction description" required />
+                  <FormFieldLabel icon={FileText} label="Description / Reason" htmlFor="transaction-description" required color="emerald" />
+                  <Input id="transaction-description" value={formData.description} onChange={(event) => handleChange("description", event.target.value)} placeholder="What was this transaction for?" required />
                 </div>
                 <div>
-                  <FormFieldLabel icon={IndianRupee} label="Amount (₹)" htmlFor="amount" required color="amber" />
-                  <Input id="amount" type="number" value={formData.amount} onChange={(e) => handleChange('amount', e.target.value)} className="border-coral-200 focus:border-coral-400" placeholder="0.00" step="0.01" min="0" required />
+                  <FormFieldLabel icon={IndianRupee} label="Amount (₹)" htmlFor="transaction-amount" required color="amber" />
+                  <Input id="transaction-amount" type="number" value={formData.amount} onChange={(event) => handleChange("amount", event.target.value)} placeholder="0.00" step="0.01" min="0.01" required />
                 </div>
                 <div>
-                  <FormFieldLabel icon={CreditCard} label="Payment Mode" htmlFor="paymentMode" color="purple" />
-                  <Select value={formData.paymentMode} onValueChange={(value) => handleChange('paymentMode', value)}>
-                    <SelectTrigger className="border-coral-200 focus:border-coral-400">
-                      <SelectValue placeholder="Select payment mode" />
-                    </SelectTrigger>
+                  <FormFieldLabel icon={CreditCard} label="Payment Mode" required color="purple" />
+                  <Select value={formData.paymentMode} onValueChange={(value) => handleChange("paymentMode", value)}>
+                    <SelectTrigger><SelectValue placeholder="Select payment mode" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Cash">Cash</SelectItem>
-                      <SelectItem value="UPI">UPI</SelectItem>
-                      <SelectItem value="Account Transfer">Account Transfer</SelectItem>
-                      <SelectItem value="Cheque">Cheque</SelectItem>
+                      <SelectItem value="cash">Cash</SelectItem>
+                      <SelectItem value="upi">UPI</SelectItem>
+                      <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                      <SelectItem value="cheque">Cheque</SelectItem>
+                      <SelectItem value="card">Card</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -137,27 +204,21 @@ const AddNewTransactionModal: React.FC<AddNewTransactionModalProps> = ({
           {/* Additional Information */}
           <Card className="border-coral-200/30">
             <CardContent className="p-4">
-              <FormSectionHeader icon={Layers} title="Additional Information" color="indigo" />
+              <FormSectionHeader icon={Receipt} title="Additional Information" color="indigo" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <FormFieldLabel icon={Hash} label="Invoice/Bill Number" htmlFor="invoiceNo" color="indigo" />
-                  <Input id="invoiceNo" value={formData.invoiceNo} onChange={(e) => handleChange('invoiceNo', e.target.value)} className="border-coral-200 focus:border-coral-400" placeholder="INV-001" />
-                </div>
-                <div>
-                  <FormFieldLabel icon={User} label="Customer/Vendor Name" htmlFor="customerName" color="blue" />
-                  <Input id="customerName" value={formData.customerName} onChange={(e) => handleChange('customerName', e.target.value)} className="border-coral-200 focus:border-coral-400" placeholder="Enter name" />
-                </div>
-                <div>
-                  <FormFieldLabel icon={Package} label="Product/Service" htmlFor="productName" color="emerald" />
-                  <Input id="productName" value={formData.productName} onChange={(e) => handleChange('productName', e.target.value)} className="border-coral-200 focus:border-coral-400" placeholder="Product or service name" />
-                </div>
-                <div>
-                  <FormFieldLabel icon={Tag} label="Unit/Quantity" htmlFor="unit" color="cyan" />
-                  <Input id="unit" value={formData.unit} onChange={(e) => handleChange('unit', e.target.value)} className="border-coral-200 focus:border-coral-400" placeholder="e.g., 10L, 5 pieces" />
+                {formData.type === "Receipt" && (
+                  <div>
+                    <FormFieldLabel icon={User} label="Payer Name" htmlFor="payer-name" required color="blue" />
+                    <Input id="payer-name" value={formData.customerName} onChange={(event) => handleChange("customerName", event.target.value)} placeholder="Who paid?" required />
+                  </div>
+                )}
+                <div className={formData.type === "Receipt" ? "" : "md:col-span-2"}>
+                  <FormFieldLabel icon={Hash} label="Reference / Bill Number" htmlFor="transaction-reference" color="indigo" />
+                  <Input id="transaction-reference" value={formData.invoiceNo} onChange={(event) => handleChange("invoiceNo", event.target.value)} placeholder="Optional reference" />
                 </div>
                 <div className="md:col-span-2">
-                  <FormFieldLabel icon={MessageSquare} label="Notes" htmlFor="notes" color="slate" />
-                  <Textarea id="notes" value={formData.notes} onChange={(e) => handleChange('notes', e.target.value)} className="border-coral-200 focus:border-coral-400 min-h-[80px]" placeholder="Add any additional notes or remarks..." />
+                  <FormFieldLabel icon={MessageSquare} label="Notes" htmlFor="transaction-notes" color="slate" />
+                  <Textarea id="transaction-notes" value={formData.notes} onChange={(event) => handleChange("notes", event.target.value)} className="min-h-[80px]" placeholder="Optional notes" />
                 </div>
               </div>
             </CardContent>
@@ -165,21 +226,13 @@ const AddNewTransactionModal: React.FC<AddNewTransactionModalProps> = ({
 
           {/* Form Actions */}
           <div className="flex justify-end gap-3 pt-4 border-t border-coral-200">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              className="border-coral-200 text-coral-700 hover:bg-coral-50"
-            >
+            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)} disabled={saving}>
               <X className="h-4 w-4 mr-2" />
               Cancel
             </Button>
-            <Button
-              type="submit"
-              className="bg-coral-500 hover:bg-coral-600 text-white"
-            >
+            <Button type="submit" disabled={saving} className="bg-coral-500 hover:bg-coral-600 text-white">
               <Save className="h-4 w-4 mr-2" />
-              Save Transaction
+              {saving ? "Saving..." : "Save Transaction"}
             </Button>
           </div>
         </form>
