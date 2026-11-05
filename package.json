@@ -1,0 +1,13 @@
+{
+  "name": "paint-shop-nexus-preview",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "paint-shop-nexus-main"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=vite_react_shadcn_ts -- --host 0.0.0.0",
+    "build": "npm run build --workspace=vite_react_shadcn_ts",
+    "lint": "npm run lint --workspace=vite_react_shadcn_ts"
+  }
+}
