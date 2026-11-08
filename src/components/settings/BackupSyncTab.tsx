@@ -9,15 +9,17 @@ import { Database, Download, Upload, Clock, CheckCircle, AlertCircle } from "luc
 import { useBackupSettings } from "@/hooks/useAppSettings";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import JSZip from "jszip";
 
 const TABLES = ["customers", "vendors", "products", "categories", "sales", "sale_items", "purchases", "purchase_items", "expenses", "cash_receipts", "stock_adjustments"] as const;
+const LOCAL_SETTINGS = ["ncf_shop_info", "ncf_invoice_settings", "ncf_theme_settings", "ncf_ui_settings", "ncf_invoice_counter"] as const;
 
 export default function BackupSyncTab() {
   const [s, setS] = useBackupSettings();
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  const exportData = async (format: "json" | "csv") => {
+  const exportData = async (format: "json" | "csv" | "zip") => {
     setBusy(true);
     setProgress(5);
     try {
@@ -28,13 +30,13 @@ export default function BackupSyncTab() {
         if (error) throw error;
         dump[t] = data || [];
         i++;
-        setProgress(Math.round((i / TABLES.length) * 100));
+        setProgress(Math.round((i / TABLES.length) * (format === "zip" ? 65 : 100)));
       }
       const ts = new Date().toISOString().replace(/[:.]/g, "-");
       if (format === "json") {
         const blob = new Blob([JSON.stringify(dump, null, 2)], { type: "application/json" });
         triggerDownload(blob, `backup-${ts}.json`);
-      } else {
+      } else if (format === "csv") {
         // CSV: zip-like text per table joined
         const parts: string[] = [];
         Object.entries(dump).forEach(([table, rows]) => {
@@ -47,6 +49,36 @@ export default function BackupSyncTab() {
         });
         const blob = new Blob([parts.join("\n")], { type: "text/csv" });
         triggerDownload(blob, `backup-${ts}.csv`);
+      } else {
+        const archive = new JSZip();
+        const dataFolder = archive.folder("business-data");
+        Object.entries(dump).forEach(([table, rows]) => {
+          dataFolder?.file(`${table}.json`, JSON.stringify(rows, null, 2));
+          const headers = rows.length ? Object.keys(rows[0]) : [];
+          const csv = [headers.join(","), ...rows.map((row) => headers.map((header) => csvCell(row[header])).join(","))].join("\n");
+          dataFolder?.file(`${table}.csv`, csv);
+        });
+
+        const settingsFolder = archive.folder("device-settings");
+        LOCAL_SETTINGS.forEach((key) => {
+          const value = localStorage.getItem(key);
+          if (value === null) return;
+          let parsed: unknown = value;
+          try { parsed = JSON.parse(value); } catch { /* keep plain text values as-is */ }
+          settingsFolder?.file(`${key}.json`, JSON.stringify(parsed, null, 2));
+        });
+        archive.file("README.txt", [
+          "NEO COLOR FACTORY backup",
+          `Created: ${new Date().toLocaleString("en-IN")}`,
+          "Business data was exported from Lovable Cloud using your signed-in account's access.",
+          "Device settings were read from this browser and may not be shared across devices.",
+          "Uploaded photos and bill files remain in Cloud storage and are not included in this archive.",
+        ].join("\n"));
+
+        const blob = await archive.generateAsync({ type: "blob" }, (metadata) => {
+          setProgress(65 + Math.round(metadata.percent * 0.35));
+        });
+        triggerDownload(blob, `neo-color-factory-backup-${ts}.zip`);
       }
       setS({ ...s, lastSync: new Date().toLocaleString("en-IN") });
       toast.success("Backup downloaded");
@@ -89,10 +121,13 @@ export default function BackupSyncTab() {
         <CardContent className="space-y-4 pt-6">
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div>
-              <p>Download your data as JSON or CSV files</p>
-              <p className="text-sm text-muted-foreground">Includes all products, sales, customers, and settings</p>
+              <p>Download your business records and settings</p>
+              <p className="text-sm text-muted-foreground">ZIP includes Cloud records and this browser’s settings; uploaded photos and bill files stay in Cloud storage.</p>
             </div>
-            <div className="flex space-x-2">
+            <div className="flex flex-wrap gap-2">
+              <Button onClick={() => exportData("zip")} disabled={busy}>
+                {busy ? "Creating..." : "Backup ZIP"}
+              </Button>
               <Button variant="outline" onClick={() => exportData("json")} disabled={busy}>
                 {busy ? "Creating..." : "Backup JSON"}
               </Button>
@@ -131,8 +166,8 @@ export default function BackupSyncTab() {
             </Alert>
           )}
           <div className="flex space-x-3">
-            <Button onClick={() => exportData("json")} disabled={busy}>Sync Now</Button>
-            <Button variant="outline" onClick={() => exportData("json")} disabled={busy}>Export Full Data</Button>
+            <Button onClick={() => exportData("zip")} disabled={busy}>Download ZIP</Button>
+            <Button variant="outline" onClick={() => exportData("json")} disabled={busy}>Export JSON</Button>
           </div>
         </CardContent>
       </Card>
