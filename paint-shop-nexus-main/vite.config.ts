@@ -10,6 +10,8 @@ export default defineConfig(({ mode }) => ({
     port: 3000,
     allowedHosts: true,
   },
+  envDir: path.resolve(__dirname, ".."),
+  envPrefix: ["VITE_", "NEXT_PUBLIC_"],
   plugins: [
     react(),
     mode === 'development' &&
