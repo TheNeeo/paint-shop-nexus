@@ -56,7 +56,7 @@ export function TreeNode({ item, level, expandedItems, onToggle, onAction, colla
           collapsed && level === 0 ? "h-9 w-9" : "h-10 w-10"
         )}
       >
-        <Icon3D label={item.title} className={level === 0 ? "h-10 w-10" : "h-8 w-8"} />
+        <Icon3D name={item.icon3d} className={level === 0 ? "h-10 w-10" : "h-8 w-8"} />
       </div>
 
       {/* Title */}
