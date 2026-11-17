@@ -572,6 +572,17 @@
 
 /* Reference-inspired sculpted surfaces. Print documents and auth remain independent. */
 :root {
+  --nav-icon-green: 142 69% 58%;
+  --nav-icon-blue: 213 94% 68%;
+  --nav-icon-purple: 270 95% 75%;
+  --nav-icon-indigo: 234 89% 74%;
+  --nav-icon-kelly: 88 52% 49%;
+  --nav-icon-pink: 330 86% 71%;
+  --nav-icon-emerald: 158 64% 52%;
+  --nav-icon-slate: 215 20% 65%;
+  --nav-icon-orange: 27 96% 65%;
+  --nav-icon-coral: 357 88% 67%;
+  --nav-icon-gray: 220 9% 64%;
   --neo-canvas: 195 20% 90%;
   --neo-surface: 195 23% 96%;
   --neo-highlight: 0 0% 100%;
@@ -609,6 +620,17 @@
 .neo-nav-item { white-space: normal; text-align: left; }
 .neo-nav-active { background: var(--neo-nav-gradient); box-shadow: var(--neo-raised); }
 .neo-nav-icon { background: hsl(var(--sidebar-accent) / .6); box-shadow: inset 1px 1px 2px hsl(var(--neo-highlight) / .18), 2px 3px 5px hsl(var(--neo-shade) / .15); }
+.neo-nav-sub-icon-green { color: hsl(var(--nav-icon-green)); }
+.neo-nav-sub-icon-blue { color: hsl(var(--nav-icon-blue)); }
+.neo-nav-sub-icon-purple { color: hsl(var(--nav-icon-purple)); }
+.neo-nav-sub-icon-indigo { color: hsl(var(--nav-icon-indigo)); }
+.neo-nav-sub-icon-kelly { color: hsl(var(--nav-icon-kelly)); }
+.neo-nav-sub-icon-pink { color: hsl(var(--nav-icon-pink)); }
+.neo-nav-sub-icon-emerald { color: hsl(var(--nav-icon-emerald)); }
+.neo-nav-sub-icon-slate { color: hsl(var(--nav-icon-slate)); }
+.neo-nav-sub-icon-orange { color: hsl(var(--nav-icon-orange)); }
+.neo-nav-sub-icon-coral { color: hsl(var(--nav-icon-coral)); }
+.neo-nav-sub-icon-gray { color: hsl(var(--nav-icon-gray)); }
 .neo-icon-3d { filter: drop-shadow(var(--neo-icon-shadow)); transition: transform var(--app-anim-duration, .3s) ease; }
 .neo-nav-item:hover .neo-icon-3d, .neo-stat:hover .neo-icon-3d { transform: translateY(-3px) rotate(-5deg); }
 .neo-profile { background: var(--neo-sidebar-gradient); box-shadow: var(--neo-sidebar-shadow); }

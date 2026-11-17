@@ -57,7 +57,10 @@ export function TreeNode({ item, level, expandedItems, onToggle, onAction, colla
         )}
       >
         {level > 0 && item.icon ? (
-          <item.icon aria-hidden="true" className="h-5 w-5" />
+          <item.icon
+            aria-hidden="true"
+            className={cn("h-5 w-5", item.iconColor && `neo-nav-sub-icon-${item.iconColor}`)}
+          />
         ) : (
           <Icon3D name={item.icon3d} className="h-10 w-10" />
         )}
